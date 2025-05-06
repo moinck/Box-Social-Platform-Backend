@@ -5,7 +5,7 @@ $customizerHidden = 'customizer-hide';
 
 @extends('layouts/layoutMaster')
 
-@section('title', 'Login Basic - Pages')
+@section('title', 'Login Page')
 
 @section('vendor-style')
 @vite([
@@ -44,61 +44,68 @@ $customizerHidden = 'customizer-hide';
         <div class="app-brand justify-content-center mt-5">
           <a href="{{url('/')}}" class="app-brand-link gap-2">
             <span class="app-brand-logo demo">@include('_partials.macros',["width"=>25,"withbg"=>'var(--bs-primary)'])</span>
-            <span class="app-brand-text demo text-heading fw-semibold">{{config('variables.templateName')}}</span>
+            <span class="app-brand-text demo text-heading fw-semibold">{{config('app.name')}}</span>
           </a>
         </div>
         <!-- /Logo -->
 
         <div class="card-body mt-1">
-          <h4 class="mb-1">Welcome to {{config('variables.templateName')}}! 👋</h4>
-          <p class="mb-5">Please sign-in to your account and start the adventure</p>
-
-          <form id="formAuthentication" class="mb-5" action="{{url('login')}}" method="POST">
-            @csrf
-            <div class="form-floating form-floating-outline mb-5">
-              <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email or username" autofocus>
-              @if($errors->has('email'))
-                  <div class="error">{{ $errors->first('email') }}</div>
-              @endif
-              @if (session('email-err-msg'))
-                    <div class="alert alert-danger" id="email-err-msg">
-                        {{ session('email-err-msg') }}
-                    </div>
-                @endif
-              <label for="email">Email or Username</label>
-            </div>
-            <div class="mb-5">
-              <div class="form-password-toggle">
-                <div class="input-group input-group-merge">
-                  <div class="form-floating form-floating-outline">
-                    @if($errors->has('password'))
-                        <div class="error">{{ $errors->first('password') }}</div>
-                    @endif
-
-                    <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
-                    <label for="password">Password</label>
-                  </div>
-                  <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line"></i></span>
+            <h4 class="mb-1">Welcome to {{config('app.name')}}! 👋</h4>
+            <p class="mb-5">Please sign-in to your account and start the adventure</p>
+            @if (session('email-err-msg'))
+                <div class="alert alert-danger" id="email-err-msg">
+                    {{ session('email-err-msg') }}
                 </div>
-              </div>
-            </div>
-            <div class="mb-5 d-flex justify-content-between mt-5">
-              <div class="form-check mt-2">
-                <input class="form-check-input" type="checkbox" id="remember-me">
-                <label class="form-check-label" for="remember-me">
-                  Remember Me
-                </label>
-              </div>
-              <a href="{{url('auth/forgot-password-basic')}}" class="float-end mb-1 mt-2">
-                <span>Forgot Password?</span>
-              </a>
-            </div>
-            <div class="mb-5">
-              <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
-            </div>
-          </form>
+            @endif
 
-          <p class="text-center">
+            {{-- login Form --}}
+            <form id="formAuthentication" class="mb-5" action="{{ url('login') }}" method="POST">
+                @csrf
+
+                {{-- Email --}}
+                <div class="form-floating form-floating-outline mb-5">
+                    <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email or username" autofocus>
+                    @if($errors->has('email'))
+                        <div class="error">{{ $errors->first('email') }}</div>
+                    @endif
+                    <label for="email">Email or Username</label>
+                </div>
+
+                {{-- Password --}}
+                <div class="mb-5">
+                    <div class="form-password-toggle">
+                        <div class="input-group input-group-merge">
+                            <div class="form-floating form-floating-outline">              
+                                <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
+                                <label for="password">Password</label>
+                            </div>
+                            <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line"></i></span>
+                        </div>
+                        @if($errors->has('password'))
+                            <div class="error">{{ $errors->first('password') }}</div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Remember Me --}}
+                <div class="mb-5 d-flex justify-content-between mt-5">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" name="remember" type="checkbox" id="remember-me">
+                        <label class="form-check-label" for="remember-me">
+                        Remember Me
+                        </label>
+                    </div>
+                {{-- <a href="{{url('auth/forgot-password-basic')}}" class="float-end mb-1 mt-2">
+                    <span>Forgot Password?</span>
+                </a> --}}
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                </div>
+            </form>
+
+          {{-- <p class="text-center">
             <span>New on our platform?</span>
             <a href="{{url('auth/register-basic')}}">
               <span>Create an account</span>
@@ -125,7 +132,7 @@ $customizerHidden = 'customizer-hide';
             <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
               <i class="tf-icons ri-google-fill"></i>
             </a>
-          </div>
+          </div> --}}
         </div>
       </div>
       <!-- /Login -->

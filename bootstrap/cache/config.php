@@ -6,7 +6,7 @@
   14 => 'hashing',
   'app' => 
   array (
-    'name' => 'Box-Social-Platform',
+    'name' => 'Box-Social',
     'env' => 'local',
     'debug' => true,
     'url' => 'http://127.0.0.1:8003',
@@ -169,7 +169,7 @@
         'driver' => 'octane',
       ),
     ),
-    'prefix' => 'box_social_platform_cache_',
+    'prefix' => 'box_social_cache_',
   ),
   'custom' => 
   array (
@@ -294,7 +294,7 @@
       'options' => 
       array (
         'cluster' => 'redis',
-        'prefix' => 'box_social_platform_database_',
+        'prefix' => 'box_social_database_',
       ),
       'default' => 
       array (
@@ -651,7 +651,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'box_social_platform_session',
+    'cookie' => 'box_social_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => NULL,
