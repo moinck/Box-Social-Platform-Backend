@@ -1,0 +1,10 @@
+{
+  "menu": [
+    {
+      "url": "/home",
+      "name": "User Management",
+      "icon": "menu-icon tf-icons ri-home-smile-line",
+      "slug": "pages-home"
+    }
+  ]
+}
