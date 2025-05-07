@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
 use App\Http\Controllers\pages\HomePage;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
     Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
     Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
+
+    // Users Controller
+    Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
+    Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
 
     Route::post('logout', [LoginController::class, 'logout'])
     ->name('logout');
