@@ -27,9 +27,16 @@ class LoginController extends Controller
         ]);
 
         // Check if the user exists
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials,$request->remember)) {
-            return redirect()->intended('/home')->with('message','Logged-in');
+        // then check user status
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            if ($user->status != 'active') {
+                return redirect()->back()->with('email-err-msg', 'Your account is inactive. Please contact the administrator.');
+            }
+            if (Hash::check($request->password, $user->password)) {
+                Auth::login($user, $request->remember);
+                return redirect()->intended('/home')->with('message', 'Logged-in');
+            }
         }
 
         return redirect()->back()->withInput()->with('email-err-msg', 'These credentials do not match our records.');
