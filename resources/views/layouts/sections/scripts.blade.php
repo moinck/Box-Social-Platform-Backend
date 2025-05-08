@@ -20,6 +20,20 @@
 <!-- Pricing Modal JS-->
 @stack('pricing-script')
 <!-- END: Pricing Modal JS-->
+{{-- common js --}}
+<script>
+    // show sweet alert function
+    function showSweetAlert(type, title, text) {
+        Swal.fire({
+            icon: type,
+            title: title,
+            text: text,
+            customClass: {
+                confirmButton: `btn btn-${type === 'success' ? 'success' : 'danger'}`
+            }
+        });
+    }
+</script>
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->

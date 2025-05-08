@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
 
     // Users Controller
     Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
+    Route::get('/user/edit/{id}', [UserManagementController::class,'edit'])->name('user.edit');
+    Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');
+    Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
 
     Route::post('logout', [LoginController::class, 'logout'])
