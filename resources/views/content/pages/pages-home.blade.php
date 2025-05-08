@@ -268,6 +268,9 @@
                     },
                     edit_last_name: {
                         validators: {
+                            notEmpty: {
+                                message: 'Please enter your last name'
+                            },
                             regexp: {
                                 regexp: /^[a-zA-Z\s'-]*$/,
                                 message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
@@ -280,6 +283,9 @@
                     },
                     edit_company_name: {
                         validators: {
+                            notEmpty: {
+                                message: 'Please enter your company name'
+                            },
                             regexp: {
                                 regexp: /^[a-zA-Z0-9\s&.,'-]*$/,
                                 message: 'Company name contains invalid characters'
@@ -306,6 +312,9 @@
                     },
                     user_fca_number: {
                         validators: {
+                            notEmpty: {
+                                message: 'Please enter your FCA Number'
+                            },
                             regexp: {
                                 regexp: /^[0-9]*$/,
                                 message: 'FCA Number can only contain digits'
