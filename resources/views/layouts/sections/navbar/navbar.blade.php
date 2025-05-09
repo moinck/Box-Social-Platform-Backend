@@ -53,22 +53,22 @@ $navbarDetached = ($navbarDetached ?? '');
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="{{ Route::has('profile.show') ? route('profile.show') : 'javascript:void(0);' }}">
+              <a class="dropdown-item" href="javascript:void(0);">
                 <div class="d-flex">
                   <div class="flex-shrink-0 me-2">
                     <div class="avatar avatar-online">
-                      <img src="{{ Auth::user() ? Auth::user()->profile_photo_url : asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                      <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
                     </div>
                   </div>
                   <div class="flex-grow-1">
                     <span class="fw-medium d-block small">
                       @if (Auth::check())
-                        {{ Auth::user()->name }}
+                        {{ ucfirst(Auth::user()->first_name ?? "") }} {{ ucfirst(Auth::user()->last_name ?? "") }}
                       @else
                         John Doe
                       @endif
                     </span>
-                    <small class="text-muted">Admin</small>
+                    <small class="text-muted">{{ Auth::check() ? ucfirst(Auth::user()->role ?? "User") : 'User' }}</small>
                   </div>
                 </div>
               </a>
@@ -77,7 +77,7 @@ $navbarDetached = ($navbarDetached ?? '');
               <div class="dropdown-divider"></div>
             </li>
             <li>
-              <a class="dropdown-item" href="{{ Route::has('profile.show') ? route('profile.show') : 'javascript:void(0);' }}">
+              <a class="dropdown-item" href="javascript:void(0);">
                 <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">My Profile</span>
               </a>
             </li>
