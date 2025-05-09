@@ -110,3 +110,11 @@
   text-align: center;
   margin-top: 1.25rem;
 }
+
+/*
+* Project Custom CSS
+******************************************************************************/
+
+.user-table-header {
+    justify-content: space-between;
+}

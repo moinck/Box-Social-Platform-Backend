@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersExport;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserManagementController extends Controller
 {
+    /**
+     * User Management DataTable
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function userDataTable(Request $request)
     {
         $users = User::where('role','customer')->latest()->get();
@@ -28,7 +35,7 @@ class UserManagementController extends Controller
                 return $user->fca_number ?? '-';
             })
             ->addColumn('created_date', function ($user) {
-                return $user->created_at->format('d-m-Y H:i A');
+                return $user->created_at->format('d-m-Y h:i A');
             })
             ->addColumn('account_status', function ($user) {
                 $status = $user->status == 'active' ? 'checked' : '';
@@ -57,6 +64,11 @@ class UserManagementController extends Controller
             ->make(true);
     }
 
+    /**
+     * Get User Edit Data
+     * @param mixed $id
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function edit($id)
     {
         $user = User::find($id);
@@ -73,6 +85,11 @@ class UserManagementController extends Controller
         }
     }
 
+    /**
+     * Update User Data
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function update(Request $request)
     {
 
@@ -115,6 +132,11 @@ class UserManagementController extends Controller
         }
     }
 
+    /**
+     * delete User
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request)
     {
         $user = User::find($request->user_id);
@@ -132,6 +154,11 @@ class UserManagementController extends Controller
         }
     }
 
+    /**
+     * change User account status
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function accountStatus(Request $request)
     {
         $user = User::find($request->userId);
@@ -147,6 +174,22 @@ class UserManagementController extends Controller
                 'success' => false,
                 'message' => 'User not found.'
             ]);
+        }
+    }
+
+    /**
+     * export users data
+     * @param \Illuminate\Http\Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function export(Request $request)
+    {
+        $format = $request->format;
+        $name = 'users_'.date('Y-m-d_g-s');
+        if ($format == 'csv') {
+            return Excel::download(new UsersExport, $name.'.csv');
+        } else {
+            return Excel::download(new UsersExport, $name.'.xlsx');
         }
     }
 }

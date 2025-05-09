@@ -33,19 +33,20 @@
 
     <!-- Main Table -->
     <div class="card">
-        {{-- <h5 class="card-header text-center text-md-start pb-md-0">User Management</h5> --}}
-        {{-- <div class="card-header border-bottom">
-      
-    </div> --}}
-        <div class="card-header flex-column flex-md-row border-bottom">
+        <div class="card-header d-flex flex-column flex-md-row border-bottom user-table-header">
             <div class="head-label">
                 <h5 class="card-title mb-0">User Management</h5>
             </div>
-            {{-- <div class="dt-action-buttons text-end pt-3 pt-md-0">
-            <div class="dt-buttons btn-group flex-wrap"> 
-                <button class="btn btn-secondary create-new btn-primary waves-effect waves-light" tabindex="0" aria-controls="DataTables_Table_0" type="button"><span><i class="ri-add-line ri-16px me-sm-2"></i> <span class="d-none d-sm-inline-block">Add New Record</span></span></button> 
+            <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons btn-group flex-wrap"> 
+                    <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="user-export-btn">
+                        <span>
+                            <i class="ri-upload-2-line ri-16px me-sm-2"></i>
+                            <span class="d-none d-sm-inline-block">Export Data</span>
+                        </span>
+                    </button> 
+                </div>
             </div>
-        </div> --}}
         </div>
         <div class="card-datatable table-responsive">
             <table class="dt-fixedheader table table-bordered" id="user-data-table">
@@ -138,6 +139,29 @@
     </div>
     <!--/ Edit User Modal -->
 
+    {{-- data export modal --}}
+    <div class="modal fade" id="data-export-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalCenterTitle">Export Data</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col mb-6 mt-2 text-center">
+                            <h4 class="mb-4">Select Export Format</h4>
+                            <div class="d-flex justify-content-center gap-4">
+                                <button type="button" id="csv-export-btn" title="Export users in CSV format" class="btn btn-primary">CSV</button>
+                                <button type="button" id="excel-export-btn" title="Export users in Excel format" class="btn btn-primary">Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--/ Select -->
 @endsection
 
@@ -158,7 +182,7 @@
                     orderable: true,
                     searching: true,
                     destroy: true,
-                    info: false,
+                    info: true,
                     paging: true,
                     pageLength: 10,
                     ajax: "{{ route('user.data-table') }}",
@@ -416,6 +440,21 @@
                             }
                         });
                     }
+                });
+            });
+            // ----------------------------------------------------------
+
+            // export user 
+            $(document).on('click', '#user-export-btn', function() {
+                $('#data-export-modal').modal('show');
+
+                $('#csv-export-btn').on('click', function() {
+                    window.location.href = "{{ route('user.export') }}?format=csv";
+                    $('#data-export-modal').modal('hide');
+                });
+                $('#excel-export-btn').on('click', function() {
+                    window.location.href = "{{ route('user.export') }}?format=xlsx";
+                    $('#data-export-modal').modal('hide');
                 });
             });
             // ----------------------------------------------------------

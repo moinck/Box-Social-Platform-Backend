@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');
     Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
+    Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
 
     Route::post('logout', [LoginController::class, 'logout'])
     ->name('logout');
