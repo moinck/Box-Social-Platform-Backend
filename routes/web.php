@@ -9,6 +9,7 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\ImageStockManagementController;
 
 // Main Page Route
 // Route::get('/', [HomePage::class, 'index'])->name('pages-home');
@@ -32,6 +33,9 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+    Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
+    Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
+    Route::post('/image-management/store', [ImageStockManagementController::class, 'imagesStore']);
     Route::get('/page-2', [Page2::class, 'index'])->name('pages-page-2');
     Route::get('/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
     Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');

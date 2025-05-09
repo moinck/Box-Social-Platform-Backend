@@ -6,13 +6,13 @@
   12 => 'view',
   'app' => 
   array (
-    'name' => 'Foreign-Classroom',
+    'name' => 'Box-Social-Platform',
     'env' => 'local',
     'debug' => true,
     'url' => 'http://127.0.0.1:8003',
     'frontend_url' => 'http://localhost:3000',
     'asset_url' => NULL,
-    'timezone' => 'America/Toronto',
+    'timezone' => 'UTC',
     'locale' => 'en',
     'fallback_locale' => 'en',
     'faker_locale' => 'en_US',
@@ -124,8 +124,8 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => '/var/www/html/box-socoal/final-box-social/storage/framework/cache/data',
-        'lock_path' => '/var/www/html/box-socoal/final-box-social/storage/framework/cache/data',
+        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
+        'lock_path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -169,7 +169,7 @@
         'driver' => 'octane',
       ),
     ),
-    'prefix' => 'foreign_classroom_cache_',
+    'prefix' => 'box_social_platform_cache_',
   ),
   'custom' => 
   array (
@@ -294,7 +294,7 @@
       'options' => 
       array (
         'cluster' => 'redis',
-        'prefix' => 'foreign_classroom_database_',
+        'prefix' => 'box_social_platform_database_',
       ),
       'default' => 
       array (
@@ -324,13 +324,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/box-socoal/final-box-social/storage/app',
+        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/box-socoal/final-box-social/storage/app/public',
+        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
         'url' => 'http://127.0.0.1:8003/storage',
         'visibility' => 'public',
         'throw' => false,
@@ -350,7 +350,101 @@
     ),
     'links' => 
     array (
-      '/var/www/html/box-socoal/final-box-social/public/storage' => '/var/www/html/box-socoal/final-box-social/storage/app/public',
+      '/var/www/html/Box-Social-Platform-Backend/public/storage' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
+    ),
+  ),
+  'image_topics' => 
+  array (
+    'First Time Buyer Mortgages' => 
+    array (
+      0 => 'first time buyer mortgages',
+      1 => 'happy young person with door key',
+      2 => 'happy young couple standing outside house',
+      3 => 'holding door key',
+      4 => 'happy person with thumbs up',
+      5 => 'confused person',
+      6 => 'person with question mark',
+    ),
+    'Remortgages' => 
+    array (
+      0 => 'remortgage',
+      1 => 'piggy bank',
+      2 => 'save money',
+      3 => 'savings',
+      4 => 'clock',
+      5 => 'times up',
+      6 => 'time is now',
+      7 => 'holding door key',
+      8 => 'mortgage broker',
+      9 => 'happy person or couple with thumbs up',
+    ),
+    'Home Movers' => 
+    array (
+      0 => 'move home',
+      1 => 'moving home',
+      2 => 'for sale sign outside house',
+      3 => 'holding door key',
+      4 => 'mortgage broker',
+      5 => 'happy person or couple with thumbs up',
+    ),
+    'Buy To Let' => 
+    array (
+      0 => 'buy to let',
+      1 => 'landlord',
+      2 => 'renting',
+      3 => 'limited company',
+      4 => 'business owner',
+      5 => 'mortgage broker',
+    ),
+    'Mortgage Protection' => 
+    array (
+      0 => 'life insurance',
+      1 => 'critical illness',
+      2 => 'health',
+      3 => 'family protection',
+      4 => 'income protection',
+      5 => 'protect income',
+      6 => 'protect house',
+      7 => 'protect family',
+    ),
+    'General Insurance' => 
+    array (
+      0 => 'protect home',
+      1 => 'home insurance',
+      2 => 'accidents in the home',
+    ),
+    'Adverse Credit' => 
+    array (
+      0 => 'bad credit',
+      1 => 'poor credit',
+      2 => 'credit score',
+      3 => 'happy person with thumbs up',
+      4 => 'confused person',
+      5 => 'person with question mark',
+      6 => 'sad person',
+    ),
+    'Self Employed' => 
+    array (
+      0 => 'business owner',
+      1 => 'self employed',
+      2 => 'boss',
+      3 => 'manager',
+      4 => 'company accounts',
+      5 => 'hmrc',
+      6 => 'tax return',
+      7 => 'happy middle-aged person with thumbs up',
+    ),
+    'Other Mortgage Related' => 
+    array (
+      0 => 'key workers',
+      1 => 'nurses',
+      2 => 'doctors',
+      3 => 'uk police',
+      4 => 'uk firefighters',
+      5 => 'uk military',
+      6 => 'armed forces',
+      7 => 'right to buy',
+      8 => 'happy couple over 60 years old',
     ),
   ),
   'logging' => 
@@ -375,14 +469,14 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => '/var/www/html/box-socoal/final-box-social/storage/logs/laravel.log',
+        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'replace_placeholders' => true,
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => '/var/www/html/box-socoal/final-box-social/storage/logs/laravel.log',
+        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
         'replace_placeholders' => true,
@@ -447,7 +541,7 @@
       ),
       'emergency' => 
       array (
-        'path' => '/var/www/html/box-socoal/final-box-social/storage/logs/laravel.log',
+        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
       ),
     ),
   ),
@@ -523,7 +617,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => '/var/www/html/box-socoal/final-box-social/resources/views/vendor/mail',
+        0 => '/var/www/html/Box-Social-Platform-Backend/resources/views/vendor/mail',
       ),
     ),
   ),
@@ -642,7 +736,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => '/var/www/html/box-socoal/final-box-social/storage/framework/sessions',
+    'files' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -651,7 +745,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'foreign_classroom_session',
+    'cookie' => 'box_social_platform_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => NULL,
@@ -795,9 +889,9 @@
   array (
     'paths' => 
     array (
-      0 => '/var/www/html/box-socoal/final-box-social/resources/views',
+      0 => '/var/www/html/Box-Social-Platform-Backend/resources/views',
     ),
-    'compiled' => '/var/www/html/box-socoal/final-box-social/storage/framework/views',
+    'compiled' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/views',
   ),
   'fortify' => 
   array (
@@ -987,7 +1081,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => '/var/www/html/box-socoal/final-box-social',
+    'remote_sites_path' => '/var/www/html/Box-Social-Platform-Backend',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',
