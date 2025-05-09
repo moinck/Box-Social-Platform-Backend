@@ -67,7 +67,11 @@
 
     <br>
     <div class="row mb-6" id="sortable-cards">
-
+    
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card drag-item cursor-move mb-lg-0 mb-6">
+        
+    </div>
   </div>
     </div>
   
