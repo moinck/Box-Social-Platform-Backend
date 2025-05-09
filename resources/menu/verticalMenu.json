@@ -5,6 +5,12 @@
       "name": "User Management",
       "icon": "menu-icon tf-icons ri-home-smile-line",
       "slug": "pages-home"
+    },
+    {
+      "url": "/stock-image-management",
+      "name": "Stock Image Management",
+      "icon": "menu-icon tf-icons ri-home-smile-line",
+      "slug": "stock-image-management"
     }
   ]
 }
