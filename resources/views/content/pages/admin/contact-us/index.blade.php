@@ -78,7 +78,15 @@
                     info: true,
                     paging: true,
                     pageLength: 10,
-                    ajax: "{{ route('feedback-management.data-table') }}",
+                    ajax: {
+                        url: "{{ route('feedback-management.data-table') }}",
+                        beforeSend: function () {
+                            showBSPLoader();
+                        },
+                        complete: function () {
+                            hideBSPLoader();
+                        }
+                    },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'name', name: 'name'},

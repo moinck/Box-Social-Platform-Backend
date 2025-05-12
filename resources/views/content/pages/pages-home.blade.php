@@ -185,7 +185,15 @@
                     info: true,
                     paging: true,
                     pageLength: 10,
-                    ajax: "{{ route('user.data-table') }}",
+                    ajax: {
+                        url: "{{ route('user.data-table') }}",
+                        beforeSend: function () {
+                            showBSPLoader();
+                        },
+                        complete: function () {
+                            hideBSPLoader();
+                        }
+                    },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'name', name: 'name'},
@@ -387,6 +395,12 @@
                     data: formData,
                     processData: false,
                     contentType: false,
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
                     success: function(response) {
                         if (response.success == true) {
                             showSweetAlert('success', 'Updated !',
@@ -396,6 +410,7 @@
                         }
                     },
                     error: function(xhr) {
+                        hideBSPLoader();
                         console.log(xhr.responseText);
                         showSweetAlert('error', 'Error !', 'Something went wrong.');
                     }
@@ -426,6 +441,12 @@
                                 _token: '{{ csrf_token() }}',
                                 user_id: userId
                             },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'User has been deleted.');
@@ -435,6 +456,7 @@
                                 }
                             },
                             error: function(xhr, status, error) {
+                                hideBSPLoader();
                                 console.log(xhr.responseText);
                                 showSweetAlert('error', 'Error!', 'Something went wrong.');
                             }

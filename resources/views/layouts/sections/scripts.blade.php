@@ -22,6 +22,41 @@
 <!-- END: Pricing Modal JS-->
 {{-- common js --}}
 <script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.getElementById('box-loader')) {
+            const loaderHtml = `
+                <div id="box-loader" style="display: none;">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="logo-content">
+                            <img src="{{ asset('assets/img/Box-media-logo.svg') }}" alt="Box-social Logo" class="loader-logo">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', loaderHtml);
+        }
+    });
+
+    // Function to show the loader
+    function showBSPLoader() {
+        const loader = document.getElementById('box-loader');
+        if (loader) {
+            loader.style.display = 'flex';
+        } else {
+            console.warn('Box Loader element not found. Make sure the page is fully loaded.');
+        }
+    }
+
+    // Function to hide the loader
+    function hideBSPLoader() {
+        const loader = document.getElementById('box-loader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+    }
+    
     // show sweet alert function
     function showSweetAlert(type, title, text) {
         Swal.fire({
