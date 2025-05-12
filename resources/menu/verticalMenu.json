@@ -9,7 +9,7 @@
     {
       "url": "/stock-image-management",
       "name": "Stock Image Management",
-      "icon": "menu-icon tf-icons ri-home-smile-line",
+      "icon": "menu-icon tf-icons ri-folder-image-line",
       "slug": "stock-image-management"
     }
   ]

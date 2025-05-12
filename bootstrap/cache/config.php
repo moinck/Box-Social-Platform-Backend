@@ -1,12 +1,12 @@
 <?php return array (
-  2 => 'cors',
-  4 => 'concurrency',
-  5 => 'hashing',
-  10 => 'broadcasting',
+  3 => 'broadcasting',
+  10 => 'concurrency',
+  11 => 'cors',
   12 => 'view',
+  14 => 'hashing',
   'app' => 
   array (
-    'name' => 'Box-Social-Platform',
+    'name' => 'Box-Social',
     'env' => 'local',
     'debug' => true,
     'url' => 'http://127.0.0.1:8003',
@@ -58,6 +58,8 @@
     array (
       'Helper' => 'App\\Helpers\\Helpers',
     ),
+    'pixabay_api_key' => '49984251-e73d8b5431d7a754a00b81205',
+    'pexels_api_key' => '0o2mlO0huTQtUGQn0NDlID4VU3D0q1AhIfhy0LRBwRRU2a0i6vgj7Sd8',
   ),
   'auth' => 
   array (
@@ -124,8 +126,8 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
-        'lock_path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
+        'path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/framework/cache/data',
+        'lock_path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -169,7 +171,7 @@
         'driver' => 'octane',
       ),
     ),
-    'prefix' => 'box_social_platform_cache_',
+    'prefix' => 'box_social_cache_',
   ),
   'custom' => 
   array (
@@ -210,7 +212,7 @@
       array (
         'driver' => 'sqlite',
         'url' => NULL,
-        'database' => 'box_social_platform',
+        'database' => 'iih_box_social_platform',
         'prefix' => '',
         'foreign_key_constraints' => true,
       ),
@@ -220,7 +222,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'iih_box_social_platform',
         'username' => 'root',
         'password' => 'root',
         'unix_socket' => '',
@@ -240,7 +242,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'iih_box_social_platform',
         'username' => 'root',
         'password' => 'root',
         'unix_socket' => '',
@@ -260,7 +262,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'iih_box_social_platform',
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8',
@@ -275,7 +277,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'iih_box_social_platform',
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8',
@@ -294,7 +296,7 @@
       'options' => 
       array (
         'cluster' => 'redis',
-        'prefix' => 'box_social_platform_database_',
+        'prefix' => 'box_social_database_',
       ),
       'default' => 
       array (
@@ -324,13 +326,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app',
+        'root' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
+        'root' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/app/public',
         'url' => 'http://127.0.0.1:8003/storage',
         'visibility' => 'public',
         'throw' => false,
@@ -350,7 +352,7 @@
     ),
     'links' => 
     array (
-      '/var/www/html/Box-Social-Platform-Backend/public/storage' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
+      '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/public/storage' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/app/public',
     ),
   ),
   'image_topics' => 
@@ -469,14 +471,14 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'replace_placeholders' => true,
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
         'replace_placeholders' => true,
@@ -541,7 +543,7 @@
       ),
       'emergency' => 
       array (
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/logs/laravel.log',
       ),
     ),
   ),
@@ -617,7 +619,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => '/var/www/html/Box-Social-Platform-Backend/resources/views/vendor/mail',
+        0 => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/resources/views/vendor/mail',
       ),
     ),
   ),
@@ -736,7 +738,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/sessions',
+    'files' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -745,7 +747,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'box_social_platform_session',
+    'cookie' => 'box_social_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => NULL,
@@ -779,55 +781,6 @@
     'githubUrl' => 'https://github.com/pixinvent',
     'dribbbleUrl' => 'https://dribbble.com/pixinvent',
     'instagramUrl' => 'https://www.instagram.com/pixinvents/',
-  ),
-  'cors' => 
-  array (
-    'paths' => 
-    array (
-      0 => 'api/*',
-      1 => 'sanctum/csrf-cookie',
-    ),
-    'allowed_methods' => 
-    array (
-      0 => '*',
-    ),
-    'allowed_origins' => 
-    array (
-      0 => '*',
-    ),
-    'allowed_origins_patterns' => 
-    array (
-    ),
-    'allowed_headers' => 
-    array (
-      0 => '*',
-    ),
-    'exposed_headers' => 
-    array (
-    ),
-    'max_age' => 0,
-    'supports_credentials' => false,
-  ),
-  'concurrency' => 
-  array (
-    'default' => 'process',
-  ),
-  'hashing' => 
-  array (
-    'driver' => 'bcrypt',
-    'bcrypt' => 
-    array (
-      'rounds' => 12,
-      'verify' => true,
-    ),
-    'argon' => 
-    array (
-      'memory' => 65536,
-      'threads' => 1,
-      'time' => 4,
-      'verify' => true,
-    ),
-    'rehash_on_login' => true,
   ),
   'broadcasting' => 
   array (
@@ -885,13 +838,62 @@
       ),
     ),
   ),
+  'concurrency' => 
+  array (
+    'default' => 'process',
+  ),
+  'cors' => 
+  array (
+    'paths' => 
+    array (
+      0 => 'api/*',
+      1 => 'sanctum/csrf-cookie',
+    ),
+    'allowed_methods' => 
+    array (
+      0 => '*',
+    ),
+    'allowed_origins' => 
+    array (
+      0 => '*',
+    ),
+    'allowed_origins_patterns' => 
+    array (
+    ),
+    'allowed_headers' => 
+    array (
+      0 => '*',
+    ),
+    'exposed_headers' => 
+    array (
+    ),
+    'max_age' => 0,
+    'supports_credentials' => false,
+  ),
   'view' => 
   array (
     'paths' => 
     array (
-      0 => '/var/www/html/Box-Social-Platform-Backend/resources/views',
+      0 => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/resources/views',
     ),
-    'compiled' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/views',
+    'compiled' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/framework/views',
+  ),
+  'hashing' => 
+  array (
+    'driver' => 'bcrypt',
+    'bcrypt' => 
+    array (
+      'rounds' => 12,
+      'verify' => true,
+    ),
+    'argon' => 
+    array (
+      'memory' => 65536,
+      'threads' => 1,
+      'time' => 4,
+      'verify' => true,
+    ),
+    'rehash_on_login' => true,
   ),
   'fortify' => 
   array (
@@ -1110,7 +1112,7 @@
     ),
     'temporary_files' => 
     array (
-      'local_path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/laravel-excel',
+      'local_path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend/storage/framework/cache/laravel-excel',
       'local_permissions' => 
       array (
       ),
@@ -1203,7 +1205,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => '/var/www/html/Box-Social-Platform-Backend',
+    'remote_sites_path' => '/var/www/html/IIH-GLOBAL/Box-Social-Platform-Backend',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',
