@@ -79,7 +79,8 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                 'startColor' => [
-                    'rgb' => '59E659', // light Green color
+                    // 'rgb' => '59E659', // light Green color
+                    'rgb' => 'F4D106', // our theme color
                 ],
             ],
         ]);

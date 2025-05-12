@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Contact Us')
+@section('title', 'Feedback Management')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
