@@ -30,7 +30,7 @@ class ImageStockManagementController extends Controller
         
         $url = "https://pixabay.com/api/?key=".env('PIXABAY')."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
         
-        dd(env('PEXELS'));
+        // dd(env('PEXELS'));
         if($request->api_type == "pexels"){
             $url = "https://api.pexels.com/v1/search?query=".urlencode($request->type)."&per_page=100&page=".$request->page;
             
@@ -64,7 +64,7 @@ class ImageStockManagementController extends Controller
 
             // Execute cURL request
             $response = curl_exec($ch);
-            dd($response);
+            // dd($response);
 
             // Check for errors
             if (curl_errno($ch)) {

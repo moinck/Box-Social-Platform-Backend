@@ -1,15 +1,15 @@
 <?php return array (
-  2 => 'cors',
-  4 => 'concurrency',
+  4 => 'view',
   5 => 'hashing',
-  10 => 'broadcasting',
-  12 => 'view',
+  8 => 'cors',
+  11 => 'broadcasting',
+  13 => 'concurrency',
   'app' => 
   array (
     'name' => 'Box-Social-Platform',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://127.0.0.1:8003',
+    'url' => 'http://127.0.0.1:8000',
     'frontend_url' => 'http://localhost:3000',
     'asset_url' => NULL,
     'timezone' => 'UTC',
@@ -124,8 +124,8 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
-        'lock_path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/data',
+        'path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/framework/cache/data',
+        'lock_path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -210,7 +210,7 @@
       array (
         'driver' => 'sqlite',
         'url' => NULL,
-        'database' => 'box_social_platform',
+        'database' => 'Box',
         'prefix' => '',
         'foreign_key_constraints' => true,
       ),
@@ -220,7 +220,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'Box',
         'username' => 'root',
         'password' => 'root',
         'unix_socket' => '',
@@ -240,7 +240,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'Box',
         'username' => 'root',
         'password' => 'root',
         'unix_socket' => '',
@@ -260,7 +260,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'Box',
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8',
@@ -275,7 +275,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'box_social_platform',
+        'database' => 'Box',
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8',
@@ -324,14 +324,14 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app',
+        'root' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
-        'url' => 'http://127.0.0.1:8003/storage',
+        'root' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/app/public',
+        'url' => 'http://127.0.0.1:8000/storage',
         'visibility' => 'public',
         'throw' => false,
       ),
@@ -350,7 +350,7 @@
     ),
     'links' => 
     array (
-      '/var/www/html/Box-Social-Platform-Backend/public/storage' => '/var/www/html/Box-Social-Platform-Backend/storage/app/public',
+      '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/public/storage' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/app/public',
     ),
   ),
   'image_topics' => 
@@ -469,14 +469,14 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'replace_placeholders' => true,
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
         'replace_placeholders' => true,
@@ -541,7 +541,7 @@
       ),
       'emergency' => 
       array (
-        'path' => '/var/www/html/Box-Social-Platform-Backend/storage/logs/laravel.log',
+        'path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/logs/laravel.log',
       ),
     ),
   ),
@@ -617,7 +617,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => '/var/www/html/Box-Social-Platform-Backend/resources/views/vendor/mail',
+        0 => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/resources/views/vendor/mail',
       ),
     ),
   ),
@@ -690,7 +690,7 @@
       2 => '127.0.0.1',
       3 => '127.0.0.1:8000',
       4 => '::1',
-      5 => '127.0.0.1:8003',
+      5 => '127.0.0.1:8000',
     ),
     'guard' => 
     array (
@@ -736,7 +736,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/sessions',
+    'files' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -780,6 +780,31 @@
     'dribbbleUrl' => 'https://dribbble.com/pixinvent',
     'instagramUrl' => 'https://www.instagram.com/pixinvents/',
   ),
+  'view' => 
+  array (
+    'paths' => 
+    array (
+      0 => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/resources/views',
+    ),
+    'compiled' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend/storage/framework/views',
+  ),
+  'hashing' => 
+  array (
+    'driver' => 'bcrypt',
+    'bcrypt' => 
+    array (
+      'rounds' => 12,
+      'verify' => true,
+    ),
+    'argon' => 
+    array (
+      'memory' => 65536,
+      'threads' => 1,
+      'time' => 4,
+      'verify' => true,
+    ),
+    'rehash_on_login' => true,
+  ),
   'cors' => 
   array (
     'paths' => 
@@ -807,27 +832,6 @@
     ),
     'max_age' => 0,
     'supports_credentials' => false,
-  ),
-  'concurrency' => 
-  array (
-    'default' => 'process',
-  ),
-  'hashing' => 
-  array (
-    'driver' => 'bcrypt',
-    'bcrypt' => 
-    array (
-      'rounds' => 12,
-      'verify' => true,
-    ),
-    'argon' => 
-    array (
-      'memory' => 65536,
-      'threads' => 1,
-      'time' => 4,
-      'verify' => true,
-    ),
-    'rehash_on_login' => true,
   ),
   'broadcasting' => 
   array (
@@ -885,13 +889,9 @@
       ),
     ),
   ),
-  'view' => 
+  'concurrency' => 
   array (
-    'paths' => 
-    array (
-      0 => '/var/www/html/Box-Social-Platform-Backend/resources/views',
-    ),
-    'compiled' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/views',
+    'default' => 'process',
   ),
   'fortify' => 
   array (
@@ -997,128 +997,6 @@
       'secret' => NULL,
     ),
   ),
-  'excel' => 
-  array (
-    'exports' => 
-    array (
-      'chunk_size' => 1000,
-      'pre_calculate_formulas' => false,
-      'strict_null_comparison' => false,
-      'csv' => 
-      array (
-        'delimiter' => ',',
-        'enclosure' => '"',
-        'line_ending' => '
-',
-        'use_bom' => false,
-        'include_separator_line' => false,
-        'excel_compatibility' => false,
-        'output_encoding' => '',
-        'test_auto_detect' => true,
-      ),
-      'properties' => 
-      array (
-        'creator' => '',
-        'lastModifiedBy' => '',
-        'title' => '',
-        'description' => '',
-        'subject' => '',
-        'keywords' => '',
-        'category' => '',
-        'manager' => '',
-        'company' => '',
-      ),
-    ),
-    'imports' => 
-    array (
-      'read_only' => true,
-      'ignore_empty' => false,
-      'heading_row' => 
-      array (
-        'formatter' => 'slug',
-      ),
-      'csv' => 
-      array (
-        'delimiter' => NULL,
-        'enclosure' => '"',
-        'escape_character' => '\\',
-        'contiguous' => false,
-        'input_encoding' => 'guess',
-      ),
-      'properties' => 
-      array (
-        'creator' => '',
-        'lastModifiedBy' => '',
-        'title' => '',
-        'description' => '',
-        'subject' => '',
-        'keywords' => '',
-        'category' => '',
-        'manager' => '',
-        'company' => '',
-      ),
-      'cells' => 
-      array (
-        'middleware' => 
-        array (
-        ),
-      ),
-    ),
-    'extension_detector' => 
-    array (
-      'xlsx' => 'Xlsx',
-      'xlsm' => 'Xlsx',
-      'xltx' => 'Xlsx',
-      'xltm' => 'Xlsx',
-      'xls' => 'Xls',
-      'xlt' => 'Xls',
-      'ods' => 'Ods',
-      'ots' => 'Ods',
-      'slk' => 'Slk',
-      'xml' => 'Xml',
-      'gnumeric' => 'Gnumeric',
-      'htm' => 'Html',
-      'html' => 'Html',
-      'csv' => 'Csv',
-      'tsv' => 'Csv',
-      'pdf' => 'Dompdf',
-    ),
-    'value_binder' => 
-    array (
-      'default' => 'Maatwebsite\\Excel\\DefaultValueBinder',
-    ),
-    'cache' => 
-    array (
-      'driver' => 'memory',
-      'batch' => 
-      array (
-        'memory_limit' => 60000,
-      ),
-      'illuminate' => 
-      array (
-        'store' => NULL,
-      ),
-      'default_ttl' => 10800,
-    ),
-    'transactions' => 
-    array (
-      'handler' => 'db',
-      'db' => 
-      array (
-        'connection' => NULL,
-      ),
-    ),
-    'temporary_files' => 
-    array (
-      'local_path' => '/var/www/html/Box-Social-Platform-Backend/storage/framework/cache/laravel-excel',
-      'local_permissions' => 
-      array (
-      ),
-      'remote_disk' => NULL,
-      'remote_prefix' => NULL,
-      'force_resync_remote' => NULL,
-    ),
-  ),
   'flare' => 
   array (
     'key' => NULL,
@@ -1203,7 +1081,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => '/var/www/html/Box-Social-Platform-Backend',
+    'remote_sites_path' => '/var/www/html/Laravel/Test/Box-Social-Platform-Backend',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',

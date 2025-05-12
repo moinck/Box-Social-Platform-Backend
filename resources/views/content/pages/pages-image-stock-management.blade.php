@@ -22,7 +22,7 @@
 <!-- Page Scripts -->
 @section('page-script')
 @vite(['resources/assets/js/tables-datatables-extensions.js'])
-@vite(['resources/assets/js/pages-images-stock'])
+@vite(['resources/assets/js/pages-images-stock.js'])
 @endsection
 
 @section('content')
