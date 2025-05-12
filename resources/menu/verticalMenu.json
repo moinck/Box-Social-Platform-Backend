@@ -11,6 +11,12 @@
       "name": "Stock Image Management",
       "icon": "menu-icon tf-icons ri-folder-image-line",
       "slug": "stock-image-management"
+    },
+    {
+      "url": "/feedback-management",
+      "name": "Feedback Management",
+      "icon": "menu-icon tf-icons ri-contacts-book-3-line",
+      "slug": "feedback-management"
     }
   ]
 }

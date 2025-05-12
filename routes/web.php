@@ -10,6 +10,7 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
 
 
@@ -38,6 +39,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
+
+    // user feedback-management controller
+    Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
+    Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
