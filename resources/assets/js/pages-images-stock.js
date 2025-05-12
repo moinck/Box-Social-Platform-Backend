@@ -52,6 +52,12 @@ $(function () {
         'page':$("#total_page").val(),
         'api_type':$("#api_type").val()
      },
+     beforeSend: function () {
+      showBSPLoader();
+     },
+     complete: function () {
+      hideBSPLoader();
+     },
       success: function (data) {
           var image = "";
           var getData = "";
@@ -88,6 +94,7 @@ $(function () {
           $("#sortable-cards").html(image);
       },
       error: function (error) {
+        hideBSPLoader();
         console.log(error);
       }
     });

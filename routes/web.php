@@ -24,15 +24,19 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+
+    // Stock image Management
     Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
     Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
     Route::post('/image-management/store', [ImageStockManagementController::class, 'imagesStore']);
+
+    // extra pages
     Route::get('/page-2', [Page2::class, 'index'])->name('pages-page-2');
     Route::get('/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
     Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
     Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
-    // Users Controller
+    // User Management Controller
     Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
     Route::get('/user/edit/{id}', [UserManagementController::class,'edit'])->name('user.edit');
     Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');

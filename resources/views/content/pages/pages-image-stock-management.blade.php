@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'DataTables - Tables')
+@section('title', 'Stock Image Management')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
