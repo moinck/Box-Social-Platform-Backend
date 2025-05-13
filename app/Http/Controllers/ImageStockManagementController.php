@@ -28,7 +28,8 @@ class ImageStockManagementController extends Controller
         return '1';
     }
 
-    public function GetImages(Request $request){
+    public function GetImages(Request $request)
+    {
 
         $pixabay_api_key = config('app.pixabay_api_key');
         $pexels_api_key = config('app.pexels_api_key');
@@ -83,8 +84,18 @@ class ImageStockManagementController extends Controller
 
             // Close cURL session
             curl_close($ch);
+        }
     }
-}
+
+    public function savedImages()
+    {
+        $images = ImageStockManagement::all();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $images
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.

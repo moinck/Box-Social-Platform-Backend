@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
     Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
     Route::post('/image-management/store', [ImageStockManagementController::class, 'imagesStore']);
+    Route::get('/image-management/get/saved-images', [ImageStockManagementController::class, 'savedImages'])->name('image-management.get.saved-images');
 
     // extra pages
     Route::get('/page-2', [Page2::class, 'index'])->name('pages-page-2');
