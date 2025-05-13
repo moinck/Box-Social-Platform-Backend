@@ -10,6 +10,7 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
 
 
@@ -23,21 +24,29 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+
+    // Stock image Management
     Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
     Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
     Route::post('/image-management/store', [ImageStockManagementController::class, 'imagesStore']);
+
+    // extra pages
     Route::get('/page-2', [Page2::class, 'index'])->name('pages-page-2');
     Route::get('/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
     Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
     Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
-    // Users Controller
+    // User Management Controller
     Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
     Route::get('/user/edit/{id}', [UserManagementController::class,'edit'])->name('user.edit');
     Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');
     Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
+
+    // user feedback-management controller
+    Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
+    Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 

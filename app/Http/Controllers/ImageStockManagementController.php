@@ -27,6 +27,9 @@ class ImageStockManagementController extends Controller
     }
 
     public function GetImages(Request $request){
+
+        $pixabay_api_key = config('app.pixabay_api_key');
+        $pexels_api_key = config('app.pexels_api_key');
         
         $url = "https://pixabay.com/api/?key=".env('PIXABAY')."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
         
