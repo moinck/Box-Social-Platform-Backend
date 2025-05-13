@@ -5,24 +5,26 @@
 <!-- Vendor Styles -->
 @section('vendor-style')
     @vite([
-            'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-            'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-            'resources/assets/vendor/libs/datatables-select-bs5/select.bootstrap5.scss',
-            'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss',
-            'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss',
-            'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss'
+            'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+            'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
         ])
 @endsection
 
 <!-- Vendor Scripts -->
 @section('vendor-script')
-    @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@vite([
+        'resources/assets/vendor/libs/@form-validation/popular.js',
+        'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
+        'resources/assets/vendor/libs/@form-validation/auto-focus.js',
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+    ])
+    
 @endsection
 
 <!-- Page Scripts -->
 @section('page-script')
-    @vite(['resources/assets/js/tables-datatables-extensions.js'])
-    @vite(['resources/assets/js/pages-images-stock'])
+@vite(['resources/assets/js/tables-datatables-extensions.js'])
+@vite(['resources/assets/js/pages-images-stock.js'])
 @endsection
 
 @section('content')

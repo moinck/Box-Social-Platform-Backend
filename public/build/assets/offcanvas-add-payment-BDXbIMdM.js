@@ -1,0 +1,1 @@
+(function(){const e=document.querySelector(".invoice-amount");e&&new Cleave(e,{numeral:!0});const t=document.querySelectorAll(".invoice-date");t&&t.forEach(function(n){n.flatpickr({monthSelectorType:"static"})})})();

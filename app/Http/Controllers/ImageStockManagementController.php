@@ -24,6 +24,8 @@ class ImageStockManagementController extends Controller
                 ['tag_name' => $request->select2Icons]
             );
         }
+
+        return '1';
     }
 
     public function GetImages(Request $request){
@@ -31,18 +33,18 @@ class ImageStockManagementController extends Controller
         $pixabay_api_key = config('app.pixabay_api_key');
         $pexels_api_key = config('app.pexels_api_key');
         
-        $url = "https://pixabay.com/api/?key=".$pixabay_api_key."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
+        $url = "https://pixabay.com/api/?key=".env('PIXABAY')."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
         
+        // dd(env('PEXELS'));
         if($request->api_type == "pexels"){
             $url = "https://api.pexels.com/v1/search?query=".urlencode($request->type)."&per_page=100&page=".$request->page;
             
-          
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "Authorization:  ".$pexels_api_key
+                "Authorization:  ".env('PEXELS')
             ]);
 
             $response = curl_exec($ch);
@@ -67,6 +69,7 @@ class ImageStockManagementController extends Controller
 
             // Execute cURL request
             $response = curl_exec($ch);
+            // dd($response);
 
             // Check for errors
             if (curl_errno($ch)) {

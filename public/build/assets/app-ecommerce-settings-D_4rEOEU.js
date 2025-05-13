@@ -1,0 +1,1 @@
+$(function(){var n=$(".select2");n.length&&n.each(function(){var e=$(this);select2Focus(e),e.wrap('<div class="position-relative"></div>').select2({dropdownParent:e.parent(),placeholder:e.data("placeholder")})})});(function(){const n=document.querySelectorAll(".phone-mask");n&&n.forEach(function(e){new Cleave(e,{phone:!0,phoneRegionCode:"US"})})})();

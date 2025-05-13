@@ -1,7 +1,6 @@
 /node_modules
 /vendor
 .env
-composer.lock
 yarn.lock
 /bootstrap/cache/config.php
 /bootstrap/cache/routes-v7.php

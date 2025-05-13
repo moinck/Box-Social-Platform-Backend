@@ -130,7 +130,4 @@ return [
     'Helper' => App\Helpers\Helpers::class,
   ],
 
-  // image library api keys
-  'pixabay_api_key' => env('pixabay_api_key'),
-  'pexels_api_key' => env('pexels_api_key'),
 ];
