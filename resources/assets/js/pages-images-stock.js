@@ -25,8 +25,12 @@ $(function () {
             complete: function () {
                 hideBSPLoader();
             },
-            success: function (data) {
-                showSweetAlert('success', 'Store!', 'Your image has been successfully saved to your design template!.');
+            success: function (response) {
+                if (response.success) {
+                    showSweetAlert('success', 'Store!', 'Your image has been successfully saved to your design template!.');
+                } else {
+                    showSweetAlert('error', 'Info!', 'Please select 1 image.');
+                }
             },
             error: function (xhr, status, error) {
                 hideBSPLoader();
@@ -69,15 +73,15 @@ $(function () {
             complete: function () {
                 hideBSPLoader();
             },
-            success: function (data) {
+            success: function (response) {
 
                 var image = "";
                 var getData = "";
                 if ($("#api_type").val() == "pexels") {
-                    getData = data['photos'];
+                    getData = response['photos'];
                 } else {
 
-                    getData = data['hits'];
+                    getData = response['hits'];
                 }
 
                 // console.log(getData);
@@ -95,7 +99,7 @@ $(function () {
 
                         '<div class="card-body text-center" style=>' +
                         '<label class="form-check m-0" style="float: right">' +
-                        '<input type="checkbox" class="form-check-input" value=' + image_url + ' name="selectImages[]">' +
+                        '<input type="checkbox" class="form-check-input search-image-checkbox" value=' + image_url + ' name="selectImages[]">' +
                         '</label>' +
                         '<img src=' + image_url + ' style="width: 96%; height:auto">' +
                         '</div>' +

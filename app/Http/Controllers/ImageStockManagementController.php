@@ -18,14 +18,31 @@ class ImageStockManagementController extends Controller
     }
 
     public function imagesStore(Request $request){
-        foreach ($request->selectImages as $key => $value) {
-            $imge = ImageStockManagement::updateOrCreate(
-                ['image_url' => $value], 
-                ['tag_name' => $request->select2Icons]
-            );
+
+        $selectImages = $request->selectImages;
+        if (!empty($selectImages)) {
+            foreach ($selectImages as $key => $value) {
+                $imge = ImageStockManagement::updateOrCreate(
+                    [
+                        'image_url' => $value
+                    ], 
+                    [
+                        'tag_name' => $request->select2Icons,
+                        'user_id' => auth()->user()->id
+                    ]
+                );
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Images saved successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No images selected'
+            ]);
         }
 
-        return '1';
     }
 
     public function GetImages(Request $request)
@@ -89,7 +106,7 @@ class ImageStockManagementController extends Controller
 
     public function savedImages()
     {
-        $images = ImageStockManagement::all();
+        $images = ImageStockManagement::where('user_id', auth()->user()->id)->latest()->get();
         
         return response()->json([
             'success' => true,

@@ -100,6 +100,11 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">Stock Image Management</h5>
                 {{-- <small class="text-muted float-end">Default label</small> --}}
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-danger me-4 delete_select_images d-none" style="float: inline-end;">
+                        <span class="tf-icons ri-delete-bin-line ri-16px me-2"></span>Delete Select Images
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="card-header p-0">
@@ -270,6 +275,33 @@
                     }
                 });
             }
+            // --------------------------------------------------
+
+            let deleteImageIds = [];
+            // check if any image is selected or not
+            $(document).on('click', '.saved-image-checkbox', function () {
+                if ($('.saved-image-checkbox:checked').length > 0) {
+                    $('.delete_select_images').removeClass('d-none');
+                } else {
+                    $('.delete_select_images').addClass('d-none');
+                }
+            });
+            // --------------------------------------------------
+
+            // delete selected images
+            $(document).on('click', '.delete_select_images', function () {
+                deleteImageIds = [];
+                $('.saved-image-checkbox:checked').each(function () {
+                    deleteImageIds.push($(this).data('image-id'));
+                });
+                if (deleteImageIds.length > 0) {
+                    // deleteSavedImages();
+                    console.log(deleteImageIds);
+                } else {
+                    showSweetAlert('error', 'Info!', 'Please select 1 image.');
+                }
+            });
+            // --------------------------------------------------
         });
     </script>
 @endsection

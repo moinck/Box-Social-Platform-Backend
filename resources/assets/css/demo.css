@@ -174,3 +174,11 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* custom option image */
+.custom-option-image {
+  border-color: #F4D106;
+}
+.custom-option-image:hover {
+  border-color: #F4D106;
+}
