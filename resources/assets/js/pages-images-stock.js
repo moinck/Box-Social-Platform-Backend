@@ -26,8 +26,13 @@ $(function () {
         hideBSPLoader();
       },
       success: function (data) {
-
-      }
+        showSweetAlert('success', 'Store!', 'Your image has been successfully saved to your design template!.');
+      },
+      error: function(xhr, status, error) {
+        hideBSPLoader();
+        console.log(xhr.responseText);
+        showSweetAlert('error', 'Error!', 'Something went wrong.');
+    }
     });
   })
 

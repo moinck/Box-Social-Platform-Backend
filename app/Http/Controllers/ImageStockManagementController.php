@@ -24,6 +24,8 @@ class ImageStockManagementController extends Controller
                 ['tag_name' => $request->select2Icons]
             );
         }
+
+        return '1';
     }
 
     public function GetImages(Request $request){
