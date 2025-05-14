@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +17,10 @@ Route::group([
 ], function () {
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
+
+        // api for submit contact-us form
+        // Route::post('store/contact-us', [ContactUsController::class, 'store']);
     });
 });
+
+Route::post('/store/contact-us', [ContactUsController::class, 'store']);

@@ -174,3 +174,27 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* custom option image */
+.custom-option-image {
+  border-color: #F4D106;
+}
+.custom-option-image:hover {
+  border-color: #F4D106 !important;
+}
+.custom-option:hover{
+  background-color: #F4D106 !important;
+}
+.search-image-checkbox , .saved-image-checkbox {
+  border-color: #F4D106 !important;
+}
+
+.custom-option-image .form-check-input:checked {
+  border-color: #F4D106 !important;
+}
+
+.row #sortable-cards, #saved_images {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+

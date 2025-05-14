@@ -17,18 +17,37 @@ class ImageStockManagementController extends Controller
         return view('content.pages.pages-image-stock-management', compact('topics'));
     }
 
-    public function imagesStore(Request $request){
-        foreach ($request->selectImages as $key => $value) {
-            $imge = ImageStockManagement::updateOrCreate(
-                ['image_url' => $value], 
-                ['tag_name' => $request->select2Icons]
-            );
+    public function imagesStore(Request $request)
+    {
+
+        $selectImages = $request->selectImages;
+        if (!empty($selectImages)) {
+            foreach ($selectImages as $key => $value) {
+                $imge = ImageStockManagement::updateOrCreate(
+                    [
+                        'image_url' => $value
+                    ], 
+                    [
+                        'tag_name' => $request->select2Icons,
+                        'user_id' => auth()->user()->id
+                    ]
+                );
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Images saved successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No images selected'
+            ]);
         }
 
-        return '1';
     }
 
-    public function GetImages(Request $request){
+    public function GetImages(Request $request)
+    {
 
         $pixabay_api_key = config('app.pixabay_api_key');
         $pexels_api_key = config('app.pexels_api_key');
@@ -83,8 +102,38 @@ class ImageStockManagementController extends Controller
 
             // Close cURL session
             curl_close($ch);
+        }
     }
-}
+
+    public function savedImages()
+    {
+        $images = ImageStockManagement::where('user_id', auth()->user()->id)->latest()->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $images
+        ]);
+    }
+
+    // delete saved images
+    public function deleteSavedImages(Request $request)
+    {
+        $imageIds = $request->image_ids;
+
+        if (!empty($imageIds)) {
+            ImageStockManagement::whereIn('id', $imageIds)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Images deleted successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No images selected'
+            ]);
+        }
+        
+    }
 
     /**
      * Show the form for creating a new resource.
