@@ -45,7 +45,7 @@
                         <th>No</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Subject</th>
+                        <th>Company Name</th>
                         <th>Message</th>
                         <th>Created Date</th>
                     </tr>
@@ -91,7 +91,7 @@
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'name', name: 'name'},
                         { data: 'email', name: 'email'},
-                        { data: 'subject', name: 'subject'},
+                        { data: 'company_name', name: 'company_name'},
                         { data: 'message', name: 'message'},
                         { data: 'created_date', name: 'created_date'},
                     ],

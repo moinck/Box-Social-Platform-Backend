@@ -27,7 +27,7 @@ class ContactUsController extends Controller
             ->addColumn('email', function ($contactUs) {
                 return $contactUs->email;
             })
-            ->addColumn('subject', function ($contactUs) {
+            ->addColumn('company_name', function ($contactUs) {
                 return $contactUs->subject;
             })
             ->addColumn('message', function ($contactUs) {
@@ -44,8 +44,8 @@ class ContactUsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email',
-            'subject' => 'required',
+            'email' => 'required|email:rfc,dns',
+            'company_name' => 'required',
             'message' => 'required',
         ]);
 
@@ -63,7 +63,7 @@ class ContactUsController extends Controller
         ContactUs::create([
             'name' => $request->name,
             'email' => $request->email,
-            'subject' => $request->subject,
+            'subject' => $request->company_name,
             'message' => $request->message,
             'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
