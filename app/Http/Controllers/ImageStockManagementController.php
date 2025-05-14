@@ -17,7 +17,8 @@ class ImageStockManagementController extends Controller
         return view('content.pages.pages-image-stock-management', compact('topics'));
     }
 
-    public function imagesStore(Request $request){
+    public function imagesStore(Request $request)
+    {
 
         $selectImages = $request->selectImages;
         if (!empty($selectImages)) {
@@ -112,6 +113,26 @@ class ImageStockManagementController extends Controller
             'success' => true,
             'data' => $images
         ]);
+    }
+
+    // delete saved images
+    public function deleteSavedImages(Request $request)
+    {
+        $imageIds = $request->image_ids;
+
+        if (!empty($imageIds)) {
+            ImageStockManagement::whereIn('id', $imageIds)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Images deleted successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No images selected'
+            ]);
+        }
+        
     }
 
     /**

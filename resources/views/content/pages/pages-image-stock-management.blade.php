@@ -295,12 +295,43 @@
                     deleteImageIds.push($(this).data('image-id'));
                 });
                 if (deleteImageIds.length > 0) {
-                    // deleteSavedImages();
-                    console.log(deleteImageIds);
+                    deleteSavedImages();
                 } else {
                     showSweetAlert('error', 'Info!', 'Please select 1 image.');
                 }
             });
+            // --------------------------------------------------
+
+            // delete saved images
+            function deleteSavedImages(){
+                var url = "{{ route('image-management.delete.saved-images') }}";
+                $.ajax({
+                    type: 'post',
+                    url: url,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        image_ids: deleteImageIds
+                    },
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            loadSavedImages();
+                            showSweetAlert('success', 'Delete!', 'Image deleted successfully.');
+                        } else {
+                            showSweetAlert('error', 'Info!', 'Something went wrong.');
+                        }
+                    },
+                    error: function (error) {
+                        hideBSPLoader();
+                        console.log(error);
+                    }
+                });
+            };
             // --------------------------------------------------
         });
     </script>

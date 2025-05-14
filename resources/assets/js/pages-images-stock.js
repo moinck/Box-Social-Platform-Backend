@@ -27,6 +27,8 @@ $(function () {
             },
             success: function (response) {
                 if (response.success) {
+                    // clear the selected checkboxes
+                    $('.search-image-checkbox').prop('checked', false);
                     showSweetAlert('success', 'Store!', 'Your image has been successfully saved to your design template!.');
                 } else {
                     showSweetAlert('error', 'Info!', 'Please select 1 image.');
