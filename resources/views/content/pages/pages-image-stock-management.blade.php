@@ -217,12 +217,20 @@
                 e.preventDefault();
             });
 
+            // load image when user comes to saved images tab
             $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-image-section"]', function (e) {
                 loadSavedImages();
+            });
+            
+            // on change of tab hide delete button
+            $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-image-home-section"]', function (e) {
+                $('.delete_select_images').addClass('d-none');
             });
 
             // Function to load saved images
             function loadSavedImages() {
+                // hide delete button
+                $('.delete_select_images').addClass('d-none');
                 var url = "{{ route('image-management.get.saved-images') }}";
                 $.ajax({
                     type: 'get',
@@ -280,10 +288,15 @@
             let deleteImageIds = [];
             // check if any image is selected or not
             $(document).on('click', '.saved-image-checkbox', function () {
-                if ($('.saved-image-checkbox:checked').length > 0) {
-                    $('.delete_select_images').removeClass('d-none');
-                } else {
-                    $('.delete_select_images').addClass('d-none');
+                // also check the current tab
+                // if current tab is saved images then only show btn
+                var currentTab = $('#navs-saved-image-section').attr('id');
+                if (currentTab == 'navs-saved-image-section') {
+                    if ($('.saved-image-checkbox:checked').length > 0) {
+                        $('.delete_select_images').removeClass('d-none');
+                    } else {
+                        $('.delete_select_images').addClass('d-none');
+                    }
                 }
             });
             // --------------------------------------------------

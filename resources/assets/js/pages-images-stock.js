@@ -78,6 +78,7 @@ $(function () {
             success: function (response) {
 
                 var image = "";
+                var newImage = "";
                 var getData = "";
                 if ($("#api_type").val() == "pexels") {
                     getData = response['photos'];
@@ -90,26 +91,53 @@ $(function () {
 
                 $.each(getData, function (i, settings) {
                     var image_url = "";
+                    var id = "";
                     if ($("#api_type").val() == "pexels") {
                         image_url = settings.src.large;
+                        id = settings.id;
                     } else {
                         image_url = settings.largeImageURL;
+                        id = settings.id;
                     }
 
-                    image += '<div class="col-lg-3 col-md-6 col-sm-12">' +
-                        '<div class="card drag-item cursor-move mb-lg-0 mb-6">' +
+                    // image += '<div class="col-lg-3 col-md-6 col-sm-12">' +
+                    //     '<div class="card drag-item cursor-move mb-lg-0 mb-6">' +
 
-                        '<div class="card-body text-center" style=>' +
-                        '<label class="form-check m-0" style="float: right">' +
-                        '<input type="checkbox" class="form-check-input search-image-checkbox" value=' + image_url + ' name="selectImages[]">' +
-                        '</label>' +
-                        '<img src=' + image_url + ' style="width: 96%; height:auto">' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
+                    //     '<div class="card-body text-center" style=>' +
+                    //     '<label class="form-check m-0" style="float: right">' +
+                    //     '<input type="checkbox" class="form-check-input search-image-checkbox" value=' + image_url + ' name="selectImages[]">' +
+                    //     '</label>' +
+                    //     '<img src=' + image_url + ' style="width: 96%; height:auto">' +
+                    //     '</div>' +
+                    //     '</div>' +
+                    //     '</div>';
+
+                    // in1 row show only 4 images
+                    if (i % 4 === 0) {
+                        newImage += `
+                            <div class="row">
+                        `;
+                    }
+                    newImage += `
+                            <div class="col-md mb-md-0 mb-5">
+                                <div class="form-check custom-option custom-option-image custom-option-image-check">
+                                    <input class="form-check-input search-image-checkbox" type="checkbox" name="selectImages[]" id="search-image-${id}" value="${image_url}"/>
+                                    <label class="form-check-label custom-option-content" for="search-image-${id}">
+                                    <span class="custom-option-body">
+                                        <img src="${image_url}" alt="cbImg" />
+                                    </span>
+                                    </label>
+                                </div>
+                            </div>
+                    `;
+                    if (i % 4 === 3) {
+                        newImage += `
+                            </div>
+                        `;
+                    }
 
                 })
-                $("#sortable-cards").html(image);
+                $("#sortable-cards").html(newImage);
             },
             error: function (error) {
                 hideBSPLoader();
