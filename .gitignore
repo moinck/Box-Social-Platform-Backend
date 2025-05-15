@@ -4,3 +4,4 @@
 yarn.lock
 /bootstrap/cache/config.php
 /bootstrap/cache/routes-v7.php
+/public/hot

@@ -268,6 +268,12 @@
                         $.each(getData, function (i, settings) {
                             var image_url = settings.image_url;
                             var imageId = settings.id;
+                            var imageExists = settings.image_exists;
+
+                            // if image does not exist then show not available image
+                            if (imageExists != true) {
+                                image_url = "{{ asset('assets/img/image_not_available.jpg') }}";
+                            }
 
                             // in1 row show only 4 images
                             if (i % 4 === 0) {
