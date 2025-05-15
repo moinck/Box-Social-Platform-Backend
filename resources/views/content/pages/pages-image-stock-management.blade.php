@@ -112,12 +112,15 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-image-home-section" aria-controls="navs-image-home-section" aria-selected="true">
+                                    <i class="tf-icons ri-image-add-fill me-2"></i>
                                     Image Search
                                 </button>
                             </li>
                             <li class="nav-item">
                                 <button type="button" id="saved-img-tab-btn" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-saved-image-section" aria-controls="navs-saved-image-section" aria-selected="false">
-                                    Saved Images
+                                    <i class="tf-icons ri-save-3-line me-2"></i>
+                                    Saved Images 
+                                    <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-success ms-2 pt-50" id="saved-img-count">{{ @$savedImagesCount ?? 0 }}</span>
                                 </button>
                             </li>
                         </ul>
@@ -151,9 +154,15 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-12">
+                                    <div class="col-md-1 col-sm-12">
                                         <button class="clipboard-btn btn btn-primary me-2 waves-effect waves-light search_btn">
                                             Search
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <button type="button" class="btn btn-primary me-4 d-none save_select_images" style=" float: inline-end;">
+                                            <i class="ri-save-3-line me-sm-1 me-0"></i>
+                                            Save Select Images
                                         </button>
                                     </div>
                                 </div>
@@ -183,10 +192,10 @@
                                         </button>
                                     </div>
                 
-                                    <div class="col-md-12">
+                                    {{-- <div class="col-md-12">
                                         <br><br>
                                         <button type="button" class="btn btn-primary me-4 save_select_images" style=" float: inline-end;">Save Select Images</button>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </form>
                         </div>
@@ -227,6 +236,16 @@
                 $('.delete_select_images').addClass('d-none');
             });
 
+            // only show save button if any image is selected
+            $(document).on('change', '.search-image-checkbox', function () {
+                if ($('.search-image-checkbox:checked').length > 0) {
+                    $('.save_select_images').removeClass('d-none');
+                } else {
+                    $('.save_select_images').addClass('d-none');
+                }
+            });
+            // --------------------------------------------------
+
             // Function to load saved images
             function loadSavedImages() {
                 // hide delete button
@@ -249,6 +268,12 @@
                         $.each(getData, function (i, settings) {
                             var image_url = settings.image_url;
                             var imageId = settings.id;
+                            var imageExists = settings.image_exists;
+
+                            // if image does not exist then show not available image
+                            if (imageExists != true) {
+                                image_url = "{{ asset('assets/img/image_not_available.jpg') }}";
+                            }
 
                             // in1 row show only 4 images
                             if (i % 4 === 0) {
@@ -262,7 +287,7 @@
                                         <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
                                         <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
                                         <span class="custom-option-body">
-                                            <img src="${image_url}" alt="cbImg" />
+                                            <img src="${image_url}" alt="saved-image"/>
                                         </span>
                                         </label>
                                     </div>
@@ -334,6 +359,7 @@
                     success: function (data) {
                         if (data.success) {
                             loadSavedImages();
+                            $('#saved-img-count').text(data.savedImagesCount);
                             showSweetAlert('success', 'Delete!', 'Image deleted successfully.');
                         } else {
                             showSweetAlert('error', 'Info!', 'Something went wrong.');

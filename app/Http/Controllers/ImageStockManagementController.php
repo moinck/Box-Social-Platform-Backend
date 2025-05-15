@@ -13,8 +13,9 @@ class ImageStockManagementController extends Controller
     public function index()
     {
         $topics = config('image_topics');
+        $savedImagesCount = ImageStockManagement::myImageCount();
        
-        return view('content.pages.pages-image-stock-management', compact('topics'));
+        return view('content.pages.pages-image-stock-management', compact('topics', 'savedImagesCount'));
     }
 
     public function imagesStore(Request $request)
@@ -33,9 +34,13 @@ class ImageStockManagementController extends Controller
                     ]
                 );
             }
+
+            // update saved images count
+            $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
             return response()->json([
                 'success' => true,
-                'message' => 'Images saved successfully'
+                'message' => 'Images saved successfully',
+                'savedImagesCount' => $savedImagesCount
             ]);
         } else {
             return response()->json([
@@ -107,7 +112,14 @@ class ImageStockManagementController extends Controller
 
     public function savedImages()
     {
-        $images = ImageStockManagement::where('user_id', auth()->user()->id)->latest()->get();
+        $images = ImageStockManagement::where('user_id', auth()->user()->id)->latest()->get()
+        ->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => $image->image_url,
+                'image_exists' => pathinfo($image->image_url, PATHINFO_EXTENSION) ? true : false,
+            ];
+        });
         
         return response()->json([
             'success' => true,
@@ -122,9 +134,11 @@ class ImageStockManagementController extends Controller
 
         if (!empty($imageIds)) {
             ImageStockManagement::whereIn('id', $imageIds)->delete();
+            $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
             return response()->json([
                 'success' => true,
-                'message' => 'Images deleted successfully'
+                'message' => 'Images deleted successfully',
+                'savedImagesCount' => $savedImagesCount
             ]);
         } else {
             return response()->json([

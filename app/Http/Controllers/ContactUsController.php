@@ -43,7 +43,7 @@ class ContactUsController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'full_name' => 'required',
             'email' => 'required|email:rfc,dns',
             'company_name' => 'required',
             'message' => 'required',
@@ -61,7 +61,7 @@ class ContactUsController extends Controller
 
         // store data in database
         ContactUs::create([
-            'name' => $request->name,
+            'name' => $request->full_name,
             'email' => $request->email,
             'subject' => $request->company_name,
             'message' => $request->message,
