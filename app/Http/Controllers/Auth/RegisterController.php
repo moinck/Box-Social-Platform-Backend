@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 
@@ -35,18 +35,73 @@ class RegisterController extends Controller
         ->make(true);
     }
 
-    public function register(AuthRegisterRequest $request)
+    public function register(Request $request)
     {
-
-        $user = User::create([
-            'first_name' => 'Supper',
-            'last_name' => 'Admin',
-            'email' => 'admin.box@yopmail.com',
-            'password' => Hash::make('adminbox123'),
-            'status' => 'active',
-            'role' => 'admin',
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            'company_name' => 'required|string',
+            'fca_number' => 'required|numeric|min:6',
+            'website' => 'required|string|url',
         ]);
-        return response()->json($user);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            // Create the user
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'company_name' => $request->company_name,
+                'website' => $request->website,
+                'fca_number' => $request->fca_number,
+            ]);
+            
+            // Create an API token for the user
+            $token = $user->createToken('auth_token')->plainTextToken;
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'User registered successfully.',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'company_name' => $user->company_name,
+                        'website' => $user->website,
+                        'fca_number' => $user->fca_number,
+                        'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                    ],
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ],
+            ], 201);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed. Please try again.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Server error',
+            ], 500);
+        }
     }
 
     public function login(Request $request)
@@ -60,7 +115,7 @@ class RegisterController extends Controller
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Validation errors',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -68,7 +123,7 @@ class RegisterController extends Controller
         // Attempt to authenticate the user
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'message' => 'Invalid login credentials',
+                'message' => 'Invalid login credentials.',
             ], 401);
         }
 
@@ -78,7 +133,7 @@ class RegisterController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
+            'message' => 'Login successfully.',
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
