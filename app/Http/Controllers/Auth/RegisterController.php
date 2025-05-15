@@ -104,6 +104,8 @@ class RegisterController extends Controller
     
         $response = Http::withHeaders($headers)->get('https://register.fca.org.uk/services/V0.1/Firm/'.$request->fca_number);
         $data = $response->json();
+
+        
     
         if (!empty($data['Data'][0]["Name"])) {
             $nameUrl = $data['Data'][0]["Name"];
