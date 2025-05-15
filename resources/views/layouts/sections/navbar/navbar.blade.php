@@ -68,8 +68,8 @@ $navbarDetached = ($navbarDetached ?? '');
                         </div>
                       </div>
                       <div class="flex-grow-1">
-                        <h6 class="small mb-1">Congratulation Lettie 🎉</h6>
-                        <small class="mb-1 d-block text-body">Won the monthly best seller gold badge</small>
+                        <h6 class="small mb-1">New User Register </h6>
+                        <small class="mb-1 d-block text-body">User Register</small>
                         <small class="text-muted">1h ago</small>
                       </div>
                       <div class="flex-shrink-0 dropdown-notifications-actions">
