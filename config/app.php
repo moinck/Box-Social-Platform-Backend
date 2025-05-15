@@ -14,6 +14,8 @@ return [
   */
 
   'name' => env('APP_NAME', 'Laravel'),
+  'FCA_Auth_EMAIL' => env('FCA_Auth_EMAIL', ''),
+  'FCA_Auth_KEY' => env('FCA_Auth_KEY', ''),
 
   /*
   |--------------------------------------------------------------------------

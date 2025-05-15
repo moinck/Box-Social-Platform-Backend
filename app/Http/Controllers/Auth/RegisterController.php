@@ -9,8 +9,11 @@ use App\Models\User;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+
 
 class RegisterController extends Controller
 {
@@ -139,4 +142,51 @@ class RegisterController extends Controller
         ]);
 
     }
+
+    public function checkFca(Request $request){
+        $fcaNumber = $request->fca_number;
+
+        if (empty($fcaNumber)) {
+            return response()->json([
+                'status' => '0',
+                'Message' => 'FCA number is required.'
+            ]);
+        }
+
+        $returnResponse = [];
+        $headers = [
+            'x-auth-email' => config('app.FCA_Auth_EMAIL'),
+            'x-auth-key' => config('app.FCA_Auth_KEY'),
+            'Content-Type' => 'application/json',
+        ];
+    
+        $response = Http::withHeaders($headers)->get('https://register.fca.org.uk/services/V0.1/Firm/'.$request->fca_number);
+        $data = $response->json();
+
+        
+    
+        if (!empty($data['Data'][0]["Name"])) {
+            $nameUrl = $data['Data'][0]["Name"];
+    
+            $responseName = Http::withHeaders($headers)->get($nameUrl);
+            $nameData = $responseName->json();
+    
+            $companyName = $nameData['Data'][0]['Current Names'][0]['Name'] ?? '';
+    
+            $returnResponse = [
+                'status' => '1',
+                'Company Name' => $companyName
+            ];
+        } else {
+            $returnResponse = [
+                'status' => '0',
+                'Message' => 'Please Enter Valide FCA Number'
+            ];
+        }
+    
+        return response()->json($returnResponse);
+    }
+
+
+
 }
