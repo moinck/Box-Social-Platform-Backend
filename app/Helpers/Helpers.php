@@ -226,4 +226,16 @@ class Helpers
       }
     }
   }
+
+    /**
+     * function to save images
+     */
+    public static function uploadImage($name,$image, $path)
+    {
+        $image_name = $name ."_". time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path($path), $image_name);
+
+        $imageUrl = $path . '/' . $image_name;
+        return $imageUrl;
+    }
 }

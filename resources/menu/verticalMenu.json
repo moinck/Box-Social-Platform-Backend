@@ -1,22 +1,28 @@
 {
-  "menu": [
-    {
-      "url": "/home",
-      "name": "User Management",
-      "icon": "menu-icon tf-icons ri-home-smile-line",
-      "slug": "pages-home"
-    },
-    {
-      "url": "/stock-image-management",
-      "name": "Stock Image Management",
-      "icon": "menu-icon tf-icons ri-folder-image-line",
-      "slug": "stock-image-management"
-    },
-    {
-      "url": "/feedback-management",
-      "name": "Feedback Management",
-      "icon": "menu-icon tf-icons ri-contacts-book-3-line",
-      "slug": "feedback-management"
-    }
-  ]
+    "menu": [
+        {
+            "url": "/home",
+            "name": "User Management",
+            "icon": "menu-icon tf-icons ri-home-smile-line",
+            "slug": "pages-home"
+        },
+        {
+            "url": "/stock-image-management",
+            "name": "Stock Image Management",
+            "icon": "menu-icon tf-icons ri-folder-image-line",
+            "slug": "stock-image-management"
+        },
+        {
+            "url": "/feedback-management",
+            "name": "Feedback Management",
+            "icon": "menu-icon tf-icons ri-contacts-book-3-line",
+            "slug": "feedback-management"
+        },
+        {
+            "url": "/categories",
+            "name": "Categories",
+            "icon": "menu-icon tf-icons ri-archive-stack-line",
+            "slug": "categories"
+        }
+    ]
 }

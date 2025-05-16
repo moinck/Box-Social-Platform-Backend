@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
@@ -45,6 +46,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
+
+    // categories controller
+    Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
+    Route::post('/categories/store', [CategoriesController::class,'store'])->name('categories.store');
+    Route::get('/categories/datatable', [CategoriesController::class,'categoriesDataTable'])->name('categories.data-table');
+    Route::get('/categories/edit/{id}', [CategoriesController::class,'edit'])->name('categories.edit');
+    Route::post('/categories/update', [CategoriesController::class,'update'])->name('categories.update');
+    Route::post('/categories/delete', [CategoriesController::class,'destroy'])->name('categories.delete');
+    Route::post('/categories/account-status', [CategoriesController::class,'accountStatus'])->name('categories.account-status');
+    Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
 
     // user feedback-management controller
     Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
