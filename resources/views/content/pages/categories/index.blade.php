@@ -178,6 +178,7 @@
                 addCategoryFV.resetForm();
                 $('#add-category-modal').modal('show');
             });
+            // -------------------------------------------
             
             // validate the submit form
             const addCategoryForm = document.getElementById('add-category-form');
@@ -273,6 +274,56 @@
                         hideBSPLoader();
                         console.log(xhr.responseText);
                         showSweetAlert('error', 'Error !', 'Something went wrong.');
+                    }
+                });
+            });
+            // ----------------------------------------------------------
+
+            // change status function
+            $(document).on('click', '#category-status', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't to change status!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, change it!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('categories.change-status') }}",
+                            type: "POST",
+                            data: {
+                                id: id,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function (response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Updated !','Category status has been updated successfully.');
+                                    CategoriesDataTable();
+                                }
+                            },
+                            error: function (xhr) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error !', 'Something went wrong.');
+                            }
+                        });
+                    } else {
+                        $(this).prop('checked', !$(this).prop('checked'));
                     }
                 });
             });

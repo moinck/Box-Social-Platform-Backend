@@ -112,6 +112,7 @@ class CategoriesController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'required|string',
             'status' => 'required|string|in:active,inactive',
+            'category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $category = Categories::find($request->id);
@@ -119,6 +120,12 @@ class CategoriesController extends Controller
             $category->name = $request->name;
             $category->description = $request->description;
             $category->status = $request->status;
+
+            if ($request->hasFile('category_image')) {  
+                $image = $request->file('category_image');
+                $image_url = Helpers::uploadImage('cat', $image, 'images/categories');
+                $category->image = $image_url;
+            }
             $category->save();
 
             return response()->json([
@@ -150,12 +157,18 @@ class CategoriesController extends Controller
         }
     }
 
-    public function accountStatus(Request $request)
+    /**
+     * change Category status
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function changeStatus(Request $request)
     {
         $category = Categories::find($request->id);
         if ($category) {
-            $category->status = $category->status == 'active' ? 'inactive' : 'active';
+            $category->status = $category->status == true ? false : true;
             $category->save();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Category status updated successfully.'

@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/categories/edit/{id}', [CategoriesController::class,'edit'])->name('categories.edit');
     Route::post('/categories/update', [CategoriesController::class,'update'])->name('categories.update');
     Route::post('/categories/delete', [CategoriesController::class,'destroy'])->name('categories.delete');
-    Route::post('/categories/account-status', [CategoriesController::class,'accountStatus'])->name('categories.account-status');
+    Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
     Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
 
     // user feedback-management controller
