@@ -24,7 +24,7 @@ class CategoriesController extends Controller
                 return $category->name;
             })
             ->addColumn('image', function ($category) {
-                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="img-fluid" width="100" height="100">';
+                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="img-fluid br-1" width="100" height="100">';
             })
             ->addColumn('description', function ($category) {
                 return $category->description;
@@ -108,21 +108,26 @@ class CategoriesController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'required|string',
-            'status' => 'required|string|in:active,inactive',
-            'category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'edit_category_name' => 'required|string|max:255',
+            'edit_category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'edit_category_description' => 'required|string',
+            'edit_category_status' => 'required|string|in:active,inactive',
         ]);
 
-        $category = Categories::find($request->id);
+        $category = Categories::find($request->edit_category_id);
         if ($category) {
-            $category->name = $request->name;
-            $category->description = $request->description;
-            $category->status = $request->status;
+            $category->name = $request->edit_category_name;
+            $category->description = $request->edit_category_description;
+            $category->status = $request->edit_category_status == 'active' ? true : false;
 
-            if ($request->hasFile('category_image')) {  
-                $image = $request->file('category_image');
+            if ($request->hasFile('edit_category_image')) {
+                // delete old image
+                if ($category->image) {
+                    unlink(public_path($category->image));
+                }
+
+                // upload new image
+                $image = $request->file('edit_category_image');
                 $image_url = Helpers::uploadImage('cat', $image, 'images/categories');
                 $category->image = $image_url;
             }
@@ -144,6 +149,10 @@ class CategoriesController extends Controller
     {
         $category = Categories::find($id);
         if ($category) {
+            // delete old image
+            if ($category->image) {
+                unlink(public_path($category->image));
+            }
             $category->delete();
             return response()->json([
                 'success' => true,

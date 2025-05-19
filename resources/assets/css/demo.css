@@ -198,3 +198,6 @@
   overflow-y: auto;
 }
 
+.br-1 {
+  border-radius: 10px;
+}

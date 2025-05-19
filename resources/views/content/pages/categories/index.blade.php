@@ -66,6 +66,7 @@
     </div>
     <!--/ Main Table -->
 
+    {{-- add category modal --}}
     <div class="modal fade" id="add-category-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-simple">
             <div class="modal-content">
@@ -110,6 +111,69 @@
                         </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- edit category modal --}}
+    <div class="modal fade" id="edit-category-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-simple">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body p-0">
+                    <div class="text-center mb-6">
+                        <h4 class="mb-2">Edit Category</h4>
+                    </div>
+                    <form id="edit-category-form" class="row g-5" method="POST">
+                        @csrf
+                        <input type="hidden" name="edit_category_id" id="edit_category_id">
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="edit_category_name" name="edit_category_name" class="form-control"
+                                    placeholder="Category Name" required />
+                                <label for="edit_category_name">Category Name</label>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-floating form-floating-outline mt-6">
+                                <input type="file" id="edit_category_image" name="edit_category_image" class="form-control"
+                                    placeholder="Image"  accept="image/*"/>
+                                <label for="edit_category_image">Image</label>
+                            </div>
+                            <small class="text-dark">only upload image if you want to change image</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <img src="" alt="edit category image" class="img-fluid br-1" id="edit_category_image_preview" height="200" width="200">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <textarea id="edit_category_description" rows="3" name="edit_category_description" class="form-control h-px-75"
+                                    placeholder="Description"></textarea>
+                                <label for="edit_category_description">Description</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <select id="edit_category_status" name="edit_category_status" class="form-select"
+                                    aria-label="Default select example">
+                                    <option value="">Select Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                <label for="edit_category_status">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary">Update</button>
                             <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
                                 aria-label="Close">
                                 Cancel
@@ -324,6 +388,141 @@
                         });
                     } else {
                         $(this).prop('checked', !$(this).prop('checked'));
+                    }
+                });
+            });
+            // ----------------------------------------------------------
+
+            // Edit User modal
+            $(document).on('click', '.edit-category-btn', function() {
+                var categoryId = $(this).data('category-id');
+                var editUrl = "{{ url('/categories/edit/') }}/" + categoryId;
+                $.ajax({
+                    url: editUrl,
+                    type: "GET",
+                    success: function(response) {
+                        if (response.success == true) {
+                            $('#edit_category_name').val(response.data.name);
+                            $('#edit_category_id').val(response.data.id);
+                            $('#edit_category_description').val(response.data.description);
+                            $('#edit_category_status').val(response.data.status);
+                            var accountStatus = response.data.status;
+                            if (accountStatus == true) {
+                                $('#edit_category_status').val('active');
+                            } else {
+                                $('#edit_category_status').val('inactive');
+                            }
+
+                            var ImageUrl = "{{ asset('') }}" + response.data.image;
+                            $('#edit_category_image_preview').attr('src', ImageUrl);
+                        } else {
+                            // toastr.error(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+                // clear edit user form validation
+                // categoryEditFV.resetForm();
+                $('#edit-category-modal').modal('show');
+            });
+            // -------------------------------------------
+
+            // edit form validation & submission
+            var editCategoryForm = document.getElementById('edit-category-form');
+            var categoryEditFV = FormValidation.formValidation( editCategoryForm,
+                {
+                    fields: {
+                        edit_category_name: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Please enter category name'
+                                },
+                                stringLength: {
+                                    min: 2,
+                                    max: 50,
+                                    message: 'Category name must be between 2 and 50 characters'
+                                }
+                            }
+                        },
+                        edit_category_image: {
+                            validators: {
+                                file: {
+                                    extension: 'png,jpg,jpeg,gif',
+                                    type: 'image/jpeg,image/png,image/jpg,image/gif',
+                                    maxSize: 2 * 1024 * 1024,
+                                    message: 'Please upload a valid image file'
+                                }
+                            }
+                        },
+                        edit_category_description: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Please enter your category description'
+                                },
+                                stringLength: {
+                                    max: 100,
+                                    message: 'Category description must be less than 100 characters'
+                                }
+                            }
+                        },
+                        edit_category_status: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Please select account status'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                            eleValidClass: '',
+                            rowSelector: function(field, ele) {
+                                // Customize row selector based on your form layout
+                                if (['edit_category_name', 'edit_category_description','edit_category_status'].includes(field)) {
+                                    return '.col-12';
+                                }
+                                if (['edit_category_image'].includes(field)) {
+                                    return '.col-8';
+                                }
+                                return '.col-12';
+                            }
+                        }),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+                        // autoFocus: new FormValidation.plugins.AutoFocus()
+                    }
+                }
+            ).on('core.form.valid', function() {
+                // Form is valid, proceed with form submission
+                var form = $('#edit-category-form');
+                var formData = new FormData(form[0]); // Creates FormData object
+
+                $.ajax({
+                    url: "{{ route('categories.update') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function(response) {
+                        if (response.success == true) {
+                            showSweetAlert('success', 'Updated !','Category has been updated successfully.');
+                            $('#edit-category-modal').modal('hide');
+                            CategoriesDataTable();
+                        }
+                    },
+                    error: function(xhr) {
+                        hideBSPLoader();
+                        console.log(xhr.responseText);
+                        showSweetAlert('error', 'Error !', 'Something went wrong.');
                     }
                 });
             });
