@@ -51,8 +51,8 @@ class CategoriesController extends Controller
             })
             ->addColumn('action', function ($category) {
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn" data-category-id="'.$category->id.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn" data-category-id="'.$category->id.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" title="edit category" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn" data-category-id="'.$category->id.'"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:;" title="delete category" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn" data-category-id="'.$category->id.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['image', 'status', 'action'])
@@ -145,9 +145,14 @@ class CategoriesController extends Controller
         }
     }
 
-    public function destroy($id)
+    /**
+     * Function to delete category
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request)
     {
-        $category = Categories::find($id);
+        $category = Categories::find($request->category_id);
         if ($category) {
             // delete old image
             if ($category->image) {
