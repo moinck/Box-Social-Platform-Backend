@@ -44,13 +44,13 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8',
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6',
-            'website' => 'required|string|url',
+            'website' => 'string|url',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed.',
+                'message' => 'Validation failed',
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -98,7 +98,7 @@ class RegisterController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed, Please try again.',
+                'message' => 'Registration failed. Please try again.',
                 'error' => config('app.debug') ? $e->getMessage() : 'Server error',
             ], 500);
         }
@@ -115,7 +115,6 @@ class RegisterController extends Controller
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
                 'message' => 'Validation errors.',
                 'errors' => $validator->errors(),
             ], 422);
@@ -124,7 +123,6 @@ class RegisterController extends Controller
         // Attempt to authenticate the user
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'success' => false,
                 'message' => 'Invalid login credentials.',
             ], 401);
         }
@@ -135,7 +133,6 @@ class RegisterController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'success' => true,
             'message' => 'Login successfully.',
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -182,9 +179,11 @@ class RegisterController extends Controller
                 'status' => '0',
                 'Message' => 'Please Enter Valide FCA Number'
             ];
+
+            return response()->json($returnResponse,422);
         }
     
-        return response()->json($returnResponse);
+        return response()->json($returnResponse,200);
     }
 
 
