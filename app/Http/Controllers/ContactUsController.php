@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactUs;
+use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class ContactUsController extends Controller
 {
+    use ResponseTrait;
+
     public function index() 
     {
         return view('content.pages.admin.contact-us.index');
@@ -50,10 +53,7 @@ class ContactUsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation errors',
-                'errors' => $validator->errors(),
-            ], 422);
+            return $this->validationError('Validation errors', $validator->errors(), 422);
         }
 
         $ipAddress = $request->getClientIp();
@@ -69,9 +69,6 @@ class ContactUsController extends Controller
             'user_agent' => $userAgent,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Contact Us submitted successfully',
-        ], 200);
+        return $this->success('Contact Us submitted successfully');
     }
 }

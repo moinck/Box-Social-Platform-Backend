@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
@@ -22,8 +23,12 @@ Route::group([
 
         // api for submit contact-us form
         // Route::post('store/contact-us', [ContactUsController::class, 'store']);
+
+        // category list
+        // Route::get('/category/list', [CategoriesController::class, 'list']);
     });
 });
 
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
+Route::get('/category/list', [CategoriesController::class, 'list']);
 
