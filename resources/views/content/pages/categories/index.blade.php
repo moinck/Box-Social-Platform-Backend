@@ -109,6 +109,17 @@
                                 <label for="category_status">Status</label>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="mb-0">Subcategories</h5>
+                                <button type="button" class="btn btn-sm btn-primary" id="add-subcategory-btn">
+                                    <i class="fas fa-plus me-1"></i> Add Subcategory
+                                </button>
+                            </div>
+                            <div id="subcategories-container">
+                                <!-- Subcategory fields will be added here dynamically -->
+                            </div>
+                        </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary">Create</button>
                             <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
@@ -238,6 +249,8 @@
             $(document).on('click','#category-add-btn', function () {
                 // reset the form
                 $('#add-category-form')[0].reset();
+                $('.subcategory-item').remove();
+                subcategoryCount = 0;
                 // reset the form validation
                 addCategoryFV.resetForm();
                 $('#add-category-modal').modal('show');
@@ -573,6 +586,51 @@
                         });
                     }
                 });
+            });
+            // ----------------------------------------------------------
+
+
+            // add subcategory
+            let subcategoryCount = 0;
+            $(document).on('click', '#add-subcategory-btn', function() {
+                subcategoryCount++;
+                var subcategoriesContainer = $('#subcategories-container');
+                var subcategoryHtml = `
+                    <div class="col-12 mt-2 subcategory-item">
+                        <div class="input-group input-group-merge">
+                            <div class="form-floating form-floating-outline">
+                                <input
+                                    type="text"
+                                    class="form-control subcategory-name"
+                                    id="subcategory_name_${subcategoryCount}"
+                                    name="subcategory_name[${subcategoryCount}]"
+                                    placeholder="Subcategory Name"
+                                    aria-describedby="subcategory_name_${subcategoryCount}" />
+                                <label for="subcategory_name_${subcategoryCount}">Subcategory Name ${subcategoryCount}</label>
+                            </div>
+                            <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
+                        </div>
+                    </div>
+                `;
+                subcategoriesContainer.append(subcategoryHtml);
+
+                // also add validation for subcategory name
+                addCategoryFV.revalidateField('subcategory_name');
+                addCategoryFV.addField(`subcategory_name[${subcategoryCount}]`, {
+                    validators: {
+                        notEmpty: {
+                            message: 'Subcategory ' + subcategoryCount + ' name is required'
+                        }
+                    }
+                });
+            });
+            // ----------------------------------------------------------
+
+            // remove subcategory
+            $(document).on('click', '.remove-subcategory-btn', function() {
+                $(this).parent().parent().remove();
+                subcategoryCount--;
+                addCategoryFV.removeField(`subcategory_name[${subcategoryCount}]`);
             });
             // ----------------------------------------------------------
         });

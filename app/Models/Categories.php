@@ -14,4 +14,14 @@ class Categories extends Model
         'description',
         'status',
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo(Categories::class, 'parent_id');
+    }
+    
+    public function children()
+    {
+        return $this->hasMany(Categories::class, 'parent_id');
+    }
 }

@@ -16,7 +16,7 @@ class CategoriesController extends Controller
 
     public function categoriesDataTable()
     {
-        $categories = Categories::latest()->get();
+        $categories = Categories::where('parent_id', null)->latest()->get();
 
         return DataTables::of($categories)
             ->addIndexColumn()
@@ -71,6 +71,8 @@ class CategoriesController extends Controller
             'category_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_description' => 'required|string',
             'category_status' => 'required|string|in:active,inactive',
+            'subcategory_name' => 'nullable|array',
+            'subcategory_name.*' => 'required|string|max:255',
         ]);
 
         $image = $request->file('category_image');
@@ -82,6 +84,16 @@ class CategoriesController extends Controller
         $category->description = $request->category_description;
         $category->status = $request->category_status == 'active' ? true : false;
         $category->save();
+
+        // add subcategories
+        if ($request->has('subcategory_name')) {
+            foreach ($request->subcategory_name as $subcategory_name) {
+                $subcategory = new Categories();
+                $subcategory->name = $subcategory_name;
+                $subcategory->parent_id = $category->id;
+                $subcategory->save();
+            }
+        }
 
         return response()->json([
             'success' => true,
