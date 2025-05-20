@@ -14,7 +14,12 @@ class CategoriesController extends Controller
 
     public function list(Request $request)
     {
-        $categories = Categories::where('status', 1)->latest()->get();
+        $categories = Categories::where(function ($query) {
+            $query->where('status', true)
+                ->where('parent_id', null);
+        })->with('children:id,name,parent_id')->latest()->get();
+
+        // send data to resource
         $categoryCollection = CategoryResource::collection($categories);
 
         return $this->success($categoryCollection, 'Categories list.');

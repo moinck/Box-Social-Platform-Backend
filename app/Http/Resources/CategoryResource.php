@@ -19,6 +19,7 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'image' => asset($this->image),
             'description' => $this->description,
+            'sub_categories' => $this->whenLoaded('children'),
         ];
     }
 }
