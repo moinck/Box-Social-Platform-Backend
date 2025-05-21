@@ -18,8 +18,15 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'image' => asset($this->image),
-            'description' => $this->description,
-            'sub_categories' => $this->whenLoaded('children'),
+            // 'description' => $this->description,
+            'sub_categories' => $this->whenLoaded('children', function () {
+                return $this->children->map(function ($child) {
+                    return [
+                        'id' => $child->id,
+                        'name' => $child->name,
+                    ];
+                });
+            }),
         ];
     }
 }
