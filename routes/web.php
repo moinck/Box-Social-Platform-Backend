@@ -47,19 +47,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
 
-    // categories controller
-    Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
-    Route::post('/categories/store', [CategoriesController::class,'store'])->name('categories.store');
-    Route::get('/categories/datatable', [CategoriesController::class,'categoriesDataTable'])->name('categories.data-table');
-    Route::get('/categories/edit/{id}', [CategoriesController::class,'edit'])->name('categories.edit');
-    Route::post('/categories/update', [CategoriesController::class,'update'])->name('categories.update');
-    Route::post('/categories/delete', [CategoriesController::class,'destroy'])->name('categories.delete');
-    Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
-    Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
-
-    // user feedback-management controller
-    Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
-    Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
+    Route::middleware('checkRole:admin')->group(function () {        
+        // categories controller
+        Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
+        Route::post('/categories/store', [CategoriesController::class,'store'])->name('categories.store');
+        Route::get('/categories/datatable', [CategoriesController::class,'categoriesDataTable'])->name('categories.data-table');
+        Route::get('/categories/edit/{id}', [CategoriesController::class,'edit'])->name('categories.edit');
+        Route::post('/categories/update', [CategoriesController::class,'update'])->name('categories.update');
+        Route::post('/categories/delete', [CategoriesController::class,'destroy'])->name('categories.delete');
+        Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
+        Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
+    
+        // user feedback-management controller
+        Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
+        Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
+    });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 

@@ -69,6 +69,30 @@
         });
     }
 </script>
+@if (session()->has('warning'))
+    <script>
+        setTimeout(() => {
+            hideBSPLoader();
+            showSweetAlert('warning', 'Warning', '{{ session()->get('warning') }}');
+        }, 500);
+    </script>
+@endif
+@if (session()->has('success'))
+    <script>
+        setTimeout(() => {
+            hideBSPLoader();
+            showSweetAlert('success', 'Success', '{{ session()->get('success') }}');
+        }, 1000);
+    </script>
+@endif
+@if (session()->has('error'))
+    <script>
+        setTimeout(() => {
+            hideBSPLoader();
+            showSweetAlert('error', 'Error', '{{ session()->get('error') }}');
+        }, 1000);
+    </script>
+@endif
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->
