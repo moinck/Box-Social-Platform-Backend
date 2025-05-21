@@ -16,7 +16,7 @@ class CategoriesController extends Controller
 
     public function categoriesDataTable()
     {
-        $categories = Categories::latest()->get();
+        $categories = Categories::where('parent_id', null)->latest()->get();
 
         return DataTables::of($categories)
             ->addIndexColumn()
@@ -24,7 +24,7 @@ class CategoriesController extends Controller
                 return $category->name;
             })
             ->addColumn('image', function ($category) {
-                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="img-fluid" width="100" height="100">';
+                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="img-fluid br-1" width="100" height="100">';
             })
             ->addColumn('description', function ($category) {
                 return $category->description;
@@ -51,8 +51,8 @@ class CategoriesController extends Controller
             })
             ->addColumn('action', function ($category) {
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn" data-category-id="'.$category->id.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn" data-category-id="'.$category->id.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" title="edit category" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn" data-category-id="'.$category->id.'"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:;" title="delete category" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn" data-category-id="'.$category->id.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['image', 'status', 'action'])
@@ -71,6 +71,8 @@ class CategoriesController extends Controller
             'category_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_description' => 'required|string',
             'category_status' => 'required|string|in:active,inactive',
+            'subcategory_name' => 'nullable|array',
+            'subcategory_name.*' => 'required|string|max:255',
         ]);
 
         $image = $request->file('category_image');
@@ -83,6 +85,16 @@ class CategoriesController extends Controller
         $category->status = $request->category_status == 'active' ? true : false;
         $category->save();
 
+        // add subcategories
+        if ($request->has('subcategory_name')) {
+            foreach ($request->subcategory_name as $subcategory_name) {
+                $subcategory = new Categories();
+                $subcategory->name = $subcategory_name;
+                $subcategory->parent_id = $category->id;
+                $subcategory->save();
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Category created successfully.'
@@ -91,7 +103,7 @@ class CategoriesController extends Controller
 
     public function edit($id)
     {
-        $category = Categories::find($id);
+        $category = Categories::with('children:id,name,parent_id')->find($id);
         if ($category) {
             return response()->json([
                 'success' => true,
@@ -108,18 +120,63 @@ class CategoriesController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'required|string',
-            'status' => 'required|string|in:active,inactive',
+            'edit_category_name' => 'required|string|max:255',
+            'edit_category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'edit_category_description' => 'required|string',
+            'edit_category_status' => 'required|string|in:active,inactive',
+            'edit_subcategory_ids' => 'nullable|json',
         ]);
 
-        $category = Categories::find($request->id);
+        $category = Categories::find($request->edit_category_id);
         if ($category) {
-            $category->name = $request->name;
-            $category->description = $request->description;
-            $category->status = $request->status;
+            $category->name = $request->edit_category_name;
+            $category->description = $request->edit_category_description;
+            $category->status = $request->edit_category_status == 'active' ? true : false;
+
+            if ($request->hasFile('edit_category_image')) {
+                // delete old image
+                if ($category->image) {
+                    unlink(public_path($category->image));
+                }
+
+                // upload new image
+                $image = $request->file('edit_category_image');
+                $image_url = Helpers::uploadImage('cat', $image, 'images/categories');
+                $category->image = $image_url;
+            }
             $category->save();
+
+            // update subcategories
+            // if subcategory id is 0 then create new subcategory
+            // else update subcategory
+            if ($request->has('edit_subcategory_ids') && $request->edit_subcategory_ids != null) {
+                $subCategories = json_decode($request->edit_subcategory_ids, true);
+                $subCategoryIds = array_column($subCategories, 'id');
+                $subCategoryNames = array_column($subCategories, 'name');
+
+
+                foreach ($subCategories as $subCategory) {
+                    if ($subCategory['id'] == 0) {
+                        $subcategory = new Categories();
+                        $subcategory->name = $subCategory['name'];
+                        $subcategory->parent_id = $category->id;
+                        $subcategory->save();
+                    } else {
+                        $subcategory = Categories::where('id', $subCategory['id'])->first();
+                        $subcategory->name = $subCategory['name'];
+                        $subcategory->save();
+                    }
+                }
+
+                // delete subcategories that are not in the request
+                $deleteSubcategories = Categories::where('parent_id', $category->id)
+                    ->whereNotIn('id', $subCategoryIds)
+                    ->whereNotIn('name', $subCategoryNames)
+                    ->get();
+                foreach ($deleteSubcategories as $deleteSubcategory) {
+                    $deleteSubcategory->delete();
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -133,10 +190,19 @@ class CategoriesController extends Controller
         }
     }
 
-    public function destroy($id)
+    /**
+     * Function to delete category
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request)
     {
-        $category = Categories::find($id);
+        $category = Categories::find($request->category_id);
         if ($category) {
+            // delete old image
+            if ($category->image) {
+                unlink(public_path($category->image));
+            }
             $category->delete();
             return response()->json([
                 'success' => true,
@@ -150,12 +216,18 @@ class CategoriesController extends Controller
         }
     }
 
-    public function accountStatus(Request $request)
+    /**
+     * change Category status
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function changeStatus(Request $request)
     {
         $category = Categories::find($request->id);
         if ($category) {
-            $category->status = $category->status == 'active' ? 'inactive' : 'active';
+            $category->status = $category->status == true ? false : true;
             $category->save();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Category status updated successfully.'
