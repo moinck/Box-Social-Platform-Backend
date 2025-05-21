@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rules\Password;
 
 
 class RegisterController extends Controller
@@ -41,16 +42,32 @@ class RegisterController extends Controller
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'password' => [
+            'required',
+            'string',
+            Password::min(8)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(), // check if password was leaked in data breaches
+            ],
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6',
-            'website' => 'string|url',
+            'website' => 'nullable|string|url',
+
         ]);
+
+        $messages = [
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            // More specific messages can be added if needed
+        ];
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => $validator->errors()->first(),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -115,15 +132,27 @@ class RegisterController extends Controller
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
+                'success' => false,
                 'message' => 'Validation errors.',
                 'errors' => $validator->errors(),
             ], 422);
         }
 
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email is not registered.',
+                'data' => []
+            ], 404);
+        }
+
         // Attempt to authenticate the user
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'message' => 'Invalid login credentials.',
+                'success' => false,
+                'message' => 'Incorrect password.',
             ], 401);
         }
 
@@ -133,10 +162,26 @@ class RegisterController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Login successfully.',
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+            'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'company_name' => $user->company_name,
+                        'website' => $user->website,
+                        'fca_number' => $user->fca_number,
+                        'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                    ],
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ],
+
+        ], 201);
 
     }
 
