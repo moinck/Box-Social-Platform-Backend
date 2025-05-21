@@ -103,7 +103,7 @@ class CategoriesController extends Controller
 
     public function edit($id)
     {
-        $category = Categories::find($id);
+        $category = Categories::with('children:id,name,parent_id')->find($id);
         if ($category) {
             return response()->json([
                 'success' => true,
@@ -124,6 +124,7 @@ class CategoriesController extends Controller
             'edit_category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'edit_category_description' => 'required|string',
             'edit_category_status' => 'required|string|in:active,inactive',
+            'edit_subcategory_ids' => 'nullable|json',
         ]);
 
         $category = Categories::find($request->edit_category_id);
@@ -144,6 +145,38 @@ class CategoriesController extends Controller
                 $category->image = $image_url;
             }
             $category->save();
+
+            // update subcategories
+            // if subcategory id is 0 then create new subcategory
+            // else update subcategory
+            if ($request->has('edit_subcategory_ids') && $request->edit_subcategory_ids != null) {
+                $subCategories = json_decode($request->edit_subcategory_ids, true);
+                $subCategoryIds = array_column($subCategories, 'id');
+                $subCategoryNames = array_column($subCategories, 'name');
+
+
+                foreach ($subCategories as $subCategory) {
+                    if ($subCategory['id'] == 0) {
+                        $subcategory = new Categories();
+                        $subcategory->name = $subCategory['name'];
+                        $subcategory->parent_id = $category->id;
+                        $subcategory->save();
+                    } else {
+                        $subcategory = Categories::where('id', $subCategory['id'])->first();
+                        $subcategory->name = $subCategory['name'];
+                        $subcategory->save();
+                    }
+                }
+
+                // delete subcategories that are not in the request
+                $deleteSubcategories = Categories::where('parent_id', $category->id)
+                    ->whereNotIn('id', $subCategoryIds)
+                    ->whereNotIn('name', $subCategoryNames)
+                    ->get();
+                foreach ($deleteSubcategories as $deleteSubcategory) {
+                    $deleteSubcategory->delete();
+                }
+            }
 
             return response()->json([
                 'success' => true,

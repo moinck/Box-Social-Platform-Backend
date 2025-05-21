@@ -183,6 +183,17 @@
                                 <label for="edit_category_status">Status</label>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="mb-0">Subcategories</h5>
+                                <button type="button" class="btn btn-sm btn-primary" id="edit-add-subcategory-btn">
+                                    <i class="fas fa-plus me-1"></i> Add Subcategory
+                                </button>
+                            </div>
+                            <div id="edit-subcategories-container">
+                                <!-- Subcategory fields will be added here dynamically -->
+                            </div>
+                        </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary">Update</button>
                             <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
@@ -204,6 +215,7 @@
     <script>
         $(document).ready(function() {
             CategoriesDataTable();
+            let editSubcategoryCount = 0;
 
             // contact data table function
             function CategoriesDataTable() {
@@ -428,6 +440,47 @@
 
                             var ImageUrl = "{{ asset('') }}" + response.data.image;
                             $('#edit_category_image_preview').attr('src', ImageUrl);
+
+                            var subcategories = response.data.children;
+                            var subcategoriesEditHtml = '';
+                            editSubcategoryCount = 0;
+                            if (subcategories.length > 0) {
+                                subcategories.forEach(function(subcategory) {
+                                    editSubcategoryCount++;
+                                    subcategoriesEditHtml += `
+                                        <div class="col-12 mt-2 edit-subcategory-item">
+                                            <div class="input-group input-group-merge">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control edit-subcategory-name"
+                                                        id="edit_subcategory_name_${editSubcategoryCount}"
+                                                        name="edit_subcategory_name[${editSubcategoryCount}]"
+                                                        data-subcategory-id="${subcategory.id}"
+                                                        placeholder="Subcategory ${editSubcategoryCount} Name"
+                                                        value="${subcategory.name}"
+                                                        aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
+                                                    <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory ${editSubcategoryCount} Name</label>
+                                                </div>
+                                                <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    // also add validation for subcategory name
+                                    categoryEditFV.revalidateField('edit_subcategory_name');
+                                    categoryEditFV.addField(`edit_subcategory_name[${editSubcategoryCount}]`, {
+                                        validators: {
+                                            notEmpty: {
+                                                message: 'Subcategory ' + editSubcategoryCount + ' name is required'
+                                            }
+                                        }
+                                    });
+                                });
+
+                                editSubcategoryCount = subcategories.length;
+                            }
+                            $('#edit-subcategories-container').html(subcategoriesEditHtml);
                         } else {
                             // toastr.error(response.message);
                         }
@@ -512,6 +565,16 @@
                 // Form is valid, proceed with form submission
                 var form = $('#edit-category-form');
                 var formData = new FormData(form[0]); // Creates FormData object
+
+                // get subcategory ids with name in array
+                var subcategoryIds = [];
+                $('.edit-subcategory-name').each(function() {
+                    subcategoryIds.push({
+                        id: $(this).data('subcategory-id') ?? 0,
+                        name: $(this).val()
+                    });
+                });
+                formData.append('edit_subcategory_ids', JSON.stringify(subcategoryIds));
 
                 $.ajax({
                     url: "{{ route('categories.update') }}",
@@ -631,6 +694,52 @@
                 $(this).parent().parent().remove();
                 subcategoryCount--;
                 addCategoryFV.removeField(`subcategory_name[${subcategoryCount}]`);
+            });
+            // ----------------------------------------------------------
+
+            // add edit subcategory
+            // new category have subcategory id = 0
+            $(document).on('click', '#edit-add-subcategory-btn', function() {
+                editSubcategoryCount++;
+
+                var editSubcategoriesContainer = $('#edit-subcategories-container');
+                var subcategoryHtml = `
+                    <div class="col-12 mt-2 edit-subcategory-item">
+                        <div class="input-group input-group-merge">
+                            <div class="form-floating form-floating-outline">
+                                <input
+                                    type="text"
+                                    class="form-control edit-subcategory-name"
+                                    id="edit_subcategory_name_${editSubcategoryCount}"
+                                    name="edit_subcategory_name[${editSubcategoryCount}]"
+                                    data-subcategory-id="0"
+                                    placeholder="Subcategory Name"
+                                    aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
+                                <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory Name ${editSubcategoryCount}</label>
+                            </div>
+                            <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
+                        </div>
+                    </div>
+                `;
+                editSubcategoriesContainer.append(subcategoryHtml);
+
+                // also add validation for subcategory name
+                categoryEditFV.revalidateField('edit_subcategory_name');
+                categoryEditFV.addField(`edit_subcategory_name[${editSubcategoryCount}]`, {
+                    validators: {
+                        notEmpty: {
+                            message: 'Subcategory ' + editSubcategoryCount + ' name is required'
+                        }
+                    }
+                });
+            });
+            // ----------------------------------------------------------
+            
+            // remove edit subcategory
+            $(document).on('click', '.remove-edit-subcategory-btn', function() {
+                $(this).parent().parent().remove();
+                editSubcategoryCount--;
+                categoryEditFV.removeField(`edit_subcategory_name[${editSubcategoryCount}]`);
             });
             // ----------------------------------------------------------
         });
