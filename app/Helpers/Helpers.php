@@ -230,6 +230,9 @@ class Helpers
      */
     public static function uploadImage($prefix, $image, $path)
     {
+        // give storage permision
+        chmod($path, 0777);
+        
         $image_name = $prefix . "_" . time() . '.' . $image->getClientOriginalExtension();
         $image->move(public_path($path), $image_name);
 
