@@ -23,6 +23,9 @@ class BrnadconfigurationController extends Controller
             ->addColumn('logo', function ($data) {
                 return '<img src="'.asset($data->logo).'" alt="'.$data->name.'" class="img-fluid br-1" width="100" height="100">';
             })
+            ->addColumn('user', function ($data) {
+                return $data->user->first_name.' '.$data->user->last_name;
+            })
             ->addColumn('company_name', function ($data) {
                 return $data->company_name;
             })
@@ -40,11 +43,15 @@ class BrnadconfigurationController extends Controller
                 $editRoute = route('brand-configuration.edit', $id);
 
                 return '
-                    <a href="'.$editRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-text-danger rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete"><i class="ri-delete-bin-line"></i></a>
+                    <a href="'.$editRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
+                        <i class="ri-edit-box-line"></i>
+                    </a>
+                    <a href="javascript:void(0);" data-brand-kit-id="'.$id.'" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-brand-kit-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+                        <i class="ri-delete-bin-line"></i>
+                    </a>
                 ';
             })
-            ->rawColumns(['logo','company_name','email','phone','created_date','action'])
+            ->rawColumns(['logo','user','company_name','email','phone','created_date','action'])
             ->make(true);
     }
 
@@ -66,14 +73,22 @@ class BrnadconfigurationController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $id = Helpers::decrypt($id);
+        $id = Helpers::decrypt($request->brand_kit_id);
         $brandKit = BrandKit::find($id);
-        $brandKit->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Brand Kit deleted successfully'
-        ]);
+        if (!empty($brandKit)) {
+            $brandKit->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Brand Kit deleted successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Brand Kit not found'
+            ]);
+        }
     }
 }

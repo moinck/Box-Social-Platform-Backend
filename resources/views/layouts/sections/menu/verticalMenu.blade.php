@@ -44,7 +44,7 @@
                         $activeClass = null;
                         $currentRouteName = Route::currentRouteName();
 
-                        if ($currentRouteName === $menu->slug) {
+                        if ($currentRouteName === $menu->slug || str_contains($currentRouteName, $menu->slug)) {
                             $activeClass = 'active';
                         } elseif (isset($menu->submenu)) {
                             if (gettype($menu->slug) === 'array') {

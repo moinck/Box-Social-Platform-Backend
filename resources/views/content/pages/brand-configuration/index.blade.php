@@ -43,6 +43,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>User</th>
                         <th>Brand Name</th>
                         <th>Brand Logo</th>
                         <th>Email</th>
@@ -90,6 +91,7 @@
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'user', name: 'user'},
                         { data: 'company_name', name: 'company_name'},
                         { data: 'logo', name: 'logo'},
                         { data: 'email', name: 'email'},
@@ -109,6 +111,54 @@
                 });
             }
             // -------------------------------------------
+
+            // delete brand configuration
+            $(document).on('click', '.delete-brand-kit-btn', function() {
+                var brandKitId = $(this).data('brand-kit-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('brand-configuration.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                brand_kit_id: brandKitId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Deleted!', 'Brand Configuration has been deleted.');
+                                    BrandConfigurationDataTable();
+                                } else {
+                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+            });
+            // ----------------------------------------------------------
         });
     </script>
 @endsection
