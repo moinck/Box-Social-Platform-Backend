@@ -11,6 +11,7 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
 
@@ -58,6 +59,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
         Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
     
+        // brand configuration controller
+        Route::get('/brand-configuration', [BrnadconfigurationController::class,'index'])->name('brand-configuration');
+        Route::post('/brand-configuration/store', [BrnadconfigurationController::class,'store'])->name('brand-configuration.store');
+        Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class,'dataTable'])->name('brand-configuration.data-table');
+
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
         Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
