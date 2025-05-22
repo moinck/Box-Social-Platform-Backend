@@ -33,4 +33,5 @@ Route::group([
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/category/list', [CategoriesController::class, 'list']);
 Route::post('/brandkit/store', [BrandKitController::class, 'store']);
+Route::get('/brandkit/get', [BrandKitController::class, 'get']);
 

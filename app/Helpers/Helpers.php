@@ -242,4 +242,55 @@ class Helpers
         $imageUrl = $path . '/' . $image_name;
         return $imageUrl;
     }
+
+    static $secretKey = 'rT9vL2pN6xBzCqA3WmEyKdSfUjHgXzV1';
+    static $secretIv = 'Yt6MnBpQaWxCrV8dLfZuKiJhGvTeSdR4';
+
+    /**
+     * Returns encrypted original string
+     *
+     * @param  $string - Enctrypted string
+     *
+     * @return string
+     */
+    public static function encrypt($string) {
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        //pls set your unique hashing key
+        // hash
+        $key = hash('sha256', self::$secretKey);
+
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+        $iv = substr(hash('sha256', self::$secretIv), 0, 16);
+
+        $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+        $output = base64_encode($output);
+
+        return $output;
+    }
+    /**
+     * Returns decrypted original string
+     *
+     * @param  $string - Enctrypted string
+     *
+     * @return string
+     */
+    public static function decrypt($string) {
+
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        //pls set your unique hashing key
+        $secret_key = 'iih';
+        $secret_iv = 'iih';
+
+        // hash
+        $key = hash('sha256', self::$secretKey);
+
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+        $iv = substr(hash('sha256', self::$secretIv), 0, 16);
+
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+
+        return $output;
+    }
 }
