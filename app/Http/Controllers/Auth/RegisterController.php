@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use Illuminate\Http\Request;
@@ -96,7 +97,7 @@ class RegisterController extends Controller
                 'message' => 'User registered successfully.',
                 'data' => [
                     'user' => [
-                        'id' => $user->id,
+                        'id' => Helpers::encrypt($user->id),
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'email' => $user->email,
@@ -168,7 +169,7 @@ class RegisterController extends Controller
             'token_type' => 'Bearer',
             'data' => [
                     'user' => [
-                        'id' => $user->id,
+                        'id' => Helpers::encrypt($user->id),
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'email' => $user->email,

@@ -10,4 +10,6 @@ class SocialMedia extends Model
         'brand_kit_id',
         'social_media_icon'
     ];
+
+    protected $table = 'social_media';
 }
