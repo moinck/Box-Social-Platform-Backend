@@ -39,7 +39,8 @@
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
-                    <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="category-add-btn" title="Add Category">
+                    <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="category-add-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Category">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
                             <span class="d-none d-sm-inline-block">Add Category</span>
@@ -252,6 +253,9 @@
                             next: '<i class="ri-arrow-right-s-line"></i>',
                             previous: '<i class="ri-arrow-left-s-line"></i>'
                         }
+                    },
+                    drawCallback: function(settings) {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
                     }
                 });
             }

@@ -46,9 +46,9 @@ class UserManagementController extends Controller
                     $title = 'Click To Enable Account';
                 }
 
-                return '<label class="switch" title="'.$title.'">
+                return '<label class="switch" >
                             <input type="checkbox" class="switch-input" '.$status.' data-id="'.$user->id.'" id="user-account-status">
-                            <span class="switch-toggle-slider">
+                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
                             </span>
@@ -56,8 +56,8 @@ class UserManagementController extends Controller
             })
             ->addColumn('action', function ($user) {
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-user-id="'.$user->id.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-user-id="'.$user->id.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="'.$user->id.'"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-id="'.$user->id.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action'])

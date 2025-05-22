@@ -40,8 +40,8 @@ class BrnadconfigurationController extends Controller
                 $editRoute = route('brand-configuration.edit', $id);
 
                 return '
-                    <a href="'.$editRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-text-danger rounded-pill btn-icon"><i class="ri-delete-bin-line"></i></a>
+                    <a href="'.$editRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-text-danger rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['logo','company_name','email','phone','created_date','action'])
