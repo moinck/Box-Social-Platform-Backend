@@ -25,6 +25,7 @@ class BrandKitController extends Controller
     }
 
     public function Store(Request $request){
+        
         $request->merge([
             'user_id' => Helpers::decrypt($request->user_id)
         ]);
@@ -74,7 +75,7 @@ class BrandKitController extends Controller
         }
         
         $brandKitObj->logo = $request->logo;
-        $brandKitObj->user_id = Helpers::decrypt($request->user_id);
+        $brandKitObj->user_id = $request->user_id;
         $brandKitObj->company_name = $request->company_name;
         $brandKitObj->email = $request->email;
         $brandKitObj->address = $request->address;
@@ -107,17 +108,39 @@ class BrandKitController extends Controller
             $SocialMediaObj->social_media_icon = json_encode($socialMediaIconArr,1);
             $SocialMediaObj->save();
         }
-        
 
+        $brandKitObj = BrandKit::where('user_id',$request->user_id)->first();
+        
+        $SocialMediaObj = SocialMedia::where('brand_kits_id',$brandKitObj->id)->first();
+        $SocialMediaIcon = []; 
+        if(!empty($SocialMediaObj)){
+            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon_show);
+        }
+        
         return response()->json([
             'success' => true,
-            'message' => 'BrandKit updated successfully.',
+            'message' => 'BrandKit updated successfully',
             'data' => [
-                $brandKitObj
-                ],
+                "id" => Helpers::encrypt($brandKitObj->id),
+                "user_id" => Helpers::encrypt($brandKitObj->user_id),
+                "logo" => $brandKitObj->logo,
+                "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color,true) : null ,
+                "company_name" => $brandKitObj->company_name,
+                "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font,1) : null,
+                "email" => $brandKitObj->email,
+                "address" =>$brandKitObj->address,
+                "state" => $brandKitObj->state,
+                "phone" => $brandKitObj->phone,
+                "country" =>$brandKitObj->country,
+                "website" => $brandKitObj->website,
+                "postal_code" => $brandKitObj->postal_code,
+                "show_email_on_post" => $brandKitObj->show_email_on_post,
+                "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
+                "show_website_on_post" => $brandKitObj->show_website_on_post,
+                "social_media_icon_show" => $SocialMediaIcon,
+                "design_style" => $brandKitObj->design_style
+            ],
         ], 200);
-
-
     }
 
     public function get(Request $request){
@@ -145,17 +168,14 @@ class BrandKitController extends Controller
             ], 422);
         }
 
-        $brandKitObj = BrandKit::where('user_id',Helpers::decrypt($request->user_id))->first();
+        $brandKitObj = BrandKit::where('user_id',$request->user_id)->first();
         
-        $SocialMediaObj = SocialMedia::where('brand_kits_id',$brandKitObj->id)->get();
-        
+        $SocialMediaObj = SocialMedia::where('brand_kits_id',$brandKitObj->id)->first();
         $SocialMediaIcon = []; 
         if(!empty($SocialMediaObj)){
-            foreach ($SocialMediaObj as $key => $value) {
-                $SocialMediaIcon = json_decode($value->social_media_icon,1);
-            }
+            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon_show);
         }
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Data Fetched Successfully.',
@@ -163,9 +183,9 @@ class BrandKitController extends Controller
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $brandKitObj->logo,
-                "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color) : null ,
+                "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color,true) : null ,
                 "company_name" => $brandKitObj->company_name,
-                "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font) : null,
+                "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font,1) : null,
                 "email" => $brandKitObj->email,
                 "address" =>$brandKitObj->address,
                 "state" => $brandKitObj->state,
