@@ -65,8 +65,10 @@ Route::middleware('auth')->group(function () {
     
         // brand configuration controller
         Route::get('/brand-configuration', [BrnadconfigurationController::class,'index'])->name('brand-configuration');
-        Route::post('/brand-configuration/store', [BrnadconfigurationController::class,'store'])->name('brand-configuration.store');
+        Route::get('/brand-configuration/edit/{id}', [BrnadconfigurationController::class,'edit'])->name('brand-configuration.edit');
+        Route::post('/brand-configuration/update', [BrnadconfigurationController::class,'update'])->name('brand-configuration.update');
         Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class,'dataTable'])->name('brand-configuration.data-table');
+        Route::post('/brand-configuration/delete', [BrnadconfigurationController::class,'destroy'])->name('brand-configuration.delete');
 
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');

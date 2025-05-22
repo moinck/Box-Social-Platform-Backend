@@ -45,7 +45,8 @@
                         <th>No</th>
                         <th>Brand Name</th>
                         <th>Brand Logo</th>
-                        <th>Brand Description</th>
+                        <th>Email</th>
+                        <th>Phone</th>
                         <th>Created Date</th>
                         <th>Action</th>
                     </tr>
@@ -91,8 +92,10 @@
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'company_name', name: 'company_name'},
                         { data: 'logo', name: 'logo'},
+                        { data: 'email', name: 'email'},
+                        { data: 'phone', name: 'phone'},
                         { data: 'created_date', name: 'created_date'},
-                        { data: 'action', name: 'action'},
+                        { data: 'action', name: 'action', orderable: false, searchable: false},
                     ],
                     language: {
                         paginate: {
