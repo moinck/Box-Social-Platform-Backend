@@ -13,16 +13,14 @@
 @endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-6">
-                <div class="user-profile-header-banner">
-                    <img src="{{ asset('assets/img/pages/profile-banner.png') }}" alt="Banner image" class="rounded-top" />
-                </div>
-                <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-5">
-                    <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
+    <div class="col-12">
+        <div class="row">
+            {{-- simple header --}}
+            <div class="card b-6 mb-6">
+                <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center">
+                    <div class="flex-shrink-0 m-3 mx-sm-0 mx-auto" style="margin-top:1.25rem;margin-bottom:1.25rem;">
                         <img src="{{ asset('assets/img/avatars/1.png') }}" alt="user image"
-                            class="d-block h-auto ms-0 ms-sm-5 rounded-4 user-profile-img" />
+                            class="d-block h-auto ms-0 rounded-4 user-profile-img" />
                     </div>
                     <div class="flex-grow-1 mt-4 mt-sm-12">
                         <div
@@ -32,18 +30,114 @@
                                 <ul
                                     class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-4">
                                     <li class="list-inline-item">
-                                        <i class="ri-palette-line me-2 ri-24px"></i><span
-                                            class="fw-medium">{{ $user->role }}</span>
+                                        <i class="ri-palette-line me-2 ri-24px"></i>
+                                        <span class="fw-medium">{{ $user->role }}</span>
                                     </li>
                                     <li class="list-inline-item">
-                                        <i class="ri-calendar-line me-2 ri-24px"></i><span class="fw-medium"> Joined
-                                            {{ $user->created_at->format('F Y') }}</span>
+                                        <i class="ri-calendar-line me-2 ri-24px"></i>
+                                        <span class="fw-medium">Joined | {{ $user->created_at->format('d F Y') }}</span>
                                     </li>
                                 </ul>
                             </div>
-                            <a href="javascript:void(0)" class="btn btn-primary">
+                            {{-- <a href="javascript:void(0)" class="btn btn-primary">
                                 <i class="ri-user-follow-line ri-16px me-2"></i>Connected
-                            </a>
+                            </a> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- profile information --}}
+            <div class="col-lg-8 col-md-12 col-sm-12 card mb-6">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Profile Information</h4>
+                </div>
+                <div class="card-body mt-2">
+                    <form id="edit-profile-form" action="{{ route('profile-management.update') }}" class="row g-5" method="POST">
+                        @csrf
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="edit_first_name" name="edit_first_name" class="form-control"
+                                    placeholder="First Name" value="{{ $user->first_name }}" />
+                                <label for="edit_first_name">First Name</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="edit_last_name" name="edit_last_name" class="form-control"
+                                    placeholder="Last Name" value="{{ $user->last_name }}" />
+                                <label for="edit_last_name">Last Name</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <input type="email" id="edit_user_email" name="edit_user_email" class="form-control"
+                                    placeholder="User Email" value="{{ $user->email }}" readonly />
+                                <label for="edit_user_email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="edit_company_name" name="edit_company_name" class="form-control"
+                                    placeholder="Company Name" value="{{ $user->company_name }}" />
+                                <label for="edit_company_name">Company Name</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="number" id="edit_user_fca_number" name="edit_user_fca_number" class="form-control"
+                                    placeholder="123456789" value="{{ $user->fca_number }}" />
+                                <label for="edit_user_fca_number">FCA No.</label>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- image with subscription plan detail --}}
+            <div class="col-lg-4 col-md-12 col-sm-12">
+                <div class="card mb-6">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge bg-label-primary rounded-pill">Standard</span>
+                            <div class="d-flex justify-content-center">
+                                <sup class="h5 pricing-currency mt-5 mb-0 me-1 text-primary">$</sup>
+                                <h1 class="mb-0 text-primary">99</h1>
+                                <sub class="h6 pricing-duration mt-auto mb-3 fw-normal">month</sub>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled g-2 my-6">
+                            <li class="mb-2 d-flex align-items-center">
+                                <i class="ri-circle-fill text-body ri-10px me-2"></i><span>10 Users</span>
+                            </li>
+                            <li class="mb-2 d-flex align-items-center">
+                                <i class="ri-circle-fill text-body ri-10px me-2"></i><span>Up to 10 GB storage</span>
+                            </li>
+                            <li class="mb-2 d-flex align-items-center">
+                                <i class="ri-circle-fill text-body ri-10px me-2"></i><span>Basic Support</span>
+                            </li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-center mb-1 fw-medium text-heading">
+                            <span>Days</span>
+                            <span>26 of 30 Days</span>
+                        </div>
+                        <div class="progress mb-1 rounded">
+                            <div class="progress-bar rounded" role="progressbar" style="width: 75%" aria-valuenow="75"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small>4 days remaining</small>
+                        <div class="d-grid w-100 mt-6">
+                            <button class="btn btn-primary waves-effect waves-light" data-bs-target="#upgradePlanModal"
+                                data-bs-toggle="modal">
+                                Upgrade Plan
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -55,8 +149,86 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
+        // Update/reset user image of account page
+        let accountUserImage = document.getElementById('uploadedAvatar');
+        const fileInput = document.querySelector('.account-file-input'),
+            resetFileInput = document.querySelector('.account-image-reset');
+
+        if (accountUserImage) {
+            const resetImage = accountUserImage.src;
+            fileInput.onchange = () => {
+                if (fileInput.files[0]) {
+                    accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+                }
+            };
+            resetFileInput.onclick = () => {
+                fileInput.value = '';
+                accountUserImage.src = resetImage;
+            };
+        }
         $(document).ready(function() {
 
+            // profile form validation
+            const formValidationExamples = document.getElementById('edit-profile-form');
+            const validator = FormValidation.formValidation(formValidationExamples, {
+                fields: {
+                    edit_first_name: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please enter first name'
+                            }
+                        }
+                    },
+                    edit_last_name: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please enter last name'
+                            }
+                        }
+                    },
+                    edit_company_name: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please enter company name'
+                            }
+                        }
+                    },
+                    edit_user_fca_number: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please enter FCA number'
+                            },
+                            regexp: {
+                                regexp: /^[0-9]*$/,
+                                message: 'FCA Number can only contain digits'
+                            },
+                            stringLength: {
+                                min: 6,
+                                max: 30,
+                                message: 'FCA Number must be between 5 and 30 digits'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: function(field, ele) {
+                            if (['edit_first_name', 'edit_last_name', 'edit_company_name','edit_user_fca_number'
+                                ].includes(field)) {
+                                return '.col-md-6';
+                            }
+                            return '.col-12';
+                        }
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                }
+            }).on('core.form.valid', function() {
+                $('#edit-profile-form').submit();
+            });
+            // -----------------------------------------------------
         });
     </script>
 @endsection
