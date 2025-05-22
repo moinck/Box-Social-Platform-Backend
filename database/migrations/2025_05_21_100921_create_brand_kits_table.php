@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedInteger("user_id")->nullable();
             $table->text("logo")->nullable(); 
             $table->longText("color")->nullable(); 
-            $table->text("company_name")->nullable(); 
+            $table->text("company_name")->nullable();
+            $table->text("font")->nullable(); 
             $table->text("email")->nullable(); 
             $table->text("address")->nullable(); 
             $table->text("state")->nullable(); 
@@ -29,7 +30,6 @@ return new class extends Migration
             $table->text("show_phone_number_on_post")->nullable(); 
             $table->text("show_website_on_post")->nullable(); 
 
-            $table->text("social_media_icon_show")->nullable();
             $table->text("design_style")->nullable();
 
             $table->timestamps();

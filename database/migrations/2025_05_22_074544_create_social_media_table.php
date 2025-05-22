@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // $table->string('website')->nullable()->after('company_name');
+        Schema::create('social_media', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger("brand_kits_id")->nullable();
+            $table->text("social_media_icon")->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('website');
-        });
+        Schema::dropIfExists('social_media');
     }
 };

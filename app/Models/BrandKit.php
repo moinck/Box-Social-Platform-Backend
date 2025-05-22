@@ -20,13 +20,15 @@ class BrandKit extends Model
         'show_email_on_post',
         'show_phone_number_on_post',
         'show_website_on_post',
-        'social_media_icon_show',
         'design_style',
-
 
     ];
 
-    protected $table = "brand_kits";
+    public function socialMedia()
+{
+    return $this->hasOne(SocialMedia::class);
+}
+
 
 
 }
