@@ -10,7 +10,7 @@ class BrandKitController extends Controller
 {
     public function GetData(Request $request){
         $brandKitObj = BrandKit::where('user_id',$request->user_id)->first();
-       
+        
 
         return response()->json([
             'success' => true,
@@ -38,7 +38,6 @@ class BrandKitController extends Controller
             'show_phone_number_on_post' => 'nullable|boolean',
             'show_website_on_post' => 'nullable|boolean',
             'social_media_icon_show' => 'nullable|array',
-            'design_style' => 'nullable|array',
         ];
         
         $messages = [
@@ -55,11 +54,13 @@ class BrandKitController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors.',
+                'message' => $validator->errors()->first(),
                 'errors' => $validator->errors(),
             ], 422);
         }
 
+        
+       
         $brandKitObj = new BrandKit();
         $brandKitObj->logo = $request->logo;
         $brandKitObj->user_id = $request->user_id;
@@ -74,9 +75,23 @@ class BrandKitController extends Controller
         $brandKitObj->show_email_on_post = $request->show_email_on_post;
         $brandKitObj->show_phone_number_on_post = $request->show_phone_number_on_post;
         $brandKitObj->show_website_on_post = $request->show_website_on_post;
-        $brandKitObj->social_media_icon_show = json_encode($request->social_media_icon_show);
-        $brandKitObj->design_style = json_encode($request->design_style);
+        // $brandKitObj->social_media_icon_show = json_encode($request->social_media_icon_show);
+        $brandKitObj->color = json_encode($request->color);
+        $brandKitObj->font = json_encode($request->font);
+        $brandKitObj->design_style = $request->design_style;
         $brandKitObj->save();
+
+        $socialMediaIconArr = [];
+        if(!empty($request->social_media_icon_show)){
+            foreach ($request->social_media_icon_show as $key => $value) {
+                $socialMediaIconArr[] = $value;
+            }
+            $brandKitObj->socialMedia()->updateOrCreate(
+                ['brand_kit_id' => $brandKitObj->id],
+                ['social_media_icon_show' => json_encode($socialMediaIconArr)]
+            );
+        }
+       
 
         return response()->json([
             'success' => true,
@@ -84,7 +99,7 @@ class BrandKitController extends Controller
             'data' => [
                 $brandKitObj
                 ],
-        ], 201);
+        ], 200);
 
 
     }

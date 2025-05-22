@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BrandKitController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,4 +32,5 @@ Route::group([
 
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/category/list', [CategoriesController::class, 'list']);
+Route::post('/brandkit/store', [BrandKitController::class, 'store']);
 

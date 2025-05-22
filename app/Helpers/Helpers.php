@@ -230,6 +230,9 @@ class Helpers
      */
     public static function uploadImage($prefix, $image, $path)
     {
+        if (!file_exists(public_path($path))) {
+            mkdir(public_path($path), 0777, true);
+        }
         // give storage permision
         chmod(public_path($path), 0777);
         
