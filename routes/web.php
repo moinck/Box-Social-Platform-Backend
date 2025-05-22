@@ -14,7 +14,7 @@ use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
-
+use App\Http\Controllers\ProfileManagementController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -47,6 +47,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
+
+    // Profile Management Controller
+    Route::get('/profile-management', [ProfileManagementController::class,'index'])->name('profile-management');
+    Route::post('/profile-management/update', [ProfileManagementController::class,'update'])->name('profile-management.update');
 
     Route::middleware('checkRole:admin')->group(function () {        
         // categories controller
