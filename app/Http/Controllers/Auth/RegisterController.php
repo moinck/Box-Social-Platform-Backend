@@ -108,7 +108,7 @@ class RegisterController extends Controller
                     'access_token' => $token,
                     'token_type' => 'Bearer',
                 ],
-            ], 201);
+            ], 200);
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -181,7 +181,7 @@ class RegisterController extends Controller
                     'token_type' => 'Bearer',
                 ],
 
-        ], 201);
+        ], 200);
 
     }
 
