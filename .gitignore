@@ -6,3 +6,4 @@ yarn.lock
 /bootstrap/cache/routes-v7.php
 /public/hot
 /public/images
+/public/storage
