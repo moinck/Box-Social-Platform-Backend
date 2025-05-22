@@ -11,9 +11,10 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
-
+use App\Http\Controllers\ProfileManagementController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -47,6 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
     Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
 
+    // Profile Management Controller
+    Route::get('/profile-management', [ProfileManagementController::class,'index'])->name('profile-management');
+    Route::post('/profile-management/update', [ProfileManagementController::class,'update'])->name('profile-management.update');
+
     Route::middleware('checkRole:admin')->group(function () {        
         // categories controller
         Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
@@ -58,6 +63,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
         Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
     
+        // brand configuration controller
+        Route::get('/brand-configuration', [BrnadconfigurationController::class,'index'])->name('brand-configuration');
+        Route::get('/brand-configuration/edit/{id}', [BrnadconfigurationController::class,'edit'])->name('brand-configuration.edit');
+        Route::post('/brand-configuration/update', [BrnadconfigurationController::class,'update'])->name('brand-configuration.update');
+        Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class,'dataTable'])->name('brand-configuration.data-table');
+        Route::post('/brand-configuration/delete', [BrnadconfigurationController::class,'destroy'])->name('brand-configuration.delete');
+
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
         Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');

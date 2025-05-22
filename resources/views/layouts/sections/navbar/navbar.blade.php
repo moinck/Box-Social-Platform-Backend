@@ -103,7 +103,11 @@
         <li class="nav-item navbar-dropdown dropdown-user dropdown">
             <a class="#04202E" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
-                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                    @if (Auth::check() && Auth::user()->role == "admin")
+                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                    @else
+                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
+                    @endif
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -112,7 +116,11 @@
                         <div class="d-flex">
                             <div class="flex-shrink-0 me-2">
                                 <div class="avatar avatar-online">
-                                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                                    @if (Auth::check() && Auth::user()->role == "admin")
+                                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                                    @else
+                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex-grow-1">
@@ -134,7 +142,7 @@
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="javascript:void(0);">
+                    <a class="dropdown-item" href="{{ route('profile-management') }}">
                         <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">My Profile</span>
                     </a>
                 </li>

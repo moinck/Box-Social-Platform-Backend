@@ -27,6 +27,13 @@
             "icon": "menu-icon tf-icons ri-archive-stack-line",
             "slug": "categories",
             "role": ["admin"]
+        },
+        {
+            "url": "/brand-configuration",
+            "name": "Brand Configuration",
+            "icon": "menu-icon tf-icons ri-list-settings-fill",
+            "slug": "brand-configuration",
+            "role": ["admin"]
         }
     ]
 }
