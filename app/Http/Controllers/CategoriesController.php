@@ -38,8 +38,9 @@ class CategoriesController extends Controller
                     $title = 'Click To Enable Category';
                 }
 
+                $categoryId = Helpers::encrypt($category->id);
                 return '<label class="switch">
-                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$category->id.'" id="category-status">
+                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$categoryId.'" id="category-status">
                             <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
@@ -50,11 +51,12 @@ class CategoriesController extends Controller
                 return $category->created_at->format('d-m-Y h:i A');
             })
             ->addColumn('action', function ($category) {
+                $categoryId = Helpers::encrypt($category->id);
                 return '
                     <a href="javascript:;" title="edit category" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$category->id.'"><i class="ri-edit-box-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$categoryId.'"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" title="delete category" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$category->id.'"><i class="ri-delete-bin-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$categoryId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['image', 'status', 'action'])
@@ -105,7 +107,8 @@ class CategoriesController extends Controller
 
     public function edit($id)
     {
-        $category = Categories::with('children:id,name,parent_id')->find($id);
+        $categoryId = Helpers::decrypt($id);
+        $category = Categories::with('children:id,name,parent_id')->find($categoryId);
         if ($category) {
             return response()->json([
                 'success' => true,
@@ -129,7 +132,8 @@ class CategoriesController extends Controller
             'edit_subcategory_ids' => 'nullable|json',
         ]);
 
-        $category = Categories::find($request->edit_category_id);
+        $categoryId = Helpers::decrypt($request->edit_category_id);
+        $category = Categories::find($categoryId);
         if ($category) {
             $category->name = $request->edit_category_name;
             $category->description = $request->edit_category_description;
@@ -199,7 +203,8 @@ class CategoriesController extends Controller
      */
     public function destroy(Request $request)
     {
-        $category = Categories::find($request->category_id);
+        $categoryId = Helpers::decrypt($request->category_id);
+        $category = Categories::find($categoryId);
         if ($category) {
             // delete old image
             if ($category->image) {
@@ -225,7 +230,8 @@ class CategoriesController extends Controller
      */
     public function changeStatus(Request $request)
     {
-        $category = Categories::find($request->id);
+        $categoryId = Helpers::decrypt($request->id);
+        $category = Categories::find($categoryId);
         if ($category) {
             $category->status = $category->status == true ? false : true;
             $category->save();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\UsersExport;
+use App\Helpers\Helpers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -45,9 +46,10 @@ class UserManagementController extends Controller
                 } else {
                     $title = 'Click To Enable Account';
                 }
+                $userId = Helpers::encrypt($user->id);
 
                 return '<label class="switch" >
-                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$user->id.'" id="user-account-status">
+                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$userId.'" id="user-account-status">
                             <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
@@ -55,9 +57,10 @@ class UserManagementController extends Controller
                         </label>';
             })
             ->addColumn('action', function ($user) {
+                $userId = Helpers::encrypt($user->id);
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="'.$user->id.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-id="'.$user->id.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="'.$userId.'"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-id="'.$userId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action'])
@@ -71,6 +74,7 @@ class UserManagementController extends Controller
      */
     public function edit($id)
     {
+        $id = Helpers::decrypt($id);
         $user = User::find($id);
         if ($user) {
             return response()->json([
@@ -92,8 +96,7 @@ class UserManagementController extends Controller
      */
     public function update(Request $request)
     {
-
-        $userId = $request->edit_user_id;
+        $userId = Helpers::decrypt($request->edit_user_id);
 
         $request->validate([
             'edit_first_name' => 'required|string|max:255',
@@ -139,7 +142,8 @@ class UserManagementController extends Controller
      */
     public function destroy(Request $request)
     {
-        $user = User::find($request->user_id);
+        $userId = Helpers::decrypt($request->user_id);
+        $user = User::find($userId);
         if ($user) {
             $user->delete();
             return response()->json([
@@ -161,7 +165,8 @@ class UserManagementController extends Controller
      */
     public function accountStatus(Request $request)
     {
-        $user = User::find($request->userId);
+        $userId = Helpers::decrypt($request->userId);
+        $user = User::find($userId);
         if ($user) {
             $user->status = $user->status == 'active' ? 'inactive' : 'active';
             $user->save();

@@ -432,7 +432,7 @@
                     success: function(response) {
                         if (response.success == true) {
                             $('#edit_category_name').val(response.data.name);
-                            $('#edit_category_id').val(response.data.id);
+                            $('#edit_category_id').val(categoryId);
                             $('#edit_category_description').val(response.data.description);
                             $('#edit_category_status').val(response.data.status);
                             var accountStatus = response.data.status;
