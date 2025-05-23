@@ -142,7 +142,7 @@ class CategoriesController extends Controller
             if ($request->hasFile('edit_category_image')) {
                 // delete old image
                 if ($category->image) {
-                    unlink(public_path($category->image));
+                    Helpers::deleteImage($category->image);
                 }
 
                 // upload new image
@@ -208,7 +208,7 @@ class CategoriesController extends Controller
         if ($category) {
             // delete old image
             if ($category->image) {
-                unlink(public_path($category->image));
+                Helpers::deleteImage($category->image);
             }
             $category->delete();
             return response()->json([
