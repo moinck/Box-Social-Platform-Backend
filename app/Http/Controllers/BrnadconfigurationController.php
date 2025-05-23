@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
 use App\Models\BrandKit;
+use App\Models\SocialMedia;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -59,13 +60,22 @@ class BrnadconfigurationController extends Controller
     {
         $id = Helpers::decrypt($id);
         $brandKit = BrandKit::find($id);
-        return view('content.pages.brand-configuration.edit', compact('brandKit'));
+        // dd(json_decode($brandKit->color));
+        $socialMediaObj = SocialMedia::where('brand_kits_id',$brandKit->id)->first();
+
+        $socialMedia = [];
+        if(!empty($socialMediaObj)){
+            $socialMedia= json_decode($socialMediaObj->social_media_icon);
+            // dd($socialMedia);
+        }
+        return view('content.pages.brand-configuration.edit', compact('brandKit','socialMedia'));
     }
 
     public function update(Request $request)
     {
         $id = Helpers::decrypt($request->id);
         $data = BrandKit::find($id);
+        
         $data->update($request->except('_token','id'));
         return response()->json([
             'success' => true,

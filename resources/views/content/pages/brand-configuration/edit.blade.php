@@ -19,10 +19,10 @@
             <div class="d-flex flex-column justify-content-center">
                 <h4 class="mb-1">Edit Brand Kit</h4>
             </div>
-            <div class="d-flex align-content-center flex-wrap gap-4">
+            <!-- <div class="d-flex align-content-center flex-wrap gap-4">
                 <button class="btn btn-outline-secondary">Discard</button>
                 <button type="submit" class="btn btn-primary">Update</button>
-            </div>
+            </div> -->
         </div>
 
         <div class="row">
@@ -75,283 +75,30 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="card mb-6">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Variants</h5>
-                    </div>
-                    <div class="card-body">
-                        <form class="form-repeater">
-                            <div data-repeater-list="group-a">
-                                <div data-repeater-item>
-                                    <div class="row gx-5">
-                                        <div class="mb-6 col-sm-4">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="select2Basic" class="select2 form-select"
-                                                    data-placeholder="Option" data-allow-clear="true">
-                                                    <option value="size" selected>Size</option>
-                                                    <option value="color">Color</option>
-                                                    <option value="weight">Weight</option>
-                                                    <option value="smell">Smell</option>
-                                                </select>
-                                                <label for="select2Basic">Option</label>
-                                            </div>
-                                        </div>
-                                        <div class="mb-6 col-sm-8">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" id="form-repeater-1-2" class="form-control"
-                                                    placeholder="Enter size" />
-                                                <label for="form-repeater-1-2">Value</label>
-                                            </div>
-                                        </div>
-                                    </div>
+
+                        <div class="row mb-5 gx-5">
+                        <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="brand_country"
+                                        placeholder="0123-4567" name="brand_country" value="{{ $brandKit->postal_code }}" aria-label="Product barcode" />
+                                    <label for="brand_country">Postalcode</label>
                                 </div>
                             </div>
-                            <div>
-                                <button class="btn btn-primary" data-repeater-create>
-                                    <i class="ri-add-line ri-16px me-2"></i>
-                                    Add another option
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!-- /Variants -->
-                <!-- Inventory -->
-                <div class="card mb-6">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Inventory</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Navigation -->
-                            <div class="col-12 col-md-4 mx-auto card-separator">
-                                <div class="nav-align-left d-flex justify-content-between flex-column mb-4 mb-md-0 pe-md-3">
-                                    <ul class="nav nav-pills flex-column">
-                                        <li class="nav-item">
-                                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#restock">
-                                                <i class="ri-add-line me-2"></i>
-                                                <span class="align-middle">Restock</span>
-                                            </button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#shipping">
-                                                <i class="ri-car-line me-2"></i>
-                                                <span class="align-middle">Shipping</span>
-                                            </button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button class="nav-link" data-bs-toggle="tab"
-                                                data-bs-target="#global-delivery">
-                                                <i class="ri-global-line me-2"></i>
-                                                <span class="align-middle">Global Delivery</span>
-                                            </button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#attributes">
-                                                <i class="ri-link-m me-2"></i>
-                                                <span class="align-middle">Attributes</span>
-                                            </button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#advanced">
-                                                <i class="ri-lock-unlock-line me-2"></i>
-                                                <span class="align-middle">Advanced</span>
-                                            </button>
-                                        </li>
-                                    </ul>
+                            <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="brand_state"
+                                        placeholder="00000" name="brand_state" value="{{ $brandKit->website }}" aria-label="Product SKU" />
+                                    <label for="brand_state">Website</label>
                                 </div>
                             </div>
-                            <!-- /Navigation -->
-                            <!-- Options -->
-                            <div class="col-12 col-md-8 pt-6 pt-md-0">
-                                <div class="tab-content p-0 pe-xl-0 ps-md-4">
-                                    <!-- Restock Tab -->
-                                    <div class="tab-pane fade show active" id="restock" role="tabpanel">
-                                        <h6 class="text-body">Options</h6>
-                                        <div class="row mb-4 g-4">
-                                            <div class="col-12 col-sm-8 col-lg-12 col-xxl-8">
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="number" class="form-control"
-                                                        id="ecommerce-product-stock" placeholder="Quantity"
-                                                        name="quantity" aria-label="Quantity" />
-                                                    <label for="ecommerce-product-stock">Add to Stock</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 col-sm-4 d-grid col-lg-6 col-xxl-4">
-                                                <button class="btn btn-primary btn-lg">
-                                                    <i class="ri-check-line ri-16px me-2"></i>Confirm
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2 fw-normal">
-                                                Product in stock now: <span class="fw-medium">54</span>
-                                            </h6>
-                                            <h6 class="mb-2 fw-normal">Product in transit: <span
-                                                    class="fw-medium">390</span></h6>
-                                            <h6 class="mb-2 fw-normal">
-                                                Last time restocked: <span class="fw-medium">24th June, 2023</span>
-                                            </h6>
-                                            <h6 class="mb-0 fw-normal">
-                                                Total stock over lifetime: <span class="fw-medium">2430</span>
-                                            </h6>
-                                        </div>
-                                    </div>
-                                    <!-- Shipping Tab -->
-                                    <div class="tab-pane fade" id="shipping" role="tabpanel">
-                                        <h6 class="mb-3 text-body">Shipping Type</h6>
-                                        <div>
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="radio" name="shippingType"
-                                                    id="seller" />
-                                                <label class="form-check-label d-flex flex-column gap-1" for="seller">
-                                                    <span class="h6 mb-0">Fulfilled by Seller</span>
-                                                    <small>You'll be responsible for product delivery. Any damage or delay
-                                                        during shipping
-                                                        may cost you a Damage fee.</small>
-                                                </label>
-                                            </div>
-                                            <div class="form-check mb-6">
-                                                <input class="form-check-input" type="radio" name="shippingType"
-                                                    id="companyName" checked />
-                                                <label class="form-check-label d-flex flex-column gap-1"
-                                                    for="companyName">
-                                                    <span class="h6 mb-0">Fulfilled by Company name &nbsp;<span
-                                                            class="badge rounded-pill rounded-2 badge-warning bg-label-warning fs-tiny py-1">RECOMMENDED</span></span>
-                                                    <small>Your product, Our responsibility. For a measly fee, we will
-                                                        handle the delivery
-                                                        process for you.</small>
-                                                </label>
-                                            </div>
-                                            <p class="mb-0">
-                                                See our <a href="javascript:void(0);">Delivery terms and conditions</a> for
-                                                details
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <!-- Global Delivery Tab -->
-                                    <div class="tab-pane fade" id="global-delivery" role="tabpanel">
-                                        <h6 class="mb-3 text-body">Global Delivery</h6>
-                                        <!-- Worldwide delivery -->
-                                        <div class="form-check mb-4">
-                                            <input class="form-check-input" type="radio" name="globalDel"
-                                                id="worldwide" />
-                                            <label class="form-check-label d-flex flex-column gap-1" for="worldwide">
-                                                <span class="h6 mb-0">Worldwide delivery</span>
-                                                <small>Only available with Shipping method:
-                                                    <a href="javascript:void(0);">Fulfilled by Company name</a></small>
-                                            </label>
-                                        </div>
-                                        <!-- Global delivery -->
-                                        <div class="form-check mb-4">
-                                            <input class="form-check-input" type="radio" name="globalDel" checked />
-                                            <label class="form-check-label w-75 pe-12 mb-3" for="country-selected">
-                                                <span class="h6">Selected Countries</span>
-                                            </label>
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control"
-                                                    placeholder="Type Country name" id="country-selected" />
-                                                <label for="ecommerce-product-name">Countries</label>
-                                            </div>
-                                        </div>
-                                        <!-- Local delivery -->
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="globalDel"
-                                                id="local" />
-                                            <label class="form-check-label d-flex flex-column gap-1" for="local">
-                                                <span class="h6 mb-0">Local delivery</span>
-                                                <small>Deliver to your country of residence :
-                                                    <a href="javascript:void(0);">Change profile address</a></small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <!-- Attributes Tab -->
-                                    <div class="tab-pane fade" id="attributes" role="tabpanel">
-                                        <h6 class="mb-2 text-body">Attributes</h6>
-                                        <div>
-                                            <!-- Fragile Product -->
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="checkbox" value="fragile"
-                                                    id="fragile" />
-                                                <label class="form-check-label" for="fragile">
-                                                    <span>Fragile Product</span>
-                                                </label>
-                                            </div>
-                                            <!-- Biodegradable -->
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="checkbox" value="biodegradable"
-                                                    id="biodegradable" />
-                                                <label class="form-check-label" for="biodegradable">
-                                                    <span>Biodegradable</span>
-                                                </label>
-                                            </div>
-                                            <!-- Frozen Product -->
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="checkbox" id="frozen"
-                                                    value="frozen" checked />
-                                                <label class="form-check-label w-75 pe-12 mb-3" for="frozen">
-                                                    <span class="mb-1">Frozen Product</span>
-                                                </label>
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="number" class="form-control" placeholder="In Celsius"
-                                                        id="temp" />
-                                                    <label for="temp">Max. allowed Temperature</label>
-                                                </div>
-                                            </div>
-                                            <!-- Exp Date -->
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="expDate"
-                                                    id="expDate" checked />
-                                                <label class="form-check-label w-75 pe-12 mb-3" for="expDate">
-                                                    <span class="mb-1">Expiry Date of Product</span>
-                                                </label>
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="date" class="product-date form-control"
-                                                        id="flatpickr-date" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- /Attributes Tab -->
-                                    <!-- Advanced Tab -->
-                                    <div class="tab-pane fade" id="advanced" role="tabpanel">
-                                        <h6 class="mb-3 text-body">Advanced</h6>
-                                        <div class="row">
-                                            <!-- Product Id Type -->
-                                            <div class="col">
-                                                <h6 class="mb-2">Product ID Type</h6>
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="product-id" class="select2 form-select"
-                                                        data-placeholder="ISBN" data-allow-clear="true">
-                                                        <option value="">ISBN</option>
-                                                        <option value="ISBN">ISBN</option>
-                                                        <option value="UPC">UPC</option>
-                                                        <option value="EAN">EAN</option>
-                                                        <option value="JAN">JAN</option>
-                                                    </select>
-                                                    <label for="product-id">Id</label>
-                                                </div>
-                                            </div>
-                                            <!-- Product Id -->
-                                            <div class="col">
-                                                <h6 class="mb-2">Product ID</h6>
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="number" id="product-id-1" class="form-control"
-                                                        placeholder="ISBN Number" />
-                                                    <label for="product-id-1">Id Number</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- /Advanced Tab -->
-                                </div>
-                            </div>
-                            <!-- /Options-->
                         </div>
                     </div>
                 </div>
+              
+                
+               
+                <!-- /Variants -->
+                <!-- Inventory -->
                 <!-- /Inventory -->
             </div>
             <!-- /Second column -->
@@ -360,40 +107,71 @@
             <div class="col-12 col-lg-4">
                 <!-- Pricing Card -->
                 <div class="card mb-6">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Pricing</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Base Price -->
-                        <div class="form-floating form-floating-outline mb-5">
-                            <input type="number" class="form-control" id="ecommerce-product-price" placeholder="Price"
-                                name="productPrice" aria-label="Product price" />
-                            <label for="ecommerce-product-price">Best Price</label>
-                        </div>
+                    <h5 class="card-header">Social Media Icon To Show</h5>
 
-                        <!-- Discounted Price -->
-                        <div class="form-floating form-floating-outline mb-5">
-                            <input type="number" class="form-control" id="ecommerce-product-discount-price"
-                                placeholder="Discounted Price" name="productDiscountedPrice"
-                                aria-label="Product discounted price" />
-                            <label for="ecommerce-product-discount-price">Discounted Price</label>
-                        </div>
-                        <!-- Charge tax check box -->
-                        <div class="form-check m-2 me-0 pb-2">
-                            <input class="form-check-input" type="checkbox" value="" id="price-charge-tax"
-                                checked />
-                            <label class="form-check-label" for="price-charge-tax"> Charge tax on this product </label>
-                        </div>
-                        <!-- Instock switch -->
-                        <div class="d-flex justify-content-between align-items-center border-top pt-4">
-                            <p class="mb-0">In stock</p>
-                            <div class="w-25 d-flex justify-content-end">
-                                <div class="form-check form-switch me-n3 mb-0">
-                                    <input type="checkbox" class="form-check-input" checked />
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-lg-12 p-12">
+                    
+                   
+                    @if(in_array('facebook',$socialMedia))
+                   
+                    
+                    <button type="button" class="btn btn-icon btn-facebook waves-effect waves-light"><i class="tf-icons ri-facebook-circle-fill ri-22px"></i></button>
+                    @endif
+
+                    @if(in_array('instagram',$socialMedia))
+                    
+                    <button type="button" class="btn btn-icon btn-instagram waves-effect waves-light"><i class="tf-icons ri-instagram-fill ri-22px"></i></button>
+                    @endif
+
+                    @if(in_array('linkedin',$socialMedia))
+                    
+                    <button type="button" class="btn btn-icon btn-linkedin waves-effect waves-light"><i class="tf-icons ri-linkedin-circle-fill ri-22px"></i></button>
+                     @endif
+
+                    @if(in_array('whatsapp',$socialMedia))
+                    
+                    <button type="button" class="btn btn-icon btn-whatsapp waves-effect waves-light"><i class="tf-icons ri-whatsapp-fill ri-22px"></i></button>
+                     @endif
+
+                    @if(in_array('tiktok',$socialMedia))
+                    
+                    <button type="button" class="btn btn-icon btn-tiktok waves-effect waves-light" style="background-color: #000000; /* or use a gradient */
+  color: #fff;"><i class="tf-icons ri-tiktok-fill ri-22px"></i></button>
+                     @endif
+
+                    @if(in_array('x',$socialMedia))
+                    
+                    <button type="button" class="btn btn-icon btn-dark waves-effect waves-light">
+  <i class="tf-icons ri-twitter-x-fill ri-22px"></i>
+</button>
+                    
+                    @endif
+                   
                     </div>
+
+
+
+
+
+                </div>
+                
+                <div class="card mb-6">
+                    <h5 class="card-header">Color</h5>
+
+                    <div class="col-lg-12 p-12">
+                    
+
+                    @if(!empty($brandKit->color))
+                        @foreach ( json_decode($brandKit->color) as $color )
+                        <button type="button" class="btn btn-icon btn-tiktok waves-effect waves-light" style="background-color: {{ $color }};"></i></button>                     
+                        @endforeach
+                    @endif
+                    </div>
+
+
+
+
+
                 </div>
                 <!-- /Pricing Card -->
                 <!-- Organize Card -->
