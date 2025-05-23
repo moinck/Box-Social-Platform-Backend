@@ -42,10 +42,11 @@ class BrnadconfigurationController extends Controller
             ->addColumn('action', function ($data) {
                 $id = Helpers::encrypt($data->id);
                 $editRoute = route('brand-configuration.edit', $id);
+                $showRoute = route('brand-configuration.show', $id);
 
                 return '
-                    <a href="'.$editRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit">
-                        <i class="ri-edit-box-line"></i>
+                    <a href="'.$showRoute.'" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Show">
+                        <i class="ri-eye-line"></i>
                     </a>
                     <a href="javascript:void(0);" data-brand-kit-id="'.$id.'" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-brand-kit-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                         <i class="ri-delete-bin-line"></i>
@@ -54,6 +55,18 @@ class BrnadconfigurationController extends Controller
             })
             ->rawColumns(['logo','user','company_name','email','phone','created_date','action'])
             ->make(true);
+    }
+
+    public function show($id)
+    {
+        $id = Helpers::decrypt($id);
+        $brandKit = BrandKit::find($id);
+        $socialMediaObj = SocialMedia::where('brand_kits_id',$brandKit->id)->first();
+        $socialMedia = [];
+        if(!empty($socialMediaObj)){
+            $socialMedia= json_decode($socialMediaObj->social_media_icon);
+        }
+        return view('content.pages.brand-configuration.show', compact('brandKit','socialMedia'));
     }
 
     public function edit($id)
