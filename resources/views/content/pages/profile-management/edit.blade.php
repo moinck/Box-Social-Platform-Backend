@@ -19,7 +19,7 @@
             <div class="card b-6 mb-6">
                 <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center">
                     <div class="flex-shrink-0 m-3 mx-sm-0 mx-auto" style="margin-top:1.25rem;margin-bottom:1.25rem;">
-                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt="user image"
+                        <img src="{{ $profileImage }}" alt="user image" id="account-file-input" height="200" width="200"
                             class="d-block h-auto ms-0 rounded-4 user-profile-img" />
                     </div>
                     <div class="flex-grow-1 mt-4 mt-sm-12">
@@ -38,6 +38,16 @@
                                         <span class="fw-medium">Joined | {{ $user->created_at->format('d F Y') }}</span>
                                     </li>
                                 </ul>
+
+                                {{-- add button to upload image --}}
+                                {{-- <div class="button-wrapper mt-3">
+                                    <label for="upload" class="btn btn-primary me-3 mb-4 waves-effect waves-light" tabindex="0">
+                                        <span class="d-none d-sm-block">Upload new photo</span>
+                                        <i class="ri-upload-2-line d-block d-sm-none"></i>
+                                        <input type="file" id="upload" class="account-file-input" hidden="" accept="image/png, image/jpeg">
+                                    </label>
+                                    <p>Allowed JPG, GIF or PNG. Max size of 800K</p>
+                                </div> --}}
                             </div>
                             {{-- <a href="javascript:void(0)" class="btn btn-primary">
                                 <i class="ri-user-follow-line ri-16px me-2"></i>Connected
@@ -53,7 +63,7 @@
                     <h4 class="card-title mb-0">Profile Information</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="edit-profile-form" action="{{ route('profile-management.update') }}" class="row g-5" method="POST">
+                    <form id="edit-profile-form" action="{{ route('profile-management.update') }}" class="row g-5" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
@@ -69,11 +79,18 @@
                                 <label for="edit_last_name">Last Name</label>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="email" id="edit_user_email" name="edit_user_email" class="form-control"
                                     placeholder="User Email" value="{{ $user->email }}" readonly />
                                 <label for="edit_user_email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="file" id="edit_user_image" name="edit_user_image" class="form-control"
+                                    placeholder="User Image" accept="image/*"/>
+                                <label for="edit_user_image">Image</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -150,21 +167,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         // Update/reset user image of account page
-        let accountUserImage = document.getElementById('uploadedAvatar');
-        const fileInput = document.querySelector('.account-file-input'),
+        let accountUserImage = document.getElementById('account-file-input');
+        const fileInput = document.querySelector('#edit_user_image'),
             resetFileInput = document.querySelector('.account-image-reset');
 
         if (accountUserImage) {
             const resetImage = accountUserImage.src;
             fileInput.onchange = () => {
+                // check file size
+                if (fileInput.files[0].size > 1 * 1024 * 1024) {
+                    return;
+                }
+                // check file type
+                if (!fileInput.files[0].type.includes('image')) {
+                    return;
+                }
                 if (fileInput.files[0]) {
                     accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
                 }
             };
-            resetFileInput.onclick = () => {
-                fileInput.value = '';
-                accountUserImage.src = resetImage;
-            };
+            if (resetFileInput) {
+                resetFileInput.onclick = () => {
+                    fileInput.value = '';
+                    accountUserImage.src = resetImage;
+                };
+            }
         }
         $(document).ready(function() {
 
@@ -190,6 +217,16 @@
                         validators: {
                             notEmpty: {
                                 message: 'Please enter company name'
+                            }
+                        }
+                    },
+                    edit_user_image: {
+                        validators: {
+                            file: {
+                                extension: 'png,jpg,jpeg',
+                                type: 'image/jpeg,image/png',
+                                maxSize: 1 * 1024 * 1024,
+                                message: 'Please upload a valid image file (max 1MB)'
                             }
                         }
                     },

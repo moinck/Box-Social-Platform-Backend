@@ -64,7 +64,7 @@
             title: title,
             text: text,
             customClass: {
-                confirmButton: `btn btn-${type === 'success' ? 'success' : 'danger'}`
+                confirmButton: `btn btn-${type === 'success' ? 'primary' : 'danger'}`
             }
         });
     }
@@ -74,7 +74,7 @@
         setTimeout(() => {
             hideBSPLoader();
             showSweetAlert('warning', 'Warning', '{{ session()->get('warning') }}');
-        }, 500);
+        }, 100);
     </script>
 @endif
 @if (session()->has('success'))

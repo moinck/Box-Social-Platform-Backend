@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Helpers
@@ -230,18 +232,42 @@ class Helpers
      */
     public static function uploadImage($prefix, $image, $path)
     {
-        if (!file_exists(public_path($path))) {
-            mkdir(public_path($path), 0777, true);
+        // Ensure the directory exists in the storage
+        if (!Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->makeDirectory($path);
         }
-        // give storage permision
-        chmod(public_path($path), 0777);
-        
+        // Generate a unique name for the image
         $image_name = $prefix . "_" . time() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path($path), $image_name);
-
-        $imageUrl = $path . '/' . $image_name;
+        
+        // Store the image in the storage directory
+        $image->storeAs($path, $image_name, 'public');
+        // Return the relative path to the image
+        $imageUrl = 'storage/' . $path . '/' . $image_name;
         return $imageUrl;
     }
+    
+    /**
+     * Function to delete image
+     * @param mixed $path
+     * @return void
+     */
+    public static function deleteImage($path)
+    {
+        try {
+            // Remove 'storage/' prefix if it exists
+            $storagePath = str_replace('storage/', '', $path);
+            
+            if (Storage::disk('public')->exists($storagePath)) {
+                Storage::disk('public')->delete($storagePath);
+                Log::info("File deleted successfully: " . $path);
+            } else {
+                Log::info("File does not exist at: " . $path);
+            }
+        } catch (\Exception $e) {
+            Log::error("Error deleting file: " . $e->getMessage());
+        }
+    }
+    
 
     static $secretKey = 'rT9vL2pN6xBzCqA3WmEyKdSfUjHgXzV1';
     static $secretIv = 'Yt6MnBpQaWxCrV8dLfZuKiJhGvTeSdR4';
