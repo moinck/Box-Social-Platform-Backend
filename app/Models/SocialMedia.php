@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SocialMedia extends Model
 {
     protected $fillable = [
-        'brand_kit_id',
+        'brand_kits_id',
         'social_media_icon'
     ];
 
