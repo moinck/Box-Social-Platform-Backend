@@ -60,13 +60,14 @@ class BrnadconfigurationController extends Controller
     public function show($id)
     {
         $id = Helpers::decrypt($id);
-        $brandKit = BrandKit::find($id);
+        $brandKit = BrandKit::with('user:id,first_name,last_name,role,company_name,email')->find($id);
         $socialMediaObj = SocialMedia::where('brand_kits_id',$brandKit->id)->first();
         $socialMedia = [];
         if(!empty($socialMediaObj)){
             $socialMedia= json_decode($socialMediaObj->social_media_icon);
         }
-        return view('content.pages.brand-configuration.show', compact('brandKit','socialMedia'));
+        $fontsData = json_decode($brandKit->font,true);
+        return view('content.pages.brand-configuration.show', compact('brandKit','socialMedia','fontsData'));
     }
 
     public function edit($id)

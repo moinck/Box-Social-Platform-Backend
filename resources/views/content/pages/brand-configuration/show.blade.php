@@ -58,11 +58,10 @@
                     <div class="card-header">
                         <h5 class="card-tile mb-0">Brand information</h5>
                     </div>
-                    <hr class="m-3">
                     <div class="card-body">
                         <div class="form-floating form-floating-outline mb-5">
                             <input type="text" class="form-control" id="brand_company_name" placeholder="Product title"
-                                name="brand_company_name" value="{{ $brandKit->company_name }}"
+                                name="brand_company_name" value="{{ $brandKit->user->company_name }}"
                                 aria-label="Product title" readonly />
                             <label for="brand_company_name">Company Name</label>
                         </div>
@@ -71,7 +70,7 @@
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
                                     <input type="email" class="form-control" id="brand_email" placeholder="00000"
-                                        name="brand_email" value="{{ $brandKit->email }}" aria-label="Product SKU" readonly />
+                                        name="brand_email" value="{{ $brandKit->user->email }}" aria-label="Product SKU" readonly />
                                     <label for="brand_email">Email</label>
                                 </div>
                             </div>
@@ -123,6 +122,50 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {{-- brand fonts card --}}
+                <div class="card mb-6">
+                    <h5 class="card-header">Brand Fonts</h5>
+                    <div class="col-lg-12 px-5 pb-5">
+                        @if (!empty($fontsData))
+                            <div class="row">
+                                <div class="row mb-5 gx-5">
+                                    <div class="col-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="email" class="form-control" id="font_family" placeholder="00000"
+                                                name="font_family" value="{{ $fontsData['family'] }}" aria-label="Font Family" readonly />
+                                            <label for="font_family">Font Family</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="number" class="form-control" id="font_size" placeholder="0123-4567"
+                                                name="font_size" value="{{ $fontsData['size'] }}" aria-label="Font Size" readonly />
+                                            <label for="font_size">Font Size</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 font-icon-btns">
+                                        @if (!empty($fontsData['font_bold']) && $fontsData['font_bold'] == true)
+                                            <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Bold">
+                                                <i class="tf-icons ri-bold ri-22px"></i>
+                                            </button>
+                                        @endif
+                                        @if (!empty($fontsData['font_italic']) && $fontsData['font_italic'] == true)
+                                            <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Italic">
+                                                <i class="tf-icons ri-italic ri-22px"></i>
+                                            </button>
+                                        @endif
+                                        @if (!empty($fontsData['font_underline']) && $fontsData['font_underline'] == true)
+                                            <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Underline">
+                                                <i class="tf-icons ri-underline ri-22px"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

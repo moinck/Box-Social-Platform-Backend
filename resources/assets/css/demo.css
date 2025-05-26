@@ -201,3 +201,9 @@
 .br-1 {
   border-radius: 10px;
 }
+
+div.font-icon-btns {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
