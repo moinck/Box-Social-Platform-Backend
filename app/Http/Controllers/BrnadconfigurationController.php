@@ -101,6 +101,13 @@ class BrnadconfigurationController extends Controller
         $id = Helpers::decrypt($request->brand_kit_id);
         $brandKit = BrandKit::find($id);
         if (!empty($brandKit)) {
+            // delete it's social media icons
+            $socialMedia = SocialMedia::where('brand_kits_id',$brandKit->id)->first();
+            if(!empty($socialMedia)){
+                $socialMedia->delete();
+            }
+            // delete logo with data
+            Helpers::deleteImage($brandKit->logo);
             $brandKit->delete();
             
             return response()->json([

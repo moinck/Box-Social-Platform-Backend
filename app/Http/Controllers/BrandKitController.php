@@ -42,14 +42,14 @@ class BrandKitController extends Controller
         $rules = [
             'email' => 'required|email',
             'company_name' => 'required|string|max:255',
-            'logo' => 'nullable|string',
+            'logo' => 'required|string',
             'user_id' => 'required|string|exists:users,id',
-            'address' => 'nullable|string|max:500',
-            'state' => 'nullable|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'address' => 'required|string|max:500',
+            'state' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
             'website' => 'nullable|url',
-            'postal_code' => 'nullable|string|max:20',
+            'postal_code' => 'required|string|max:20',
             'show_email_on_post' => 'nullable|boolean',
             'show_phone_number_on_post' => 'nullable|boolean',
             'show_website_on_post' => 'nullable|boolean',
@@ -81,8 +81,13 @@ class BrandKitController extends Controller
         if(empty($brandKitObj)){
             $brandKitObj = new BrandKit();
         }
+
+        $uploadLogoUrl = $request->logo;
+        if($uploadLogoUrl){
+            $logoUrl = Helpers::uploadImageFromUrl('brand_kit',$uploadLogoUrl, 'images/brand-kit-logos');
+        }
         
-        $brandKitObj->logo = $request->logo;
+        $brandKitObj->logo = $logoUrl;
         $brandKitObj->user_id = $decryptedUserId;
         $brandKitObj->company_name = $request->company_name;
         $brandKitObj->email = $request->email;
@@ -132,7 +137,7 @@ class BrandKitController extends Controller
             'data' => [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
-                "logo" => $brandKitObj->logo,
+                "logo" => asset($brandKitObj->logo),
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color,true) : null ,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font,1) : null,
@@ -192,7 +197,7 @@ class BrandKitController extends Controller
             'data' => [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
-                "logo" => $brandKitObj->logo,
+                "logo" => asset($brandKitObj->logo),
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color,true) : null ,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font,1) : null,

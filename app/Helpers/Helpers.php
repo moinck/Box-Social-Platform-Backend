@@ -319,4 +319,74 @@ class Helpers
 
         return $output;
     }
+
+    /**
+     * Helper function to get file extension from MIME type
+     */
+    public static function getExtensionFromMimeType($mimeType)
+    {
+        $mimeToExt = [
+            'image/jpeg' => 'jpg',
+            'image/jpg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'image/bmp' => 'bmp',
+            'image/svg+xml' => 'svg',
+        ];
+
+        return $mimeToExt[$mimeType] ?? null;
+    }
+
+    public static function uploadImageFromUrl($prefix, $imageUrl, $path)
+    {
+        try {
+            // Validate URL
+            if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Invalid URL provided');
+            }
+
+            // Ensure the directory exists in the storage
+            if (!Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->makeDirectory($path);
+            }
+
+            // Get image content from URL
+            $imageContent = @file_get_contents($imageUrl);
+            
+            if ($imageContent === false) {
+                throw new \Exception('Failed to fetch image from URL');
+            }
+
+            // Get image info to determine extension
+            $imageInfo = @getimagesizefromstring($imageContent);
+            
+            if ($imageInfo === false) {
+                throw new \Exception('Invalid image format');
+            }
+
+            // Determine file extension from MIME type
+            $extension = self::getExtensionFromMimeType($imageInfo['mime']);
+            
+            if (!$extension) {
+                throw new \Exception('Unsupported image format');
+            }
+
+            // Generate a unique name for the image
+            $image_name = $prefix . "_" . time() . '.' . $extension;
+            
+            // Store the image content in the storage directory
+            $fullPath = $path . '/' . $image_name;
+            Storage::disk('public')->put($fullPath, $imageContent);
+            
+            // Return the relative path to the image
+            $savedImageUrl = 'storage/' . $fullPath;
+            return $savedImageUrl;
+
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Image upload from URL failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

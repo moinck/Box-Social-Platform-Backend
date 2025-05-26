@@ -19,7 +19,7 @@
         <div class="card b-6 mb-6">
             <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center">
                 <div class="flex-shrink-0 m-3" style="margin-top:1.25rem;margin-bottom:1.25rem;">
-                    <img src="{{ $brandKit->logo ?? asset('assets/img/image_not_available.jpg') }}" alt="user image" id="account-file-input" height="200" width="200"
+                    <img src="{{ $brandKit->logo ? asset($brandKit->logo) : asset('assets/img/image_not_available.jpg') }}" alt="user image" id="account-file-input" height="200" width="200"
                         class="d-block h-auto ms-0 rounded-4 shadow" />
                 </div>
                 <div class="flex-grow-1 mt-4 mt-sm-12">
