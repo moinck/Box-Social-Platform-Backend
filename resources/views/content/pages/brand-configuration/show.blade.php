@@ -213,6 +213,13 @@
                                 <span>Show website on post</span>
                             </label>
                         </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" value="show_address" id="show_address"
+                                {{ $brandKit->show_address_on_post == 1 ? 'checked' : '' }} onclick="return false;">
+                            <label class="form-check-label" for="show_address">
+                                <span>Show address on post</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

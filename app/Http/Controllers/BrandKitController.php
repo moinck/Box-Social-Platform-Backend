@@ -54,6 +54,7 @@ class BrandKitController extends Controller
             'show_phone_number_on_post' => 'nullable|boolean',
             'show_website_on_post' => 'nullable|boolean',
             'social_media_icon_show' => 'nullable|array',
+            'show_address_on_post' => 'nullable|boolean',
         ];
         
         $messages = [
@@ -94,6 +95,7 @@ class BrandKitController extends Controller
         $brandKitObj->show_email_on_post = $request->show_email_on_post;
         $brandKitObj->show_phone_number_on_post = $request->show_phone_number_on_post;
         $brandKitObj->show_website_on_post = $request->show_website_on_post;
+        $brandKitObj->show_address_on_post = $request->show_address_on_post;
         $brandKitObj->color = json_encode($request->color);
         $brandKitObj->font = json_encode($request->font);
         $brandKitObj->design_style = $request->design_style;
@@ -144,6 +146,7 @@ class BrandKitController extends Controller
                 "show_email_on_post" => $brandKitObj->show_email_on_post,
                 "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
+                "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
                 "design_style" => $brandKitObj->design_style
             ],
@@ -203,6 +206,7 @@ class BrandKitController extends Controller
                 "show_email_on_post" => $brandKitObj->show_email_on_post,
                 "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
+                "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
                 "design_style" => $brandKitObj->design_style
             ],

@@ -10,12 +10,13 @@ class BrandKit extends Model
 
     protected $fillable = [
         'brand_kits_id',
-        'social_media_icon'
+        'social_media_icon',
+        'show_address_on_post',
     ];
 
     public function socialMedia()
     {
-        return $this->hasOne(SocialMedia::class);
+        return $this->belongsTo(SocialMedia::class, 'id', 'brand_kits_id');
     }
 
     public function user()
