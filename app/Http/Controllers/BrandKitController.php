@@ -29,12 +29,21 @@ class BrandKitController extends Controller
         $request->merge([
             'user_id' => Helpers::decrypt($request->user_id)
         ]);
+
+        $decryptedUserId = $request->user_id;
+        if ($decryptedUserId == false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User ID is invalid.',
+                'errors' => 'User ID is invalid.',
+            ], 422);
+        }
        
         $rules = [
             'email' => 'required|email',
             'company_name' => 'required|string|max:255',
             'logo' => 'nullable|string',
-            'user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'required|string|exists:users,id',
             'address' => 'nullable|string|max:500',
             'state' => 'nullable|string|max:100',
             'phone' => 'nullable|string|max:20',
@@ -66,16 +75,14 @@ class BrandKitController extends Controller
             ], 422);
         }
 
-        
-       
-        $brandKitObj = BrandKit::where('user_id',Helpers::decrypt($request->user_id))->first();
+        $brandKitObj = BrandKit::where('user_id',$decryptedUserId)->first();
 
         if(empty($brandKitObj)){
             $brandKitObj = new BrandKit();
         }
         
         $brandKitObj->logo = $request->logo;
-        $brandKitObj->user_id = $request->user_id;
+        $brandKitObj->user_id = $decryptedUserId;
         $brandKitObj->company_name = $request->company_name;
         $brandKitObj->email = $request->email;
         $brandKitObj->address = $request->address;
@@ -109,7 +116,7 @@ class BrandKitController extends Controller
             $SocialMediaObj->save();
         }
 
-        $brandKitObj = BrandKit::where('user_id',$request->user_id)->first();
+        $brandKitObj = BrandKit::where('user_id',$decryptedUserId)->first();
         
         $SocialMediaObj = SocialMedia::where('brand_kits_id',$brandKitObj->id)->first();
         $SocialMediaIcon = []; 
