@@ -27,6 +27,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
 
+    // encode & decode 
+    Route::get('/encryption/encode/{value}', [HomePage::class, 'encode'])->name('encryption.encode');
+    Route::get('/encryption/decode/{value}', [HomePage::class, 'decode'])->name('encryption.decode');
+
     // Stock image Management
     Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
     Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
