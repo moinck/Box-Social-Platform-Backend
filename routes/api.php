@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\ProfileManagementController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandKitController;
 use App\Http\Controllers\ContactUsController;
@@ -35,3 +36,6 @@ Route::get('/category/list', [CategoriesController::class, 'list']);
 Route::post('/brandkit/store', [BrandKitController::class, 'store']);
 Route::get('/brandkit/get', [BrandKitController::class, 'get']);
 
+// profile management api
+Route::get('/profile-management/get', [ProfileManagementController::class, 'index']);
+// Route::post('/profile-management/update', [ProfileManagementController::class, 'update']);

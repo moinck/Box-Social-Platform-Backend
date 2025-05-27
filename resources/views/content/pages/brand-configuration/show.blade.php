@@ -147,18 +147,30 @@
                                         </div>
                                     </div>
                                     <div class="col-4 font-icon-btns">
-                                        @if (!empty($fontsData['font_bold']) && $fontsData['font_bold'] == true)
+                                        @if (!empty($fontsData['font_bold']) && $fontsData['font_bold'] == "true")
                                             <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Bold">
                                                 <i class="tf-icons ri-bold ri-22px"></i>
                                             </button>
+                                        @else
+                                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Font Bold">
+                                                <i class="tf-icons ri-bold ri-22px"></i>
+                                            </button>
                                         @endif
-                                        @if (!empty($fontsData['font_italic']) && $fontsData['font_italic'] == true)
+                                        @if (!empty($fontsData['font_italic']) && $fontsData['font_italic'] == "true")
                                             <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Italic">
                                                 <i class="tf-icons ri-italic ri-22px"></i>
                                             </button>
+                                        @else
+                                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Font Italic">
+                                                <i class="tf-icons ri-italic ri-22px"></i>
+                                            </button>
                                         @endif
-                                        @if (!empty($fontsData['font_underline']) && $fontsData['font_underline'] == true)
+                                        @if (!empty($fontsData['font_underline']) && $fontsData['font_underline'] == "true")
                                             <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Underline">
+                                                <i class="tf-icons ri-underline ri-22px"></i>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Font Underline">
                                                 <i class="tf-icons ri-underline ri-22px"></i>
                                             </button>
                                         @endif
