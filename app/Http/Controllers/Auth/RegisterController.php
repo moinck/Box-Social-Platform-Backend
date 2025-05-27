@@ -232,6 +232,17 @@ class RegisterController extends Controller
         return response()->json($returnResponse,200);
     }
 
-
-
+    /**
+     * Logout api
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout successfully.',
+        ], 200);
+    }
 }
