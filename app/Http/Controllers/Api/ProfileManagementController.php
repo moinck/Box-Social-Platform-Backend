@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileManagementController extends Controller
@@ -20,18 +21,17 @@ class ProfileManagementController extends Controller
      */
     public function index(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
+        // get token
+        $token = $request->bearerToken();
+        if (!$token) {
             return $this->error([
                 'status' => false,
-                'message' => 'Invalid user id',
+                'message' => 'Invalid token',
             ]);
         }
+        $user = Auth::user();
 
-        $user_id = Helpers::decrypt($request->user_id);
+        $user_id = $user->id;
         if (!$user_id) {
             return $this->error([
                 'status' => false,
@@ -49,7 +49,7 @@ class ProfileManagementController extends Controller
         // make data array
         $data = [];
         $data['user'] = [
-            'id' => $request->user_id,
+            'id' => Helpers::encrypt($user_id),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'company_name' => $user->company_name,
@@ -74,8 +74,17 @@ class ProfileManagementController extends Controller
      */
     public function update(Request $request)
     {
+        // need to change here
+        $token = $request->bearerToken();
+        $user = Auth::user();
+        $user_id = $user->id;
+        if (!$user_id || $token != $user->api_token) {
+            return $this->error([
+                'status' => false,
+                'message' => 'Invalid user id',
+            ]);
+        }
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
             'full_name' => 'required',
             'company_name' => 'required',
             'fca_number' => 'required',
@@ -92,7 +101,7 @@ class ProfileManagementController extends Controller
             ]);
         }
 
-        $user_id = Helpers::decrypt($request->user_id);
+        $user_id = $user->id;
         if (!$user_id) {
             return $this->error([
                 'status' => false,
