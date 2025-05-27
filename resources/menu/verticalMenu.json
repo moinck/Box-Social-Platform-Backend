@@ -34,6 +34,13 @@
             "icon": "menu-icon tf-icons ri-list-settings-fill",
             "slug": "brand-configuration",
             "role": ["admin"]
+        },
+        {
+            "url": "/post-content",
+            "name": "Post Content",
+            "icon": "menu-icon tf-icons ri-profile-line",
+            "slug": "post-content",
+            "role": ["admin"]
         }
     ]
 }

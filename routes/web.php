@@ -14,6 +14,7 @@ use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
+use App\Http\Controllers\PostContentController;
 use App\Http\Controllers\ProfileManagementController;
 
 Route::middleware('guest')->group(function () {
@@ -78,6 +79,17 @@ Route::middleware('auth')->group(function () {
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
         Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
+
+        // post content controller
+        Route::get('/post-content', [PostContentController::class,'index'])->name('post-content');
+        Route::get('/post-content/create', [PostContentController::class,'create'])->name('post-content.create');
+        Route::post('/post-content/store', [PostContentController::class,'store'])->name('post-content.store');
+        Route::get('/post-content/datatable', [PostContentController::class,'dataTable'])->name('post-content.data-table');
+        Route::get('/post-content/edit/{id}', [PostContentController::class,'edit'])->name('post-content.edit');
+        Route::post('/post-content/update', [PostContentController::class,'update'])->name('post-content.update');
+        Route::post('/post-content/delete', [PostContentController::class,'destroy'])->name('post-content.delete');
+        Route::post('/post-content/account-status', [PostContentController::class,'changeStatus'])->name('post-content.change-status');
+        Route::get('/post-content/export', [PostContentController::class,'export'])->name('post-content.export');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
