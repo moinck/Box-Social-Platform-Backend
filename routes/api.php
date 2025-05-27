@@ -27,10 +27,11 @@ Route::group([
         // Route::post('store/contact-us', [ContactUsController::class, 'store']);
 
         // category list
-        // Route::get('/category/list', [CategoriesController::class, 'list']);
+        Route::get('/category/list', [CategoriesController::class, 'list']);
 
-        Route::post('/brandkit/store', [BrandKitController::class, 'store']);
+        // brandkit api
         Route::get('/brandkit/get', [BrandKitController::class, 'get']);
+        Route::post('/brandkit/store', [BrandKitController::class, 'store']);
 
         // profile management api
         Route::get('/profile-management/get', [ProfileManagementController::class, 'index']);
@@ -39,6 +40,5 @@ Route::group([
 });
 
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
-Route::get('/category/list', [CategoriesController::class, 'list']);
 
 
