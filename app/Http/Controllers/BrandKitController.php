@@ -42,7 +42,7 @@ class BrandKitController extends Controller
         $rules = [
             'email' => 'required|email',
             'company_name' => 'required|string|max:255',
-            'logo' => 'required|string',
+            'logo' => 'required',
             'user_id' => 'required|string|exists:users,id',
             'address' => 'required|string|max:500',
             'state' => 'required|string|max:100',
@@ -84,7 +84,8 @@ class BrandKitController extends Controller
 
         $uploadLogoUrl = $request->logo;
         if($uploadLogoUrl){
-            $logoUrl = Helpers::uploadImageFromUrl('brand_kit',$uploadLogoUrl, 'images/brand-kit-logos');
+            // $logoUrl = Helpers::uploadImageFromUrl('brand_kit',$uploadLogoUrl, 'images/brand-kit-logos');
+            $logoUrl = Helpers::uploadImage('brand_kit',$uploadLogoUrl, 'images/brand-kit-logos');
         }
         
         $brandKitObj->logo = $logoUrl;
