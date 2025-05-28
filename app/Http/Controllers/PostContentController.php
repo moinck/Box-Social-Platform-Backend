@@ -102,4 +102,19 @@ class PostContentController extends Controller
             ->rawColumns(['action', 'post_description'])
             ->make(true);
     }
+
+    /**
+     * function to destroy post content
+     */
+    public function destroy(Request $request)
+    {
+        $postId = Helpers::decrypt($request->post_id);
+        $postContent = PostContent::find($postId);
+        $postContent->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Post Content Deleted Successfully',
+        ]);
+    }
 }
