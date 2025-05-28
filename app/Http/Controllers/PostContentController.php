@@ -24,6 +24,50 @@ class PostContentController extends Controller
         return view('content.pages.admin.post-content.create', compact('categories'));
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'post_title' => 'required',
+            'post_category' => 'required|exists:categories,id',
+            'post_description' => 'required',
+        ]);
+
+        PostContent::create([
+            'title' => $request->post_title,
+            'category_id' => $request->post_category,
+            'description' => $request->post_description,
+        ]);
+
+        return redirect()->route('post-content')->with('success', 'Post Content Created Successfully');
+    }
+
+    public function edit($id)
+    {
+        $postContent = PostContent::find(Helpers::decrypt($id));
+        $categories = Categories::where('parent_id', null)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('content.pages.admin.post-content.edit', compact('postContent', 'categories'));
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'post_title' => 'required',
+            'post_category' => 'required|exists:categories,id',
+            'post_description' => 'required',
+        ]);
+
+        PostContent::find($request->post_id)->update([
+            'title' => $request->post_title,
+            'category_id' => $request->post_category,
+            'description' => $request->post_description,
+        ]);
+
+        return redirect()->route('post-content')->with('success', 'Post Content Updated Successfully');
+    }
+
     public function dataTable(Request $request)
     {
         $postContents = PostContent::with('category')->latest()->get();
@@ -37,22 +81,25 @@ class PostContentController extends Controller
                 return $postContent->category->name;
             })
             ->addColumn('post_description', function ($postContent) {
-                return $postContent->description;
+                // just show some lines of description
+                $description = str($postContent->description)->limit(60);
+                return $description;
             })
             ->addColumn('created_date', function ($postContent) {
-                return $postContent->created_at->format('Y-m-d');
+                return Helpers::dateFormate($postContent->created_at);
             })
             ->addColumn('action', function ($postContent) {
                 $postId = Helpers::encrypt($postContent->id);
                 $editUrl = route('post-content.edit', $postId);
 
                 return '
-                    <a href="'.$editUrl.'" title="edit category" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
+                    <a href="'.$editUrl.'" title="edit post content" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
                         data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" title="delete category" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-content-btn"
+                    <a href="javascript:;" title="delete post content" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-content-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-id="'.$postId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
+            ->rawColumns(['action', 'post_description'])
             ->make(true);
     }
 }

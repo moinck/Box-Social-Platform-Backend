@@ -40,10 +40,10 @@
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
                     <a href="{{ route('post-content.create') }}" class="btn btn-secondary btn-primary waves-effect waves-light" 
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Post Content">
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Content">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">Add Post Content</span>
+                            <span class="d-none d-sm-inline-block">Create Post Content</span>
                         </span>
                     </a> 
                 </div>
@@ -111,6 +111,9 @@
                             next: '<i class="ri-arrow-right-s-line"></i>',
                             previous: '<i class="ri-arrow-left-s-line"></i>'
                         }
+                    },
+                    drawCallback: function(settings) {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
                     }
                 });
             }

@@ -389,4 +389,9 @@ class Helpers
             return false;
         }
     }
+
+    public static function dateFormate($date)
+    {
+        return \Carbon\Carbon::parse($date)->format('d-m-Y | h:i A');
+    }
 }

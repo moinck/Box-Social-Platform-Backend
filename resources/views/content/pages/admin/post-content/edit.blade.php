@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Create Post Content')
+@section('title', 'Edit Post Content')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -34,16 +34,17 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Create Post Content</h4>
+                    <h4 class="card-title mb-0">Edit Post Content</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="create-post-content-form" action="{{ route('post-content.store') }}" class="row g-5"
-                        method="POST" enctype="multipart/form-data">
+                    <form id="edit-post-content-form" action="{{ route('post-content.update') }}"
+                        class="row g-5" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="post_id" value="{{ $postContent->id }}">
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="post_title" name="post_title" class="form-control"
-                                    placeholder="Post Title" />
+                                    placeholder="Post Title" value="{{ $postContent->title }}"/>
                                 <label for="post_title">Post Title</label>
                             </div>
                         </div>
@@ -53,7 +54,7 @@
                                     data-choices-search-false>
                                     <option value="">Select Category</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" {{ $category->id == $postContent->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                                 <label for="post_category">Post Category</label>
@@ -65,13 +66,13 @@
                                     placeholder="Post Description"></textarea>
                                 <label for="post_description">Post Description</label>
                             </div> --}}
-                            <div id="post_description">{{old('post_description')}}</div>
+                            <div id="post_description">{!! $postContent->description !!}</div>
                             <input type="hidden" name="post_description" id="hiddenPostDescription"
-                                value="{{old('post_description')}}" />
+                                value="{{ $postContent->description }}" />
                         </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <button type="reset" class="btn btn-outline-secondary" id="cancelCreatePostContentBtn">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="reset" class="btn btn-outline-secondary" id="cancelEditPostContentBtn">
                                 Cancel
                             </button>
                         </div>
@@ -150,7 +151,7 @@
                 ['link', 'image', 'video', 'formula'],
                 ['clean']
             ];
-            const createPostDescription = new Quill('#post_description', {
+            const editPostDescription = new Quill('#post_description', {
                 bounds: '#post_description',
                 placeholder: 'Type Something...',
                 modules: {
@@ -161,18 +162,19 @@
             });
 
             // update hidden post description
-            createPostDescription.on('text-change', function () {
-                $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
+            editPostDescription.on('text-change', function () {
+                $('#hiddenPostDescription').val(editPostDescription.root.innerHTML);
                 validator.revalidateField('post_description');
             });
 
-            // cancel create post content
-            $('#cancelCreatePostContentBtn').click(function () {
+            // cancel edit post content
+            $('#cancelEditPostContentBtn').click(function () {
                 window.location.href = '{{ route('post-content') }}';
             });
 
+
             // profile form validation
-            const formValidationExamples = document.getElementById('create-post-content-form');
+            const formValidationExamples = document.getElementById('edit-post-content-form');
             const validator = FormValidation.formValidation(formValidationExamples, {
                 fields: {
                     post_title: {
@@ -213,7 +215,7 @@
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 }
             }).on('core.form.valid', function () {
-                $('#create-post-content-form').submit();
+                $('#edit-post-content-form').submit();
             });
             // -----------------------------------------------------
         });
