@@ -24,9 +24,6 @@ Route::group([
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
 
-        // api for submit contact-us form
-        // Route::post('store/contact-us', [ContactUsController::class, 'store']);
-
         // category list
         Route::get('/category/list', [CategoriesController::class, 'list']);
 

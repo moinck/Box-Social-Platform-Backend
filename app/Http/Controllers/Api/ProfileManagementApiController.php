@@ -78,20 +78,19 @@ class ProfileManagementApiController extends Controller
         $token = $request->bearerToken();
         $user = Auth::user();
         $user_id = $user->id;
-        if (!$user_id || $token != $user->api_token) {
+        if (!$user_id || !$token) {
             return $this->error([
                 'status' => false,
                 'message' => 'Invalid user id',
             ]);
         }
         $validator = Validator::make($request->all(), [
-            'full_name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
             'company_name' => 'required',
             'fca_number' => 'required',
-            'website' => 'required',
-            'email' => 'required',
-            'phone_number' => 'required',
-            'profile_image' => 'required',
+            'website' => 'nullable|url',
+            'email' => 'required|email',
         ]);
 
         if ($validator->fails()) {
@@ -101,14 +100,6 @@ class ProfileManagementApiController extends Controller
             ]);
         }
 
-        $user_id = $user->id;
-        if (!$user_id) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
-        }
-        $user = User::find($user_id);
         if (!$user) {
             return $this->error([
                 'status' => false,
@@ -116,19 +107,15 @@ class ProfileManagementApiController extends Controller
             ]);
         }
 
-        $user->first_name = $request->full_name;
-        $user->last_name = $request->full_name;
+        $user = User::find($user_id);
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
         $user->company_name = $request->company_name;
         $user->fca_number = $request->fca_number;
         $user->website = $request->website;
         $user->email = $request->email;
-        $user->phone = $request->phone_number;
-        $user->profile_image = $request->profile_image;
         $user->save();
 
-        return $this->success([
-            'status' => true,
-            'message' => 'Profile updated successfully',
-        ]);
+        return $this->success([], 'Profile updated successfully');
     }
 }
