@@ -39,8 +39,9 @@ Route::group([
         Route::post('/profile-management/update', [ProfileManagementApiController::class, 'update']);
 
         // post content api
-        Route::get('/post-content/get', [PostContentApiController::class, 'index']);
-        Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
+        // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);
+        // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
+        Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
