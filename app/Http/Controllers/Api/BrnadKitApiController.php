@@ -1,31 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Helpers\Helpers;
+use App\Http\Controllers\Controller;
+use App\ResponseTrait;
 use Illuminate\Http\Request;
+use App\Helpers\Helpers;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BrandKit;
 use App\Models\SocialMedia;
 use Faker\Extension\Helper;
 
-class BrandKitController extends Controller
+class BrnadKitApiController extends Controller
 {
-    public function GetData(Request $request)
-    {
-        $brandKitObj = BrandKit::where('user_id', $request->user_id)->first();
+    use ResponseTrait;
 
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data Fetched Successfully.',
-            'data' => [
-                $brandKitObj
-            ],
-        ], 201);
-    }
-
-    public function Store(Request $request)
+    public function store(Request $request)
     {
 
         $request->merge([
@@ -177,31 +167,13 @@ class BrandKitController extends Controller
 
     public function get(Request $request)
     {
-
-        $request->merge([
-            'user_id' => Helpers::decrypt($request->user_id)
-        ]);
-
-        $rules = [
-            'user_id' => 'required|integer|exists:users,id',
-        ];
-
-        $messages = [
-            'user_id.required' => 'User ID is required.',
-            'user_id.exists' => 'User does not exist.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-                'errors' => $validator->errors(),
-            ], 422);
+        // check barer token
+        $user = $request->user();
+        if (!$user) {
+            return $this->error('Unauthorized', 401);
         }
 
-        $brandKitObj = BrandKit::where('user_id', $request->user_id)->first();
+        $brandKitObj = BrandKit::where('user_id', $user->id)->first();
 
         $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
         $SocialMediaIcon = [];

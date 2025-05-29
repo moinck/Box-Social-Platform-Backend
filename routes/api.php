@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\BrandKitController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,8 +31,8 @@ Route::group([
         Route::get('/category/list', [CategoriesController::class, 'list']);
 
         // brandkit api
-        Route::get('/brandkit/get', [BrandKitController::class, 'get']);
-        Route::post('/brandkit/store', [BrandKitController::class, 'store']);
+        Route::get('/brandkit/get', [BrnadKitApiController::class, 'get']);
+        Route::post('/brandkit/store', [BrnadKitApiController::class, 'store']);
 
         // profile management api
         Route::get('/profile-management/get', [ProfileManagementController::class, 'index']);
