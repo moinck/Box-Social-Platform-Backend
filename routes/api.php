@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Api\PostContentApiController;
-use App\Http\Controllers\Api\ProfileManagementController;
+use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
@@ -35,8 +35,8 @@ Route::group([
         Route::post('/brandkit/store', [BrnadKitApiController::class, 'store']);
 
         // profile management api
-        Route::get('/profile-management/get', [ProfileManagementController::class, 'index']);
-        Route::post('/profile-management/update', [ProfileManagementController::class, 'update']);
+        Route::get('/profile-management/get', [ProfileManagementApiController::class, 'index']);
+        Route::post('/profile-management/update', [ProfileManagementApiController::class, 'update']);
 
         // post content api
         Route::get('/post-content/get', [PostContentApiController::class, 'index']);
