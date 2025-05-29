@@ -33,11 +33,13 @@ class BrnadconfigurationController extends Controller
             ->addColumn('email', function ($data) {
                 return $data->email;
             })
-            ->addColumn('phone', function ($data) {
-                return $data->phone;
-            })
             ->addColumn('created_date', function ($data) {
-                return $data->created_at->format('d-m-Y h:i A');
+                $date = Helpers::dateFormate($data->created_at);
+                return $date;
+            })
+            ->addColumn('updated_date', function ($data) {
+                $date = Helpers::dateFormate($data->updated_at);
+                return $date;
             })
             ->addColumn('action', function ($data) {
                 $id = Helpers::encrypt($data->id);
@@ -53,7 +55,7 @@ class BrnadconfigurationController extends Controller
                     </a>
                 ';
             })
-            ->rawColumns(['logo','user','company_name','email','phone','created_date','action'])
+            ->rawColumns(['logo','user','company_name','email','created_date','updated_date','action'])
             ->make(true);
     }
 

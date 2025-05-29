@@ -47,8 +47,8 @@
                         <th>Brand Name</th>
                         <th>Brand Logo</th>
                         <th>Email</th>
-                        <th>Phone</th>
                         <th>Created Date</th>
+                        <th>Updated Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -95,8 +95,8 @@
                         { data: 'company_name', name: 'company_name'},
                         { data: 'logo', name: 'logo'},
                         { data: 'email', name: 'email'},
-                        { data: 'phone', name: 'phone'},
                         { data: 'created_date', name: 'created_date'},
+                        { data: 'updated_date', name: 'updated_date'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
                     ],
                     language: {
