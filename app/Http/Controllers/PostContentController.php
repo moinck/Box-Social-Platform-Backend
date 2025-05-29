@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
+use App\Imports\PostContentImport;
 use App\Models\Categories;
 use App\Models\PostContent;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PostContentController extends Controller
@@ -116,5 +118,17 @@ class PostContentController extends Controller
             'success' => true,
             'message' => 'Post Content Deleted Successfully',
         ]);
+    }
+    
+    public function import(Request $request)
+    {
+        $request->validate([
+            'post_content_file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('post_content_file');
+        Excel::import(new PostContentImport(), $file);
+        
+        return redirect()->back()->with('success', 'Post Content Imported Successfully');
     }
 }

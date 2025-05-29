@@ -45,7 +45,15 @@
                             <i class="ri-add-line ri-16px me-sm-2"></i>
                             <span class="d-none d-sm-inline-block">Create Post Content</span>
                         </span>
-                    </a> 
+                    </a>
+                    <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="post-content-import-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom"
+                        title="Import Post Content Data">
+                        <span>
+                            <i class="ri-upload-2-line ri-16px me-sm-2"></i>
+                            <span class="d-none d-sm-inline-block">Import Data</span>
+                        </span>
+                    </button> 
                 </div>
             </div>
         </div>
@@ -66,6 +74,41 @@
     </div>
     <!--/ Main Table -->
 
+        {{-- data import modal --}}
+        <div class="modal fade" id="data-import-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="modalCenterTitle">Import Data</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col mb-6 mt-2 text-center">
+                                <h4 class="mb-4">Select Import Format</h4>
+                                <form id="post-content-import-form" action="{{ route('post-content.import') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="col-12">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="file" id="post_content_file" name="post_content_file" class="form-control"
+                                                placeholder="Last Name"  accept=".csv, .xlsx, .xls"/>
+                                            <label for="post_content_file">Post Content File</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4 mt-3">
+                                        <button type="submit" class="btn btn-primary">Import</button>
+                                        <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!--/ Select -->
 @endsection
 
@@ -166,6 +209,10 @@
                 });
             });
             // ----------------------------------------------------------
+
+            $(document).on('click', '#post-content-import-btn', function() {
+                $('#data-import-modal').modal('show');
+            });
         });
     </script>
 @endsection

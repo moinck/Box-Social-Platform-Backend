@@ -88,8 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/post-content/edit/{id}', [PostContentController::class,'edit'])->name('post-content.edit');
         Route::post('/post-content/update', [PostContentController::class,'update'])->name('post-content.update');
         Route::post('/post-content/delete', [PostContentController::class,'destroy'])->name('post-content.delete');
-        Route::post('/post-content/account-status', [PostContentController::class,'changeStatus'])->name('post-content.change-status');
-        Route::get('/post-content/export', [PostContentController::class,'export'])->name('post-content.export');
+        Route::post('/post-content/import', [PostContentController::class,'import'])->name('post-content.import');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
