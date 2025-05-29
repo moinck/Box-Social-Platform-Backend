@@ -83,7 +83,7 @@ class BrnadKitApiController extends Controller
 
             // Check if it's base64 data
             if (strpos($uploadLogoUrl, 'data:image/') === 0) {
-                $logoUrl = $this->handleBase64Image($uploadLogoUrl);
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'brand_kit','images/brand-kit-logos');
             } else {
                 // If it's not base64, handle as before (URL or regular file)
                 $logoUrl = Helpers::uploadImage('brand_kit', $uploadLogoUrl, 'images/brand-kit-logos');
@@ -206,49 +206,5 @@ class BrnadKitApiController extends Controller
                 "design_style" => $brandKitObj->design_style
             ],
         ], 200);
-    }
-
-    // Helper method to handle base64 images
-    private function handleBase64Image($base64String)
-    {
-        // Extract the base64 data and mime type
-        $data = explode(',', $base64String);
-        $mimeType = explode(';', explode(':', $data[0])[1])[0];
-        $base64Data = $data[1];
-
-        // Decode base64 data
-        $imageData = base64_decode($base64Data);
-
-        // Generate a unique filename
-        $extension = explode('/', $mimeType)[1];
-        $filename = 'logo_' . uniqid() . '.' . $extension;
-        $tempPath = storage_path('app/temp/' . $filename);
-
-        // Create temp directory if it doesn't exist
-        if (!file_exists(dirname($tempPath))) {
-            mkdir(dirname($tempPath), 0755, true);
-        }
-
-        // Save the decoded image to a temporary file
-        file_put_contents($tempPath, $imageData);
-
-        // Create an UploadedFile instance
-        $uploadedFile = new \Illuminate\Http\UploadedFile(
-            $tempPath,
-            $filename,
-            $mimeType,
-            null,
-            true
-        );
-
-        // Pass the uploaded file to your helper function
-        $logoUrl = Helpers::uploadImage('brand_kit', $uploadedFile, 'images/brand-kit-logos');
-
-        // Clean up the temporary file
-        if (file_exists($tempPath)) {
-            unlink($tempPath);
-        }
-
-        return $logoUrl;
     }
 }

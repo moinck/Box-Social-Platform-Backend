@@ -394,4 +394,54 @@ class Helpers
     {
         return \Carbon\Carbon::parse($date)->format('d-m-Y | h:i A');
     }
+
+    /**
+     * handle Base64 Image upload
+     * @param mixed $base64String
+     * @param mixed $prefix
+     * @param mixed $path
+     * @return string
+     */
+    public static function handleBase64Image($base64String,$prefix,$path)
+    {
+        // Extract the base64 data and mime type
+        $data = explode(',', $base64String);
+        $mimeType = explode(';', explode(':', $data[0])[1])[0];
+        $base64Data = $data[1];
+
+        // Decode base64 data
+        $imageData = base64_decode($base64Data);
+
+        // Generate a unique filename
+        $extension = explode('/', $mimeType)[1];
+        $filename = 'logo_' . uniqid() . '.' . $extension;
+        $tempPath = storage_path('app/temp/' . $filename);
+
+        // Create temp directory if it doesn't exist
+        if (!file_exists(dirname($tempPath))) {
+            mkdir(dirname($tempPath), 0755, true);
+        }
+
+        // Save the decoded image to a temporary file
+        file_put_contents($tempPath, $imageData);
+
+        // Create an UploadedFile instance
+        $uploadedFile = new \Illuminate\Http\UploadedFile(
+            $tempPath,
+            $filename,
+            $mimeType,
+            null,
+            true
+        );
+
+        // Pass the uploaded file to your helper function
+        $logoUrl = self::uploadImage($prefix, $uploadedFile, $path);
+
+        // Clean up the temporary file
+        if (file_exists($tempPath)) {
+            unlink($tempPath);
+        }
+
+        return $logoUrl;
+    }
 }

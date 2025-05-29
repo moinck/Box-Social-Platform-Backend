@@ -118,4 +118,52 @@ class ProfileManagementApiController extends Controller
 
         return $this->success([], 'Profile updated successfully');
     }
+
+    public function profileUpdate(Request $request)
+    {
+        $token = $request->bearerToken();
+        $user = Auth::user();
+        if (!$user || !$token) {
+            return $this->error([
+                'status' => false,
+                'message' => 'Invalid user id',
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'profile_image' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError(
+                'Profile image is required',
+                $validator->errors(),
+            );
+        }
+
+        $uploadLogoUrl = $request->profile_image;
+        $logoUrl = null;
+        $oldLogoUrl = $user->profile_image;
+        if ($uploadLogoUrl) {
+
+            // Check if it's base64 data
+            if (strpos($uploadLogoUrl, 'data:image/') === 0) {
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'profile','images/profile');
+            } else {
+                // If it's not base64, handle as before (URL or regular file)
+                $logoUrl = Helpers::uploadImage('profile', $uploadLogoUrl, 'images/profile');
+            }
+        }
+
+        $user_id = $user->id;
+        $user = User::find($user_id);
+        $user->profile_image = $logoUrl;
+        $user->save();
+
+        if ($oldLogoUrl) {
+            Helpers::deleteImage($oldLogoUrl);
+        }
+
+        return $this->success([], 'Profile updated successfully');
+    }
 }
