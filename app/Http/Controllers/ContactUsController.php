@@ -69,6 +69,6 @@ class ContactUsController extends Controller
             'user_agent' => $userAgent,
         ]);
 
-        return $this->success('Contact Us submitted successfully');
+        return $this->success([],'Contact Us submitted successfully');
     }
 }

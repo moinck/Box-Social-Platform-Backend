@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandKitController;
@@ -36,6 +37,10 @@ Route::group([
         // profile management api
         Route::get('/profile-management/get', [ProfileManagementController::class, 'index']);
         Route::post('/profile-management/update', [ProfileManagementController::class, 'update']);
+
+        // post content api
+        Route::get('/post-content/get', [PostContentApiController::class, 'index']);
+        Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
