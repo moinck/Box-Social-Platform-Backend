@@ -24,26 +24,17 @@ class ProfileManagementApiController extends Controller
         // get token
         $token = $request->bearerToken();
         if (!$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid token',
-            ]);
+            return $this->error('Invalid token');
         }
         $user = Auth::user();
 
         $user_id = $user->id;
         if (!$user_id) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
+            return $this->error('Invalid user id');
         }
         $user = User::find($user_id);
         if (!$user) {
-            return $this->error([
-                'status' => false,
-                'message' => 'User not found',
-            ]);
+            return $this->error('User not found');
         }
 
         // make data array
@@ -79,10 +70,7 @@ class ProfileManagementApiController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
         if (!$user_id || !$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
+            return $this->error('Invalid user id');
         }
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
@@ -94,17 +82,14 @@ class ProfileManagementApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
+            return $this->validationError(
+                'Validation failed',
+                $validator->errors()
+            );
         }
 
         if (!$user) {
-            return $this->error([
-                'status' => false,
-                'message' => 'User not found',
-            ]);
+            return $this->error('User not found');
         }
 
         $user = User::find($user_id);
@@ -124,10 +109,7 @@ class ProfileManagementApiController extends Controller
         $token = $request->bearerToken();
         $user = Auth::user();
         if (!$user || !$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
+            return $this->error('Invalid user id');
         }
 
         $validator = Validator::make($request->all(), [
