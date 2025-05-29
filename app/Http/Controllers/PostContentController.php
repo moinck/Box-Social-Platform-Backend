@@ -90,6 +90,9 @@ class PostContentController extends Controller
             ->addColumn('created_date', function ($postContent) {
                 return Helpers::dateFormate($postContent->created_at);
             })
+            ->addColumn('updated_date', function ($postContent) {
+                return Helpers::dateFormate($postContent->updated_at);
+            })
             ->addColumn('action', function ($postContent) {
                 $postId = Helpers::encrypt($postContent->id);
                 $editUrl = route('post-content.edit', $postId);
@@ -101,7 +104,7 @@ class PostContentController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-id="'.$postId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_description'])
+            ->rawColumns(['action', 'post_description','created_date', 'updated_date'])
             ->make(true);
     }
 

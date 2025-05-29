@@ -66,6 +66,7 @@
                         <th>Post Category</th>
                         <th>Post Description</th>
                         <th>Created Date</th>
+                        <th>Updated Date</th>
                         <th>action</th>
                     </tr>
                 </thead>
@@ -147,6 +148,7 @@
                         { data: 'post_category', name: 'post_category'},
                         { data: 'post_description', name: 'post_description'},
                         { data: 'created_date', name: 'created_date'},
+                        { data: 'updated_date', name: 'updated_date'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
                     ],
                     language: {
