@@ -1,31 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Helpers\Helpers;
+use App\Http\Controllers\Controller;
+use App\ResponseTrait;
 use Illuminate\Http\Request;
+use App\Helpers\Helpers;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BrandKit;
 use App\Models\SocialMedia;
 use Faker\Extension\Helper;
 
-class BrandKitController extends Controller
+class BrnadKitApiController extends Controller
 {
-    public function GetData(Request $request)
-    {
-        $brandKitObj = BrandKit::where('user_id', $request->user_id)->first();
+    use ResponseTrait;
 
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data Fetched Successfully.',
-            'data' => [
-                $brandKitObj
-            ],
-        ], 201);
-    }
-
-    public function Store(Request $request)
+    public function store(Request $request)
     {
 
         $request->merge([
@@ -93,7 +83,7 @@ class BrandKitController extends Controller
 
             // Check if it's base64 data
             if (strpos($uploadLogoUrl, 'data:image/') === 0) {
-                $logoUrl = $this->handleBase64Image($uploadLogoUrl);
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'brand_kit','images/brand-kit-logos');
             } else {
                 // If it's not base64, handle as before (URL or regular file)
                 $logoUrl = Helpers::uploadImage('brand_kit', $uploadLogoUrl, 'images/brand-kit-logos');
@@ -177,31 +167,13 @@ class BrandKitController extends Controller
 
     public function get(Request $request)
     {
-
-        $request->merge([
-            'user_id' => Helpers::decrypt($request->user_id)
-        ]);
-
-        $rules = [
-            'user_id' => 'required|integer|exists:users,id',
-        ];
-
-        $messages = [
-            'user_id.required' => 'User ID is required.',
-            'user_id.exists' => 'User does not exist.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-                'errors' => $validator->errors(),
-            ], 422);
+        // check barer token
+        $user = $request->user();
+        if (!$user) {
+            return $this->error('Unauthorized', 401);
         }
 
-        $brandKitObj = BrandKit::where('user_id', $request->user_id)->first();
+        $brandKitObj = BrandKit::where('user_id', $user->id)->first();
 
         $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
         $SocialMediaIcon = [];
@@ -234,49 +206,5 @@ class BrandKitController extends Controller
                 "design_style" => $brandKitObj->design_style
             ],
         ], 200);
-    }
-
-    // Helper method to handle base64 images
-    private function handleBase64Image($base64String)
-    {
-        // Extract the base64 data and mime type
-        $data = explode(',', $base64String);
-        $mimeType = explode(';', explode(':', $data[0])[1])[0];
-        $base64Data = $data[1];
-
-        // Decode base64 data
-        $imageData = base64_decode($base64Data);
-
-        // Generate a unique filename
-        $extension = explode('/', $mimeType)[1];
-        $filename = 'logo_' . uniqid() . '.' . $extension;
-        $tempPath = storage_path('app/temp/' . $filename);
-
-        // Create temp directory if it doesn't exist
-        if (!file_exists(dirname($tempPath))) {
-            mkdir(dirname($tempPath), 0755, true);
-        }
-
-        // Save the decoded image to a temporary file
-        file_put_contents($tempPath, $imageData);
-
-        // Create an UploadedFile instance
-        $uploadedFile = new \Illuminate\Http\UploadedFile(
-            $tempPath,
-            $filename,
-            $mimeType,
-            null,
-            true
-        );
-
-        // Pass the uploaded file to your helper function
-        $logoUrl = Helpers::uploadImage('brand_kit', $uploadedFile, 'images/brand-kit-logos');
-
-        // Clean up the temporary file
-        if (file_exists($tempPath)) {
-            unlink($tempPath);
-        }
-
-        return $logoUrl;
     }
 }

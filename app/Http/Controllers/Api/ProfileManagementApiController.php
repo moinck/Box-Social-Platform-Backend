@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class ProfileManagementController extends Controller
+class ProfileManagementApiController extends Controller
 {
     use ResponseTrait;
 
@@ -78,20 +78,19 @@ class ProfileManagementController extends Controller
         $token = $request->bearerToken();
         $user = Auth::user();
         $user_id = $user->id;
-        if (!$user_id || $token != $user->api_token) {
+        if (!$user_id || !$token) {
             return $this->error([
                 'status' => false,
                 'message' => 'Invalid user id',
             ]);
         }
         $validator = Validator::make($request->all(), [
-            'full_name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
             'company_name' => 'required',
             'fca_number' => 'required',
-            'website' => 'required',
-            'email' => 'required',
-            'phone_number' => 'required',
-            'profile_image' => 'required',
+            'website' => 'nullable|url',
+            'email' => 'required|email',
         ]);
 
         if ($validator->fails()) {
@@ -101,14 +100,6 @@ class ProfileManagementController extends Controller
             ]);
         }
 
-        $user_id = $user->id;
-        if (!$user_id) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid user id',
-            ]);
-        }
-        $user = User::find($user_id);
         if (!$user) {
             return $this->error([
                 'status' => false,
@@ -116,19 +107,63 @@ class ProfileManagementController extends Controller
             ]);
         }
 
-        $user->first_name = $request->full_name;
-        $user->last_name = $request->full_name;
+        $user = User::find($user_id);
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
         $user->company_name = $request->company_name;
         $user->fca_number = $request->fca_number;
         $user->website = $request->website;
         $user->email = $request->email;
-        $user->phone = $request->phone_number;
-        $user->profile_image = $request->profile_image;
         $user->save();
 
-        return $this->success([
-            'status' => true,
-            'message' => 'Profile updated successfully',
+        return $this->success([], 'Profile updated successfully');
+    }
+
+    public function profileUpdate(Request $request)
+    {
+        $token = $request->bearerToken();
+        $user = Auth::user();
+        if (!$user || !$token) {
+            return $this->error([
+                'status' => false,
+                'message' => 'Invalid user id',
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'profile_image' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return $this->validationError(
+                'Profile image is required',
+                $validator->errors(),
+            );
+        }
+
+        $uploadLogoUrl = $request->profile_image;
+        $logoUrl = null;
+        $oldLogoUrl = $user->profile_image;
+        if ($uploadLogoUrl) {
+
+            // Check if it's base64 data
+            if (strpos($uploadLogoUrl, 'data:image/') === 0) {
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'profile','images/profile');
+            } else {
+                // If it's not base64, handle as before (URL or regular file)
+                $logoUrl = Helpers::uploadImage('profile', $uploadLogoUrl, 'images/profile');
+            }
+        }
+
+        $user_id = $user->id;
+        $user = User::find($user_id);
+        $user->profile_image = $logoUrl;
+        $user->save();
+
+        if ($oldLogoUrl) {
+            Helpers::deleteImage($oldLogoUrl);
+        }
+
+        return $this->success([], 'Profile updated successfully');
     }
 }
