@@ -19,10 +19,7 @@ class PostContentApiController extends Controller
         // check token
         $token = $request->bearerToken();
         if (!$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid token',
-            ]);
+            return $this->error('Invalid token',401);
         }
 
         $postContent = PostContent::latest()->get();
@@ -36,11 +33,7 @@ class PostContentApiController extends Controller
             ];
         }
 
-        return $this->success([
-            'status' => true,
-            'message' => 'Post content fetched successfully',
-            'data' => $resposeData,
-        ]);
+        return $this->success($resposeData,'Post content fetched successfully');
     }
 
     public function show(Request $request, $id)
@@ -48,18 +41,12 @@ class PostContentApiController extends Controller
         // check token
         $token = $request->bearerToken();
         if (!$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid token',
-            ]);
+            return $this->error('Invalid token',401);
         }
 
         $postContent = PostContent::where('category_id', Helpers::decrypt($id))->get();
         if (!$postContent) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Post content not found',
-            ]);
+            return $this->error('Post content not found',404);
         }
 
         $resturnData = [];
@@ -72,11 +59,7 @@ class PostContentApiController extends Controller
             ];
         }
 
-        return $this->success([
-            'status' => true,
-            'message' => 'Post content fetched successfully',
-            'data' => $resturnData,
-        ]);
+        return $this->success($resturnData,'Post content fetched successfully');
     }
 
     public function getData(Request $request)
@@ -84,10 +67,7 @@ class PostContentApiController extends Controller
         // check token
         $token = $request->bearerToken();
         if (!$token) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Invalid token',
-            ]);
+            return $this->error('Invalid token',401);
         }
 
         $validator = Validator::make($request->all(), [
@@ -95,10 +75,7 @@ class PostContentApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error([
-                'status' => false,
-                'message' => $validator->errors(),
-            ]);
+            return $this->validationError('Validation Error',$validator->errors());
         }
         $requestCategoryIds = $request->category_ids;
 
@@ -108,10 +85,7 @@ class PostContentApiController extends Controller
 
         $postContent = PostContent::withCount('category')->whereIn('category_id', $requestCategoryIds)->get();
         if (!$postContent) {
-            return $this->error([
-                'status' => false,
-                'message' => 'Post content not found',
-            ]);
+            return $this->error('Post content not found',404);
         }
 
         $resturnData = [];
