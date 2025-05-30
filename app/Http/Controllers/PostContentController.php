@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
+use App\Imports\PostContentImport;
 use App\Models\Categories;
 use App\Models\PostContent;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class PostContentController extends Controller
@@ -88,6 +90,9 @@ class PostContentController extends Controller
             ->addColumn('created_date', function ($postContent) {
                 return Helpers::dateFormate($postContent->created_at);
             })
+            ->addColumn('updated_date', function ($postContent) {
+                return Helpers::dateFormate($postContent->updated_at);
+            })
             ->addColumn('action', function ($postContent) {
                 $postId = Helpers::encrypt($postContent->id);
                 $editUrl = route('post-content.edit', $postId);
@@ -99,7 +104,7 @@ class PostContentController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-id="'.$postId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_description'])
+            ->rawColumns(['action', 'post_description','created_date', 'updated_date'])
             ->make(true);
     }
 
@@ -116,5 +121,17 @@ class PostContentController extends Controller
             'success' => true,
             'message' => 'Post Content Deleted Successfully',
         ]);
+    }
+    
+    public function import(Request $request)
+    {
+        $request->validate([
+            'post_content_file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('post_content_file');
+        Excel::import(new PostContentImport(), $file);
+        
+        return redirect()->back()->with('success', 'Post Content Imported Successfully');
     }
 }
