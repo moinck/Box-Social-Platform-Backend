@@ -155,7 +155,7 @@ class RegisterController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Incorrect password.',
-            ], 401);
+            ], 400);
         }
 
         // Authentication passed, generate token or proceed as needed
