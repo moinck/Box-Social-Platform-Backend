@@ -59,6 +59,15 @@
                                 <label for="post_category">Post Category</label>
                             </div>
                         </div>
+                        <div class="col-12 col-md-12 d-none" id="selectSubCategory-div">
+                            <div class="form-floating form-floating-outline">
+                                <select name="post_sub_category" id="post_sub_category" class="form-select" data-choices
+                                    data-choices-search-false>
+                                    <option value="">Select Subcategory</option>
+                                </select>
+                                <label for="post_sub_category">Post Subcategory</label>
+                            </div>
+                        </div>
                         <div class="col-12">
                             {{-- <div class="form-floating form-floating-outline">
                                 <textarea name="post_description" id="post_description" class="form-control"
@@ -216,6 +225,58 @@
                 $('#create-post-content-form').submit();
             });
             // -----------------------------------------------------
+
+            // post category change event
+            $('#post_category').change(function () {
+                var category_id = $(this).val();
+                if(category_id.length == 0){
+                    $('#post_sub_category').html('<option value="">Select Subcategory</option>');
+                    $('#selectSubCategory-div').addClass('d-none');
+                    validator.revalidateField('post_sub_category');
+                    validator.removeField(`post_sub_category`);
+                    return;
+                }
+                $.ajax({
+                    url: '{{ route('post-content.sub-category.get.data') }}',
+                    type: 'GET',
+                    data: {
+                        category_id: category_id
+                    },
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (data) {
+                        if(data.success){
+                            var responseData = data.data;
+                            var option = '';
+                            option += '<option value="">Select Subcategory</option>';
+                            responseData.forEach(function (item) {
+                                option += '<option value="' + item.id + '">' + item.name + '</option>';
+                            });
+                            $('#post_sub_category').html(option);
+                            $('#selectSubCategory-div').removeClass('d-none');
+
+                            validator.revalidateField('post_sub_category');
+                            validator.addField(`post_sub_category`, {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Subcategory is required'
+                                    }
+                                }
+                            });
+                            
+                        }else{
+                            $('#post_sub_category').html('<option value="">Select Subcategory</option>');
+                            $('#selectSubCategory-div').addClass('d-none');
+                            validator.revalidateField('post_sub_category');
+                            // validator.removeField(`post_sub_category`);
+                        }
+                    }
+                });
+            });
         });
     </script>
 @endsection

@@ -67,7 +67,7 @@
                         <th>Post Description</th>
                         <th>Created Date</th>
                         <th>Updated Date</th>
-                        <th>action</th>
+                        <th class="table-action-col">action</th>
                     </tr>
                 </thead>
             </table>
