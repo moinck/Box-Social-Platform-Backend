@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\BrandKit;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
@@ -50,6 +51,10 @@ class ProfileManagementApiController extends Controller
             'phone_number' => $user->phone ?? null,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
         ];
+
+        // check user has brandkit
+        $brandKit = BrandKit::where('user_id', $user_id)->exists() ? true : false;
+        $data['is_brandkit'] = $brandKit;
 
         return $this->success([
             'status' => true,

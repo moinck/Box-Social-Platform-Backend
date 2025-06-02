@@ -135,7 +135,7 @@ class BrnadKitApiController extends Controller
         $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
         $SocialMediaIcon = [];
         if (!empty($SocialMediaObj)) {
-            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon_show);
+            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
         }
 
         return response()->json([
@@ -176,9 +176,12 @@ class BrnadKitApiController extends Controller
         $brandKitObj = BrandKit::where('user_id', $user->id)->first();
 
         $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
+        if (empty($brandKitObj)) {
+            return $this->error('BrandKit not found', 404);
+        }
         $SocialMediaIcon = [];
         if (!empty($SocialMediaObj)) {
-            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon_show);
+            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
         }
 
         return response()->json([
