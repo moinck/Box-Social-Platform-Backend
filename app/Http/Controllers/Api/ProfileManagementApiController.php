@@ -106,7 +106,19 @@ class ProfileManagementApiController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        return $this->success([], 'Profile updated successfully');
+        $returnData = [];
+        $returnData['user'] = [
+            'id' => Helpers::encrypt($user_id),
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'company_name' => $user->company_name,
+            'fca_number' => $user->fca_number,
+            'website' => $user->website,
+            'email' => $user->email,
+            'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+        ];
+
+        return $this->success($returnData, 'Profile updated successfully');
     }
 
     public function profileUpdate(Request $request)
@@ -151,6 +163,18 @@ class ProfileManagementApiController extends Controller
             Helpers::deleteImage($oldLogoUrl);
         }
 
-        return $this->success([], 'Profile updated successfully');
+        $returnData = [];
+        $returnData['user'] = [
+            'id' => Helpers::encrypt($user_id),
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'company_name' => $user->company_name,
+            'fca_number' => $user->fca_number,
+            'website' => $user->website,
+            'email' => $user->email,
+            'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+        ];
+
+        return $this->success($returnData, 'Profile updated successfully');
     }
 }
