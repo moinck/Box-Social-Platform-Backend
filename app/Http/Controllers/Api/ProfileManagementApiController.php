@@ -31,12 +31,15 @@ class ProfileManagementApiController extends Controller
 
         $user_id = $user->id;
         if (!$user_id) {
-            return $this->error('Invalid user id');
+            return $this->error('Invalid user id', 404);
         }
         $user = User::find($user_id);
         if (!$user) {
-            return $this->error('User not found');
+            return $this->error('User not found', 404);
         }
+
+        // check user has brandkit
+        $brandKit = BrandKit::where('user_id', $user_id)->exists() ? true : false;
 
         // make data array
         $data = [];
@@ -50,17 +53,10 @@ class ProfileManagementApiController extends Controller
             'email' => $user->email,
             'phone_number' => $user->phone ?? null,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'is_brandkit' => $brandKit,
         ];
 
-        // check user has brandkit
-        $brandKit = BrandKit::where('user_id', $user_id)->exists() ? true : false;
-        $data['is_brandkit'] = $brandKit;
-
-        return $this->success([
-            'status' => true,
-            'message' => 'Profile fetched successfully',
-            'data' => $data,
-        ]);
+        return $this->success($data, 'Profile fetched successfully');
     }
 
     /**
@@ -75,7 +71,7 @@ class ProfileManagementApiController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
         if (!$user_id || !$token) {
-            return $this->error('Invalid user id');
+            return $this->error('Invalid user id', 404);
         }
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
@@ -94,7 +90,7 @@ class ProfileManagementApiController extends Controller
         }
 
         if (!$user) {
-            return $this->error('User not found');
+            return $this->error('User not found', 404);
         }
 
         $user = User::find($user_id);
@@ -126,7 +122,7 @@ class ProfileManagementApiController extends Controller
         $token = $request->bearerToken();
         $user = Auth::user();
         if (!$user || !$token) {
-            return $this->error('Invalid user id');
+            return $this->error('Invalid user id', 404);
         }
 
         $validator = Validator::make($request->all(), [
