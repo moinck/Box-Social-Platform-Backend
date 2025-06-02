@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
 
         // post content controller
         Route::get('/post-content', [PostContentController::class,'index'])->name('post-content');
+        Route::get('/post-content/sub-category/get/data', [PostContentController::class,'subCategoryData'])->name('post-content.sub-category.get.data');
         Route::get('/post-content/create', [PostContentController::class,'create'])->name('post-content.create');
         Route::post('/post-content/store', [PostContentController::class,'store'])->name('post-content.store');
         Route::get('/post-content/datatable', [PostContentController::class,'dataTable'])->name('post-content.data-table');

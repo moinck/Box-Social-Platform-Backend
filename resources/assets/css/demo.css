@@ -207,3 +207,7 @@ div.font-icon-btns {
     justify-content: space-evenly;
     align-items: center;
 }
+
+.table-action-col {
+    width: 80px !important;
+}

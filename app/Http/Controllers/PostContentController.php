@@ -19,11 +19,30 @@ class PostContentController extends Controller
 
     public function create()
     {
-        $categories = Categories::where('parent_id', null)
+        $categories = Categories::with('children:id,name,parent_id')->where('parent_id', null)
             ->orderBy('name', 'asc')
             ->get();
 
         return view('content.pages.admin.post-content.create', compact('categories'));
+    }
+
+    public function subCategoryData(Request $request)
+    {
+        $categories = Categories::with('children:id,name,parent_id')->where('parent_id', $request->category_id)
+            ->orderBy('name', 'asc')
+            ->get();
+        
+        if($categories->isEmpty()){
+            return response()->json([
+                'success' => false,
+                'message' => 'No Subcategory Found'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $categories
+        ]);
     }
 
     public function store(Request $request)
@@ -31,12 +50,14 @@ class PostContentController extends Controller
         $request->validate([
             'post_title' => 'required',
             'post_category' => 'required|exists:categories,id',
+            'post_sub_category' => 'nullable|exists:categories,id',
             'post_description' => 'required',
         ]);
 
         PostContent::create([
             'title' => $request->post_title,
             'category_id' => $request->post_category,
+            'sub_category_id' => $request->post_sub_category,
             'description' => $request->post_description,
         ]);
 
@@ -49,8 +70,11 @@ class PostContentController extends Controller
         $categories = Categories::where('parent_id', null)
             ->orderBy('name', 'asc')
             ->get();
+        $subCategories = Categories::where('id', $postContent->category_id)
+            ->orderBy('name', 'asc')
+            ->get();
 
-        return view('content.pages.admin.post-content.edit', compact('postContent', 'categories'));
+        return view('content.pages.admin.post-content.edit', compact('postContent', 'categories', 'subCategories'));
     }
 
     public function update(Request $request)
@@ -58,12 +82,14 @@ class PostContentController extends Controller
         $request->validate([
             'post_title' => 'required',
             'post_category' => 'required|exists:categories,id',
+            'post_content_edit_sub_category' => 'nullable|exists:categories,id',
             'post_description' => 'required',
         ]);
 
         PostContent::find($request->post_id)->update([
             'title' => $request->post_title,
             'category_id' => $request->post_category,
+            'sub_category_id' => $request->post_content_edit_sub_category ?? null,
             'description' => $request->post_description,
         ]);
 

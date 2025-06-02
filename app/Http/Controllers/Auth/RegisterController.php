@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
+use App\Models\BrandKit;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Yajra\DataTables\DataTables;
@@ -154,7 +155,7 @@ class RegisterController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Incorrect password.',
-            ], 401);
+            ], 400);
         }
 
         // Authentication passed, generate token or proceed as needed
@@ -162,11 +163,12 @@ class RegisterController extends Controller
         // For example, generate a token if using Laravel Sanctum or Passport
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // check does user have brandkit
+        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
+
         return response()->json([
             'success' => true,
             'message' => 'Login successfully.',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
             'data' => [
                     'user' => [
                         'id' => Helpers::encrypt($user->id),
@@ -180,6 +182,7 @@ class RegisterController extends Controller
                     ],
                     'access_token' => $token,
                     'token_type' => 'Bearer',
+                    'is_brandkit' => $isBrandkit,
                 ],
 
         ], 200);
