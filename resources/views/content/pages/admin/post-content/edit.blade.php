@@ -37,14 +37,14 @@
                     <h4 class="card-title mb-0">Edit Post Content</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="edit-post-content-form" action="{{ route('post-content.update') }}"
-                        class="row g-5" method="POST" enctype="multipart/form-data">
+                    <form id="edit-post-content-form" action="{{ route('post-content.update') }}" class="row g-5"
+                        method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="post_id" value="{{ $postContent->id }}">
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="post_title" name="post_title" class="form-control"
-                                    placeholder="Post Title" value="{{ $postContent->title }}"/>
+                                    placeholder="Post Title" value="{{ $postContent->title }}" />
                                 <label for="post_title">Post Title</label>
                             </div>
                         </div>
@@ -58,6 +58,15 @@
                                     @endforeach
                                 </select>
                                 <label for="post_category">Post Category</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-12 d-none" id="selectSubCategory-edit-div">
+                            <div class="form-floating form-floating-outline">
+                                <select name="post_content_edit_sub_category" id="post_content_edit_sub_category"
+                                    class="form-select" data-choices data-choices-search-false>
+                                    <option value="">Select Subcategory</option>
+                                </select>
+                                <label for="post_content_edit_sub_category">Post Subcategory</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -95,8 +104,14 @@
         //     },
         //     theme: 'snow'
         // });
-        
+
         $(document).ready(function () {
+            var editSubCategoryId = {{ $postContent->sub_category_id ?? 0 }};
+            var editCategoryId = {{ $postContent->category_id ?? 0 }};
+            if (editCategoryId != 0) {
+                GetSubCategory(editCategoryId);
+            }
+
             const fullToolbar = [
                 [
                     {
@@ -217,6 +232,71 @@
             }).on('core.form.valid', function () {
                 $('#edit-post-content-form').submit();
             });
+            // -----------------------------------------------------
+
+            // post category change event
+            $('#post_category').change(function () {
+                var category_id = $(this).val();
+                if (category_id.length == 0) {
+                    $('#post_content_edit_sub_category').html('<option value="">Select Subcategory</option>');
+                    $('#selectSubCategory-edit-div').addClass('d-none');
+                    validator.revalidateField('post_content_edit_sub_category');
+                    validator.removeField(`post_content_edit_sub_category`);
+                    return;
+                }
+                GetSubCategory(category_id);
+            });
+
+            // get sub category
+            function GetSubCategory(category_id) {
+                $.ajax({
+                    url: '{{ route('post-content.sub-category.get.data') }}',
+                    type: 'GET',
+                    data: {
+                        category_id: category_id
+                    },
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            var responseData = data.data;
+                            var option = '';
+                            option += '<option value="">Select Subcategory</option>';
+                            responseData.forEach(function (item) {
+                                if (editSubCategoryId == item.id) {
+                                    option += '<option value="' + item.id + '" selected>' + item.name + '</option>';
+                                } else {
+                                    option += '<option value="' + item.id + '">' + item.name + '</option>';
+                                }
+                            });
+                            $('#post_content_edit_sub_category').html(option);
+                            $('#selectSubCategory-edit-div').removeClass('d-none');
+
+                            validator.revalidateField('post_content_edit_sub_category');
+                            validator.addField(`post_content_edit_sub_category`, {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Subcategory is required'
+                                    }
+                                }
+                            });
+
+                        } else {
+                            var subCategoryField = $('#post_content_edit_sub_category');
+                            if (editSubCategoryId != 0) {
+                                validator.revalidateField('post_content_edit_sub_category');
+                                validator.removeField(`post_content_edit_sub_category`);
+                            }
+                            subCategoryField.html('<option value="">Select Subcategory</option>');
+                            $('#selectSubCategory-edit-div').addClass('d-none');
+                        }
+                    }
+                });
+            }
             // -----------------------------------------------------
         });
     </script>

@@ -12,10 +12,16 @@ class PostContent extends Model
         'category_id',
         'title',
         'description',
+        'sub_category_id',
     ];
 
     public function category()
     {
         return $this->belongsTo(Categories::class,'category_id','id');
+    }
+
+    public function subCategory()
+    {
+        return $this->belongsTo(Categories::class,'sub_category_id','id');
     }
 }
