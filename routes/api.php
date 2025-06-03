@@ -35,6 +35,7 @@ Route::group([
         Route::get('/profile-management/get', [ProfileManagementApiController::class, 'index']);
         Route::post('/profile-management/update', [ProfileManagementApiController::class, 'update']);
         Route::post('/profile-management/profile/update', [ProfileManagementApiController::class, 'profileUpdate']);
+        Route::post('/profile-management/password/update', [ProfileManagementApiController::class, 'passwordUpdate']);
 
         // post content api
         // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);

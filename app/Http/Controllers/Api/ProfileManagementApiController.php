@@ -9,6 +9,7 @@ use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileManagementApiController extends Controller
@@ -117,6 +118,11 @@ class ProfileManagementApiController extends Controller
         return $this->success($returnData, 'Profile updated successfully');
     }
 
+    /**
+     * Update user profile image
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function profileUpdate(Request $request)
     {
         $token = $request->bearerToken();
@@ -172,5 +178,42 @@ class ProfileManagementApiController extends Controller
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
+    }
+
+    /**
+     * Update user password
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function passwordUpdate(Request $request)
+    {
+        $token = $request->bearerToken();
+        $user = Auth::user();
+        if (!$user || !$token) {
+            return $this->error('Invalid user id', 404);
+        }
+
+        // so bassically 3 field will come in request
+        // old_password, new_password, new_password_confirmation
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError(
+                'Validation failed',
+                $validator->errors(),
+            );
+        }
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return $this->error('Old password is incorrect', 404);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return $this->success([],'Password updated successfully');
     }
 }
