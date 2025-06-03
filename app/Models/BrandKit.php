@@ -12,7 +12,13 @@ class BrandKit extends Model
         'brand_kits_id',
         'social_media_icon',
         'show_address_on_post',
+        'design_style_id',
     ];
+
+    public function designStyle()
+    {
+        return $this->belongsTo(DesignStyles::class);
+    }
 
     public function socialMedia()
     {

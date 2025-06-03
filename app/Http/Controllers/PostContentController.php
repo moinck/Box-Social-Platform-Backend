@@ -110,7 +110,7 @@ class PostContentController extends Controller
             })
             ->addColumn('post_description', function ($postContent) {
                 // just show some lines of description
-                $description = str($postContent->description)->limit(60);
+                $description = str($postContent->description)->limit(40);
                 return $description;
             })
             ->addColumn('created_date', function ($postContent) {

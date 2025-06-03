@@ -184,6 +184,24 @@
 
             {{-- social media icon & Brand color & post information  --}}
             <div class="col-12 col-lg-4">
+                {{-- design style --}}
+                <div class="card mb-6">
+                    <h5 class="card-header">Design Style</h5>
+                    <div class="col-lg-12 px-5 pb-5">
+                        @if (!empty($brandKit->designStyle))
+                            <button type="button" class="btn btn-outline-primary waves-effect" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ $brandKit->designStyle->name }}">
+                                <span class="tf-icons ri-palette-line ri-16px me-2"></span>
+                                {{ $brandKit->designStyle->name }}
+                            </button>   
+                        @else
+                            <button type="button" class="btn btn-outline-primary waves-effect" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Design Style">
+                                <span class="tf-icons ri-palette-line ri-16px me-2"></span>
+                                No Design Style
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
                 {{-- social media icon --}}
                 <div class="card mb-6">
                     <h5 class="card-header">Social Media Icon To Show</h5>

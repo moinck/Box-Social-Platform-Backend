@@ -30,7 +30,7 @@
                                 <ul
                                     class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-4">
                                     <li class="list-inline-item">
-                                        <i class="ri-palette-line me-2 ri-24px"></i>
+                                        <i class="ri-user-line me-2 ri-24px"></i>
                                         <span class="fw-medium">{{ $user->role }}</span>
                                     </li>
                                     <li class="list-inline-item">
@@ -241,8 +241,8 @@
                             },
                             stringLength: {
                                 min: 6,
-                                max: 30,
-                                message: 'FCA Number must be between 5 and 30 digits'
+                                max: 6,
+                                message: 'FCA Number must be 6 digits'
                             }
                         }
                     }
@@ -263,6 +263,8 @@
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 }
             }).on('core.form.valid', function() {
+                // disable submit button
+                $('#edit-profile-form button[type="submit"]').prop('disabled', true);
                 $('#edit-profile-form').submit();
             });
             // -----------------------------------------------------

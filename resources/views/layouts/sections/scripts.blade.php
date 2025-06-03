@@ -24,6 +24,9 @@
 <script>
     // Wait for the DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
+        // remove menu customize button
+        document.querySelector('#template-customizer')?.remove();
+        
         if (!document.getElementById('box-loader')) {
             const loaderHtml = `
                 <div id="box-loader" style="display: none;">

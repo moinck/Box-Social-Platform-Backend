@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\DesignStyles;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use App\Helpers\Helpers;
@@ -47,6 +48,7 @@ class BrnadKitApiController extends Controller
             'show_website_on_post' => 'nullable|boolean',
             'social_media_icon_show' => 'nullable|array',
             'show_address_on_post' => 'nullable|boolean',
+            'design_style' => 'required|string|exists:design_styles,name',
         ];
 
         $messages = [
@@ -56,6 +58,8 @@ class BrnadKitApiController extends Controller
             'user_id.required' => 'User ID is required.',
             'user_id.exists' => 'User does not exist.',
             'website.url' => 'Please enter a valid URL.',
+            'design_style.required' => 'Design style is required.',
+            'design_style.exists' => 'Design style does not exist.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -90,6 +94,11 @@ class BrnadKitApiController extends Controller
             }
         }
 
+        $designStyle = DesignStyles::where('name','like', "%$request->design_style%")->first();
+        if (empty($designStyle)) {
+            $designStyle = null;
+        }
+
         $brandKitObj->logo = $logoUrl;
         $brandKitObj->user_id = $decryptedUserId;
         $brandKitObj->company_name = $request->company_name;
@@ -107,6 +116,7 @@ class BrnadKitApiController extends Controller
         $brandKitObj->color = json_encode($request->color);
         $brandKitObj->font = json_encode($request->font);
         $brandKitObj->design_style = $request->design_style;
+        $brandKitObj->design_style_id = $designStyle->id ?? null;
         $brandKitObj->save();
 
         if ($oldLogoUrl) {
@@ -160,7 +170,7 @@ class BrnadKitApiController extends Controller
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
-                "design_style" => $brandKitObj->design_style
+                "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null)
             ],
         ], 200);
     }
@@ -182,6 +192,12 @@ class BrnadKitApiController extends Controller
         $SocialMediaIcon = [];
         if (!empty($SocialMediaObj)) {
             $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
+        }
+
+        // design style
+        $designStyle = DesignStyles::where('id', $brandKitObj->design_style)->first();
+        if (empty($designStyle)) {
+            $designStyle = null;
         }
 
         return response()->json([
@@ -206,7 +222,7 @@ class BrnadKitApiController extends Controller
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
-                "design_style" => $brandKitObj->design_style
+                "design_style" => $designStyle->name ?? null,
             ],
         ], 200);
     }
