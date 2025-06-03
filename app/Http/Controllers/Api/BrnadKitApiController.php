@@ -195,10 +195,14 @@ class BrnadKitApiController extends Controller
         }
 
         // design style
-        $designStyle = DesignStyles::where('id', $brandKitObj->design_style)->first();
+        $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
         if (empty($designStyle)) {
             $designStyle = null;
         }
+
+        $path = $brandKitObj->logo;
+        $mime = pathinfo($path, PATHINFO_EXTENSION);
+        $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
 
         return response()->json([
             'success' => true,
@@ -206,7 +210,7 @@ class BrnadKitApiController extends Controller
             'data' => [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
-                "logo" => asset($brandKitObj->logo),
+                "logo" => $base64Image,
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,
@@ -222,7 +226,7 @@ class BrnadKitApiController extends Controller
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
-                "design_style" => $designStyle->name ?? null,
+                "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
             ],
         ], 200);
     }
