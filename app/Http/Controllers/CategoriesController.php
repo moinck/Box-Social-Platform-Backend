@@ -24,7 +24,7 @@ class CategoriesController extends Controller
                 return $category->name;
             })
             ->addColumn('image', function ($category) {
-                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="img-fluid br-1" width="100" height="100">';
+                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="br-1" width="100" height="100">';
             })
             ->addColumn('description', function ($category) {
                 return $category->description;

@@ -22,7 +22,7 @@ class BrnadconfigurationController extends Controller
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('logo', function ($data) {
-                return '<img src="'.asset($data->logo).'" alt="'.$data->name.'" class="img-fluid br-1" width="100" height="100">';
+                return '<img src="'.asset($data->logo).'" alt="'.$data->name.'" class="br-1" width="100" height="100">';
             })
             ->addColumn('user', function ($data) {
                 return $data->user->first_name.' '.$data->user->last_name;

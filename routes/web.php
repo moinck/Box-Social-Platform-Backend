@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\PostTemplateController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
@@ -90,6 +91,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-content/update', [PostContentController::class,'update'])->name('post-content.update');
         Route::post('/post-content/delete', [PostContentController::class,'destroy'])->name('post-content.delete');
         Route::post('/post-content/import', [PostContentController::class,'import'])->name('post-content.import');
+
+        // post template controller
+        Route::get('/post-template', [PostTemplateController::class,'index'])->name('post-template');
+        Route::get('/post-template/datatable', [PostTemplateController::class,'dataTable'])->name('post-template.data-table');
+        Route::post('/post-template/delete', [PostTemplateController::class,'destroy'])->name('post-template.delete');
+        Route::post('/post-template/account-status', [PostTemplateController::class,'changeStatus'])->name('post-template.change-status');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');

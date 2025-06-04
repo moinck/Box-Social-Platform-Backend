@@ -36,6 +36,13 @@
             "role": ["admin"]
         },
         {
+            "url": "/post-template",
+            "name": "Post Template",
+            "icon": "menu-icon tf-icons ri-layout-2-line",
+            "slug": "post-template",
+            "role": ["admin"]
+        },
+        {
             "url": "/feedback-management",
             "name": "Feedback Management",
             "icon": "menu-icon tf-icons ri-contacts-book-3-line",

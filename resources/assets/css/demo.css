@@ -211,3 +211,7 @@ div.font-icon-btns {
 .table-action-col {
     width: 80px !important;
 }
+.table-images {
+    width: 100px;
+    height: 100px;
+}
