@@ -8,7 +8,7 @@ use App\Models\Categories;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 
-class CategoriesController extends Controller
+class CategoriesApiController extends Controller
 {
     use ResponseTrait;
 
