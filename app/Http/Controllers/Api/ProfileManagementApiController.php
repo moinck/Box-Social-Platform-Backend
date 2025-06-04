@@ -193,10 +193,7 @@ class ProfileManagementApiController extends Controller
             return $this->error('Invalid user id', 404);
         }
 
-        // so bassically 3 field will come in request
-        // old_password, new_password, new_password_confirmation
         $validator = Validator::make($request->all(), [
-            'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
 
@@ -205,10 +202,6 @@ class ProfileManagementApiController extends Controller
                 'Validation failed',
                 $validator->errors(),
             );
-        }
-
-        if (!Hash::check($request->old_password, $user->password)) {
-            return $this->error('Old password is incorrect', 404);
         }
 
         $user->password = Hash::make($request->new_password);

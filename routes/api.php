@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BrnadKitApiController;
-use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -25,7 +25,7 @@ Route::group([
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
 
         // category list
-        Route::get('/category/list', [CategoriesController::class, 'list']);
+        Route::get('/category/list', [CategoriesApiController::class, 'list']);
 
         // brandkit api
         Route::get('/brandkit/get', [BrnadKitApiController::class, 'get']);
