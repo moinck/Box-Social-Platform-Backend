@@ -20,10 +20,7 @@ class PostTemplateController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        $status1 = PostTemplate::where('status', 1)->first()->toArray();
-        $status2 = PostTemplate::where('status', 0)->first()->toArray();
-
-        return view('content.pages.admin.post-template.index', compact('categories','status1','status2'));
+        return view('content.pages.admin.post-template.index', compact('categories'));
     }
 
     public function dataTable(Request $request)
@@ -33,7 +30,7 @@ class PostTemplateController extends Controller
                 if ($request->category) {
                     $query->where('category_id', $request->category);
                 }
-                if ($request->status) {
+                if ($request->has('status') && $request->status != '') {
                     $query->where('status', $request->status);
                 }
             })

@@ -99,10 +99,10 @@
                         // Create a row to hold the two md-3 divs
                         targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div><div class="col-md-6" id="status-filter-container"></div></div>');
 
-                        // Append category filter to the first md-3 div
+                        // Append category filter
                         $('#category-filter-container').append('<select class="form-select input-sm" id="category_filter"><option value="">Categories</option></select>');
 
-                        // Append status filter to the second md-3 div
+                        // Append status filter
                         $('#status-filter-container').append(`<select class="form-select input-sm" id="status_filter">
                             <option value="">Status</option>
                             <option value="1">Active</option>
