@@ -55,12 +55,6 @@ class User extends Authenticatable
         ];
     }
 
-    // Override the email verification notification
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new CustomVerifyEmail);
-    }
-
     // Custom method to mark email as verified
     public function markEmailAsVerified()
     {
