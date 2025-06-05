@@ -14,12 +14,14 @@ class CustomVerifyEmail extends Notification
 {
     use Queueable;
 
+    public $token;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($token)
     {
-        //
+        $this->token = $token;
     }
 
     /**
@@ -37,7 +39,7 @@ class CustomVerifyEmail extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
+        $verificationUrl = $this->verificationUrl($this->token);
 
         return (new MailMessage)
             ->subject('Verify Email Address')
@@ -47,32 +49,8 @@ class CustomVerifyEmail extends Notification
             ->line('If you did not create an account, no further action is required.');
     }
 
-    // /**
-    //  * Get the array representation of the notification.
-    //  *
-    //  * @return array<string, mixed>
-    //  */
-    // public function toArray(object $notifiable): array
-    // {
-    //     return [
-    //         //
-    //     ];
-    // }
-
-    protected function verificationUrl($notifiable)
+    protected function verificationUrl($token)
     {
-        // Create a verification token with user data
-        $tokenData = [
-            'user_id' => $notifiable->getKey(),
-            'email' => $notifiable->getEmailForVerification(),
-            'expires_at' => Carbon::now()->addMinutes(5)->timestamp,
-            'random' => Str::random(10) // Add randomness for extra security
-        ];
-
-        // Encrypt the entire token data
-        $encryptedToken = Helpers::encrypt(json_encode($tokenData));
-
-        // Create the verification URL with encrypted token
-        return url('/api/email/verify/' . urlencode($encryptedToken));
+        return url('/api/email/verify/' . urlencode($token));
     }
 }

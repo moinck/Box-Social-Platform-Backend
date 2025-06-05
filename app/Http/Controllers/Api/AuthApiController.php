@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\BrandKit;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Auth\Events\Verified;
@@ -20,13 +21,13 @@ class AuthApiController extends Controller
      * Verify email
      */
     // public function verifyEmail(EmailVerificationRequest $request)
-    public function verify(Request $request, $encryptedToken)
+    public function verify($encryptedToken)
     {
         try {
             // Decrypt the token
             $tokenData = json_decode(Helpers::decrypt(urldecode($encryptedToken)), true);
             
-            if (!$tokenData || !isset($tokenData['user_id'], $tokenData['email'], $tokenData['expires_at'])) {
+            if (!$tokenData || !isset($tokenData['user_id'], $tokenData['expires_at'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid verification token'
@@ -58,46 +59,33 @@ class AuthApiController extends Controller
             ], 404);
         }
 
-        // Verify email matches
-        if ($user->getEmailForVerification() !== $tokenData['email']) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid verification token'
-            ], 400);
-        }
+        // gernerte token
+        $LoginToken = $user->createToken('auth_token')->plainTextToken;
+        // check does user have brandkit
+        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
+
+        $returnData = [
+            'user' => [
+                'id' => Helpers::encrypt($user->id),
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_verified' => $user->is_verified,
+            ],
+            'access_token' => $LoginToken,
+            'token_type' => 'Bearer',
+            'is_brandkit' => $isBrandkit,
+        ];
 
         // Check if already verified
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Email already verified',
-                'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'is_verified' => $user->is_verified,
-                    ]
-                ]
-            ]);
+            return $this->success($returnData, 'Email already verified');
         }
 
         // Mark email as verified
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Email verified successfully',
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'is_verified' => $user->is_verified,
-                ]
-            ]
-        ]);
+        return $this->success($returnData, 'Email verified successfully');
     }
 
     /**
@@ -112,17 +100,18 @@ class AuthApiController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Email already verified'
-            ]);
+            return $this->success([], 'Email already verified');
         }
 
-        $user->sendEmailVerificationNotification();
+        // also chcek if 5 mintues has passed since last verification email
+        if (Carbon::now()->timestamp - $user->email_verified_at->timestamp < 300) {
+            return $this->error('Please wait 5 minutes before resending the verification email');
+        }   
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification email sent successfully'
-        ]);
+        $token = Helpers::sendVerificationMail($user);
+
+        return $this->success([
+            'verification_token' => $token
+        ], 'Verification email sent successfully');
     }
 }

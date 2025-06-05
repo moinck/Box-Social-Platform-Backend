@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Notifications\CustomVerifyEmail;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -443,5 +445,38 @@ class Helpers
         }
 
         return $logoUrl;
+    }
+
+    /**
+     * Generate verification token
+     * @param mixed $user
+     * @return string
+     */
+    public static function generateVarificationToken($user)
+    {
+        $tokenData = [
+            'user_id' => $user->getKey(),
+            'expires_at' => Carbon::now()->addMinutes(5)->timestamp,
+            'random' => Str::random(10)
+        ];
+
+        // Encrypt the entire token data
+        $encryptedToken = self::encrypt(json_encode($tokenData));
+
+        return $encryptedToken;
+    }
+
+    /**
+     * Send verification mail to user
+     * @param mixed $user
+     * @return string
+     */
+    public static function sendVerificationMail($user)
+    {
+        $token = self::generateVarificationToken($user);
+
+        $user->notify(new CustomVerifyEmail($token));
+
+        return $token;
     }
 }

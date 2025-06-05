@@ -79,25 +79,23 @@ class RegisterController extends Controller
             DB::beginTransaction();
             
             // Create the user
-            // $user = User::create([
-            //     'first_name' => $request->first_name,
-            //     'last_name' => $request->last_name,
-            //     'email' => $request->email,
-            //     'password' => Hash::make($request->password),
-            //     'company_name' => $request->company_name,
-            //     'website' => $request->website,
-            //     'fca_number' => $request->fca_number,
-            //     'is_verified' => false,
-            // ]);
-            $user = user::where('id',20)->first();
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'company_name' => $request->company_name,
+                'website' => $request->website,
+                'fca_number' => $request->fca_number,
+                'is_verified' => false,
+            ]);
             
             // Create an API token for the user
-            // $token = $user->createToken('auth_token')->plainTextToken;
+            $authnticationToken = $user->createToken('auth_token')->plainTextToken;
 
             // Send verification email
             // event(new Registered($user));
-            $user->sendEmailVerificationNotification();
-            
+            // $token = Helpers::sendVerificationMail($user);
             DB::commit();
             
             return response()->json([
@@ -115,8 +113,9 @@ class RegisterController extends Controller
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
                         'is_verified' => $user->is_verified,
                     ],
-                    // 'access_token' => $token,
-                    // 'token_type' => 'Bearer',
+                    // 'verification_token' => $token,
+                    'access_token' => $authnticationToken,
+                    'token_type' => 'Bearer',
                 ],
             ], 200);
             
@@ -171,21 +170,21 @@ class RegisterController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // Check if email is verified
-        if (!$user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email not verified. Please verify your email first.',
-                'data' => [
-                    'user' => [
-                        'id' => Helpers::encrypt($user->id),
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'email' => $user->email,
-                        'is_verified' => $user->is_verified,
-                    ]
-                ]
-            ], 403);
-        }
+        // if (!$user->hasVerifiedEmail()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Email not verified. Please verify your email first.',
+        //         'data' => [
+        //             'user' => [
+        //                 'id' => Helpers::encrypt($user->id),
+        //                 'first_name' => $user->first_name,
+        //                 'last_name' => $user->last_name,
+        //                 'email' => $user->email,
+        //                 'is_verified' => $user->is_verified,
+        //             ]
+        //         ]
+        //     ], 403);
+        // }
         // For example, generate a token if using Laravel Sanctum or Passport
         $token = $user->createToken('auth_token')->plainTextToken;
 
