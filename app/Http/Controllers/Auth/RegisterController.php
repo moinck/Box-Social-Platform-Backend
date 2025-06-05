@@ -170,21 +170,21 @@ class RegisterController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // Check if email is verified
-        if (!$user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email not verified. Please verify your email first.',
-                'data' => [
-                    'user' => [
-                        'id' => Helpers::encrypt($user->id),
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'email' => $user->email,
-                        'is_verified' => $user->is_verified,
-                    ]
-                ]
-            ], 403);
-        }
+        // if (!$user->hasVerifiedEmail()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Email not verified. Please verify your email first.',
+        //         'data' => [
+        //             'user' => [
+        //                 'id' => Helpers::encrypt($user->id),
+        //                 'first_name' => $user->first_name,
+        //                 'last_name' => $user->last_name,
+        //                 'email' => $user->email,
+        //                 'is_verified' => $user->is_verified,
+        //             ]
+        //         ]
+        //     ], 403);
+        // }
         // For example, generate a token if using Laravel Sanctum or Passport
         $token = $user->createToken('auth_token')->plainTextToken;
 
