@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Models\BrandKit;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Yajra\DataTables\DataTables;
@@ -78,24 +79,30 @@ class RegisterController extends Controller
             DB::beginTransaction();
             
             // Create the user
-            $user = User::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'company_name' => $request->company_name,
-                'website' => $request->website,
-                'fca_number' => $request->fca_number,
-            ]);
+            // $user = User::create([
+            //     'first_name' => $request->first_name,
+            //     'last_name' => $request->last_name,
+            //     'email' => $request->email,
+            //     'password' => Hash::make($request->password),
+            //     'company_name' => $request->company_name,
+            //     'website' => $request->website,
+            //     'fca_number' => $request->fca_number,
+            //     'is_verified' => false,
+            // ]);
+            $user = user::where('id',20)->first();
             
             // Create an API token for the user
-            $token = $user->createToken('auth_token')->plainTextToken;
+            // $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Send verification email
+            // event(new Registered($user));
+            $user->sendEmailVerificationNotification();
             
             DB::commit();
             
             return response()->json([
                 'success' => true,
-                'message' => 'User registered successfully.',
+                'message' => 'User registered successfully. Please check your email for verification link.',
                 'data' => [
                     'user' => [
                         'id' => Helpers::encrypt($user->id),
@@ -106,9 +113,10 @@ class RegisterController extends Controller
                         'website' => $user->website,
                         'fca_number' => $user->fca_number,
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                        'is_verified' => $user->is_verified,
                     ],
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
+                    // 'access_token' => $token,
+                    // 'token_type' => 'Bearer',
                 ],
             ], 200);
             
@@ -159,7 +167,25 @@ class RegisterController extends Controller
         }
 
         // Authentication passed, generate token or proceed as needed
-        $user = Auth::user();
+        // $user = Auth::user();
+        $user = User::where('email', $request->email)->first();
+
+        // Check if email is verified
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not verified. Please verify your email first.',
+                'data' => [
+                    'user' => [
+                        'id' => Helpers::encrypt($user->id),
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'is_verified' => $user->is_verified,
+                    ]
+                ]
+            ], 403);
+        }
         // For example, generate a token if using Laravel Sanctum or Passport
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -179,6 +205,7 @@ class RegisterController extends Controller
                         'website' => $user->website,
                         'fca_number' => $user->fca_number,
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                        'is_verified' => $user->is_verified,
                     ],
                     'access_token' => $token,
                     'token_type' => 'Bearer',

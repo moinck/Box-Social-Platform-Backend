@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\PostContentApiController;
@@ -12,7 +13,13 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::post('/fca-check', [RegisterController::class, 'checkFca']);
+// Email verification routes
+Route::get('/email/verify/{encryptedToken}', [AuthApiController::class, 'verify'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.verify');
 
+Route::post('/email/resend-verification', [AuthApiController::class, 'resend'])
+    ->middleware(['throttle:6,1']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
