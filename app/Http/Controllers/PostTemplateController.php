@@ -39,21 +39,22 @@ class PostTemplateController extends Controller
         return DataTables::of($postTemplates)
             ->addIndexColumn()
             ->addColumn('template_image', function ($data) {
-                return '<img src="'.asset($data->template_image).'" alt="'.$data->template_name.'" class="br-1" width="100" height="100">';
+                $categoryName = $data->category->name;
+                return '<img src="'.asset($data->template_image).'" alt="'.$data->template_name.'" class="br-1 template-image" data-category="'.$categoryName.'" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
             })
-            ->addColumn('category', function ($postTemplate) {
-                return $postTemplate->category->name;
+            ->addColumn('category', function ($data) {
+                return $data->category->name;
             })
-            ->addColumn('status', function ($postTemplate) {
-                $status = $postTemplate->status == true ? 'checked' : '';
+            ->addColumn('status', function ($data) {
+                $status = $data->status == true ? 'checked' : '';
                 $title = '';
-                if ($postTemplate->status == true) {
+                if ($data->status == true) {
                     $title = 'Click To Disable Post Template';
                 } else {
                     $title = 'Click To Enable Post Template';
                 }
 
-                $postTemplateId = Helpers::encrypt($postTemplate->id);
+                $postTemplateId = Helpers::encrypt($data->id);
                 return '<label class="switch">
                             <input type="checkbox" class="switch-input" '.$status.' data-id="'.$postTemplateId.'" id="post-template-status">
                             <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
@@ -62,14 +63,14 @@ class PostTemplateController extends Controller
                             </span>
                         </label>';
             })
-            ->addColumn('raw_status', function ($postTemplate) {
-                return $postTemplate->status;
+            ->addColumn('raw_status', function ($data) {
+                return $data->status;
             })
-            ->addColumn('created_at', function ($postTemplate) {
-                return Helpers::dateFormate($postTemplate->created_at);
+            ->addColumn('created_at', function ($data) {
+                return Helpers::dateFormate($data->created_at);
             })
-            ->addColumn('action', function ($postTemplate) {
-                $postTemplateId = Helpers::encrypt($postTemplate->id);
+            ->addColumn('action', function ($data) {
+                $postTemplateId = Helpers::encrypt($data->id);
                 return '
                     <a href="javascript:;" title="edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="'.$postTemplateId.'"><i class="ri-edit-box-line"></i></a>

@@ -56,6 +56,21 @@
     <!--/ Main Table -->
 
     <!--/ Select -->
+
+    {{-- need a modal to show image --}}
+    <div class="modal fade" id="template-image-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" alt="template-image" class="template-modal-image">
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 <!-- Page Scripts -->
@@ -243,6 +258,16 @@
                         });
                     }
                 });
+            });
+            // ----------------------------------------------------------
+
+            // show image modal
+            $(document).on('click','.template-image', function () {
+                var image = $(this).attr('src');
+                var category = $(this).data('category');
+                $('#template-image-modal').modal('show');
+                $('#template-image-modal .modal-body img').attr('src', image);
+                $('#template-image-modal .modal-header .modal-title').text(category);
             });
             // ----------------------------------------------------------
         });
