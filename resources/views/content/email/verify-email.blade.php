@@ -3,7 +3,7 @@
 @section('main-content')    
     <div class="container">
         <div class="logo">
-            <img src="{{ asset('assets/img/Box-media-logo.svg') }}" alt="Logo">
+            <img src="http://178.128.45.173:9162/assets/img/Box-media-logo.svg" alt="Logo">
         </div>
         <div class="title">Almost There! ✨</div>
         <div class="subtitle">
