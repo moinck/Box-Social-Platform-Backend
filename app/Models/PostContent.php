@@ -12,6 +12,7 @@ class PostContent extends Model
         'category_id',
         'title',
         'description',
+        'warning_message',
         'sub_category_id',
     ];
 
