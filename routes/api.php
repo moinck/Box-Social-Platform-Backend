@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
+use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
@@ -48,6 +49,12 @@ Route::group([
         // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);
         // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
+
+        // Create Template 
+
+        Route::post('/template', [TemplateApiController::class, 'store']);
+        Route::get('/template/{id}', [TemplateApiController::class, 'getTemplate']);
+        Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
