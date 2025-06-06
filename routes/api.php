@@ -53,7 +53,7 @@ Route::group([
         // Create Template 
 
         Route::post('/template', [TemplateApiController::class, 'store']);
-        Route::get('/template', [TemplateApiController::class, 'getTemplate']);
+        Route::get('/template/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
 
         // logout api

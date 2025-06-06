@@ -45,21 +45,9 @@ class TemplateApiController extends Controller
 
     }
 
-    public function getTemplate(Request $request){
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-        ]);
+    public function getTemplate(Request $request,$id){
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors.',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-        
-
-        $tempObj = PostTemplate::find(Helpers::decrypt($request->id))->first();
+        $tempObj = PostTemplate::where('id',Helpers::decrypt($id))->first();
 
         $data =  [
             "template_data" => json_decode($tempObj->template_data),
