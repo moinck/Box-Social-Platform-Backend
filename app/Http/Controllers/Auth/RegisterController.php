@@ -58,7 +58,6 @@ class RegisterController extends Controller
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6',
             'website' => 'nullable|string|url',
-
         ]);
 
         $messages = [
@@ -91,11 +90,11 @@ class RegisterController extends Controller
             ]);
             
             // Create an API token for the user
-            $authnticationToken = $user->createToken('auth_token')->plainTextToken;
+            // $authnticationToken = $user->createToken('auth_token')->plainTextToken;
 
             // Send verification email
             // event(new Registered($user));
-            // $token = Helpers::sendVerificationMail($user);
+            $token = Helpers::sendVerificationMail($user);
             DB::commit();
             
             return response()->json([
@@ -113,9 +112,9 @@ class RegisterController extends Controller
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
                         'is_verified' => $user->is_verified,
                     ],
-                    // 'verification_token' => $token,
-                    'access_token' => $authnticationToken,
-                    'token_type' => 'Bearer',
+                    'verification_token' => $token,
+                    // 'access_token' => $authnticationToken,
+                    // 'token_type' => 'Bearer',
                 ],
             ], 200);
             

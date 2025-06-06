@@ -39,15 +39,13 @@ class CustomVerifyEmail extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $verificationUrl = $this->verificationUrl($this->token);
+        $verificationUrl = "http://178.128.45.173:9163/email/verification-success/";
 
         return (new MailMessage)
             ->subject('Verify Email Address')
-            ->line('Please click the button below to verify your email address.')
-            ->action('Verify Email Address', $verificationUrl)
-            ->line('This verification link will expire in 5 minutes.')
-            ->line('If you did not create an account, no further action is required.');
+            ->view('content.email.verify-email', ['verification_link' => $verificationUrl]);
     }
+
 
     protected function verificationUrl($token)
     {
