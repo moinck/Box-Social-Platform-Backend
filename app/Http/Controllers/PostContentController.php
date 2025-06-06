@@ -52,6 +52,7 @@ class PostContentController extends Controller
             'post_category' => 'required|exists:categories,id',
             'post_sub_category' => 'nullable|exists:categories,id',
             'post_description' => 'required',
+            'warning_message' => 'nullable',
         ]);
 
         PostContent::create([
@@ -59,6 +60,7 @@ class PostContentController extends Controller
             'category_id' => $request->post_category,
             'sub_category_id' => $request->post_sub_category,
             'description' => $request->post_description,
+            'warning_message' => $request->warning_message,
         ]);
 
         return redirect()->route('post-content')->with('success', 'Post Content Created Successfully');
@@ -84,6 +86,7 @@ class PostContentController extends Controller
             'post_category' => 'required|exists:categories,id',
             'post_content_edit_sub_category' => 'nullable|exists:categories,id',
             'post_description' => 'required',
+            'warning_message' => 'nullable',
         ]);
 
         PostContent::find($request->post_id)->update([
@@ -91,6 +94,7 @@ class PostContentController extends Controller
             'category_id' => $request->post_category,
             'sub_category_id' => $request->post_content_edit_sub_category ?? null,
             'description' => $request->post_description,
+            'warning_message' => $request->warning_message,
         ]);
 
         return redirect()->route('post-content')->with('success', 'Post Content Updated Successfully');

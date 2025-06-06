@@ -78,6 +78,13 @@
                             <input type="hidden" name="post_description" id="hiddenPostDescription"
                                 value="{{old('post_description')}}" />
                         </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="warning_message" name="warning_message" class="form-control"
+                                    placeholder="Warning Message" />
+                                <label for="warning_message">Warning Message</label>
+                            </div>
+                        </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary">Create</button>
                             <button type="reset" class="btn btn-outline-secondary" id="cancelCreatePostContentBtn">
@@ -211,7 +218,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function (field, ele) {
-                            if (['post_title', 'post_category', 'post_description'
+                            if (['post_title', 'post_category', 'post_description',
                             ].includes(field)) {
                                 return '.col-12';
                             }

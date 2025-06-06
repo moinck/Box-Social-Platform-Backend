@@ -9,6 +9,8 @@ class Page2 extends Controller
 {
   public function index()
   {
-    return view('content.pages.pages-page2');
+    // return view('content.pages.pages-page2');
+    $verification_link = "www.youtube.com";
+    return view('content.email.verify-email',compact('verification_link'));
   }
 }
