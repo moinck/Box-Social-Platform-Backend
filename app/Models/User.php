@@ -77,4 +77,10 @@ class User extends Authenticatable
     {
         return $this->email;
     }
+
+    // check if user have brand-kit
+    public function hasBrandKit()
+    {
+        return $this->hasOne(BrandKit::class,'user_id','id')->exists();
+    }
 }

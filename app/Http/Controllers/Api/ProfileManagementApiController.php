@@ -39,9 +39,6 @@ class ProfileManagementApiController extends Controller
             return $this->error('User not found', 404);
         }
 
-        // check user has brandkit
-        $brandKit = BrandKit::where('user_id', $user_id)->exists() ? true : false;
-
         // make data array
         $data = [];
         $data['user'] = [
@@ -54,7 +51,7 @@ class ProfileManagementApiController extends Controller
             'email' => $user->email,
             'phone_number' => $user->phone ?? null,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
-            'is_brandkit' => $brandKit,
+            'is_brandkit' => $user->hasBrandKit(),
         ];
 
         return $this->success($data, 'Profile fetched successfully');
@@ -113,6 +110,7 @@ class ProfileManagementApiController extends Controller
             'website' => $user->website,
             'email' => $user->email,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'is_brandkit' => $user->hasBrandKit(),
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
@@ -175,6 +173,7 @@ class ProfileManagementApiController extends Controller
             'website' => $user->website,
             'email' => $user->email,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'is_brandkit' => $user->hasBrandKit()
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
