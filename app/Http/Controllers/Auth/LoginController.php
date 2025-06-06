@@ -33,6 +33,9 @@ class LoginController extends Controller
             if ($user->status != 'active') {
                 return redirect()->back()->with('email-err-msg', 'Your account is inactive. Please contact the administrator.');
             }
+            if ($user->role != 'admin') {
+                return redirect()->back()->with('email-err-msg', 'You do not have permission to login.');
+            }
             if (Hash::check($request->password, $user->password)) {
                 Auth::login($user, $request->remember);
                 return redirect()->intended('/home')->with('message', 'Logged-in');
