@@ -91,8 +91,8 @@ class PostContentApiController extends Controller
         $resturnData = [];
         foreach ($postContent as $post) {
             $categoryName = $post->category->name;
-            $categoryPostCount = PostContent::where('category_id', $post->category_id)->count();
-            $customName = $categoryName . ' (' . $categoryPostCount . ')';
+            // $categoryPostCount = PostContent::where('category_id', $post->category_id)->count();
+            // $customName = $categoryName . ' (' . $categoryPostCount . ')';
 
             $resturnData[$categoryName][] = [
                 'id' => Helpers::encrypt($post->id),
