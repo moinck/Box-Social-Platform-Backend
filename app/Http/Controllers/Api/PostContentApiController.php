@@ -94,7 +94,7 @@ class PostContentApiController extends Controller
             $categoryPostCount = PostContent::where('category_id', $post->category_id)->count();
             $customName = $categoryName . ' (' . $categoryPostCount . ')';
 
-            $resturnData[$customName][] = [
+            $resturnData[$categoryName][] = [
                 'id' => Helpers::encrypt($post->id),
                 'category_id' => Helpers::encrypt($post->category_id),
                 'title' => $post->title,
