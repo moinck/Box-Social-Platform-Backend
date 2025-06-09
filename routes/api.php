@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
+use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
@@ -55,6 +56,9 @@ Route::group([
         Route::post('/template', [TemplateApiController::class, 'store']);
         Route::get('/template/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
+
+        // get stock image
+        Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);

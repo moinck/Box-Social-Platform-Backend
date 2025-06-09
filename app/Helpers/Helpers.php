@@ -2,10 +2,12 @@
 
 namespace App\Helpers;
 
+use App\Mail\RegisterVerificationMail;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -475,7 +477,8 @@ class Helpers
     {
         $token = self::generateVarificationToken($user);
 
-        $user->notify(new CustomVerifyEmail($token));
+        // $user->notify(new CustomVerifyEmail($token));
+        Mail::to($user->email)->send(new RegisterVerificationMail($token));
 
         return $token;
     }

@@ -107,7 +107,7 @@ class AuthApiController extends Controller
             ], 400);
         }
 
-        $user = User::where('verification_token', $tokenData['user_id'])->first();
+        $user = User::where('id', $tokenData['user_id'])->first();
 
         if (!$user) {
             return $this->error('User not found', 404);
