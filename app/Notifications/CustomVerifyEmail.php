@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Helpers\Helpers;
+use App\Mail\RegisterVerificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -37,13 +38,11 @@ class CustomVerifyEmail extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): RegisterVerificationMail
     {
-        $verificationUrl = "http://178.128.45.173:9163/email/verification-success/";
+        // $verificationUrl = "http://178.128.45.173:9163/email/verification-success/";
 
-        return (new MailMessage)
-            ->subject('Verify Email Address')
-            ->view('content.email.verify-email', ['verification_link' => $verificationUrl]);
+        return new RegisterVerificationMail($this->token);
     }
 
 
