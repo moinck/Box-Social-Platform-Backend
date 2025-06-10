@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
+use App\Events\NewNotificationEvent;
 use App\Mail\RegisterVerificationMail;
+use App\Models\Notification;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Pusher\Pusher;
 
 class Helpers
 {
@@ -481,5 +484,48 @@ class Helpers
         Mail::to($user->email)->send(new RegisterVerificationMail($token));
 
         return $token;
+    }
+
+    public static function sendNotification($user, $type)
+    {
+        $title = "";
+        $body = "";
+        if ($type == "new-registration") {
+            $fullName = $user->first_name." ".$user->last_name;
+            $title = "New Registration";
+            $body = "New user ".$fullName." registered";
+        } elseif ($type == "new-contact") {
+            $title = "New Contact";
+            $body = "New contact form is submitted";
+        }
+
+        if($title && $body){
+            $newnotification = Notification::create([
+                'tital' => $title,
+                'body' => $body,
+                'type' => $type,
+                'is_read' => false,
+            ]);
+            // event(new NewNotificationEvent($newnotification));
+            // user pusher event
+
+            // New Pusher instance with your config data
+            $pusher = new Pusher(
+                config('broadcasting.connections.pusher.key'),
+                config('broadcasting.connections.pusher.secret'),
+                config('broadcasting.connections.pusher.app_id'),
+                config('broadcasting.connections.pusher.options')
+            );
+
+            $pusher->trigger('admin-notifications', 'new-notification', [
+                'id' => $newnotification->id,
+                'type' => $newnotification->type,
+                'title' => $newnotification->tital,
+                'body' => $newnotification->body,
+                'created_at' => $newnotification->created_at->format('Y-m-d H:i:s'),
+            ]);
+        }
+
+        return true;
     }
 }

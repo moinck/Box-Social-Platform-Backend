@@ -14,6 +14,10 @@ class Page2 extends Controller
 {
     public function index(Request $request)
     {
+        $user = User::find(4);
+        Helpers::sendNotification($user, 'new-registration');
+
+        dd($user);
         if ($request->has('send_mail') && $request->send_mail == 1) {
             return $this->testMail();
         }

@@ -88,6 +88,8 @@ class RegisterController extends Controller
                 'fca_number' => $request->fca_number,
                 'is_verified' => false,
             ]);
+
+            Helpers::sendNotification($user, "new-registration");
             
             // Create an API token for the user
             // $authnticationToken = $user->createToken('auth_token')->plainTextToken;
