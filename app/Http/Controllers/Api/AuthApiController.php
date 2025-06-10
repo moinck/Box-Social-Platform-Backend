@@ -107,7 +107,11 @@ class AuthApiController extends Controller
             ], 400);
         }
 
-        $user = User::where('id', $tokenData['user_id'])->first();
+        $user = User::where(function ($query) use ($tokenData) {
+            $query->where('id', $tokenData['user_id'])
+                ->where('is_verified', false)
+                ->whereNull('email_verified_at');
+        })->first();
 
         if (!$user) {
             return $this->error('User not found', 404);
@@ -118,9 +122,9 @@ class AuthApiController extends Controller
         }
 
         // check timestamp from token (5 mintues)
-        if (Carbon::now()->timestamp > $tokenData['expires_at']) {
-            return $this->error('Verification link has expired', 400);
-        }
+        // if (Carbon::now()->timestamp > $tokenData['expires_at']) {
+        //     return $this->error('Verification link has expired', 400);
+        // }
 
         // also chcek if 5 mintues has passed since last verification email
         if (Carbon::now()->timestamp - $tokenData['expires_at'] < 300) {
