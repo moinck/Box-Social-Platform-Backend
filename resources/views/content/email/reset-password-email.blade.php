@@ -1,6 +1,6 @@
 @extends('layouts.email-layout')
 
-@section('title','Verify Email')
+@section('title','Reset Password')
 
 @section('main-content')
     <!-- Logo Section -->
@@ -12,13 +12,13 @@
     <!-- Title -->
     <div class="email-title"
         style="text-align: center; font-size: 26px; color: #222; font-weight: 600; margin-bottom: 10px; line-height: 1.3;">
-        Almost There! ✨
+        Password Reset
     </div>
 
     <!-- Description -->
     <div class="email-description"
         style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
-        Just one more step — tap the button below to confirm your email and unlock your full experience.
+        You are receiving this email because we received a request to reset your password. Please use the button below to reset your password.
     </div>
 
     <!-- CTA Button -->
@@ -36,15 +36,13 @@
             transition: background-color 0.3s ease;
             border: none;
             cursor: pointer;">
-            Verify My Email
+            Reset Password
         </a>
     </div>
 
-    <!-- Alternative Link (for clients that don't support buttons) -->
-    {{-- <div style="text-align: center; margin-bottom: 32px;">
-        <p style="font-size: 13px; color: #888; margin: 0;">
-            Or copy and paste this link in your browser:<br>
-            <a href="{{ $verification_link }}" style="color: #F4D106; word-break: break-all; font-size: 12px;">{{ $verification_link }}</a>
-        </p>
-    </div> --}}
+    <!-- Description -->
+    <div class="email-description"
+        style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
+        If you find any issue or have any questions, please contact support at <a href="mailto:help@boxsocials.com" style="color: #F4D106;">help@boxsocials.com</a>.
+    </div>
 @endsection
