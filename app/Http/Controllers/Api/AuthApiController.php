@@ -59,15 +59,24 @@ class AuthApiController extends Controller
             ], 404);
         }
 
+        // Check if already verified
+        if ($user->hasVerifiedEmail()) {
+            return $this->success([], 'Email already verified');
+        }
+
         // gernerte token
         $LoginToken = $user->createToken('auth_token')->plainTextToken;
         // check does user have brandkit
         $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
 
+        // Mark email as verified
+        $user->markEmailAsVerified();
+        event(new Verified($user));
+
         $returnData = [
             'user' => [
                 'id' => Helpers::encrypt($user->id),
-                'name' => $user->name,
+                'name' => $user->first_name . ' ' . $user->last_name,
                 'email' => $user->email,
                 'is_verified' => $user->is_verified,
             ],
@@ -75,15 +84,6 @@ class AuthApiController extends Controller
             'token_type' => 'Bearer',
             'is_brandkit' => $isBrandkit,
         ];
-
-        // Check if already verified
-        if ($user->hasVerifiedEmail()) {
-            return $this->success($returnData, 'Email already verified');
-        }
-
-        // Mark email as verified
-        $user->markEmailAsVerified();
-        event(new Verified($user));
 
         return $this->success($returnData, 'Email verified successfully');
     }
@@ -107,7 +107,11 @@ class AuthApiController extends Controller
             ], 400);
         }
 
-        $user = User::where('id', $tokenData['user_id'])->first();
+        $user = User::where(function ($query) use ($tokenData) {
+            $query->where('id', $tokenData['user_id'])
+                ->where('is_verified', false)
+                ->whereNull('email_verified_at');
+        })->first();
 
         if (!$user) {
             return $this->error('User not found', 404);
@@ -117,8 +121,13 @@ class AuthApiController extends Controller
             return $this->success([], 'Email already verified');
         }
 
+        // check timestamp from token (5 mintues)
+        // if (Carbon::now()->timestamp > $tokenData['expires_at']) {
+        //     return $this->error('Verification link has expired', 400);
+        // }
+
         // also chcek if 5 mintues has passed since last verification email
-        if (Carbon::now()->timestamp - $user->email_verified_at->timestamp < 300) {
+        if (Carbon::now()->timestamp - $tokenData['expires_at'] < 300) {
             return $this->error('Please wait 5 minutes before resending the verification email', 400);
         }   
 
