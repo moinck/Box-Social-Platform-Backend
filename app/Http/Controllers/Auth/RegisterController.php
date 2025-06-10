@@ -56,7 +56,7 @@ class RegisterController extends Controller
                 ->uncompromised(), // check if password was leaked in data breaches
             ],
             'company_name' => 'required|string',
-            'fca_number' => 'required|numeric|min:6',
+            'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
             'website' => 'nullable|string|url',
         ]);
 

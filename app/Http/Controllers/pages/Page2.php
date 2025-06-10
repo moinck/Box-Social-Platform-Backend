@@ -32,7 +32,7 @@ class Page2 extends Controller
         $user = User::find(4);
         $verification_link = "www.youtube.com";
         // Mail::to($user->email)->send(new RegisterVerificationMail($verification_link));
-        $token = Helpers::sendVerificationMail($user);
+        $token = Helpers::sendVerificationMail($user,$verification_link);
 
         return response()->json([
             'success' => true,

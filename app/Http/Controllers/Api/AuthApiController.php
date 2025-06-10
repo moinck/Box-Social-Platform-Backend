@@ -56,7 +56,7 @@ class AuthApiController extends Controller
 
         // Check if already verified
         if ($user->hasVerifiedEmail()) {
-            return $this->success([], 'Email already verified');
+            return $this->error('Email is already verified', 400);
         }
 
         // gernerte token
