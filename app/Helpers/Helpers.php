@@ -486,6 +486,12 @@ class Helpers
         return $token;
     }
 
+    /**
+     * Send notification to admin
+     * @param mixed $data
+     * @param mixed $type
+     * @return bool
+     */
     public static function sendNotification($data, $type)
     {
         $title = "";
@@ -513,10 +519,8 @@ class Helpers
                 'type' => $type,
                 'is_read' => false,
             ]);
-            // event(new NewNotificationEvent($newnotification));
-            // user pusher event
 
-            // New Pusher instance with your config data
+            // New Pusher instance
             $pusher = new Pusher(
                 config('broadcasting.connections.pusher.key'),
                 config('broadcasting.connections.pusher.secret'),
@@ -525,7 +529,7 @@ class Helpers
             );
 
             $pusher->trigger('admin-notifications', 'new-notification', [
-                'id' => $newnotification->id,
+                // 'id' => $newnotification->id,
                 'type' => $newnotification->type,
                 'title' => $newnotification->tital,
                 'body' => $newnotification->body,
