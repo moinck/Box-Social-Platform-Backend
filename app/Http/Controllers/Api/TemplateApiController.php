@@ -50,7 +50,7 @@ class TemplateApiController extends Controller
         $tempObj = PostTemplate::where('id',Helpers::decrypt($id))->first();
 
         $data =  [
-            "template_data" => json_decode($tempObj->template_data),
+            "template_data" => $tempObj->template_data,
             'id'=>$request->id
         ];
         
