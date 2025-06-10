@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
 use App\Models\User;
+use App\Models\UserTokens;
 use App\ResponseTrait;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -23,40 +24,34 @@ class AuthApiController extends Controller
     // public function verifyEmail(EmailVerificationRequest $request)
     public function verify($encryptedToken)
     {
-        try {
-            // Decrypt the token
-            $tokenData = json_decode(Helpers::decrypt(urldecode($encryptedToken)), true);
-            
-            if (!$tokenData || !isset($tokenData['user_id'], $tokenData['expires_at'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid verification token'
-                ], 400);
-            }
+        $validator = Validator::make([
+            'verification_token' => $encryptedToken
+        ], [
+            'verification_token' => 'required|string'
+        ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid verification token'
-            ], 400);
+        if ($validator->fails()) {
+            return $this->validationError('Invalid verification token', $validator->errors());
         }
 
-        // Check if token has expired
-        if (Carbon::now()->timestamp > $tokenData['expires_at']) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Verification link has expired'
-            ], 400);
+        $verificationToken = $encryptedToken;
+
+        $userToken = UserTokens::where(function ($query) use ($verificationToken) {
+            $query->where('token', $verificationToken)
+                ->where('type', 'email-verification')
+                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                ->where('is_used', false);
+        })->first();
+
+        if (!$userToken) {
+            return $this->error('Invalid or expired verification token', 400);
         }
 
         // Find the user
-        $user = User::find($tokenData['user_id']);
-        
+        $user = User::find($userToken->user_id);
+
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
+            return $this->error('User not found', 404);
         }
 
         // Check if already verified
@@ -72,6 +67,10 @@ class AuthApiController extends Controller
         // Mark email as verified
         $user->markEmailAsVerified();
         event(new Verified($user));
+
+        $userToken->update([
+            'is_used' => true
+        ]);
 
         $returnData = [
             'user' => [
@@ -97,44 +96,44 @@ class AuthApiController extends Controller
             'verification_token' => 'required'
         ]);
 
-        // Decrypt the token
-        $tokenData = json_decode(Helpers::decrypt(urldecode($request->verification_token)), true);
-            
-        if (!$tokenData || !isset($tokenData['user_id'], $tokenData['expires_at'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid verification token'
-            ], 400);
-        }
-
-        $user = User::where(function ($query) use ($tokenData) {
-            $query->where('id', $tokenData['user_id'])
-                ->where('is_verified', false)
-                ->whereNull('email_verified_at');
+        $userToken = UserTokens::where(function ($query) use ($request) {
+            $query->where('token', $request->verification_token)
+                ->where('type', 'email-verification')
+                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                ->where('is_used', false);
         })->first();
 
-        if (!$user) {
-            return $this->error('User not found', 404);
+        if (!$userToken) {
+            return $this->error('Invalid or expired verification token', 400);
         }
 
-        if ($user->hasVerifiedEmail()) {
-            return $this->success([], 'Email already verified');
+        // if there is user token
+        if ($userToken) {
+            $tokenCreatedAt = Carbon::parse($userToken->created_at);
+            $fiveMinutesAgo = Carbon::now()->subMinutes(5);
+
+            if ($tokenCreatedAt->lt($fiveMinutesAgo)) {
+                $user = User::find($userToken->user_id);
+
+
+                // Allow resending the verification email
+                $token = Helpers::generateVarificationToken($user, $request);
+                Helpers::sendVerificationMail($user, $token);
+
+                // update old user token
+                $userToken->update([
+                    'is_used' => true
+                ]);
+
+                return $this->success([
+                    'verification_token' => $token
+                ], 'Verification email re-sent successfully.');
+
+            } else {
+                // Do not allow resending the verification email
+                // Inform the user to wait for 5 minutes
+                return $this->error('Please wait for 5 minutes before resending the verification email', 400);
+            }
         }
-
-        // check timestamp from token (5 mintues)
-        // if (Carbon::now()->timestamp > $tokenData['expires_at']) {
-        //     return $this->error('Verification link has expired', 400);
-        // }
-
-        // also chcek if 5 mintues has passed since last verification email
-        if (Carbon::now()->timestamp - $tokenData['expires_at'] < 300) {
-            return $this->error('Please wait 5 minutes before resending the verification email', 400);
-        }   
-
-        $token = Helpers::sendVerificationMail($user);
-
-        return $this->success([
-            'verification_token' => $token
-        ], 'Verification email re-sent successfully.');
     }
 }

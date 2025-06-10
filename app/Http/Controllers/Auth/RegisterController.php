@@ -89,14 +89,12 @@ class RegisterController extends Controller
                 'is_verified' => false,
             ]);
 
+            // send notification of new registration
             Helpers::sendNotification($user, "new-registration");
-            
-            // Create an API token for the user
-            // $authnticationToken = $user->createToken('auth_token')->plainTextToken;
 
             // Send verification email
-            // event(new Registered($user));
-            $token = Helpers::sendVerificationMail($user);
+            $token = Helpers::generateVarificationToken($user,$request);
+            Helpers::sendVerificationMail($user,$token);
             DB::commit();
             
             return response()->json([
@@ -115,8 +113,6 @@ class RegisterController extends Controller
                         'is_verified' => $user->is_verified,
                     ],
                     'verification_token' => $token,
-                    // 'access_token' => $authnticationToken,
-                    // 'token_type' => 'Bearer',
                 ],
             ], 200);
             

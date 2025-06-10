@@ -5,7 +5,9 @@ namespace App\Helpers;
 use App\Events\NewNotificationEvent;
 use App\Mail\RegisterVerificationMail;
 use App\Models\Notification;
+use App\Models\UserTokens;
 use App\Notifications\CustomVerifyEmail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -457,16 +459,21 @@ class Helpers
      * @param mixed $user
      * @return string
      */
-    public static function generateVarificationToken($user)
+    public static function generateVarificationToken($user,Request $request)
     {
-        $tokenData = [
-            'user_id' => $user->getKey(),
-            'expires_at' => Carbon::now()->addMinutes(5)->timestamp,
-            'random' => Str::random(10)
-        ];
+        $tokenData = bin2hex(random_bytes(32));
+
+        $userToken = new UserTokens();
+        $userToken->user_id = $user->id;
+        $userToken->token = $tokenData;
+        $userToken->type = 'email-verification';
+        $userToken->is_used = false;
+        $userToken->ip_address = $request->ip();
+        $userToken->user_agent = $request->userAgent();
+        $userToken->save();
 
         // Encrypt the entire token data
-        $encryptedToken = self::encrypt(json_encode($tokenData));
+        $encryptedToken = $tokenData;
 
         return $encryptedToken;
     }
@@ -476,14 +483,14 @@ class Helpers
      * @param mixed $user
      * @return string
      */
-    public static function sendVerificationMail($user)
+    public static function sendVerificationMail($user,$token)
     {
-        $token = self::generateVarificationToken($user);
+        // $token = self::generateVarificationToken($user,$request);
 
         // $user->notify(new CustomVerifyEmail($token));
         Mail::to($user->email)->send(new RegisterVerificationMail($token));
 
-        return $token;
+        return true;
     }
 
     /**
