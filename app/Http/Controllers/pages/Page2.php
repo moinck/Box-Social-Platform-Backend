@@ -14,10 +14,10 @@ class Page2 extends Controller
 {
     public function index(Request $request)
     {
-        $user = User::find(4);
-        Helpers::sendNotification($user, 'new-registration');
+        if ($request->has('send_notification') && $request->send_notification == 1) {
+            return $this->testNotification($request->user_id);
+        }
 
-        dd($user);
         if ($request->has('send_mail') && $request->send_mail == 1) {
             return $this->testMail();
         }
@@ -37,6 +37,22 @@ class Page2 extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Mail sent successfully',
+            'data' => [
+                'id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->first_name . ' ' . $user->last_name,
+            ]
+        ]);
+    }
+
+    public function testNotification($id)
+    {
+        $user = User::find($id);
+        Helpers::sendNotification($user, 'new-registration');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification sent successfully',
             'data' => [
                 'id' => $user->id,
                 'email' => $user->email,

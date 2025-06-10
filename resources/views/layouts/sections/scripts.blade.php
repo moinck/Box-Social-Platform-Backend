@@ -96,6 +96,30 @@
         }, 1000);
     </script>
 @endif
+
+<script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
+{{-- listen pusher event --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pusher = new Pusher(
+            "{{ config('broadcasting.connections.pusher.key') }}",{
+                cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
+                forceTLS: true
+            }
+        );
+
+        const channel = pusher.subscribe('admin-notifications');
+        channel.bind('new-notification', function(data) {
+            // console.log(data);
+            var notificationData = data;
+
+            var title = notificationData.title;
+            var message = notificationData.body;
+           showSweetAlert("success", title, message);
+        });
+    });
+</script>
+
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->

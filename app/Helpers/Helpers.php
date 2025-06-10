@@ -486,17 +486,24 @@ class Helpers
         return $token;
     }
 
-    public static function sendNotification($user, $type)
+    public static function sendNotification($data, $type)
     {
         $title = "";
         $body = "";
-        if ($type == "new-registration") {
-            $fullName = $user->first_name." ".$user->last_name;
-            $title = "New Registration";
-            $body = "New user ".$fullName." registered";
-        } elseif ($type == "new-contact") {
-            $title = "New Contact";
-            $body = "New contact form is submitted";
+        switch ($type) {
+            case 'new-registration':
+                $fullName = $data->first_name." ".$data->last_name;
+                $title = "New Registration";
+                $body = "New user ".$fullName." registered";
+                break;
+            case 'new-contact-us':
+                $title = "New Feedback";
+                $body = "New feedback is given by ".$data->name;
+                break;
+            default:
+                $title = "New Notification";
+                $body = "New notification is submitted";
+                break;
         }
 
         if($title && $body){
