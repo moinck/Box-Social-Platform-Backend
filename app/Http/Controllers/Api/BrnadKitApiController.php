@@ -202,6 +202,9 @@ class BrnadKitApiController extends Controller
 
         $path = $brandKitObj->logo;
         $mime = pathinfo($path, PATHINFO_EXTENSION);
+        if ($mime == 'svg') {
+            $mime = 'svg+xml';
+        }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
 
         return response()->json([
