@@ -23,8 +23,9 @@ class Page2 extends Controller
         }
         // return view('content.pages.pages-page2');
         $verification_link = "www.youtube.com";
+        $reset_password_link = "www.youtube.com";
         // return view('content.email.verify-email', compact('verification_link'));
-        return view('content.email.reset-password-email', compact('verification_link'));
+        return view('content.email.reset-password-email', compact('reset_password_link'));
     }
 
     // make test function to send mail

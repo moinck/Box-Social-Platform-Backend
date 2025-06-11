@@ -23,7 +23,7 @@
 
     <!-- CTA Button -->
     <div style="text-align: center; margin-bottom: 20px;">
-        <a href="{{ $verification_link }}" class="verify-button"
+        <a href="{{ $reset_password_link }}" class="verify-button"
             style="background-color: #F4D106; 
             color: #000; 
             padding: 14px 32px; 
