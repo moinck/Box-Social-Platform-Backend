@@ -48,7 +48,7 @@ class CategoriesController extends Controller
                         </label>';
             })
             ->addColumn('created_at', function ($category) {
-                return $category->created_at->format('d-m-Y h:i A');
+                return Helpers::dateFormate($category->created_at);
             })
             ->addColumn('action', function ($category) {
                 $categoryId = Helpers::encrypt($category->id);

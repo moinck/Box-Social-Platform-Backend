@@ -459,14 +459,14 @@ class Helpers
      * @param mixed $user
      * @return string
      */
-    public static function generateVarificationToken($user,Request $request)
+    public static function generateVarificationToken($user,Request $request,$type)
     {
         $tokenData = bin2hex(random_bytes(32));
 
         $userToken = new UserTokens();
         $userToken->user_id = $user->id;
         $userToken->token = $tokenData;
-        $userToken->type = 'email-verification';
+        $userToken->type = $type;
         $userToken->is_used = false;
         $userToken->ip_address = $request->ip();
         $userToken->user_agent = $request->userAgent();

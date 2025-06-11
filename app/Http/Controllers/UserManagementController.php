@@ -36,7 +36,7 @@ class UserManagementController extends Controller
                 return $user->fca_number ?? '-';
             })
             ->addColumn('created_date', function ($user) {
-                return $user->created_at->format('d-m-Y h:i A');
+                return Helpers::dateFormate($user->created_at);
             })
             ->addColumn('account_status', function ($user) {
                 $status = $user->status == 'active' ? 'checked' : '';

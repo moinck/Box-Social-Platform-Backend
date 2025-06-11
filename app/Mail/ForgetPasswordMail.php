@@ -9,18 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RegisterVerificationMail extends Mailable
+class ForgetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $token;
+    public $user;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($token)
+    public function __construct($token, $user)
     {
         $this->token = $token;
+        $this->user = $user;
     }
 
     /**
@@ -29,7 +31,7 @@ class RegisterVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Register Verification Mail',
+            subject: 'Forget Password Mail',
         );
     }
 
@@ -38,12 +40,13 @@ class RegisterVerificationMail extends Mailable
      */
     public function content(): Content
     {
-        $verificationUrl = "http://178.128.45.173:9163/email/verification-success/".$this->token;
+        $reset_password_link = "http://178.128.45.173:9163/email/reset-password/".$this->token;
 
         return new Content(
-            view: 'content.email.verify-email',
+            view: 'content.email.reset-password-email',
             with: [
-                'verification_link' => $verificationUrl,
+                'reset_password_link' => $reset_password_link,
+                'user' => $this->user,
             ],
         );
     }

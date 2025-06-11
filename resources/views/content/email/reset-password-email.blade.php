@@ -15,9 +15,16 @@
         Password Reset
     </div>
 
+
+    <!-- user details -->
+    <div class="email-description"
+        style="text-align: left; font-size: 16px; color: #555; margin-top: 32px; line-height: 1.5;">
+        Hello {{ $user->first_name ?? "User" }} {{ $user->last_name ?? "" }},
+    </div>
+
     <!-- Description -->
     <div class="email-description"
-        style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
+        style="text-align: left; font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5;">
         You are receiving this email because we received a request to reset your password. Please use the button below to reset your password.
     </div>
 
@@ -25,7 +32,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <a href="{{ $reset_password_link }}" class="verify-button"
             style="background-color: #F4D106; 
-            color: #000; 
+            color: #000;
             padding: 14px 32px; 
             border-radius: 30px; 
             text-decoration: none; 
@@ -42,7 +49,7 @@
 
     <!-- Description -->
     <div class="email-description"
-        style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
+        style="text-align: left; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
         If you find any issue or have any questions, please contact support at <a href="mailto:help@boxsocials.com" style="color: #F4D106;">help@boxsocials.com</a>.
     </div>
 @endsection
