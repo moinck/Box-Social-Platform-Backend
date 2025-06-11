@@ -24,8 +24,10 @@ class Page2 extends Controller
         // return view('content.pages.pages-page2');
         $verification_link = "www.youtube.com";
         $reset_password_link = "www.youtube.com";
+        $user = User::find(1);
         // return view('content.email.verify-email', compact('verification_link'));
-        return view('content.email.reset-password-email', compact('reset_password_link'));
+        // return view('content.email.reset-password-email', compact('reset_password_link','user'));
+        return view('content.email.custom-email', compact('verification_link','user'));
     }
 
     // make test function to send mail
@@ -34,7 +36,8 @@ class Page2 extends Controller
         $user = User::find(4);
         $verification_link = "www.youtube.com";
         // Mail::to($user->email)->send(new RegisterVerificationMail($verification_link));
-        $token = Helpers::sendVerificationMail($user,$verification_link);
+        // $token = Helpers::sendVerificationMail($user,$verification_link);
+        Mail::to("pratikdev.iihglobal@gmail.com")->send(new RegisterVerificationMail($verification_link));
 
         return response()->json([
             'success' => true,
