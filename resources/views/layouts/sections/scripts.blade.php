@@ -1,6 +1,16 @@
 <!-- BEGIN: Vendor JS-->
 
-@vite(['resources/assets/vendor/libs/jquery/jquery.js', 'resources/assets/vendor/libs/popper/popper.js', 'resources/assets/vendor/js/bootstrap.js', 'resources/assets/vendor/libs/node-waves/node-waves.js', 'resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js', 'resources/assets/vendor/libs/hammer/hammer.js', 'resources/assets/vendor/libs/typeahead-js/typeahead.js', 'resources/assets/vendor/js/menu.js'])
+@vite([
+    'resources/assets/vendor/libs/jquery/jquery.js',
+    'resources/assets/vendor/libs/popper/popper.js',
+    'resources/assets/vendor/js/bootstrap.js',
+    'resources/assets/vendor/libs/node-waves/node-waves.js',
+    'resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js',
+    'resources/assets/vendor/libs/hammer/hammer.js',
+    'resources/assets/vendor/libs/typeahead-js/typeahead.js',
+    'resources/assets/vendor/js/menu.js',
+    'resources/assets/vendor/libs/toastr/toastr.js'
+])
 
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
@@ -106,7 +116,11 @@
 
             var title = notificationData.title;
             var message = notificationData.body;
-            showSweetAlert("success", title, message);
+            // showSweetAlert("success", title, message);
+            toastr.options = {
+                "progressBar": true,
+            };
+            toastr.info(message, title);
 
             // check if any user is logged in then mark as read
             if ({{ auth()->check() }}) {
