@@ -93,7 +93,7 @@ class RegisterController extends Controller
             Helpers::sendNotification($user, "new-registration");
 
             // Send verification email
-            $token = Helpers::generateVarificationToken($user,$request);
+            $token = Helpers::generateVarificationToken($user,$request,'email-verification');
             Helpers::sendVerificationMail($user,$token);
             DB::commit();
             

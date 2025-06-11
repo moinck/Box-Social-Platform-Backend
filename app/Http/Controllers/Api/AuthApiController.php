@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Mail\ForgetPasswordMail;
 use App\Models\BrandKit;
 use App\Models\User;
 use App\Models\UserTokens;
@@ -12,6 +13,8 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class AuthApiController extends Controller
@@ -117,7 +120,7 @@ class AuthApiController extends Controller
 
 
                 // Allow resending the verification email
-                $token = Helpers::generateVarificationToken($user, $request);
+                $token = Helpers::generateVarificationToken($user, $request,'email-verification');
                 Helpers::sendVerificationMail($user, $token);
 
                 // update old user token
@@ -135,5 +138,75 @@ class AuthApiController extends Controller
                 return $this->error('Please wait for 5 minutes before resending the verification email', 400);
             }
         }
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validator = Validator::make([
+            'email' => $request->email
+        ], [
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Invalid email', $validator->errors());
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        $token = Helpers::generateVarificationToken($user, $request,'forget-password');
+
+        // Send the password to the user's email
+        Mail::to($user->email)->send(new ForgetPasswordMail($token,$user));
+
+        return $this->success([], 'Password reset email sent successfully');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make([
+            'token' => $request->token,
+            'password' => $request->password,
+            'password_confirmation' => $request->password_confirmation
+        ], [
+            'token' => 'required|string',
+            'password' => 'required|string|min:7',
+            'password_confirmation' => 'required|string|min:7|same:password',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed', $validator->errors());
+        }
+
+        $userToken = UserTokens::where(function ($query) use ($request) {
+            $query->where('token', $request->token)
+                ->where('type', 'forget-password')
+                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                ->where('is_used', false);
+        })->first();
+
+        if (!$userToken) {
+            return $this->error('Invalid or expired verification token', 400);
+        }
+
+        $user = User::find($userToken->user_id);
+
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        $userToken->update([
+            'is_used' => true
+        ]);
+
+        return $this->success([], 'Password reset successfully');
     }
 }
