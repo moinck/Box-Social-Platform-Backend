@@ -423,6 +423,10 @@ class Helpers
 
         // Generate a unique filename
         $extension = explode('/', $mimeType)[1];
+        // if extension is svg+xml then change it to svg
+        if ($extension == 'svg+xml') {
+            $extension = 'svg';
+        }
         $filename = 'logo_' . uniqid() . '.' . $extension;
         $tempPath = storage_path('app/temp/' . $filename);
 
