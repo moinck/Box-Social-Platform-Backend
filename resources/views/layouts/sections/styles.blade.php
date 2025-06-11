@@ -8,6 +8,7 @@
   'resources/assets/vendor/fonts/remixicon/remixicon.scss',
   'resources/assets/vendor/fonts/flag-icons.scss',
   'resources/assets/vendor/libs/node-waves/node-waves.scss',
+  'resources/assets/vendor/libs/toastr/toastr.scss'
 ])
 <!-- Core CSS -->
 @vite(['resources/assets/vendor/scss'.$configData['rtlSupport'].'/core' .($configData['style'] !== 'light' ? '-' . $configData['style'] : '') .'.scss',
