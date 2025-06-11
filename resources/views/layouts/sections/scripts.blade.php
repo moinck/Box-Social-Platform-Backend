@@ -1,15 +1,6 @@
 <!-- BEGIN: Vendor JS-->
 
-@vite([
-  'resources/assets/vendor/libs/jquery/jquery.js',
-  'resources/assets/vendor/libs/popper/popper.js',
-  'resources/assets/vendor/js/bootstrap.js',
-  'resources/assets/vendor/libs/node-waves/node-waves.js',
-  'resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js',
-  'resources/assets/vendor/libs/hammer/hammer.js',
-  'resources/assets/vendor/libs/typeahead-js/typeahead.js',
-  'resources/assets/vendor/js/menu.js'
-])
+@vite(['resources/assets/vendor/libs/jquery/jquery.js', 'resources/assets/vendor/libs/popper/popper.js', 'resources/assets/vendor/js/bootstrap.js', 'resources/assets/vendor/libs/node-waves/node-waves.js', 'resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js', 'resources/assets/vendor/libs/hammer/hammer.js', 'resources/assets/vendor/libs/typeahead-js/typeahead.js', 'resources/assets/vendor/js/menu.js'])
 
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
@@ -26,7 +17,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // remove menu customize button
         document.querySelector('#template-customizer')?.remove();
-        
+
         if (!document.getElementById('box-loader')) {
             const loaderHtml = `
                 <div id="box-loader" style="display: none;">
@@ -59,7 +50,7 @@
             loader.style.display = 'none';
         }
     }
-    
+
     // show sweet alert function
     function showSweetAlert(type, title, text) {
         Swal.fire({
@@ -96,6 +87,48 @@
         }, 1000);
     </script>
 @endif
+
+<script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
+{{-- listen pusher event --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pusher = new Pusher(
+            "{{ config('broadcasting.connections.pusher.key') }}", {
+                cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
+                forceTLS: true
+            }
+        );
+
+        const channel = pusher.subscribe('admin-notifications');
+        channel.bind('new-notification', function(data) {
+            // console.log(data);
+            var notificationData = data;
+
+            var title = notificationData.title;
+            var message = notificationData.body;
+            showSweetAlert("success", title, message);
+
+            // check if any user is logged in then mark as read
+            if ({{ auth()->check() }}) {
+                $.ajax({
+                    url: '/notification/mark-as-read',
+                    type: 'POST',
+                    data: {
+                        id: notificationData.id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->

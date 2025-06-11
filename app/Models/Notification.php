@@ -6,5 +6,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    //
+    protected $table = 'notifications';
+
+    protected $fillable = [
+        'tital',
+        'body',
+        'type',
+        'is_read',
+    ];
+
+    // Scope for unread notifications
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+    
+    // Scope for recent notifications
+    public function scopeRecent($query, $days = 7)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    public function markAsRead($notificationId)
+    {
+        return Notification::where('id', $notificationId)->update(['is_read' => true]);
+    }
 }

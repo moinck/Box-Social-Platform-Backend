@@ -15,6 +15,7 @@
     "laravel/sanctum": "^4.0",
     "laravel/tinker": "^2.9",
     "maatwebsite/excel": "*",
+    "pusher/pusher-php-server": "^7.2",
     "yajra/laravel-datatables-oracle": "^11.1"
   },
   "require-dev": {

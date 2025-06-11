@@ -56,7 +56,7 @@ class RegisterController extends Controller
                 ->uncompromised(), // check if password was leaked in data breaches
             ],
             'company_name' => 'required|string',
-            'fca_number' => 'required|numeric|min:6',
+            'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
             'website' => 'nullable|string|url',
         ]);
 
@@ -88,13 +88,13 @@ class RegisterController extends Controller
                 'fca_number' => $request->fca_number,
                 'is_verified' => false,
             ]);
-            
-            // Create an API token for the user
-            // $authnticationToken = $user->createToken('auth_token')->plainTextToken;
+
+            // send notification of new registration
+            Helpers::sendNotification($user, "new-registration");
 
             // Send verification email
-            // event(new Registered($user));
-            $token = Helpers::sendVerificationMail($user);
+            $token = Helpers::generateVarificationToken($user,$request);
+            Helpers::sendVerificationMail($user,$token);
             DB::commit();
             
             return response()->json([
@@ -113,8 +113,6 @@ class RegisterController extends Controller
                         'is_verified' => $user->is_verified,
                     ],
                     'verification_token' => $token,
-                    // 'access_token' => $authnticationToken,
-                    // 'token_type' => 'Bearer',
                 ],
             ], 200);
             

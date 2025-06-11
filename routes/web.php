@@ -15,6 +15,7 @@ use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostContentController;
 use App\Http\Controllers\ProfileManagementController;
 
@@ -28,6 +29,9 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+
+    // notification controller
+    Route::post('/notification/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notification.mark-as-read');
 
     // encode & decode 
     Route::get('/encryption/encode/{value}', [HomePage::class, 'encode'])->name('encryption.encode');

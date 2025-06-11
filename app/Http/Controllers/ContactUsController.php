@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helpers;
 use App\Models\ContactUs;
+use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -60,7 +62,7 @@ class ContactUsController extends Controller
         $userAgent = $request->header('User-Agent');
 
         // store data in database
-        ContactUs::create([
+        $contactUs = ContactUs::create([
             'name' => $request->full_name,
             'email' => $request->email,
             'subject' => $request->company_name,
@@ -68,6 +70,10 @@ class ContactUsController extends Controller
             'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
         ]);
+
+        // send notification to admin
+        $user = User::find(1);
+        Helpers::sendNotification($contactUs, 'new-contact-us');
 
         return $this->success([],'Contact Us submitted successfully');
     }
