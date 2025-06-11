@@ -536,7 +536,7 @@ class Helpers
             );
 
             $pusher->trigger('admin-notifications', 'new-notification', [
-                // 'id' => $newnotification->id,
+                'id' => Helpers::encrypt($newnotification->id),
                 'type' => $newnotification->type,
                 'title' => $newnotification->tital,
                 'body' => $newnotification->body,

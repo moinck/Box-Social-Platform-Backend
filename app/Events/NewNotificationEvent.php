@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Helpers\Helpers;
 use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -35,11 +36,11 @@ class NewNotificationEvent
     public function broadcastWith()
     {
         return [
-            'id' => $this->notification->id,
+            'id' => Helpers::encrypt($this->notification->id),
             'type' => $this->notification->type,
             'title' => $this->notification->title,
             'body' => $this->notification->body,
-            'created_at' => $this->notification->created_at->format('Y-m-d H:i:s'),
+            // 'created_at' => $this->notification->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }
