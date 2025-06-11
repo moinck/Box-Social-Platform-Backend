@@ -39,7 +39,7 @@ class ContactUsController extends Controller
                 return $contactUs->message;
             })
             ->addColumn('created_date', function ($contactUs) {
-                return $contactUs->created_at->format('d-m-Y h:i A');
+                return Helpers::dateFormate($contactUs->created_at);
             })
             ->make(true);
     }
