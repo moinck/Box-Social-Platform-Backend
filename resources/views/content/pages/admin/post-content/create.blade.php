@@ -178,7 +178,10 @@
 
             // update hidden post description
             createPostDescription.on('text-change', function () {
-                $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
+                // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
+                $('.ql-editor').hasClass('ql-blank') ? 
+                    $('#hiddenPostDescription').val('') : 
+                    $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 validator.revalidateField('post_description');
             });
 
