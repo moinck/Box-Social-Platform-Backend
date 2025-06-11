@@ -78,13 +78,18 @@ class AuthApiController extends Controller
         $returnData = [
             'user' => [
                 'id' => Helpers::encrypt($user->id),
-                'name' => $user->first_name . ' ' . $user->last_name,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'email' => $user->email,
+                'company_name' => $user->company_name,
+                'website' => $user->website,
+                'fca_number' => $user->fca_number,
+                'created_at' => $user->created_at->format('d-m-Y h:i A'),
                 'is_verified' => $user->is_verified,
+                'is_brandkit' => $isBrandkit,
             ],
             'access_token' => $LoginToken,
             'token_type' => 'Bearer',
-            'is_brandkit' => $isBrandkit,
         ];
 
         return $this->success($returnData, 'Email verified successfully');

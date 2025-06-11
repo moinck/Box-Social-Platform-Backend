@@ -202,10 +202,10 @@ class RegisterController extends Controller
                         'fca_number' => $user->fca_number,
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
                         'is_verified' => $user->is_verified,
+                        'is_brandkit' => $isBrandkit,
                     ],
                     'access_token' => $token,
                     'token_type' => 'Bearer',
-                    'is_brandkit' => $isBrandkit,
                 ],
 
         ], 200);
