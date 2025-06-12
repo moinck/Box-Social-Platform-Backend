@@ -46,18 +46,27 @@ class RegisterController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => [
-            'required',
-            'string',
-            Password::min(8)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised(), // check if password was leaked in data breaches
+                'required',
+                'string',
+                Password::min(8)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(), // check if password was leaked in data breaches
             ],
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
             'website' => 'nullable|string|url',
+        ], [
+            // General password messages
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.mixed' => 'Password must contain both uppercase and lowercase letters.',
+            'password.letters' => 'Password must contain at least one letter.',
+            'password.numbers' => 'Password must contain at least one number.',
+            'password.symbols' => 'Password must contain at least one symbol.',
+            'password.uncompromised' => 'Please choose a strong password for security reasons.',
         ]);
 
         $messages = [
