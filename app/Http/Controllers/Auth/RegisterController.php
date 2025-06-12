@@ -119,7 +119,7 @@ class RegisterController extends Controller
                         'website' => $user->website,
                         'fca_number' => $user->fca_number,
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
-                        'is_verified' => $user->is_verified,
+                        'is_verified' => $user->is_verified ? true : false,
                     ],
                     'verification_token' => $token,
                 ],
