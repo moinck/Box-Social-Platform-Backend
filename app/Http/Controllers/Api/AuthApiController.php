@@ -104,10 +104,11 @@ class AuthApiController extends Controller
             'verification_token' => 'required'
         ]);
 
+        // check old token
         $userToken = UserTokens::where(function ($query) use ($request) {
             $query->where('token', $request->verification_token)
                 ->where('type', 'email-verification')
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                // ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
                 ->where('is_used', false);
         })->first();
 
