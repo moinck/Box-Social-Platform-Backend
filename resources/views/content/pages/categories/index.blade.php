@@ -99,7 +99,7 @@
                                 <label for="category_description">Description</label>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-floating form-floating-outline">
                                 <select id="category_status" name="category_status" class="form-select"
                                     aria-label="Default select example">
@@ -108,6 +108,17 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                                 <label for="category_status">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating form-floating-outline">
+                                <select id="category_coming_soon" name="category_coming_soon" class="form-select"
+                                    aria-label="Default select example">
+                                    <option value="">Select Coming Soon</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false" selected>No</option>
+                                </select>
+                                <label for="category_coming_soon">Coming Soon</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -153,7 +164,7 @@
                                 <label for="edit_category_name">Category Name</label>
                             </div>
                         </div>
-                        <div class="col-8">
+                        <div class="col-6">
                             <div class="form-floating form-floating-outline mt-6">
                                 <input type="file" id="edit_category_image" name="edit_category_image" class="form-control"
                                     placeholder="Image"  accept="image/*"/>
@@ -161,7 +172,7 @@
                             </div>
                             <small class="text-dark">only upload image if you want to change image</small>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="text-center">
                                 <img src="" alt="edit category image" class="img-fluid br-1" id="edit_category_image_preview" height="200" width="200">
                             </div>
@@ -173,7 +184,7 @@
                                 <label for="edit_category_description">Description</label>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-floating form-floating-outline">
                                 <select id="edit_category_status" name="edit_category_status" class="form-select"
                                     aria-label="Default select example">
@@ -182,6 +193,17 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                                 <label for="edit_category_status">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating form-floating-outline">
+                                <select id="edit_category_coming_soon" name="edit_category_coming_soon" class="form-select"
+                                    aria-label="Default select example">
+                                    <option value="">Select Coming Soon</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                                <label for="edit_category_coming_soon">Coming Soon</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -217,6 +239,7 @@
         $(document).ready(function() {
             CategoriesDataTable();
             let editSubcategoryCount = 0;
+            let subcategoryCount = 0;
 
             // contact data table function
             function CategoriesDataTable() {
@@ -319,6 +342,13 @@
                                 message: 'Please select account status'
                             }
                         }
+                    },
+                    category_coming_soon: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please select Category Coming Soon'
+                            }
+                        }
                     }
                 },
                 plugins: {
@@ -327,10 +357,11 @@
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
                             // Customize row selector based on your form layout
-                            if (['category_name', 'category_image', 'category_description',
-                                    'category_status'
-                                ].includes(field)) {
+                            if (['category_name', 'category_image', 'category_description'].includes(field)) {
                                 return '.col-12';
+                            }
+                            if (['category_status', 'category_coming_soon'].includes(field)) {
+                                return '.col-6';
                             }
                             return '.col-12';
                         }
@@ -442,6 +473,14 @@
                                 $('#edit_category_status').val('inactive');
                             }
 
+                            $('#edit_category_coming_soon').val(response.data.is_comming_soon);
+                            var accountStatus = response.data.is_comming_soon;
+                            if (accountStatus == true) {
+                                $('#edit_category_coming_soon').val('true');
+                            } else {
+                                $('#edit_category_coming_soon').val('false');
+                            }
+
                             var ImageUrl = "{{ asset('') }}" + response.data.image;
                             $('#edit_category_image_preview').attr('src', ImageUrl);
 
@@ -543,6 +582,13 @@
                                     message: 'Please select account status'
                                 }
                             }
+                        },
+                        edit_category_coming_soon: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Please select coming soon status'
+                                }
+                            }
                         }
                     },
                     plugins: {
@@ -551,11 +597,14 @@
                             eleValidClass: '',
                             rowSelector: function(field, ele) {
                                 // Customize row selector based on your form layout
-                                if (['edit_category_name', 'edit_category_description','edit_category_status'].includes(field)) {
+                                if (['edit_category_name', 'edit_category_description'].includes(field)) {
                                     return '.col-12';
                                 }
                                 if (['edit_category_image'].includes(field)) {
-                                    return '.col-8';
+                                    return '.col-6';
+                                }
+                                if (['edit_category_coming_soon','edit_category_status'].includes(field)) {
+                                    return '.col-6';
                                 }
                                 return '.col-12';
                             }
@@ -658,7 +707,7 @@
 
 
             // add subcategory
-            let subcategoryCount = 0;
+            // let subcategoryCount = 0;
             $(document).on('click', '#add-subcategory-btn', function() {
                 subcategoryCount++;
                 var subcategoriesContainer = $('#subcategories-container');
