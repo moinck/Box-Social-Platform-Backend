@@ -33,13 +33,12 @@ class CategoriesApiController extends Controller
                 $commingSoonCategories[] = [
                     'id' => Helpers::encrypt($category->id),
                     'name' => $category->name,
-                    'parent_id' => $category->parent_id,
+                    'image' => asset($category->image),
                     'is_comming_soon' => $isCommingSoon,
-                    'children' => $category->children->map(function ($child) {
+                    'sub_categories' => $category->children->map(function ($child) {
                         return [
                             'id' => Helpers::encrypt($child->id),
                             'name' => $child->name,
-                            'parent_id' => Helpers::encrypt($child->parent_id),
                         ];
                     }),
                 ];
@@ -47,13 +46,12 @@ class CategoriesApiController extends Controller
                 $notCommingSoonCategories[] = [
                     'id' => Helpers::encrypt($category->id),
                     'name' => $category->name,
-                    'parent_id' => $category->parent_id,
+                    'image' => asset($category->image),
                     'is_comming_soon' => $isCommingSoon,
-                    'children' => $category->children->map(function ($child) {
+                    'sub_categories' => $category->children->map(function ($child) {
                         return [
                             'id' => Helpers::encrypt($child->id),
                             'name' => $child->name,
-                            'parent_id' => Helpers::encrypt($child->parent_id),
                         ];
                     }),
                 ];
