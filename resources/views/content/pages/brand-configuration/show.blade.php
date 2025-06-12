@@ -210,10 +210,18 @@
                             <button type="button" class="btn btn-icon btn-facebook waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Facebook">
                                 <i class="tf-icons ri-facebook-circle-fill ri-22px"></i>
                             </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Facebook">
+                                <i class="tf-icons ri-facebook-circle-fill ri-22px"></i>
+                            </button>
                         @endif
 
                         @if (in_array('instagram', $socialMedia))
                             <button type="button" class="btn btn-icon btn-instagram waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Instagram">
+                                <i class="tf-icons ri-instagram-fill ri-22px"></i>
+                            </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Instagram">
                                 <i class="tf-icons ri-instagram-fill ri-22px"></i>
                             </button>
                         @endif
@@ -222,10 +230,18 @@
                             <button type="button" class="btn btn-icon btn-linkedin waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Linkedin">
                                 <i class="tf-icons tf-icons ri-linkedin-box-fill ri-22px"></i>
                             </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Linkedin">
+                                <i class="tf-icons tf-icons ri-linkedin-box-fill ri-22px"></i>
+                            </button>
                         @endif
 
                         @if (in_array('whatsapp', $socialMedia))
                             <button type="button" class="btn btn-icon btn-whatsapp waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Whatsapp">
+                                <i class="tf-icons ri-whatsapp-fill ri-22px"></i>
+                            </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Whatsapp">
                                 <i class="tf-icons ri-whatsapp-fill ri-22px"></i>
                             </button>
                         @endif
@@ -235,10 +251,18 @@
                                 style="background-color: #000000;color: #fff;">
                                 <i class="tf-icons ri-tiktok-fill ri-22px"></i>
                             </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Tiktok">
+                                <i class="tf-icons ri-tiktok-fill ri-22px"></i>
+                            </button>
                         @endif
 
                         @if (in_array('x', $socialMedia))
                             <button type="button" class="btn btn-icon btn-dark waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="X">
+                                <i class="tf-icons ri-twitter-x-fill ri-22px"></i>
+                            </button>
+                        @else
+                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No X">
                                 <i class="tf-icons ri-twitter-x-fill ri-22px"></i>
                             </button>
                         @endif
@@ -280,9 +304,9 @@
                             </label>
                         </div>
                         <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" value="show_phone" id="show_phone"
+                            <input class="form-check-input" type="checkbox" value="show_website" id="show_website"
                                 {{ $brandKit->show_website_on_post == 1 ? 'checked' : '' }} onclick="return false;">
-                            <label class="form-check-label" for="show_phone">
+                            <label class="form-check-label" for="show_website">
                                 <span>Show website on post</span>
                             </label>
                         </div>
