@@ -104,7 +104,7 @@
                                 <select id="category_status" name="category_status" class="form-select"
                                     aria-label="Default select example">
                                     <option value="">Select Status</option>
-                                    <option value="active">Active</option>
+                                    <option value="active" selected>Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
                                 <label for="category_status">Status</label>
