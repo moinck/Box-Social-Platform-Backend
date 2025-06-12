@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Categories;
@@ -20,8 +21,50 @@ class CategoriesApiController extends Controller
         })->with('children:id,name,parent_id')->latest()->get();
 
         // send data to resource
-        $categoryCollection = CategoryResource::collection($categories);
+        // $categoryCollection = CategoryResource::collection($categories);
+        $categoryCollection = [];
+        $commingSoonCategories = [];
+        $notCommingSoonCategories = [];
+        foreach ($categories as $category) {
 
-        return $this->success($categoryCollection, 'Categories list.');
+            $isCommingSoon = $category->is_comming_soon;
+
+            if ($isCommingSoon) {
+                $commingSoonCategories[] = [
+                    'id' => Helpers::encrypt($category->id),
+                    'name' => $category->name,
+                    'parent_id' => $category->parent_id,
+                    'is_comming_soon' => $isCommingSoon,
+                    'children' => $category->children->map(function ($child) {
+                        return [
+                            'id' => Helpers::encrypt($child->id),
+                            'name' => $child->name,
+                            'parent_id' => Helpers::encrypt($child->parent_id),
+                        ];
+                    }),
+                ];
+            } else {
+                $notCommingSoonCategories[] = [
+                    'id' => Helpers::encrypt($category->id),
+                    'name' => $category->name,
+                    'parent_id' => $category->parent_id,
+                    'is_comming_soon' => $isCommingSoon,
+                    'children' => $category->children->map(function ($child) {
+                        return [
+                            'id' => Helpers::encrypt($child->id),
+                            'name' => $child->name,
+                            'parent_id' => Helpers::encrypt($child->parent_id),
+                        ];
+                    }),
+                ];
+            }
+        }
+
+        $returnData = [
+            'active' => $notCommingSoonCategories,
+            'coming_soon' => $commingSoonCategories,
+        ];
+
+        return $this->success($returnData, 'Categories list.');
     }
 }

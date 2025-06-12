@@ -13,6 +13,7 @@ class Categories extends Model
         'image',
         'description',
         'status',
+        'is_comming_soon',
     ];
 
     public function parent()
