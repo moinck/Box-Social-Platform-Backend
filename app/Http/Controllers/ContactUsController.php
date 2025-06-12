@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
+use App\Mail\ContactUsMail;
 use App\Models\ContactUs;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -72,9 +74,18 @@ class ContactUsController extends Controller
         ]);
 
         // send notification to admin
-        $user = User::find(1);
         Helpers::sendNotification($contactUs, 'new-contact-us');
 
+        // send information mail to admin
+        $adminMail = User::where('role', 'admin')->first()->email;
+        Mail::to($adminMail)->send(new ContactUsMail($contactUs));
+
         return $this->success([],'Contact Us submitted successfully');
+    }
+
+    public function mailPreview()
+    {
+        $contactUs = ContactUs::first();
+        return view('content.email.contact-us-email', compact('contactUs'));
     }
 }
