@@ -42,7 +42,7 @@
 
     <div class="email-description"
         style="text-align: left; font-size: 16px; color: #555; margin-bottom: 10px; line-height: 1.5;">
-        <b>Company Name:</b> {{ $contactUs->name }}
+        <b>Company Name:</b> {{ $contactUs->subject }}
     </div>
 
     <div class="email-description"
