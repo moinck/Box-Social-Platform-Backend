@@ -65,12 +65,12 @@ class StockImageApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors()->first(), 422);
+            return $this->validationError($validator->errors()->first());
         }
 
         $user = Auth::user();
         if (empty($user)) {
-            return $this->error('User not found', 404);
+            return $this->error('User not found',404);
         }
         // upload image
         $imageUrl = Helpers::uploadImage('user_image', $request->image, 'image/user-images');
@@ -99,7 +99,12 @@ class StockImageApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors()->first(), 422);
+            return $this->validationError('Validation failed', $validator->errors()->first(), 422);
+        }
+
+        $decryptedImageId = Helpers::decrypt($request->image_id);
+        if ($decryptedImageId == false) {
+            return $this->error('Image ID is invalid.', 422);
         }
 
         $user = Auth::user();
@@ -107,7 +112,7 @@ class StockImageApiController extends Controller
             return $this->error('User not found', 404);
         }
 
-        $imageData = ImageStockManagement::where('id', Helpers::decrypt($request->image_id))->first();
+        $imageData = ImageStockManagement::where('id', $decryptedImageId)->first();
         if (empty($imageData)) {
             return $this->error('Image not found', 404);
         }
