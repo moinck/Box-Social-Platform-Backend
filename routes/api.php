@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::post('/fca-check', [RegisterController::class, 'checkFca']);
+
 // Email verification routes
-Route::get('/email/verify/{encryptedToken}', [AuthApiController::class, 'verify'])
+Route::post('/email/verify', [AuthApiController::class, 'verify'])
     ->middleware(['throttle:6,1'])
     ->name('verification.verify');
 
@@ -24,14 +25,16 @@ Route::post('/email/resend-verification', [AuthApiController::class, 'resend'])
     ->middleware(['throttle:6,1']);
 
 // forget password
-Route::post('/forget-password', [AuthApiController::class, 'forgetPassword']);
+Route::post('/forget-password', [AuthApiController::class, 'forgetPassword'])->middleware(['throttle:5,2']);
 // reset password
-Route::post('/reset-password', [AuthApiController::class, 'resetPassword']);
+Route::post('/reset-password', [AuthApiController::class, 'resetPassword'])->middleware(['throttle:5,2']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
+// Auth Routes
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
@@ -64,6 +67,10 @@ Route::group([
 
         // get stock image
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+
+        // user images routes
+        Route::post('/user-image/store', [StockImageApiController::class, 'store']);
+        Route::post('/user-image/delete', [StockImageApiController::class, 'delete']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);

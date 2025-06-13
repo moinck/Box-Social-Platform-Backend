@@ -121,7 +121,7 @@ class RegisterController extends Controller
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
                         'is_verified' => $user->is_verified ? true : false,
                     ],
-                    'verification_token' => $token,
+                    'verification_token' => Helpers::encrypt($token),
                 ],
             ], 200);
             

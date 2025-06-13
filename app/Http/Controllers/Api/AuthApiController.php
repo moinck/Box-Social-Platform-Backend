@@ -14,6 +14,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,10 +26,10 @@ class AuthApiController extends Controller
      * Verify email
      */
     // public function verifyEmail(EmailVerificationRequest $request)
-    public function verify($encryptedToken)
+    public function verify(Request $request)
     {
         $validator = Validator::make([
-            'verification_token' => $encryptedToken
+            'verification_token' => $request->verification_token
         ], [
             'verification_token' => 'required|string'
         ]);
@@ -37,7 +38,7 @@ class AuthApiController extends Controller
             return $this->validationError('Invalid verification token', $validator->errors());
         }
 
-        $verificationToken = $encryptedToken;
+        $verificationToken = $request->verification_token;
 
         $userToken = UserTokens::where(function ($query) use ($verificationToken) {
             $query->where('token', $verificationToken)
@@ -104,9 +105,14 @@ class AuthApiController extends Controller
             'verification_token' => 'required'
         ]);
 
+        $decryptedToken = Helpers::decrypt($request->verification_token);
+        if (!$decryptedToken) {
+            return $this->error('Invalid or expired verification token', 400);
+        }
+
         // check old token
-        $userToken = UserTokens::where(function ($query) use ($request) {
-            $query->where('token', $request->verification_token)
+        $userToken = UserTokens::where(function ($query) use ($decryptedToken) {
+            $query->where('token', $decryptedToken)
                 ->where('type', 'email-verification')
                 // ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
                 ->where('is_used', false);
@@ -124,6 +130,10 @@ class AuthApiController extends Controller
             if ($tokenCreatedAt->lt($fiveMinutesAgo)) {
                 $user = User::find($userToken->user_id);
 
+                // check if user is not verified
+                if ($user->hasVerifiedEmail()) {
+                    return $this->error('Email is already verified', 400);
+                }
 
                 // Allow resending the verification email
                 $token = Helpers::generateVarificationToken($user, $request,'email-verification');
@@ -160,16 +170,41 @@ class AuthApiController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
-            return $this->error('User not found', 404);
+        if ($user) {
+            // Check rate limiting per user
+            $recentTokens = UserTokens::where([
+                'user_id' => $user->id,
+                'type' => 'forget-password'
+            ])->where('created_at', '>=', Carbon::now()->subMinutes(5))
+              ->count();
+
+            if ($recentTokens >= 3) {
+                // Log suspicious activity
+                Log::warning('Too many password reset attempts', [
+                    'user_id' => $user->id, 
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]);
+
+                return $this->error('Too many password reset attempts', 400);
+            } else {
+                // Invalidate previous tokens
+                UserTokens::where([
+                    'user_id' => $user->id,
+                    'type' => 'forget-password'
+                ])->update(['is_used' => true]);
+
+                $token = Helpers::generateVarificationToken($user, $request, 'forget-password');
+                Mail::to($user->email)->send(new ForgetPasswordMail($token, $user));
+
+                return $this->success([
+                    'verification_token' => Helpers::encrypt($token)
+                ], 'Password reset email sent successfully');
+            }
+        } else {
+            return $this->error('Invalid email id', 404);
         }
 
-        $token = Helpers::generateVarificationToken($user, $request,'forget-password');
-
-        // Send the password to the user's email
-        Mail::to($user->email)->send(new ForgetPasswordMail($token,$user));
-
-        return $this->success([], 'Password reset email sent successfully');
     }
 
     public function resetPassword(Request $request)
@@ -187,16 +222,21 @@ class AuthApiController extends Controller
         if ($validator->fails()) {
             return $this->validationError('Validation failed', $validator->errors());
         }
+        // decrypt token
+        $decryptedToken = Helpers::decrypt($request->token);
 
-        $userToken = UserTokens::where(function ($query) use ($request) {
-            $query->where('token', $request->token)
-                ->where('type', 'forget-password')
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
-                ->where('is_used', false);
-        })->first();
+        if (!$decryptedToken) {
+            return $this->error('Invalid or expired reset token', 400);
+        }
+
+        $userToken = UserTokens::where([
+            'token' => $decryptedToken,
+            'type' => 'forget-password',
+            'is_used' => false
+        ])->where('created_at', '>=', Carbon::now()->subMinutes(5))->first();
 
         if (!$userToken) {
-            return $this->error('Invalid or expired verification token', 400);
+            return $this->error('Invalid or expired reset token', 400);
         }
 
         $user = User::find($userToken->user_id);
@@ -209,10 +249,11 @@ class AuthApiController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        $userToken->update([
-            'is_used' => true
-        ]);
-
+        // Invalidate ALL password reset tokens for this user
+        UserTokens::where([
+            'user_id' => $user->id,
+            'type' => 'forget-password'
+        ])->update(['is_used' => true]);
         return $this->success([], 'Password reset successfully');
     }
 }

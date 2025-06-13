@@ -85,7 +85,7 @@ class ContactUsController extends Controller
 
     public function mailPreview()
     {
-        $contactUs = ContactUs::first();
+        $contactUs = ContactUs::latest()->first();
         return view('content.email.contact-us-email', compact('contactUs'));
     }
 }
