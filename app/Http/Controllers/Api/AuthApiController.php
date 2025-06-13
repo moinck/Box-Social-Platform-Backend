@@ -124,6 +124,10 @@ class AuthApiController extends Controller
             if ($tokenCreatedAt->lt($fiveMinutesAgo)) {
                 $user = User::find($userToken->user_id);
 
+                // check if user is not verified
+                if ($user->hasVerifiedEmail()) {
+                    return $this->error('Email is already verified', 400);
+                }
 
                 // Allow resending the verification email
                 $token = Helpers::generateVarificationToken($user, $request,'email-verification');
@@ -169,7 +173,9 @@ class AuthApiController extends Controller
         // Send the password to the user's email
         Mail::to($user->email)->send(new ForgetPasswordMail($token,$user));
 
-        return $this->success([], 'Password reset email sent successfully');
+        return $this->success([
+            'verification_token' => Helpers::encrypt($token)
+        ], 'Password reset email sent successfully');
     }
 
     public function resetPassword(Request $request)
@@ -187,9 +193,15 @@ class AuthApiController extends Controller
         if ($validator->fails()) {
             return $this->validationError('Validation failed', $validator->errors());
         }
+        // decrypt token
+        $decryptedToken = Helpers::decrypt($request->token);
 
-        $userToken = UserTokens::where(function ($query) use ($request) {
-            $query->where('token', $request->token)
+        if (!$decryptedToken) {
+            return $this->error('Invalid or expired verification token', 400);
+        }
+
+        $userToken = UserTokens::where(function ($query) use ($decryptedToken) {
+            $query->where('token', $decryptedToken)
                 ->where('type', 'forget-password')
                 ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
                 ->where('is_used', false);
