@@ -25,9 +25,9 @@ Route::post('/email/resend-verification', [AuthApiController::class, 'resend'])
     ->middleware(['throttle:6,1']);
 
 // forget password
-Route::post('/forget-password', [AuthApiController::class, 'forgetPassword']);
+Route::post('/forget-password', [AuthApiController::class, 'forgetPassword'])->middleware(['throttle:5,2']);
 // reset password
-Route::post('/reset-password', [AuthApiController::class, 'resetPassword']);
+Route::post('/reset-password', [AuthApiController::class, 'resetPassword'])->middleware(['throttle:5,2']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();

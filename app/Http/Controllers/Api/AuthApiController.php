@@ -179,10 +179,11 @@ class AuthApiController extends Controller
               ->count();
 
             if ($recentTokens >= 3) {
-                // Log suspicious activity but don't reveal to user
+                // Log suspicious activity
                 Log::warning('Too many password reset attempts', [
                     'user_id' => $user->id, 
-                    'ip' => $request->ip()
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent()
                 ]);
 
                 return $this->error('Too many password reset attempts', 400);
@@ -225,18 +226,17 @@ class AuthApiController extends Controller
         $decryptedToken = Helpers::decrypt($request->token);
 
         if (!$decryptedToken) {
-            return $this->error('Invalid or expired verification token', 400);
+            return $this->error('Invalid or expired reset token', 400);
         }
 
-        $userToken = UserTokens::where(function ($query) use ($decryptedToken) {
-            $query->where('token', $decryptedToken)
-                ->where('type', 'forget-password')
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
-                ->where('is_used', false);
-        })->first();
+        $userToken = UserTokens::where([
+            'token' => $decryptedToken,
+            'type' => 'forget-password',
+            'is_used' => false
+        ])->where('created_at', '>=', Carbon::now()->subMinutes(5))->first();
 
         if (!$userToken) {
-            return $this->error('Invalid or expired verification token', 400);
+            return $this->error('Invalid or expired reset token', 400);
         }
 
         $user = User::find($userToken->user_id);
@@ -249,10 +249,11 @@ class AuthApiController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        $userToken->update([
-            'is_used' => true
-        ]);
-
+        // Invalidate ALL password reset tokens for this user
+        UserTokens::where([
+            'user_id' => $user->id,
+            'type' => 'forget-password'
+        ])->update(['is_used' => true]);
         return $this->success([], 'Password reset successfully');
     }
 }
