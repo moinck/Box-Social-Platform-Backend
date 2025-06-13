@@ -195,10 +195,11 @@ class AuthApiController extends Controller
                 ])->update(['is_used' => true]);
 
                 $token = Helpers::generateVarificationToken($user, $request, 'forget-password');
-                Mail::to($user->email)->send(new ForgetPasswordMail($token, $user));
+                $encyptedToken = Helpers::encrypt($token);
+                Mail::to($user->email)->send(new ForgetPasswordMail($encyptedToken, $user));
 
                 return $this->success([
-                    'verification_token' => Helpers::encrypt($token)
+                    'verification_token' => $encyptedToken
                 ], 'Password reset email sent successfully');
             }
         } else {
