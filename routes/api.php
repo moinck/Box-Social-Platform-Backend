@@ -68,6 +68,10 @@ Route::group([
         // get stock image
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
 
+        // user images routes
+        Route::post('/user-image/store', [StockImageApiController::class, 'store']);
+        Route::post('/user-image/delete', [StockImageApiController::class, 'delete']);
+
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
     });
