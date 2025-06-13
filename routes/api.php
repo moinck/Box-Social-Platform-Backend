@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::post('/fca-check', [RegisterController::class, 'checkFca']);
+
 // Email verification routes
 Route::get('/email/verify/{encryptedToken}', [AuthApiController::class, 'verify'])
     ->middleware(['throttle:6,1'])
@@ -32,6 +33,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
+// Auth Routes
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
