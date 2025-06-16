@@ -48,6 +48,9 @@ Route::group([
         Route::get('/brandkit/get', [BrnadKitApiController::class, 'get']);
         Route::post('/brandkit/store', [BrnadKitApiController::class, 'store']);
 
+        // design styles
+        Route::get('/design/styles', [BrnadKitApiController::class, 'getDesignStyles']);
+
         // profile management api
         Route::get('/profile-management/get', [ProfileManagementApiController::class, 'index']);
         Route::post('/profile-management/update', [ProfileManagementApiController::class, 'update']);
