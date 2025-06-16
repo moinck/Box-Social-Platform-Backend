@@ -10,6 +10,7 @@ class PostTemplate extends Model
 
     protected $fillable = [
         'category_id',
+        'design_style_id',
         'template_image',
         'template_name',
         'template_data',
@@ -19,5 +20,10 @@ class PostTemplate extends Model
     public function category()
     {
         return $this->belongsTo(Categories::class,'category_id','id');
+    }
+
+    public function designStyle()
+    {
+        return $this->belongsTo(DesignStyles::class,'design_style_id','id');
     }
 }
