@@ -14,9 +14,9 @@ class TemplateApiController extends Controller
 {
     use ResponseTrait;
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-       
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|integer',
             'template_image' => 'nullable|string',
@@ -30,49 +30,55 @@ class TemplateApiController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-        
+
 
         $tempObj = new PostTemplate();
         $tempObj->category_id = $request->category_id;
-        $tempObj->template_image =  $request->template_image;
-        $tempObj->template_data = json_encode($request->template_data) ;
+        $tempObj->template_image = $request->template_image;
+        $tempObj->template_data = json_encode($request->template_data);
         $tempObj->save();
 
-        $data =  [
+        $data = [
             "id" => Helpers::encrypt($tempObj->id),
         ];
         return $this->success($data, 'Template create successfully');
 
     }
 
-    public function getTemplate(Request $request,$id){
+    public function getTemplate(Request $request, $id)
+    {
 
-        $tempObj = PostTemplate::where('id',Helpers::decrypt($id))->first();
+        $tempObj = PostTemplate::where('id', Helpers::decrypt($id))->first();
 
-        $data =  [
-            "template_data" => json_decode($tempObj->template_data),
-            'id'=>$request->id
+        if (!$tempObj) {
+            return $this->error('Template not found', 404);
+        }
+
+        $data = [
+            "template_data" => isset($tempObj->template_data) ? json_decode($tempObj->template_data) : [],
+            'id' => Helpers::encrypt($tempObj->id)
         ];
-        
-        if(!empty($tempObj)){
+
+        if (!empty($tempObj)) {
             return $this->success($data, 'Template Fetch successfully');
         }
     }
 
-    public function getTemplateList(Request $request){
-        
-        $tempObj = PostTemplate::where('status',1)->get();
+    public function getTemplateList(Request $request)
+    {
+
+        $tempObj = PostTemplate::where('status', 1)->get();
 
         $tempData = [];
         foreach ($tempObj as $key => $t) {
             $tempData[] = [
-                'id'=>Helpers::encrypt( $t->id),
-                'template_data'=>json_decode($t->template_data),
+                'id' => Helpers::encrypt($t->id),
+                'template_data' => isset($t->template_data) ? json_decode($t->template_data) : [],
             ];
         }
         $data = $tempData;
-        
-        if(!empty($tempObj)){
+
+        if (!empty($tempObj)) {
             return $this->success($data, 'Template Fetch successfully');
         }
     }

@@ -61,8 +61,8 @@ Route::group([
 
         // Create Template 
 
-        Route::post('/template', [TemplateApiController::class, 'store']);
-        Route::get('/template/{id}', [TemplateApiController::class, 'getTemplate']);
+        Route::post('/template/store', [TemplateApiController::class, 'store']);
+        Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
 
         // get stock image
