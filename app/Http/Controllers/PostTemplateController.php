@@ -90,6 +90,8 @@ class PostTemplateController extends Controller
         $decryptedId = Helpers::decrypt($request->post_template_id);
         $postTemplate = PostTemplate::find($decryptedId);
         if ($postTemplate) {
+            // delete post-template image
+            Helpers::deleteImage($postTemplate->template_image);
             $postTemplate->delete();
             return response()->json([
                 'success' => true,
