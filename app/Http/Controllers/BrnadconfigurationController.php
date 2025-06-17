@@ -17,7 +17,7 @@ class BrnadconfigurationController extends Controller
 
     public function dataTable()
     {
-        $data = BrandKit::get();
+        $data = BrandKit::with('user:id,first_name,last_name,company_name,email')->latest()->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -25,7 +25,8 @@ class BrnadconfigurationController extends Controller
                 return '<img src="'.asset($data->logo).'" alt="'.$data->name.'" class="br-1" width="100" height="100">';
             })
             ->addColumn('user', function ($data) {
-                return $data->user->first_name.' '.$data->user->last_name;
+                $fullName = ($data->user->first_name ?? "" ). " " .($data->user->last_name ?? "");
+                return $fullName;
             })
             ->addColumn('company_name', function ($data) {
                 return $data->company_name;

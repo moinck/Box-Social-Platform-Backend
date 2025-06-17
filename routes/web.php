@@ -62,7 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile-management', [ProfileManagementController::class,'index'])->name('profile-management');
     Route::post('/profile-management/update', [ProfileManagementController::class,'update'])->name('profile-management.update');
 
-    Route::middleware('checkRole:admin')->group(function () {        
+    // Only Admin access routes
+    Route::middleware('checkRole:admin')->group(function () {
         // categories controller
         Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
         Route::post('/categories/store', [CategoriesController::class,'store'])->name('categories.store');
