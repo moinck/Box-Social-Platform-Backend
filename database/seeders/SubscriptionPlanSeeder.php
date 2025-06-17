@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SubscriptionPlans;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -130,6 +131,9 @@ class SubscriptionPlanSeeder extends Seeder
             ]
         ];
 
-        DB::table('subscription_plans')->insert($plans);
+        // DB::table('subscription_plans')->insert($plans);
+        foreach ($plans as $plan) {
+            SubscriptionPlans::updateOrCreate(['slug' => $plan['slug']], $plan);
+        }
     }
 }
