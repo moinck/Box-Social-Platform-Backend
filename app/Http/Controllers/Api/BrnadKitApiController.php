@@ -233,4 +233,25 @@ class BrnadKitApiController extends Controller
             ],
         ], 200);
     }
+
+
+    /**
+     * Get design styles
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getDesignStyles(Request $request)
+    {
+        $designStyles = DesignStyles::all();
+
+        $returnData = [];
+        foreach ($designStyles as $key => $designStyle) {
+            $returnData[] = [
+                'id' => Helpers::encrypt($designStyle->id),
+                'name' => $designStyle->name,
+            ];
+        }
+        return $this->success($returnData, 'Design styles fetched successfully');
+    }
 }

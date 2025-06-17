@@ -45,6 +45,7 @@
                         <th>No</th>
                         <th>Template</th>
                         <th>Category</th>
+                        <th>Style</th>
                         <th>Status</th>
                         <th>Created Date</th>
                         <th>Action</th>
@@ -146,6 +147,7 @@
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'template_image', name: 'template_image'},
                         { data: 'category', name: 'category'},
+                        { data: 'design_style', name: 'design_style'},
                         { data: 'status', name: 'status'},
                         { data: 'created_at', name: 'created_at'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
