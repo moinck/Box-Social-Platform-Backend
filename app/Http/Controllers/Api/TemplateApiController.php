@@ -69,7 +69,7 @@ class TemplateApiController extends Controller
     public function getTemplateList(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_id' => 'nullable|string',
+            'category_ids' => 'nullable|array',
             'template_ids' => 'nullable|array',
         ]);
 
@@ -84,13 +84,15 @@ class TemplateApiController extends Controller
         }
 
         // filter bt categories
-        if ($request->has('category_id') && $request->category_id) {
-            $decryptedCategoryId = Helpers::decrypt($request->category_id);
-            $tempObj->where('category_id', $decryptedCategoryId);
+        if ($request->has('category_ids') && $request->category_ids != []) {
+            $decryptedCategoryIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->category_ids);
+            $tempObj->whereIn('category_id', $decryptedCategoryIds);
         }
 
         // filter by selected templates
-        if ($request->has('template_ids') && !empty($request->template_ids)) {
+        if ($request->has('template_ids') && $request->template_ids != []) {
             $decryptedTemplateIds = array_map(function ($id) {
                 return Helpers::decrypt($id);
             }, $request->template_ids);
