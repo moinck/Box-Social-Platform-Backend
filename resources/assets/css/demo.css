@@ -272,4 +272,7 @@ div.font-icon-btns {
 }
 .ql-insert-description::before {
     content: "Description";
+    /* to add custom icon */
+    /* content: "\1F4DD";
+    margin-right: 6px; */
 }
