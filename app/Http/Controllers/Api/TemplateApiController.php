@@ -18,7 +18,7 @@ class TemplateApiController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'category_id' => 'required|integer',
+            'category_id' => 'required|string',
             'template_image' => 'nullable|string',
             'template_data' => 'required', // or 'array' if JSON
             'design_style_id' => 'nullable|string',
@@ -30,7 +30,7 @@ class TemplateApiController extends Controller
 
 
         $tempObj = new PostTemplate();
-        $tempObj->category_id = $request->category_id;
+        $tempObj->category_id = Helpers::decrypt($request->category_id);
         $tempObj->template_image = $request->template_image;
         $tempObj->template_data = json_encode($request->template_data);
         if ($request->has('design_style_id') && $request->design_style_id) {

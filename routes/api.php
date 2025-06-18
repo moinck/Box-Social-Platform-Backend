@@ -66,7 +66,7 @@ Route::group([
         // Admin Create Template 
         Route::post('/template/store', [TemplateApiController::class, 'store']);
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
-        Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
+        Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
 
         // User templates APIS
         Route::get('/user-template/list', [UserTemplatesApiController::class, 'list']);
