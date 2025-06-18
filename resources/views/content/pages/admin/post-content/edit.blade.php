@@ -171,6 +171,11 @@
                 ],
                 [{ direction: 'rtl' }],
                 ['link', 'image', 'video', 'formula'],
+                [
+                    {'insert-name': 'Name'},
+                    {'insert-phone': 'Phone'},
+                    {'insert-description': 'Description'}
+                ],
                 ['clean']
             ];
             const editPostDescription = new Quill('#post_description', {
@@ -178,7 +183,26 @@
                 placeholder: 'Type Something...',
                 modules: {
                     formula: true,
-                    toolbar: fullToolbar
+                    toolbar: {
+                        container: fullToolbar,
+                        handlers: {
+                            'insert-name': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|name|');
+                                this.quill.setSelection(cursorPosition + 6);
+                            },
+                            'insert-phone': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|phone|');
+                                this.quill.setSelection(cursorPosition + 6);
+                            },
+                            'insert-description': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|description|');
+                                this.quill.setSelection(cursorPosition + 13);
+                            }
+                        }
+                    }
                 },
                 theme: 'snow'
             });

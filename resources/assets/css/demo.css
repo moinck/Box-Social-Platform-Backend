@@ -253,3 +253,26 @@ div.font-icon-btns {
     height: 550px;
     object-fit: contain;
 }
+
+/* for quill editor insert name, phone, description */
+.ql-insert-name {
+    width: max-content !important;
+}
+.ql-insert-phone {
+    width: max-content !important;
+}
+.ql-insert-description {
+    width: max-content !important;
+}
+.ql-insert-name::before {
+    content: "Name";
+}
+.ql-insert-phone::before {
+    content: "Phone";
+}
+.ql-insert-description::before {
+    content: "Description";
+    /* to add custom icon */
+    /* content: "\1F4DD";
+    margin-right: 6px; */
+}

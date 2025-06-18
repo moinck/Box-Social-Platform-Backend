@@ -109,4 +109,30 @@ class UserTemplatesApiController extends Controller
 
         return $this->success($returnData,'User template saved successfully');
     }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'template_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed',$validator->errors());
+        }
+
+        $decyptedId = Helpers::decrypt($request->template_id);
+        $userTemplate = UserTemplates::find($decyptedId);
+
+        if (!$userTemplate) {
+            return $this->error('User template not found',404);
+        }
+
+        if ($userTemplate->template_image && $userTemplate->template_image != null) {
+            Helpers::deleteImage($userTemplate->template_image);
+        }
+
+        $userTemplate->delete();
+
+        return $this->success([],'User template deleted successfully');
+    }
 }

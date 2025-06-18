@@ -74,9 +74,9 @@
                                     placeholder="Post Description"></textarea>
                                 <label for="post_description">Post Description</label>
                             </div> --}}
-                            <div id="post_description">{{old('post_description')}}</div>
+                            <div id="post_description">{{ old('post_description') }}</div>
                             <input type="hidden" name="post_description" id="hiddenPostDescription"
-                                value="{{old('post_description')}}" />
+                                value="{{ old('post_description') }}" />
                         </div>
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
@@ -110,11 +110,10 @@
         //     },
         //     theme: 'snow'
         // });
-        
-        $(document).ready(function () {
+
+        $(document).ready(function() {
             const fullToolbar = [
-                [
-                    {
+                [{
                         font: []
                     },
                     {
@@ -122,24 +121,21 @@
                     }
                 ],
                 ['bold', 'italic', 'underline', 'strike'],
-                [
-                    {
+                [{
                         color: []
                     },
                     {
                         background: []
                     }
                 ],
-                [
-                    {
+                [{
                         script: 'super'
                     },
                     {
                         script: 'sub'
                     }
                 ],
-                [
-                    {
+                [{
                         header: '1'
                     },
                     {
@@ -148,8 +144,7 @@
                     'blockquote',
                     'code-block'
                 ],
-                [
-                    {
+                [{
                         list: 'ordered'
                     },
                     {
@@ -162,31 +157,57 @@
                         indent: '+1'
                     }
                 ],
-                [{ direction: 'rtl' }],
+                [{
+                    direction: 'rtl'
+                }],
                 ['link', 'image', 'video', 'formula'],
+                [
+                    {'insert-name': 'Name'},
+                    {'insert-phone': 'Phone'},
+                    {'insert-description': 'Description'}
+                ],
                 ['clean']
             ];
+
             const createPostDescription = new Quill('#post_description', {
                 bounds: '#post_description',
                 placeholder: 'Type Something...',
                 modules: {
                     formula: true,
-                    toolbar: fullToolbar
+                    toolbar: {
+                        container: fullToolbar,
+                        handlers: {
+                            'insert-name': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|name|');
+                                this.quill.setSelection(cursorPosition + 6);
+                            },
+                            'insert-phone': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|phone|');
+                                this.quill.setSelection(cursorPosition + 6);
+                            },
+                            'insert-description': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|description|');
+                                this.quill.setSelection(cursorPosition + 13);
+                            }
+                        }
+                    }
                 },
                 theme: 'snow'
             });
-
             // update hidden post description
-            createPostDescription.on('text-change', function () {
+            createPostDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
-                $('.ql-editor').hasClass('ql-blank') ? 
-                    $('#hiddenPostDescription').val('') : 
+                $('.ql-editor').hasClass('ql-blank') ?
+                    $('#hiddenPostDescription').val('') :
                     $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 validator.revalidateField('post_description');
             });
 
             // cancel create post content
-            $('#cancelCreatePostContentBtn').click(function () {
+            $('#cancelCreatePostContentBtn').click(function() {
                 window.location.href = '{{ route('post-content') }}';
             });
 
@@ -220,9 +241,9 @@
                     trigger: new FormValidation.plugins.Trigger(),
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
-                        rowSelector: function (field, ele) {
-                            if (['post_title', 'post_category', 'post_description',
-                            ].includes(field)) {
+                        rowSelector: function(field, ele) {
+                            if (['post_title', 'post_category', 'post_description', ].includes(
+                                    field)) {
                                 return '.col-12';
                             }
                             return '.col-12';
@@ -231,15 +252,15 @@
                     submitButton: new FormValidation.plugins.SubmitButton(),
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 }
-            }).on('core.form.valid', function () {
+            }).on('core.form.valid', function() {
                 $('#create-post-content-form').submit();
             });
             // -----------------------------------------------------
 
             // post category change event
-            $('#post_category').change(function () {
+            $('#post_category').change(function() {
                 var category_id = $(this).val();
-                if(category_id.length == 0){
+                if (category_id.length == 0) {
                     $('#post_sub_category').html('<option value="">Select Subcategory</option>');
                     $('#selectSubCategory-div').addClass('d-none');
                     validator.revalidateField('post_sub_category');
@@ -252,19 +273,20 @@
                     data: {
                         category_id: category_id
                     },
-                    beforeSend: function () {
+                    beforeSend: function() {
                         showBSPLoader();
                     },
-                    complete: function () {
+                    complete: function() {
                         hideBSPLoader();
                     },
-                    success: function (data) {
-                        if(data.success){
+                    success: function(data) {
+                        if (data.success) {
                             var responseData = data.data;
                             var option = '';
                             option += '<option value="">Select Subcategory</option>';
-                            responseData.forEach(function (item) {
-                                option += '<option value="' + item.id + '">' + item.name + '</option>';
+                            responseData.forEach(function(item) {
+                                option += '<option value="' + item.id + '">' + item
+                                    .name + '</option>';
                             });
                             $('#post_sub_category').html(option);
                             $('#selectSubCategory-div').removeClass('d-none');
@@ -277,9 +299,10 @@
                                     }
                                 }
                             });
-                            
-                        }else{
-                            $('#post_sub_category').html('<option value="">Select Subcategory</option>');
+
+                        } else {
+                            $('#post_sub_category').html(
+                                '<option value="">Select Subcategory</option>');
                             $('#selectSubCategory-div').addClass('d-none');
                             validator.revalidateField('post_sub_category');
                             // validator.removeField(`post_sub_category`);
