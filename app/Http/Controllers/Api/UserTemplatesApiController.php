@@ -133,6 +133,6 @@ class UserTemplatesApiController extends Controller
 
         $userTemplate->delete();
 
-        return $this->success('User template deleted successfully');
+        return $this->success([],'User template deleted successfully');
     }
 }
