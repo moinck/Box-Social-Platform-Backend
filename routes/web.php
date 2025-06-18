@@ -29,8 +29,10 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+    Route::get('/dashboard', [HomePage::class, 'dashboard'])->name('dashboard');
 
     // notification controller
+    Route::get('/notification/datatable', [NotificationController::class, 'dataTable'])->name('notification.data-table');
     Route::post('/notification/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notification.mark-as-read');
 
     // encode & decode 
