@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
+use App\Http\Controllers\Api\UserTemplatesApiController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
 use Illuminate\Http\Request;
@@ -62,12 +63,16 @@ Route::group([
         // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
 
-        // Create Template 
-
+        // Admin Create Template 
         Route::post('/template/store', [TemplateApiController::class, 'store']);
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::get('/template/list', [TemplateApiController::class, 'getTemplateList']);
 
+        // User templates APIS
+        Route::get('/user-template/list', [UserTemplatesApiController::class, 'list']);
+        Route::get('/user-template/get/{id}', [UserTemplatesApiController::class, 'get']);
+        Route::post('/user-template/store', [UserTemplatesApiController::class, 'store']);
+        
         // get stock image
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
 

@@ -211,9 +211,9 @@
                                 <i class="tf-icons ri-facebook-circle-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Facebook">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Facebook">
                                 <i class="tf-icons ri-facebook-circle-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
 
                         @if (in_array('instagram', $socialMedia))
@@ -221,9 +221,9 @@
                                 <i class="tf-icons ri-instagram-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Instagram">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Instagram">
                                 <i class="tf-icons ri-instagram-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
 
                         @if (in_array('linkedin', $socialMedia))
@@ -231,9 +231,9 @@
                                 <i class="tf-icons tf-icons ri-linkedin-box-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Linkedin">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Linkedin">
                                 <i class="tf-icons tf-icons ri-linkedin-box-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
 
                         @if (in_array('whatsapp', $socialMedia))
@@ -241,9 +241,9 @@
                                 <i class="tf-icons ri-whatsapp-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Whatsapp">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Whatsapp">
                                 <i class="tf-icons ri-whatsapp-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
 
                         @if (in_array('tiktok', $socialMedia))
@@ -252,9 +252,9 @@
                                 <i class="tf-icons ri-tiktok-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Tiktok">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No Tiktok">
                                 <i class="tf-icons ri-tiktok-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
 
                         @if (in_array('x', $socialMedia))
@@ -262,9 +262,9 @@
                                 <i class="tf-icons ri-twitter-x-fill ri-22px"></i>
                             </button>
                         @else
-                            <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No X">
+                            {{-- <button type="button" class="btn btn-icon btn-outline-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="No X">
                                 <i class="tf-icons ri-twitter-x-fill ri-22px"></i>
-                            </button>
+                            </button> --}}
                         @endif
                     </div>
                 </div>

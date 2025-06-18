@@ -65,7 +65,7 @@ class StockImageApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->validationError($validator->errors()->first());
+            return $this->validationError('Validation failed',$validator->errors()->first());
         }
 
         $user = Auth::user();
@@ -73,7 +73,7 @@ class StockImageApiController extends Controller
             return $this->error('User not found',404);
         }
         // upload image
-        $imageUrl = Helpers::uploadImage('user_image', $request->image, 'image/user-images');
+        $imageUrl = Helpers::uploadImage('user_image', $request->image, 'images/user-images');
 
         $imageData = new ImageStockManagement();
         $imageData->user_id = $user->id;

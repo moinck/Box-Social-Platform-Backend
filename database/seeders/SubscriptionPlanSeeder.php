@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SubscriptionPlans;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -94,9 +95,45 @@ class SubscriptionPlanSeeder extends Seeder
                 'sort_order' => 3,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
+            ],
+            [
+                'name' => 'Box Socials Premium Plan',
+                'slug' => 'box-socials-premium-plan',
+                'description' => 'Premium annual plan with comprehensive social media features',
+                'price' => 65.00,
+                'currency' => 'GBP', // Based on £65 in the image
+                'interval' => 'year',
+                'interval_count' => 1,
+                'trial_period_days' => 3, // Free 3 day trial mentioned
+                'daily_download_limit' => 40, // Based on "40 posts a day" feature
+                'total_download_limit' => null,
+                'stripe_price_id' => 'price_box_socials_premium', // Replace with actual Stripe price ID
+                'stripe_product_id' => 'prod_box_socials_premium', // Replace with actual Stripe product ID
+                'is_active' => true,
+                'is_trial' => false,
+                'is_popular' => true,
+                'features' => json_encode([
+                    'Thousands of social media content written by financial services experts',
+                    'Access to an ever-growing library of design templates',
+                    'Access to millions of royalty free stock images updated every week',
+                    'Ability to create and download 40 posts a day in just a few clicks',
+                    'AI Compliance checked social media content',
+                    'Gain first access to no extra charge future developments',
+                    'Additional Topics such as Commercial Finance, Bridging Finance, second charges',
+                    'PFA posts such as Tax, Business Protection, Investments, Will Writing, Pensions',
+                    'Built-in scheduling tool for social media accounts',
+                    'Content suitable for various platforms (Twitter & WhatsApp)',
+                    '3 day free trial included'
+                ]),
+                'sort_order' => 4,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         ];
 
-        DB::table('subscription_plans')->insert($plans);
+        // DB::table('subscription_plans')->insert($plans);
+        foreach ($plans as $plan) {
+            SubscriptionPlans::updateOrCreate(['slug' => $plan['slug']], $plan);
+        }
     }
 }
