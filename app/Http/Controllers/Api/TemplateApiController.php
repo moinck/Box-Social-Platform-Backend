@@ -28,10 +28,14 @@ class TemplateApiController extends Controller
             return $this->validationError('Validation failed', $validator->errors());
         }
 
+        $imagePath = null;
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+            $imagePath = Helpers::handleBase64Image($request->template_image,'admin_template','images/admin-post-templates');
+        }
 
         $tempObj = new PostTemplate();
         $tempObj->category_id = Helpers::decrypt($request->category_id);
-        $tempObj->template_image = $request->template_image;
+        $tempObj->template_image = $imagePath;
         $tempObj->template_data = json_encode($request->template_data);
         if ($request->has('design_style_id') && $request->design_style_id) {
             $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
