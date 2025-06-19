@@ -136,7 +136,7 @@
 
                         // Filter results on category select change
                         $('#category_filter').on('change', function() {
-                            PostTemplateTable.columns(2).search(this.value).draw();
+                            PostTemplateTable.columns(3).search(this.value).draw();
                         });
 
                         // Filter results on status select change
