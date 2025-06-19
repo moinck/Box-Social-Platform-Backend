@@ -153,10 +153,10 @@
                 <div class="card-body">
                     <ul class="p-0 m-0">
                         @foreach ($pageData['recentUsers'] as $user)
-                            <li class="d-flex align-items-center @if ($loop->last) @else mb-3 pb-2 @endif">
+                            <li class="d-flex align-items-center mb-4 pb-2">
                                 <div class="avatar flex-shrink-0 me-4">
                                     <img src="{{ $user->profile_image ? asset($user->profile_image) : asset('assets/img/avatars/5.png') }}"
-                                        alt="avatar" class="rounded-3">
+                                        alt="avatar" class="rounded-3 pull-up">
                                 </div>
                                 <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                     <div class="me-2">
@@ -173,6 +173,11 @@
                                     @endif
                                 </div>
                             </li>
+                            @if ($loop->last)
+                                <li class="d-flex justify-content-center">
+                                    <a href="{{ route('user') }}" class="text-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="View All Users">View All Users</a>
+                                </li>
+                            @endif
                         @endforeach
                     </ul>
                 </div>

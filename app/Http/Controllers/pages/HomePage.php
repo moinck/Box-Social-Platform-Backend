@@ -72,7 +72,7 @@ class HomePage extends Controller
 		$pageData['postContentCount'] = $postContent;
 		$pageData['postTemplateCount'] = $postTemplate;
 
-		$recentUsers = User::where('role', "customer")->orderBy('id', 'desc')->take(8)->get();
+		$recentUsers = User::where('role', "customer")->orderBy('id', 'desc')->take(7)->get();
 		$pageData['recentUsers'] = $recentUsers;
 
 		return view('content.pages.dashboard', compact('pageData'));
