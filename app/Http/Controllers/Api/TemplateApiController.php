@@ -22,6 +22,7 @@ class TemplateApiController extends Controller
             'template_image' => 'nullable|string',
             'template_data' => 'required', // or 'array' if JSON
             'design_style_id' => 'nullable|string',
+            'post_content_id' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -40,6 +41,10 @@ class TemplateApiController extends Controller
         if ($request->has('design_style_id') && $request->design_style_id) {
             $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
             $tempObj->design_style_id = $decryptedDesignStyleId;
+        }
+        if ($request->has('post_content_id') && $request->post_content_id) {
+            $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
+            $tempObj->post_content_id = $decryptedPostContentId;
         }
         $tempObj->save();
 
@@ -75,6 +80,7 @@ class TemplateApiController extends Controller
         $validator = Validator::make($request->all(), [
             'category_ids' => 'nullable|array',
             'template_ids' => 'nullable|array',
+            'post_content_ids' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -103,6 +109,14 @@ class TemplateApiController extends Controller
             $tempObj->whereIn('id', $decryptedTemplateIds);
         }
 
+        // filter by selected post contents
+        if ($request->has('post_content_ids') && $request->post_content_ids != []) {
+            $decryptedPostContentIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->post_content_ids);
+            $tempObj->whereIn('post_content_id', $decryptedPostContentIds);
+        }
+
         $tempObj = $tempObj->get();
 
         $tempData = [];
@@ -111,8 +125,9 @@ class TemplateApiController extends Controller
 
             $tempData[$categoryName][] = [
                 'id' => Helpers::encrypt($t->id),
-                'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                 'category_id' => Helpers::encrypt($t->category_id),
+                'post_content_id' => Helpers::encrypt($t->post_content_id),
+                'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                 'template_data' => isset($t->template_data) ? $t->template_data : [],
             ];
         }
