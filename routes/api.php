@@ -62,6 +62,7 @@ Route::group([
         // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);
         // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
+        Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
 
         // Admin Create Template 
         Route::post('/template/store', [TemplateApiController::class, 'store']);

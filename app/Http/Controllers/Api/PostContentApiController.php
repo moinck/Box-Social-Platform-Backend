@@ -105,4 +105,36 @@ class PostContentApiController extends Controller
 
         return $this->success($resturnData,'Post content fetched successfully');
     }
+
+    /**
+     * Get post content by category
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function getCategoryPostContent(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation Error',$validator->errors());
+        }
+
+        $categoryId = $request->category_id;
+        $postContent = PostContent::where('category_id', Helpers::decrypt($categoryId))->get();
+        if (!$postContent) {
+            return $this->error('Post content not found',404);
+        }
+
+        $resturnData = [];
+        foreach ($postContent as $post) {
+            $resturnData[] = [
+                'id' => Helpers::encrypt($post->id),
+                'title' => $post->title,
+            ];
+        }
+
+        return $this->success($resturnData,'Post content fetched successfully');
+    }
 }
