@@ -88,7 +88,7 @@ class UserTemplatesApiController extends Controller
         // upload image
         $imageUrl = null;
         if ($request->has('template_image')) {
-            $imageUrl = Helpers::uploadImage('user_temp', $request->template_image, 'images/user-template-images');
+            $imageUrl = Helpers::handleBase64Image($request->template_image,'user_template','images/user-template-images');
         }
 
         $userTemplate = UserTemplates::create([
