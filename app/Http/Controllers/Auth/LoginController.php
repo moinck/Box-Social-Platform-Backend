@@ -38,7 +38,7 @@ class LoginController extends Controller
             }
             if (Hash::check($request->password, $user->password)) {
                 Auth::login($user, $request->remember);
-                return redirect()->intended('/home')->with('message', 'Logged-in');
+                return redirect()->intended('/dashboard')->with('message', 'Logged-in');
             }
         }
 
