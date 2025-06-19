@@ -44,6 +44,7 @@
                     <tr>
                         <th>No</th>
                         <th>Template</th>
+                        <th>Post Content</th>
                         <th>Category</th>
                         <th>Style</th>
                         <th>Status</th>
@@ -146,6 +147,7 @@
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'template_image', name: 'template_image'},
+                        { data: 'post_content', name: 'post_content'},
                         { data: 'category', name: 'category'},
                         { data: 'design_style', name: 'design_style'},
                         { data: 'status', name: 'status'},
