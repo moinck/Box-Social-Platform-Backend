@@ -19,13 +19,18 @@ class UserTemplatesApiController extends Controller
     {
         $user = Auth::user();
 
+        $search = $request->search ?? '';
+
         $userTemplates = UserTemplates::with('template.category')
-        ->when($request->has('category_name') && $request->category_name != '', function ($query) use ($request) {
-            $query->whereHas('template.category', function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->category_name . '%');
+        ->when($search, function ($query) use ($search) {
+            $query->whereHas('template.category', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
             });
         })
         ->where('user_id', $user->id)
+        ->when($search, function ($query) use ($search) {
+            $query->where('template_name', 'like', '%' . $search . '%');
+        })
         ->get();
 
         if ($userTemplates->isEmpty()) {

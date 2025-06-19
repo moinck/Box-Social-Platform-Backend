@@ -13,6 +13,7 @@ class PostTemplate extends Model
         'design_style_id',
         'template_image',
         'template_name',
+        'post_content_id',
         'template_data',
         'status',
     ];
