@@ -152,7 +152,7 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title m-0 me-2">Recent Users</h5>
                     <div class="card-header-elements ms-auto">
-                        <span class="badge bg-primary text-dark rounded-pill">{{ date('d M Y | D') }}</span>
+                        <span class="badge bg-primary text-dark rounded-pill">{{ date('d M Y | l') }}</span>
                     </div>
                 </div>
                 <hr class="m-0">
