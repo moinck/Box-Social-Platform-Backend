@@ -28,7 +28,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
+    // Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
     Route::get('/dashboard', [HomePage::class, 'dashboard'])->name('dashboard');
 
     // notification controller
@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     // Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
     // User Management Controller
+    Route::get('/user', [UserManagementController::class,'index'])->name('user');
     Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
     Route::get('/user/edit/{id}', [UserManagementController::class,'edit'])->name('user.edit');
     Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');

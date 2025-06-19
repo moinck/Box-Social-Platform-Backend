@@ -29,7 +29,7 @@
                 <img src="{{ asset('assets/img/illustrations/misc-error-illustration.png')}}" alt="misc-error"
                     class="img-fluid z-1" width="190">
                 <div>
-                    <a href="{{url('/home')}}" class="btn btn-primary text-center my-10">Back to home</a>
+                    <a href="{{url('/dashboard')}}" class="btn btn-primary text-center my-10">Back to home</a>
                 </div>
             </div>
         </div>

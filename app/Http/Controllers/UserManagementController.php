@@ -11,6 +11,11 @@ use Yajra\DataTables\Facades\DataTables;
 
 class UserManagementController extends Controller
 {
+    public function index()
+    {
+        return view('content.pages.pages-home');
+    }
+    
     /**
      * User Management DataTable
      * @param \Illuminate\Http\Request $request

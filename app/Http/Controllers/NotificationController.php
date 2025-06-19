@@ -30,13 +30,16 @@ class NotificationController extends Controller
                 }
                 return $retrunData;
             })
+            ->addColumn('created_date', function ($notification) {
+                return Helpers::dateFormate($notification->created_at);
+            })
             ->addColumn('action', function ($notification) {
                 $encyptedId = Helpers::encrypt($notification->id);
                 return '
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon notification-mark-as-read-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read" data-notification-id="'.$encyptedId.'"><i class="ri-mail-check-fill"></i></a>
                 ';
             })
-            ->rawColumns(['title','message','type','action'])
+            ->rawColumns(['title','message','type','action','created_date'])
             ->make(true);
     }
 
