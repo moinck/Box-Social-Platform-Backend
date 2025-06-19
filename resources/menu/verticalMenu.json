@@ -1,10 +1,17 @@
 {
     "menu": [
         {
-            "url": "/home",
-            "name": "User Management",
+            "url": "/dashboard",
+            "name": "Dashboard",
             "icon": "menu-icon tf-icons ri-home-smile-line",
-            "slug": "pages-home",
+            "slug": "dashboard",
+            "role": ["admin","customer"]
+        },
+        {
+            "url": "/user",
+            "name": "User Management",
+            "icon": "menu-icon tf-icons ri-group-line",
+            "slug": "user",
             "role": ["admin","customer"]
         },
         {

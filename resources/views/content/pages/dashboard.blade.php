@@ -14,80 +14,101 @@
 
 
 @section('content')
+    <div class="row g-6 mb-6">
+        {{-- user count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('user') }}" title="Go to Users Management">
+                <div class="card card-border-shadow-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-primary rounded-3">
+                                    <i class="ri-group-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['totalUser'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Total Users</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- category count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('categories') }}" title="Go to Categories Management">
+                <div class="card card-border-shadow-secondary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-secondary rounded-3">
+                                    <i class="ri-archive-stack-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['categoriesCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Categories</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- post content count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('post-content') }}" title="Go to Post Content Management">
+                <div class="card card-border-shadow-success">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-success rounded-3">
+                                    <i class="ri-profile-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['postContentCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Post Content</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- post template count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('post-template') }}" title="Go to Post Template Management">
+                <div class="card card-border-shadow-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-primary rounded-3">
+                                    <i class="ri-layout-2-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['postTemplateCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Post Template</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <div class="row g-6">
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-border-shadow-primary h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-4">
-                            <span class="avatar-initial rounded-3 bg-label-primary"><i
-                                    class="ri-user-line ri-24px"></i></span>
-                        </div>
-                        <h4 class="mb-0">{{ $pageData['totalUser'] }}</h4>
-                    </div>
-                    <h6 class="mb-0 fw-normal">Total Users</h6>
-                    <p class="mb-0">
-                        <span class="me-1 fw-medium">{{ $pageData['activeUser'] }} Active</span>
-                        <small class="text-muted">{{ $pageData['inactiveUser'] }} Inactive</small>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-border-shadow-warning h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-4">
-                            <span class="avatar-initial rounded-3 bg-label-warning"><i
-                                    class="tf-icons ri-archive-stack-line ri-24px"></i></span>
-                        </div>
-                        <h4 class="mb-0">{{ $pageData['categoriesCount'] }}</h4>
-                    </div>
-                    <h6 class="mb-0 fw-normal">Categories</h6>
-                    <p class="mb-0">
-                        <span class="me-1 fw-medium">{{ $pageData['subCategoriesCount'] }}</span>
-                        <small class="text-muted">Sub Categories</small>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-border-shadow-danger h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-4">
-                            <span class="avatar-initial rounded-3 bg-label-danger"><i
-                                    class="ri-profile-line ri-24px"></i></span>
-                        </div>
-                        <h4 class="mb-0">{{ $pageData['postContent'] }}</h4>
-                    </div>
-                    <h6 class="mb-0 fw-normal">Post Content</h6>
-                    <p class="mb-0">
-                        {{-- <span class="me-1 fw-medium">+4.3%</span>
-                        <small class="text-muted">than last week</small> --}}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-border-shadow-info h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-4">
-                            <span class="avatar-initial rounded-3 bg-label-info"><i
-                                    class="ri-layout-2-line ri-24px"></i></span>
-                        </div>
-                        <h4 class="mb-0">{{ $pageData['postTemplate'] }}</h4>
-                    </div>
-                    <h6 class="mb-0 fw-normal">Post Template</h6>
-                    {{-- <p class="mb-0">
-                        <span class="me-1 fw-medium">+4.3%</span>
-                        <small class="text-muted">than last week</small>
-                    </p> --}}
-                </div>
-            </div>
-        </div>
-        
         {{-- notification table --}}
         <div class="col-8">
             <div class="card">
@@ -100,13 +121,15 @@
                 <div class="card-datatable table-responsive">
                     <div id="notification-data-table_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
                         <div class="table-responsive">
-                            <table class="dt-route-vehicles table dataTable no-footer dtr-column" id="notification-data-table" aria-describedby="notification-data-table_info">
+                            <table class="dt-route-vehicles table dataTable no-footer dtr-column"
+                                id="notification-data-table" aria-describedby="notification-data-table_info">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>Title</th>
                                         <th>Message</th>
-                                        <th>Type</th>
+                                        {{-- <th>Type</th> --}}
+                                        <th>Created Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -116,7 +139,7 @@
                 </div>
             </div>
         </div>
-
+    
         {{-- recent user list --}}
         <div class="col-4 col-xxl-4">
             <div class="card h-100">
@@ -130,7 +153,7 @@
                 <div class="card-body">
                     <ul class="p-0 m-0">
                         @foreach ($pageData['recentUsers'] as $user)
-                            <li class="d-flex align-items-center @if($loop->last) @else mb-4 pb-2 @endif">
+                            <li class="d-flex align-items-center @if ($loop->last) @else mb-3 pb-2 @endif">
                                 <div class="avatar flex-shrink-0 me-4">
                                     <img src="{{ $user->profile_image ? asset($user->profile_image) : asset('assets/img/avatars/5.png') }}"
                                         alt="avatar" class="rounded-3">
@@ -180,19 +203,36 @@
                     pageLength: 5,
                     ajax: {
                         url: "{{ route('notification.data-table') }}",
-                        beforeSend: function () {
+                        beforeSend: function() {
                             showBSPLoader();
                         },
-                        complete: function () {
+                        complete: function() {
                             hideBSPLoader();
                         }
                     },
-                    columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                        { data: 'title', name: 'title'},
-                        { data: 'message', name: 'message'},
-                        { data: 'type', name: 'type'},
-                        { data: 'action', name: 'action', orderable: false, searchable: false}
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex'
+                        },
+                        {
+                            data: 'title',
+                            name: 'title'
+                        },
+                        {
+                            data: 'message',
+                            name: 'message'
+                        },
+                        // { data: 'type', name: 'type'},
+                        {
+                            data: 'created_date',
+                            name: 'created_date'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
                     ],
                     language: {
                         paginate: {
@@ -217,15 +257,16 @@
                         _token: "{{ csrf_token() }}",
                         id: notificationId
                     },
-                    beforeSend: function () {
+                    beforeSend: function() {
                         showBSPLoader();
                     },
-                    complete: function () {
+                    complete: function() {
                         hideBSPLoader();
                     },
                     success: function(response) {
                         if (response.success == true) {
-                            showSweetAlert('success', 'Updated!', 'Notification has been marked as read.');
+                            showSweetAlert('success', 'Updated!',
+                                'Notification has been marked as read.');
                             NotificationDataTable();
                         }
                     },

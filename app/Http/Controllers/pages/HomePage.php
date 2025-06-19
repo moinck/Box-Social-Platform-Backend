@@ -69,8 +69,8 @@ class HomePage extends Controller
 		$pageData['inactiveUser'] = $users->inactive;
 		$pageData['categoriesCount'] = $categoriesCount;
 		$pageData['subCategoriesCount'] = $subCategoriesCount;
-		$pageData['postContent'] = $postContent;
-		$pageData['postTemplate'] = $postTemplate;
+		$pageData['postContentCount'] = $postContent;
+		$pageData['postTemplateCount'] = $postTemplate;
 
 		$recentUsers = User::where('role', "customer")->orderBy('id', 'desc')->take(8)->get();
 		$pageData['recentUsers'] = $recentUsers;
