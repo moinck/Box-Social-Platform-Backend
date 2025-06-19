@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
@@ -41,6 +42,9 @@ Route::group([
 ], function () {
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
+
+        // admin api
+        Route::get('/admin/template-data', [AdminApiController::class, 'index']);
 
         // category list
         Route::get('/category/list', [CategoriesApiController::class, 'list']);
