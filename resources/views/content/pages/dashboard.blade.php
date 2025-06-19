@@ -20,20 +20,26 @@
             <a href="{{ route('user') }}" title="Go to Users Management">
                 <div class="card card-border-shadow-primary">
                     <div class="card-body">
-                        <div class="d-flex align-items-center flex-wrap">
-                            <div class="avatar me-4">
-                                <div class="avatar-initial bg-label-primary rounded-3">
-                                    <i class="ri-group-line ri-24px"> </i>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-4">
+                                    <div class="avatar-initial bg-label-primary rounded-3">
+                                        <i class="ri-group-line ri-24px"></i>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="mb-0 me-2">{{ $pageData['totalUser'] ?? 0 }}</h5>
+                                    </div>
+                                    <p class="mb-0">Users</p>
                                 </div>
                             </div>
                             <div class="card-info">
-                                <div class="d-flex align-items-center">
-                                    <h5 class="mb-0 me-2">{{ $pageData['totalUser'] ?? 0 }}</h5>
-                                </div>
-                                <p class="mb-0">Total Users</p>
+                                <p class="mb-0">{{ $pageData['activeUser'] ?? 0 }} Active</p>
+                                <p class="mb-0">{{ $pageData['inactiveUser'] ?? 0 }} Inactive</p>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                 </div>
             </a>
         </div>
