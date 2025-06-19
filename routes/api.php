@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
@@ -42,6 +43,9 @@ Route::group([
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
 
+        // admin api
+        Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+
         // category list
         Route::get('/category/list', [CategoriesApiController::class, 'list']);
 
@@ -62,6 +66,7 @@ Route::group([
         // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);
         // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
+        Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
 
         // Admin Create Template 
         Route::post('/template/store', [TemplateApiController::class, 'store']);

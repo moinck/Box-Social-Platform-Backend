@@ -25,7 +25,7 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category')
+        $postTemplates = PostTemplate::with('category','postContent','designStyle')
             ->where(function ($query) use ($request) {
                 if ($request->category) {
                     $query->where('category_id', $request->category);
@@ -41,6 +41,9 @@ class PostTemplateController extends Controller
             ->addColumn('template_image', function ($data) {
                 $categoryName = $data->category->name;
                 return '<img src="'.asset($data->template_image).'" alt="'.$data->template_name.'" class="br-1 template-image" data-category="'.$categoryName.'" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
+            })
+            ->addColumn('post_content', function ($data) {
+                return $data->postContent->title ?? "-";
             })
             ->addColumn('category', function ($data) {
                 return $data->category->name;
@@ -81,7 +84,7 @@ class PostTemplateController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="'.$postTemplateId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action','template_image','design_style','status','created_at'])
+            ->rawColumns(['action','post_content','template_image','design_style','status','created_at'])
             ->make(true);
     }
 

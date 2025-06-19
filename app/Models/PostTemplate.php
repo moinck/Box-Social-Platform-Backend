@@ -26,4 +26,9 @@ class PostTemplate extends Model
     {
         return $this->belongsTo(DesignStyles::class,'design_style_id','id');
     }
+
+    public function postContent()
+    {
+        return $this->belongsTo(PostContent::class,'post_content_id','id');
+    }
 }

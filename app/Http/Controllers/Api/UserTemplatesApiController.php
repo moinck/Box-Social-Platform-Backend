@@ -39,7 +39,7 @@ class UserTemplatesApiController extends Controller
                 'template_id' => Helpers::encrypt($value->template_id),
                 'category' => $value->template->category->name ?? null,
                 'template_name' => $value->template_name ?? null,
-                'template_image' => $value->template_image ?? null,
+                'template_image' => $value->template_image ? asset($value->template_image) : null,
                 'edited' => Carbon::parse($value->updated_at)->diffForHumans(),
                 'template_data' => $value->template_data,
             ];
@@ -61,7 +61,7 @@ class UserTemplatesApiController extends Controller
             'id' => Helpers::encrypt($userTemplate->id),
             'category' => $userTemplate->template->category->name ?? null,
             'template_name' => $userTemplate->template_name ?? null,
-            'template_image' => $userTemplate->template_image ?? null,
+            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
             'template_data' => $userTemplate->template_data,
         ];
 
@@ -103,7 +103,7 @@ class UserTemplatesApiController extends Controller
             'id' => Helpers::encrypt($userTemplate->id),
             'category' => $userTemplate->template->category->name ?? null,
             'template_name' => $userTemplate->template_name ?? null,
-            'template_image' => $userTemplate->template_image ?? null,
+            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
             'template_data' => $userTemplate->template_data,
         ];
 
