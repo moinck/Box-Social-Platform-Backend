@@ -23,13 +23,24 @@ class UserManagementController extends Controller
      */
     public function userDataTable(Request $request)
     {
-        $users = User::where('role','customer')->latest()->get();
+        $users = User::where('role','customer')
+        ->when($request->is_brandkit, function ($query) use ($request) {
+            if ($request->is_brandkit == 1) {
+                $query->whereHas('brandKit');
+            } else {
+                $query->whereDoesntHave('brandKit');
+            }
+        })
+        ->latest()->get();
 
         return DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('name', function ($user) {
                 $name = $user->first_name . ' ' . $user->last_name;
                 return $name;
+            })
+            ->addColumn('is_brandkit', function ($user) {
+                return $user->hasBrandKit() ? 1 : 0;
             })
             ->addColumn('company_name', function ($user) {
                 return $user->company_name ?? '-';
@@ -68,7 +79,7 @@ class UserManagementController extends Controller
                     <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-id="'.$userId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action'])
+            ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action','is_brandkit'])
             ->make(true);
     }
 

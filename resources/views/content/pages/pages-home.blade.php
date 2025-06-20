@@ -189,12 +189,37 @@
                     pageLength: 10,
                     ajax: {
                         url: "{{ route('user.data-table') }}",
+                        data: function (d) {
+                            d.is_brandkit = $('#brandkit_filter').val();
+                        },
                         beforeSend: function () {
                             showBSPLoader();
                         },
                         complete: function () {
                             hideBSPLoader();
-                        }
+                        },
+                    },
+                    initComplete: function(settings, json) {
+                        // Target the first col-md-6 div within the DataTable wrapper
+                        var targetDiv = $('#user-data-table_wrapper .row:first .col-sm-12.col-md-6:first-child');
+                        targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
+
+                        // Create a row to hold the two md-3 divs
+                        targetDiv.append('<div class="row"><div class="col-md-6" id="brandkit-filter-container"></div></div>');
+
+                        // Append brandkit filter
+                        $('#brandkit-filter-container').append(`
+                            <select class="form-select input-sm" id="brandkit_filter">
+                                <option value="">User Brandkit</option>
+                                <option value="1">Configured</option>
+                                <option value="0">Not Configured</option>
+                            </select>
+                        `);
+
+                        // Filter results on brandkit select change
+                        $('#brandkit_filter').on('change', function() {
+                            UserTable.draw();
+                        });
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
