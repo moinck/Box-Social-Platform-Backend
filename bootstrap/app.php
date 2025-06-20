@@ -1,11 +1,13 @@
 <?php
 
+use App\Console\Commands\CleanExpiredTokens;
 use App\Http\Middleware\CheckRoleMiddleware;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\LocaleMiddleware;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkRole' => CheckRoleMiddleware::class,
             'verified' => EnsureEmailIsVerified::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        // $schedule->call(CleanExpiredTokens::class)->daily();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
