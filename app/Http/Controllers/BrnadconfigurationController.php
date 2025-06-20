@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
 use App\Models\BrandKit;
+use App\Models\PostTemplate;
 use App\Models\SocialMedia;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -124,5 +125,31 @@ class BrnadconfigurationController extends Controller
                 'message' => 'Brand Kit not found'
             ]);
         }
+    }
+
+
+    public function updateJsonData()
+    {
+        $postTemplate = PostTemplate::find(46);
+
+        // $templateData = json_encode($template->template_data);
+
+        $brandkit = BrandKit::find(65);
+
+        $brandkitData = [
+            'name' => $brandkit->user->first_name . ' ' . $brandkit->user->last_name,
+            'email' => $brandkit->user->email,
+            'phone' => $brandkit->phone,
+            'company' => $brandkit->company_name,
+            'address' => $brandkit->address,
+            'website' => $brandkit->website
+        ];
+
+        $processedTemplate = Helpers::replaceFabricTemplateData($postTemplate->template_data, $brandkitData);
+
+        return response()->json([
+            'template' => $processedTemplate,
+            'decode_template' => json_decode($processedTemplate)
+        ]);
     }
 }

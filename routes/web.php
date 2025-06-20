@@ -84,7 +84,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/brand-configuration/update', [BrnadconfigurationController::class,'update'])->name('brand-configuration.update');
         Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class,'dataTable'])->name('brand-configuration.data-table');
         Route::post('/brand-configuration/delete', [BrnadconfigurationController::class,'destroy'])->name('brand-configuration.delete');
-
+        
+        Route::get('/brand-configuration/update-json-data', [BrnadconfigurationController::class,'updateJsonData'])->name('brand-configuration.update-json-data');
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
         Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
