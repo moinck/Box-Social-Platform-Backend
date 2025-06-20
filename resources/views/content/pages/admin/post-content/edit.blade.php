@@ -174,7 +174,7 @@
                 [
                     {'insert-name': 'Name'},
                     {'insert-phone': 'Phone'},
-                    {'insert-description': 'Description'}
+                    // {'insert-description': 'Description'}
                 ],
                 ['clean']
             ];
@@ -206,6 +206,8 @@
                 },
                 theme: 'snow'
             });
+            $('.ql-insert-name').attr('title', 'Click to insert Name');
+            $('.ql-insert-phone').attr('title', 'Click to insert Phone');
 
             // update hidden post description
             editPostDescription.on('text-change', function () {
