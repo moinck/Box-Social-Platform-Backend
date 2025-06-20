@@ -226,7 +226,7 @@
                         // Append brandkit filter
                         $('#brandkit-filter-container').append(`
                             <select class="form-select input-sm" id="brandkit_filter">
-                                <option value="">User Brandkit</option>
+                                <option value="">User Brand Configuration</option>
                                 <option value="1">Configured</option>
                                 <option value="0">Not Configured</option>
                             </select>
