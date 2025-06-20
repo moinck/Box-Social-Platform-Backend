@@ -46,7 +46,7 @@ class UserTemplatesApiController extends Controller
                 'template_name' => $value->template_name ?? null,
                 'template_image' => $value->template_image ? asset($value->template_image) : null,
                 'edited' => Carbon::parse($value->updated_at)->diffForHumans(),
-                'template_data' => $value->template_data,
+                // 'template_data' => $value->template_data,
             ];
         }
 
@@ -77,8 +77,8 @@ class UserTemplatesApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'template_id' => 'required',
-            'template_name' => 'nullable|string',
-            'template_image' => 'nullable|string',
+            'template_name' => 'required|string',
+            'template_image' => 'required|string',
             'template_data' => 'required',
         ]);
 

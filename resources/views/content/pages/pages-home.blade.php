@@ -109,6 +109,22 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="user_has_brandkit" id="user_has_brandkit" checked="" onclick="return false;">
+                                <label class="form-check-label" for="user_has_brandkit">
+                                    <span>User has Brandkit</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="user_is_verified" id="user_is_verified" checked="" onclick="return false;">
+                                <label class="form-check-label" for="user_is_verified">
+                                    <span>User is Verified</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="user_fca_number" name="user_fca_number" class="form-control"
                                     placeholder="123456789" />
@@ -189,12 +205,37 @@
                     pageLength: 10,
                     ajax: {
                         url: "{{ route('user.data-table') }}",
+                        data: function (d) {
+                            d.is_brandkit = $('#brandkit_filter').val();
+                        },
                         beforeSend: function () {
                             showBSPLoader();
                         },
                         complete: function () {
                             hideBSPLoader();
-                        }
+                        },
+                    },
+                    initComplete: function(settings, json) {
+                        // Target the first col-md-6 div within the DataTable wrapper
+                        var targetDiv = $('#user-data-table_wrapper .row:first .col-sm-12.col-md-6:first-child');
+                        targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
+
+                        // Create a row to hold the two md-3 divs
+                        targetDiv.append('<div class="row"><div class="col-md-6" id="brandkit-filter-container"></div></div>');
+
+                        // Append brandkit filter
+                        $('#brandkit-filter-container').append(`
+                            <select class="form-select input-sm" id="brandkit_filter">
+                                <option value="">User Brandkit</option>
+                                <option value="1">Configured</option>
+                                <option value="0">Not Configured</option>
+                            </select>
+                        `);
+
+                        // Filter results on brandkit select change
+                        $('#brandkit_filter').on('change', function() {
+                            UserTable.draw();
+                        });
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -267,6 +308,9 @@
                             } else {
                                 $('#user_account_status').val('inactive');
                             }
+
+                            $('#user_has_brandkit').prop('checked', response.data.has_brandkit);
+                            $('#user_is_verified').prop('checked', response.data.is_verified);
                             $('#edit_user_id').val(userId);
                         } else {
                             // toastr.error(response.message);

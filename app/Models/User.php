@@ -83,4 +83,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(BrandKit::class,'user_id','id')->exists();
     }
+
+    /**
+     * User Brandkit relation
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<BrandKit, User>
+     */
+    public function brandKit()
+    {
+        return $this->hasOne(BrandKit::class,'user_id','id');
+    }
 }
