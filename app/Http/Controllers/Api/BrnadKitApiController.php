@@ -32,6 +32,8 @@ class BrnadKitApiController extends Controller
             ], 422);
         }
 
+        // phone no regex -> regex:/^\+44\d{10}$/|
+
         $rules = [
             'email' => 'required|email',
             'company_name' => 'required|string|max:255',
@@ -39,7 +41,7 @@ class BrnadKitApiController extends Controller
             'user_id' => 'required|string|exists:users,id',
             'address' => 'nullable|string|max:500',
             'state' => 'nullable|string|max:100',
-            'phone' => 'nullable|string|min:13|max:15|regex:/^\+44\d{10}$/|',
+            'phone' => 'nullable|string|min:10|max:13',
             'country' => 'nullable|string|max:100',
             'website' => 'nullable|url',
             'postal_code' => 'nullable|string|min:4|max:20',
