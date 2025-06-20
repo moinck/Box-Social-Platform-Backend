@@ -2,6 +2,9 @@
 * demo.css
 * File include item demo only specific css only
 ******************************************************************************/
+:root {
+    --bs-warning-rgb: 253, 181, 40;
+}
 
 .light-style .menu .app-brand.demo {
     height: 64px;
@@ -266,13 +269,40 @@ div.font-icon-btns {
 }
 .ql-insert-name::before {
     content: "Name";
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
 }
 .ql-insert-phone::before {
     content: "Phone";
+    /* content: "\1F4DE"; */
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
 }
 .ql-insert-description::before {
     content: "Description";
     /* to add custom icon */
-    /* content: "\1F4DD";
-    margin-right: 6px; */
+    /* content: "\1F4DD"; */
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
 }
