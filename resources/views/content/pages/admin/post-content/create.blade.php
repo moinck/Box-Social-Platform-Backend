@@ -40,6 +40,8 @@
                     <form id="create-post-content-form" action="{{ route('post-content.store') }}" class="row g-5"
                         method="POST" enctype="multipart/form-data">
                         @csrf
+
+                        {{-- post title --}}
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="post_title" name="post_title" class="form-control"
@@ -47,6 +49,8 @@
                                 <label for="post_title">Post Title</label>
                             </div>
                         </div>
+
+                        {{-- category select --}}
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <select name="post_category" id="post_category" class="form-select" data-choices
@@ -59,6 +63,8 @@
                                 <label for="post_category">Post Category</label>
                             </div>
                         </div>
+
+                        {{-- sub-category select --}}
                         <div class="col-12 col-md-12 d-none" id="selectSubCategory-div">
                             <div class="form-floating form-floating-outline">
                                 <select name="post_sub_category" id="post_sub_category" class="form-select" data-choices
@@ -68,16 +74,17 @@
                                 <label for="post_sub_category">Post Subcategory</label>
                             </div>
                         </div>
+
+                        {{-- quill text description --}}
                         <div class="col-12">
-                            {{-- <div class="form-floating form-floating-outline">
-                                <textarea name="post_description" id="post_description" class="form-control"
-                                    placeholder="Post Description"></textarea>
-                                <label for="post_description">Post Description</label>
-                            </div> --}}
+                            <div class="text-end">
+                                <p class="mb-1 text-secondary">Add Tags for dynamic Name and Phone</p>
+                            </div>
                             <div id="post_description">{{ old('post_description') }}</div>
                             <input type="hidden" name="post_description" id="hiddenPostDescription"
                                 value="{{ old('post_description') }}" />
                         </div>
+
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="warning_message" name="warning_message" class="form-control"

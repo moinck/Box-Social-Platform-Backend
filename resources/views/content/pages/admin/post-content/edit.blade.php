@@ -41,6 +41,8 @@
                         method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="post_id" value="{{ $postContent->id }}">
+
+                        {{-- title --}}
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="post_title" name="post_title" class="form-control"
@@ -48,6 +50,8 @@
                                 <label for="post_title">Post Title</label>
                             </div>
                         </div>
+
+                        {{-- category --}}
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <select name="post_category" id="post_category" class="form-select" data-choices
@@ -60,6 +64,8 @@
                                 <label for="post_category">Post Category</label>
                             </div>
                         </div>
+
+                        {{-- sub category --}}
                         <div class="col-12 col-md-12 d-none" id="selectSubCategory-edit-div">
                             <div class="form-floating form-floating-outline">
                                 <select name="post_content_edit_sub_category" id="post_content_edit_sub_category"
@@ -69,16 +75,18 @@
                                 <label for="post_content_edit_sub_category">Post Subcategory</label>
                             </div>
                         </div>
+
+                        {{-- quill text description --}}
                         <div class="col-12">
-                            {{-- <div class="form-floating form-floating-outline">
-                                <textarea name="post_description" id="post_description" class="form-control"
-                                    placeholder="Post Description"></textarea>
-                                <label for="post_description">Post Description</label>
-                            </div> --}}
+                            <div class="text-end">
+                                <p class="mb-1 text-secondary">Add Tags for dynamic Name and Phone</p>
+                            </div>
                             <div id="post_description">{!! $postContent->description !!}</div>
                             <input type="hidden" name="post_description" id="hiddenPostDescription"
                                 value="{{ $postContent->description }}" />
                         </div>
+
+                        {{-- warning message --}}
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="warning_message" name="warning_message" class="form-control"

@@ -93,11 +93,11 @@
         {{-- post template count --}}
         <div class="col-lg-3 col-sm-6">
             <a href="{{ route('post-template') }}" title="Go to Post Template Management">
-                <div class="card card-border-shadow-primary">
+                <div class="card card-border-shadow-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center flex-wrap">
                             <div class="avatar me-4">
-                                <div class="avatar-initial bg-label-primary rounded-3">
+                                <div class="avatar-initial bg-label-info rounded-3">
                                     <i class="ri-layout-2-line ri-24px"> </i>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title m-0 me-2">Recent Users</h5>
                     <div class="card-header-elements ms-auto">
-                        <span class="badge bg-primary text-dark rounded-pill">{{ date('d M Y | l') }}</span>
+                        <span class="badge bg-primary text-black rounded-pill">{{ date('d M Y | l') }}</span>
                     </div>
                 </div>
                 <hr class="m-0">

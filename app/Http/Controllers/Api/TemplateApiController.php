@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\BrandKit;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\PostTemplate;
+use Illuminate\Support\Facades\Auth;
 use PHPUnit\TextUI\Help;
 
 class TemplateApiController extends Controller
@@ -64,10 +66,23 @@ class TemplateApiController extends Controller
             return $this->error('Template not found', 404);
         }
 
+        $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
+
+        $brandkitData = [
+            'name' => $brandkitData->user->first_name . ' ' . $brandkitData->user->last_name,
+            'email' => $brandkitData->user->email,
+            'phone' => $brandkitData->phone ?? '',
+            'company' => $brandkitData->company_name ?? '',
+            'address' => $brandkitData->address ?? '',
+            'website' => $brandkitData->website ?? ''
+        ];
+
+        $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
+
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
-            'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
+            'template_data' => isset($tempObj->template_data) ? $processedTemplateData : [],
         ];
 
         if (!empty($tempObj)) {

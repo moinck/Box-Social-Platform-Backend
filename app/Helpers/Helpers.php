@@ -7,6 +7,7 @@ use App\Mail\RegisterVerificationMail;
 use App\Models\Notification;
 use App\Models\UserTokens;
 use App\Notifications\CustomVerifyEmail;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -549,5 +550,70 @@ class Helpers
         }
 
         return true;
+    }
+    
+    /**
+     * Function to replace text in fabric template
+     * @param mixed $templateJson
+     * @param mixed $brandkitData
+     */
+    public static function replaceFabricTemplateData($templateJson, $brandkitData)
+    {
+        try {
+            // Decode JSON
+            $data = json_decode($templateJson, true);
+            
+            if (!$data || !isset($data['objects'])) {
+                return $templateJson; // Return original if invalid
+            }
+
+            // Process each object
+            foreach ($data['objects'] as &$object) {
+                if (isset($object['boxType']) && isset($object['text'])) {
+                    $boxType = $object['boxType'];
+                    
+                    // Replace text based on boxType
+                    switch ($boxType) {
+                        case 'email':
+                            if (isset($brandkitData['email'])) {
+                                $object['text'] = $brandkitData['email'];
+                            }
+                            break;
+                        case 'phone':
+                            if (isset($brandkitData['phone'])) {
+                                $object['text'] = $brandkitData['phone'];
+                            }
+                            break;
+                        case 'name':
+                            if (isset($brandkitData['name'])) {
+                                $object['text'] = $brandkitData['name'];
+                            }
+                            break;
+                        case 'company':
+                            if (isset($brandkitData['company'])) {
+                                $object['text'] = $brandkitData['company'];
+                            }
+                            break;
+                        case 'address':
+                            if (isset($brandkitData['address'])) {
+                                $object['text'] = $brandkitData['address'];
+                            }
+                            break;
+                        case 'website':
+                            if (isset($brandkitData['website'])) {
+                                $object['text'] = $brandkitData['website'];
+                            }
+                            break;
+                    }
+                }
+            }
+
+            // Return updated JSON
+            return json_encode($data);
+            
+        } catch (Exception $e) {
+            // Return original data if error occurs
+            return $templateJson;
+        }
     }
 }
