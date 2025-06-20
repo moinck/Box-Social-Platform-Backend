@@ -102,6 +102,7 @@ class BrnadKitApiController extends Controller
         }
 
         $brandKitObj->logo = $logoUrl;
+        $brandKitObj->base64_logo = $request->logo ?? null;
         $brandKitObj->user_id = $decryptedUserId;
         $brandKitObj->company_name = $request->company_name;
         $brandKitObj->email = $request->email;
@@ -208,6 +209,11 @@ class BrnadKitApiController extends Controller
             $mime = 'svg+xml';
         }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+
+        if ($brandKitObj->base64_logo == null) {
+            $brandKitObj->base64_logo = $base64Image;
+            $brandKitObj->save();
+        }
 
         return response()->json([
             'success' => true,
