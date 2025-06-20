@@ -109,6 +109,22 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="user_has_brandkit" id="user_has_brandkit" checked="" onclick="return false;">
+                                <label class="form-check-label" for="user_has_brandkit">
+                                    <span>User has Brandkit</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="user_is_verified" id="user_is_verified" checked="" onclick="return false;">
+                                <label class="form-check-label" for="user_is_verified">
+                                    <span>User is Verified</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="user_fca_number" name="user_fca_number" class="form-control"
                                     placeholder="123456789" />
@@ -292,6 +308,9 @@
                             } else {
                                 $('#user_account_status').val('inactive');
                             }
+
+                            $('#user_has_brandkit').prop('checked', response.data.has_brandkit);
+                            $('#user_is_verified').prop('checked', response.data.is_verified);
                             $('#edit_user_id').val(userId);
                         } else {
                             // toastr.error(response.message);

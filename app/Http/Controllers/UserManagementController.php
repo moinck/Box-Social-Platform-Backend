@@ -92,6 +92,8 @@ class UserManagementController extends Controller
     {
         $id = Helpers::decrypt($id);
         $user = User::find($id);
+        $user->has_brandkit = $user->hasBrandKit() ? 1 : 0;
+        
         if ($user) {
             return response()->json([
                 'success' => true,
