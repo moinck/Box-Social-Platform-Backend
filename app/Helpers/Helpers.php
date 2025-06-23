@@ -609,7 +609,7 @@ class Helpers
                 }
 
                 // for image replacement
-                if (isset($object['type']) && $object['type'] == 'image') {
+                if (isset($object['type']) && $object['type'] == 'Image') {
                     switch ($boxType) {
                         case 'brandkit_logo':
                             if (isset($brandkitData['brandkit_logo'])) {
