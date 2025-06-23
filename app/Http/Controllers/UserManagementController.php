@@ -31,6 +31,13 @@ class UserManagementController extends Controller
                 $query->whereDoesntHave('brandKit');
             }
         })
+        ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
+            if ($request->account_status == 1) {
+                $query->where('status','=', 'active');
+            } elseif ($request->account_status == 2) {
+                $query->where('status','=', 'inactive');
+            }
+        })
         ->latest()->get();
 
         return DataTables::of($users)

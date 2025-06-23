@@ -207,6 +207,7 @@
                         url: "{{ route('user.data-table') }}",
                         data: function (d) {
                             d.is_brandkit = $('#brandkit_filter').val();
+                            d.account_status = $('#account_status_filter').val();
                         },
                         beforeSend: function () {
                             showBSPLoader();
@@ -220,8 +221,12 @@
                         var targetDiv = $('#user-data-table_wrapper .row:first .col-sm-12.col-md-6:first-child');
                         targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
 
-                        // Create a row to hold the two md-3 divs
-                        targetDiv.append('<div class="row"><div class="col-md-6" id="brandkit-filter-container"></div></div>');
+                        // Create a row to hold the two select filters
+                        targetDiv.append(`
+                            <div class="row">
+                                <div class="col-md-6" id="brandkit-filter-container"></div>
+                                <div class="col-md-6" id="account-status-filter-container"></div>
+                            </div>`);
 
                         // Append brandkit filter
                         $('#brandkit-filter-container').append(`
@@ -234,6 +239,20 @@
 
                         // Filter results on brandkit select change
                         $('#brandkit_filter').on('change', function() {
+                            UserTable.draw();
+                        });
+
+                        // Append account status filter
+                        $('#account-status-filter-container').append(`
+                            <select class="form-select input-sm" id="account_status_filter">
+                                <option value="">Account Status</option>
+                                <option value="1">Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        `);
+
+                        // Filter results on account status select change
+                        $('#account_status_filter').on('change', function() {
                             UserTable.draw();
                         });
                     },
