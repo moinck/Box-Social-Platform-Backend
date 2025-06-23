@@ -569,9 +569,10 @@ class Helpers
 
             // Process each object
             foreach ($data['objects'] as &$object) {
+                $boxType = $object['boxType'];
+
+                // for text replacement
                 if (isset($object['boxType']) && isset($object['text'])) {
-                    $boxType = $object['boxType'];
-                    
                     // Replace text based on boxType
                     switch ($boxType) {
                         case 'email':
@@ -606,6 +607,18 @@ class Helpers
                             break;
                     }
                 }
+
+                // for image replacement
+                if (isset($object['type']) && $object['type'] == 'image') {
+                    switch ($boxType) {
+                        case 'brandkit_logo':
+                            if (isset($brandkitData['brandkit_logo'])) {
+                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo']);
+                                $object['src'] = $base64Logo;
+                            }
+                            break;
+                    }
+                }
             }
 
             // Return updated JSON
@@ -615,5 +628,21 @@ class Helpers
             // Return original data if error occurs
             return $templateJson;
         }
+    }
+
+    /**
+     * Convert image to base64
+     * @param mixed $imagePath
+     * @return string
+     */
+    public static function imageToBase64($imagePath)
+    {
+        $path = $imagePath;
+        $mime = pathinfo($path, PATHINFO_EXTENSION);
+        if ($mime == 'svg') {
+            $mime = 'svg+xml';
+        }
+        $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        return $base64Image;
     }
 }

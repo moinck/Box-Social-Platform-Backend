@@ -130,11 +130,11 @@ class BrnadconfigurationController extends Controller
 
     public function updateJsonData()
     {
-        $postTemplate = PostTemplate::find(46);
+        $postTemplate = PostTemplate::find(1);
 
         // $templateData = json_encode($template->template_data);
 
-        $brandkit = BrandKit::find(65);
+        $brandkit = BrandKit::find(7);
 
         $brandkitData = [
             'name' => $brandkit->user->first_name . ' ' . $brandkit->user->last_name,
@@ -142,7 +142,8 @@ class BrnadconfigurationController extends Controller
             'phone' => $brandkit->phone,
             'company' => $brandkit->company_name,
             'address' => $brandkit->address,
-            'website' => $brandkit->website
+            'website' => $brandkit->website,
+            'brandkit_logo' => $brandkit->logo,
         ];
 
         $processedTemplate = Helpers::replaceFabricTemplateData($postTemplate->template_data, $brandkitData);

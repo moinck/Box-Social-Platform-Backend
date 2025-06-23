@@ -74,7 +74,8 @@ class TemplateApiController extends Controller
             'phone' => $brandkitData->phone ?? '',
             'company' => $brandkitData->company_name ?? '',
             'address' => $brandkitData->address ?? '',
-            'website' => $brandkitData->website ?? ''
+            'website' => $brandkitData->website ?? '',
+            'brandkit_logo' => $brandkitData->logo ?? '',
         ];
 
         $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
