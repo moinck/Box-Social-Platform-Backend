@@ -4,7 +4,9 @@ namespace App\Http\Controllers\pages;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\BrandKit;
 use App\Models\Categories;
+use App\Models\ContactUs;
 use App\Models\PostContent;
 use App\Models\PostTemplate;
 use App\Models\User;
@@ -64,6 +66,12 @@ class HomePage extends Controller
 		// post template
 		$postTemplate = PostTemplate::count();
 
+		// brand-kit count
+		$brandConfigurationCount = BrandKit::count();
+
+		// feedback count
+		$feedbackCount = ContactUs::count();
+
 		$pageData['totalUser'] = $users->total;
 		$pageData['activeUser'] = $users->active;
 		$pageData['inactiveUser'] = $users->inactive;
@@ -71,8 +79,10 @@ class HomePage extends Controller
 		$pageData['subCategoriesCount'] = $subCategoriesCount;
 		$pageData['postContentCount'] = $postContent;
 		$pageData['postTemplateCount'] = $postTemplate;
+		$pageData['brandConfigurationCount'] = $brandConfigurationCount;
+		$pageData['feedbackCount'] = $feedbackCount;
 
-		$recentUsers = User::where('role', "customer")->orderBy('id', 'desc')->take(7)->get();
+		$recentUsers = User::where('role', "customer")->latest()->take(7)->get();
 		$pageData['recentUsers'] = $recentUsers;
 
 		return view('content.pages.dashboard', compact('pageData'));

@@ -112,6 +112,52 @@
                 </div>
             </a>
         </div>
+
+        {{-- brand configuration count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('brand-configuration') }}" title="Go to Brand Configuration">
+                <div class="card card-border-shadow-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-primary rounded-3">
+                                    <i class="ri-list-settings-fill ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['brandConfigurationCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Brand Configuration</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- FeedBack count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('feedback-management') }}" title="Go to Feedback Management">
+                <div class="card card-border-shadow-secondary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-secondary rounded-3">
+                                    <i class="ri-contacts-book-3-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['feedbackCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Feedback</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <div class="row g-6">

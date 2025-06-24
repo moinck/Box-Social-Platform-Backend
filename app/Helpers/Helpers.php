@@ -625,6 +625,7 @@ class Helpers
             return json_encode($data);
             
         } catch (Exception $e) {
+            self::sendErrorMailToDeveloper($e);
             // Return original data if error occurs
             return $templateJson;
         }
@@ -644,5 +645,36 @@ class Helpers
         }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
         return $base64Image;
+    }
+
+    /**
+     * Function to send error mail to developer
+     * @param mixed $errorData
+     * @return void
+     */
+    public static function sendErrorMailToDeveloper($errorData)
+    {
+        $newErrorData = [
+            'environment' => config('app.env'),
+            'url' => request()->fullUrl(),
+            'method' => request()->method(),
+            'ipAddress' => request()->ip(),
+            'userAgent' => request()->userAgent(),
+            'file' => $errorData->getFile(),
+            'line' => $errorData->getLine(),
+            'trace' => $errorData->getTraceAsString(),
+            'message' => $errorData->getMessage(),
+            'exception' => get_class($errorData),
+            'version' => config('app.version') ?? "1.0",
+        ];
+
+        $view = view('content.email.error-report-email', compact('newErrorData'))->render();
+        
+        // send mail to developer
+        Mail::send([], [], function ($message) use ($view) {
+            $message->html($view);
+            $message->to('pratikdev.iihglobal@gmail.com');
+            $message->subject('New Error Report');
+        });
     }
 }
