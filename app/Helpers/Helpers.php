@@ -628,7 +628,11 @@ class Helpers
             return json_encode($data);
             
         } catch (Exception $e) {
-            self::sendErrorMailToDeveloper($e);
+            if(env('APP_ENV') == 'local'){
+                dd($e);
+            } else {
+                self::sendErrorMailToDeveloper($e);
+            }
             // Return original data if error occurs
             return $templateJson;
         }
@@ -646,11 +650,11 @@ class Helpers
         if ($mime == 'svg') {
             $mime = 'svg+xml';
         }
-        if($height && $width){
-            $image = imagecreatefromjpeg($path);
-            $width = imagesx($image);
-            $height = imagesy($image);
-        }
+        // if($height && $width){
+        //     $image = imagecreatefromjpeg($path);
+        //     $width = imagesx($image);
+        //     $height = imagesy($image);
+        // }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
         return $base64Image;
     }

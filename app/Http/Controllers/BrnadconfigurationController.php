@@ -7,6 +7,7 @@ use App\Models\BrandKit;
 use App\Models\PostTemplate;
 use App\Models\SocialMedia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
 class BrnadconfigurationController extends Controller
@@ -130,11 +131,11 @@ class BrnadconfigurationController extends Controller
 
     public function updateJsonData()
     {
+        DB::connection()->enableQueryLog();
+        $start = microtime(true);
         $postTemplate = PostTemplate::find(1);
 
-        // $templateData = json_encode($template->template_data);
-
-        $brandkit = BrandKit::find(2);
+        $brandkit = BrandKit::find(7);
 
         $brandkitData = [
             'name' => $brandkit->user->first_name . ' ' . $brandkit->user->last_name,
@@ -143,16 +144,25 @@ class BrnadconfigurationController extends Controller
             'company' => $brandkit->company_name,
             'address' => $brandkit->address,
             'website' => $brandkit->website,
-            'brandkit_logo' => asset($brandkit->logo),
+            'brandkit_logo' => $brandkit->logo,
         ];
 
         try {
             $processedTemplate = Helpers::replaceFabricTemplateData($postTemplate->template_data, $brandkitData);
         } catch (\Exception $e) {
-            Helpers::sendErrorMailToDeveloper($e);
+            // Helpers::sendErrorMailToDeveloper($e);
+            dd($e);
         }
+        $queryLog = DB::getQueryLog();
+        $executionTime = $queryLog[0]['time'];
+        $end = microtime(true);
+        $TotalExecutionTime = round($end - $start, 4)." seconds";
 
         return response()->json([
+            'queryLog' => $queryLog,
+            'executionTime' => $executionTime,
+            'TotalExecutionTime' => $TotalExecutionTime,
+            'test_time' => "Time: " . round(microtime(true) - $start, 4) . "s",
             'template' => $processedTemplate,
             'decode_template' => json_decode($processedTemplate)
         ]);
