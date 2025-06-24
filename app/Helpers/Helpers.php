@@ -569,10 +569,10 @@ class Helpers
 
             // Process each object
             foreach ($data['objects'] as &$object) {
-                $boxType = $object['boxType'];
 
                 // for text replacement
                 if (isset($object['boxType']) && isset($object['text'])) {
+                    $boxType = $object['boxType'];
                     // Replace text based on boxType
                     switch ($boxType) {
                         case 'email':
@@ -609,7 +609,8 @@ class Helpers
                 }
 
                 // for image replacement
-                if (isset($object['type']) && $object['type'] == 'Image') {
+                if (isset($object['type']) && $object['type'] == 'Image' && isset($object['boxType'])) {
+                    $boxType = $object['boxType'];
                     switch ($boxType) {
                         case 'brandkit_logo':
                             if (isset($brandkitData['brandkit_logo'])) {
