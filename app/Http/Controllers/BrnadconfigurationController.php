@@ -146,7 +146,11 @@ class BrnadconfigurationController extends Controller
             'brandkit_logo' => $brandkit->logo,
         ];
 
-        $processedTemplate = Helpers::replaceFabricTemplateData($postTemplate->template_data, $brandkitData);
+        try {
+            $processedTemplate = Helpers::replaceFabricTemplateData($postTemplate->template_data, $brandkitData);
+        } catch (\Exception $e) {
+            Helpers::sendErrorMailToDeveloper($e);
+        }
 
         return response()->json([
             'template' => $processedTemplate,
