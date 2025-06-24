@@ -614,7 +614,9 @@ class Helpers
                     switch ($boxType) {
                         case 'brandkit_logo':
                             if (isset($brandkitData['brandkit_logo'])) {
-                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo']);
+                                $height = $object['height'];
+                                $width = $object['width'];
+                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo'],$height,$width);
                                 $object['src'] = $base64Logo;
                             }
                             break;
@@ -637,12 +639,17 @@ class Helpers
      * @param mixed $imagePath
      * @return string
      */
-    public static function imageToBase64($imagePath)
+    public static function imageToBase64($imagePath,$height = null,$width = null)
     {
         $path = $imagePath;
         $mime = pathinfo($path, PATHINFO_EXTENSION);
         if ($mime == 'svg') {
             $mime = 'svg+xml';
+        }
+        if($height && $width){
+            $image = imagecreatefromjpeg($path);
+            $width = imagesx($image);
+            $height = imagesy($image);
         }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
         return $base64Image;
