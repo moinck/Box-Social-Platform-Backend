@@ -134,7 +134,7 @@ class BrnadconfigurationController extends Controller
 
         // $templateData = json_encode($template->template_data);
 
-        $brandkit = BrandKit::find(7);
+        $brandkit = BrandKit::find(2);
 
         $brandkitData = [
             'name' => $brandkit->user->first_name . ' ' . $brandkit->user->last_name,
@@ -143,7 +143,7 @@ class BrnadconfigurationController extends Controller
             'company' => $brandkit->company_name,
             'address' => $brandkit->address,
             'website' => $brandkit->website,
-            'brandkit_logo' => $brandkit->logo,
+            'brandkit_logo' => asset($brandkit->logo),
         ];
 
         try {

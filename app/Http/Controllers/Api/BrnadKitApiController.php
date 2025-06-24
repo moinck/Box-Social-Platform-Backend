@@ -210,10 +210,10 @@ class BrnadKitApiController extends Controller
         }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
 
-        if ($brandKitObj->base64_logo == null) {
-            $brandKitObj->base64_logo = $base64Image;
-            $brandKitObj->save();
-        }
+        // if ($brandKitObj->base64_logo == null) {
+        //     $brandKitObj->base64_logo = $base64Image;
+        //     $brandKitObj->save();
+        // }
 
         return response()->json([
             'success' => true,

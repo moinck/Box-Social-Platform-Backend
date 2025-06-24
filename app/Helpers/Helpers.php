@@ -273,7 +273,7 @@ class Helpers
             } else {
                 Log::info("File does not exist at: " . $path);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error deleting file: " . $e->getMessage());
         }
     }
@@ -353,7 +353,7 @@ class Helpers
         try {
             // Validate URL
             if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-                throw new \Exception('Invalid URL provided');
+                throw new Exception('Invalid URL provided');
             }
 
             // Ensure the directory exists in the storage
@@ -365,21 +365,21 @@ class Helpers
             $imageContent = @file_get_contents($imageUrl);
             
             if ($imageContent === false) {
-                throw new \Exception('Failed to fetch image from URL');
+                throw new Exception('Failed to fetch image from URL');
             }
 
             // Get image info to determine extension
             $imageInfo = @getimagesizefromstring($imageContent);
             
             if ($imageInfo === false) {
-                throw new \Exception('Invalid image format');
+                throw new Exception('Invalid image format');
             }
 
             // Determine file extension from MIME type
             $extension = self::getExtensionFromMimeType($imageInfo['mime']);
             
             if (!$extension) {
-                throw new \Exception('Unsupported image format');
+                throw new Exception('Unsupported image format');
             }
 
             // Generate a unique name for the image
@@ -393,7 +393,7 @@ class Helpers
             $savedImageUrl = 'storage/' . $fullPath;
             return $savedImageUrl;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log the error
             Log::error('Image upload from URL failed: ' . $e->getMessage());
             return false;
@@ -614,7 +614,9 @@ class Helpers
                     switch ($boxType) {
                         case 'brandkit_logo':
                             if (isset($brandkitData['brandkit_logo'])) {
-                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo']);
+                                $height = $object['height'];
+                                $width = $object['width'];
+                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo'],$height,$width);
                                 $object['src'] = $base64Logo;
                             }
                             break;
@@ -637,12 +639,17 @@ class Helpers
      * @param mixed $imagePath
      * @return string
      */
-    public static function imageToBase64($imagePath)
+    public static function imageToBase64($imagePath,$height = null,$width = null)
     {
         $path = $imagePath;
         $mime = pathinfo($path, PATHINFO_EXTENSION);
         if ($mime == 'svg') {
             $mime = 'svg+xml';
+        }
+        if($height && $width){
+            $image = imagecreatefromjpeg($path);
+            $width = imagesx($image);
+            $height = imagesy($image);
         }
         $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
         return $base64Image;
