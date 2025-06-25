@@ -37,6 +37,17 @@
             <div class="head-label">
                 <h5 class="card-title mb-0">Post Template</h5>
             </div>
+            <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons btn-group flex-wrap"> 
+                    <a href="http://178.128.45.173:9163/admin" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Template">
+                        <span>
+                            <i class="ri-add-line ri-16px me-sm-2"></i>
+                            <span class="d-none d-sm-inline-block">Create Post Template</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="card-datatable table-responsive">
             <table class="dt-fixedheader table table-bordered" id="post-template-data-table">

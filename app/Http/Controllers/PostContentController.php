@@ -31,8 +31,8 @@ class PostContentController extends Controller
         $categories = Categories::with('children:id,name,parent_id')->where('parent_id', $request->category_id)
             ->orderBy('name', 'asc')
             ->get();
-        
-        if($categories->isEmpty()){
+
+        if ($categories->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No Subcategory Found'
@@ -128,13 +128,13 @@ class PostContentController extends Controller
                 $editUrl = route('post-content.edit', $postId);
 
                 return '
-                    <a href="'.$editUrl.'" title="edit post content" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
+                    <a href="' . $editUrl . '" title="edit post content" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
                         data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" title="delete post content" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-content-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-id="'.$postId.'"><i class="ri-delete-bin-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-id="' . $postId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_description','created_date', 'updated_date'])
+            ->rawColumns(['action', 'post_description', 'created_date', 'updated_date'])
             ->make(true);
     }
 
@@ -152,7 +152,7 @@ class PostContentController extends Controller
             'message' => 'Post Content Deleted Successfully',
         ]);
     }
-    
+
     public function import(Request $request)
     {
         $request->validate([
@@ -161,7 +161,7 @@ class PostContentController extends Controller
 
         $file = $request->file('post_content_file');
         Excel::import(new PostContentImport(), $file);
-        
+
         return redirect()->back()->with('success', 'Post Content Imported Successfully');
     }
 }

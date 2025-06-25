@@ -147,7 +147,7 @@ class ProfileManagementApiController extends Controller
 
             // Check if it's base64 data
             if (strpos($uploadLogoUrl, 'data:image/') === 0) {
-                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'profile','images/profile');
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl, 'profile', 'images/profile');
             } else {
                 // If it's not base64, handle as before (URL or regular file)
                 $logoUrl = Helpers::uploadImage('profile', $uploadLogoUrl, 'images/profile');
@@ -206,6 +206,6 @@ class ProfileManagementApiController extends Controller
         $user->password = Hash::make($request->new_password);
         $user->save();
 
-        return $this->success([],'Password updated successfully');
+        return $this->success([], 'Password updated successfully');
     }
 }

@@ -16,13 +16,13 @@ class ContactUsController extends Controller
 {
     use ResponseTrait;
 
-    public function index() 
+    public function index()
     {
         return view('content.pages.admin.contact-us.index');
     }
 
     // data table function
-    public function contactUsDataTable(Request $request) 
+    public function contactUsDataTable(Request $request)
     {
         $contactUs = ContactUs::latest()->get();
 
@@ -80,7 +80,7 @@ class ContactUsController extends Controller
         $adminMail = User::where('role', 'admin')->first()->email;
         Mail::to($adminMail)->send(new ContactUsMail($contactUs));
 
-        return $this->success([],'Contact Us submitted successfully');
+        return $this->success([], 'Contact Us submitted successfully');
     }
 
     public function mailPreview()

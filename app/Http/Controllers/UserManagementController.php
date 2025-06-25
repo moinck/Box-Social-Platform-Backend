@@ -15,7 +15,7 @@ class UserManagementController extends Controller
     {
         return view('content.pages.pages-home');
     }
-    
+
     /**
      * User Management DataTable
      * @param \Illuminate\Http\Request $request
@@ -23,22 +23,22 @@ class UserManagementController extends Controller
      */
     public function userDataTable(Request $request)
     {
-        $users = User::where('role','customer')
-        ->when($request->is_brandkit, function ($query) use ($request) {
-            if ($request->is_brandkit == 1) {
-                $query->whereHas('brandKit');
-            } else {
-                $query->whereDoesntHave('brandKit');
-            }
-        })
-        ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
-            if ($request->account_status == 1) {
-                $query->where('status','=', 'active');
-            } elseif ($request->account_status == 2) {
-                $query->where('status','=', 'inactive');
-            }
-        })
-        ->latest()->get();
+        $users = User::where('role', 'customer')
+            ->when($request->is_brandkit, function ($query) use ($request) {
+                if ($request->is_brandkit == 1) {
+                    $query->whereHas('brandKit');
+                } else {
+                    $query->whereDoesntHave('brandKit');
+                }
+            })
+            ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
+                if ($request->account_status == 1) {
+                    $query->where('status', '=', 'active');
+                } elseif ($request->account_status == 2) {
+                    $query->where('status', '=', 'inactive');
+                }
+            })
+            ->latest()->get();
 
         return DataTables::of($users)
             ->addIndexColumn()
@@ -72,8 +72,8 @@ class UserManagementController extends Controller
                 $userId = Helpers::encrypt($user->id);
 
                 return '<label class="switch" >
-                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$userId.'" id="user-account-status">
-                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
+                            <input type="checkbox" class="switch-input" ' . $status . ' data-id="' . $userId . '" id="user-account-status">
+                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="' . $title . '">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
                             </span>
@@ -83,11 +83,11 @@ class UserManagementController extends Controller
                 $userId = Helpers::encrypt($user->id);
                 $name = $user->first_name . ' ' . $user->last_name;
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="'.$userId.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-name="'.$name.'" data-user-id="'.$userId.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="' . $userId . '"><i class="ri-edit-box-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action','is_brandkit'])
+            ->rawColumns(['name', 'company_name', 'email', 'fca_number', 'account_status', 'created_date', 'action', 'is_brandkit'])
             ->make(true);
     }
 
@@ -101,7 +101,7 @@ class UserManagementController extends Controller
         $id = Helpers::decrypt($id);
         $user = User::find($id);
         $user->has_brandkit = $user->hasBrandKit() ? 1 : 0;
-        
+
         if ($user) {
             return response()->json([
                 'success' => true,
@@ -128,7 +128,7 @@ class UserManagementController extends Controller
             'edit_first_name' => 'required|string|max:255',
             'edit_last_name' => 'required|string|max:255',
             'edit_company_name' => 'required|string|max:255',
-            'edit_user_email' => 'required|email|max:255|unique:users,email,'.$userId,
+            'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
             'user_fca_number' => 'required|string|max:255',
             'user_account_status' => 'string|in:active,inactive',
         ]);
@@ -216,11 +216,11 @@ class UserManagementController extends Controller
     public function export(Request $request)
     {
         $format = $request->format;
-        $name = 'users_'.date('Y-m-d_g-s');
+        $name = 'users_' . date('Y-m-d_g-s');
         if ($format == 'csv') {
-            return Excel::download(new UsersExport, $name.'.csv');
+            return Excel::download(new UsersExport, $name . '.csv');
         } else {
-            return Excel::download(new UsersExport, $name.'.xlsx');
+            return Excel::download(new UsersExport, $name . '.xlsx');
         }
     }
 }

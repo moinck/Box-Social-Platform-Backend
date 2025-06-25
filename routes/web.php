@@ -19,8 +19,8 @@ use App\Http\Controllers\ProfileManagementController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
-    Route::get('/login', [LoginController::class,'index'])->name('login');
-    Route::post('/login', [LoginController::class,'login']);
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
@@ -51,63 +51,63 @@ Route::middleware('auth')->group(function () {
     // Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
     // User Management Controller
-    Route::get('/user', [UserManagementController::class,'index'])->name('user');
-    Route::get('/user/datatable', [UserManagementController::class,'userDataTable'])->name('user.data-table');
-    Route::get('/user/edit/{id}', [UserManagementController::class,'edit'])->name('user.edit');
-    Route::post('/user/update', [UserManagementController::class,'update'])->name('user.update');
-    Route::post('/user/delete', [UserManagementController::class,'destroy'])->name('user.delete');
-    Route::post('/user/account-status', [UserManagementController::class,'accountStatus'])->name('user.account-status');
-    Route::get('/user/export', [UserManagementController::class,'export'])->name('user.export');
+    Route::get('/user', [UserManagementController::class, 'index'])->name('user');
+    Route::get('/user/datatable', [UserManagementController::class, 'userDataTable'])->name('user.data-table');
+    Route::get('/user/edit/{id}', [UserManagementController::class, 'edit'])->name('user.edit');
+    Route::post('/user/update', [UserManagementController::class, 'update'])->name('user.update');
+    Route::post('/user/delete', [UserManagementController::class, 'destroy'])->name('user.delete');
+    Route::post('/user/account-status', [UserManagementController::class, 'accountStatus'])->name('user.account-status');
+    Route::get('/user/export', [UserManagementController::class, 'export'])->name('user.export');
 
     // Profile Management Controller
-    Route::get('/profile-management', [ProfileManagementController::class,'index'])->name('profile-management');
-    Route::post('/profile-management/update', [ProfileManagementController::class,'update'])->name('profile-management.update');
+    Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management');
+    Route::post('/profile-management/update', [ProfileManagementController::class, 'update'])->name('profile-management.update');
 
     // Only Admin access routes
     Route::middleware('checkRole:admin')->group(function () {
         // categories controller
-        Route::get('/categories', [CategoriesController::class,'index'])->name('categories');
-        Route::post('/categories/store', [CategoriesController::class,'store'])->name('categories.store');
-        Route::get('/categories/datatable', [CategoriesController::class,'categoriesDataTable'])->name('categories.data-table');
-        Route::get('/categories/edit/{id}', [CategoriesController::class,'edit'])->name('categories.edit');
-        Route::post('/categories/update', [CategoriesController::class,'update'])->name('categories.update');
-        Route::post('/categories/delete', [CategoriesController::class,'destroy'])->name('categories.delete');
-        Route::post('/categories/account-status', [CategoriesController::class,'changeStatus'])->name('categories.change-status');
-        Route::get('/categories/export', [CategoriesController::class,'export'])->name('categories.export');
-    
+        Route::get('/categories', [CategoriesController::class, 'index'])->name('categories');
+        Route::post('/categories/store', [CategoriesController::class, 'store'])->name('categories.store');
+        Route::get('/categories/datatable', [CategoriesController::class, 'categoriesDataTable'])->name('categories.data-table');
+        Route::get('/categories/edit/{id}', [CategoriesController::class, 'edit'])->name('categories.edit');
+        Route::post('/categories/update', [CategoriesController::class, 'update'])->name('categories.update');
+        Route::post('/categories/delete', [CategoriesController::class, 'destroy'])->name('categories.delete');
+        Route::post('/categories/account-status', [CategoriesController::class, 'changeStatus'])->name('categories.change-status');
+        Route::get('/categories/export', [CategoriesController::class, 'export'])->name('categories.export');
+
         // brand configuration controller
-        Route::get('/brand-configuration', [BrnadconfigurationController::class,'index'])->name('brand-configuration');
-        Route::get('/brand-configuration/show/{id}', [BrnadconfigurationController::class,'show'])->name('brand-configuration.show');
-        Route::get('/brand-configuration/edit/{id}', [BrnadconfigurationController::class,'edit'])->name('brand-configuration.edit');
-        Route::post('/brand-configuration/update', [BrnadconfigurationController::class,'update'])->name('brand-configuration.update');
-        Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class,'dataTable'])->name('brand-configuration.data-table');
-        Route::post('/brand-configuration/delete', [BrnadconfigurationController::class,'destroy'])->name('brand-configuration.delete');
-        
-        Route::get('/brand-configuration/update-json-data', [BrnadconfigurationController::class,'updateJsonData'])->name('brand-configuration.update-json-data');
+        Route::get('/brand-configuration', [BrnadconfigurationController::class, 'index'])->name('brand-configuration');
+        Route::get('/brand-configuration/show/{id}', [BrnadconfigurationController::class, 'show'])->name('brand-configuration.show');
+        Route::get('/brand-configuration/edit/{id}', [BrnadconfigurationController::class, 'edit'])->name('brand-configuration.edit');
+        Route::post('/brand-configuration/update', [BrnadconfigurationController::class, 'update'])->name('brand-configuration.update');
+        Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class, 'dataTable'])->name('brand-configuration.data-table');
+        Route::post('/brand-configuration/delete', [BrnadconfigurationController::class, 'destroy'])->name('brand-configuration.delete');
+
+        Route::get('/brand-configuration/update-json-data', [BrnadconfigurationController::class, 'updateJsonData'])->name('brand-configuration.update-json-data');
         // user feedback-management controller
-        Route::get('/feedback-management', [ContactUsController::class,'index'])->name('feedback-management');
-        Route::get('/feedback-management/datatable', [ContactUsController::class,'contactUsDataTable'])->name('feedback-management.data-table');
-        Route::get('/feedback-management/mail-preview', [ContactUsController::class,'mailPreview'])->name('feedback-management.mail-preview');
+        Route::get('/feedback-management', [ContactUsController::class, 'index'])->name('feedback-management');
+        Route::get('/feedback-management/datatable', [ContactUsController::class, 'contactUsDataTable'])->name('feedback-management.data-table');
+        Route::get('/feedback-management/mail-preview', [ContactUsController::class, 'mailPreview'])->name('feedback-management.mail-preview');
 
         // post content controller
-        Route::get('/post-content', [PostContentController::class,'index'])->name('post-content');
-        Route::get('/post-content/sub-category/get/data', [PostContentController::class,'subCategoryData'])->name('post-content.sub-category.get.data');
-        Route::get('/post-content/create', [PostContentController::class,'create'])->name('post-content.create');
-        Route::post('/post-content/store', [PostContentController::class,'store'])->name('post-content.store');
-        Route::get('/post-content/datatable', [PostContentController::class,'dataTable'])->name('post-content.data-table');
-        Route::get('/post-content/edit/{id}', [PostContentController::class,'edit'])->name('post-content.edit');
-        Route::post('/post-content/update', [PostContentController::class,'update'])->name('post-content.update');
-        Route::post('/post-content/delete', [PostContentController::class,'destroy'])->name('post-content.delete');
-        Route::post('/post-content/import', [PostContentController::class,'import'])->name('post-content.import');
+        Route::get('/post-content', [PostContentController::class, 'index'])->name('post-content');
+        Route::get('/post-content/sub-category/get/data', [PostContentController::class, 'subCategoryData'])->name('post-content.sub-category.get.data');
+        Route::get('/post-content/create', [PostContentController::class, 'create'])->name('post-content.create');
+        Route::post('/post-content/store', [PostContentController::class, 'store'])->name('post-content.store');
+        Route::get('/post-content/datatable', [PostContentController::class, 'dataTable'])->name('post-content.data-table');
+        Route::get('/post-content/edit/{id}', [PostContentController::class, 'edit'])->name('post-content.edit');
+        Route::post('/post-content/update', [PostContentController::class, 'update'])->name('post-content.update');
+        Route::post('/post-content/delete', [PostContentController::class, 'destroy'])->name('post-content.delete');
+        Route::post('/post-content/import', [PostContentController::class, 'import'])->name('post-content.import');
 
         // post template controller
-        Route::get('/post-template', [PostTemplateController::class,'index'])->name('post-template');
-        Route::get('/post-template/datatable', [PostTemplateController::class,'dataTable'])->name('post-template.data-table');
-        Route::post('/post-template/delete', [PostTemplateController::class,'destroy'])->name('post-template.delete');
-        Route::post('/post-template/account-status', [PostTemplateController::class,'changeStatus'])->name('post-template.change-status');
+        Route::get('/post-template', [PostTemplateController::class, 'index'])->name('post-template');
+        Route::get('/post-template/datatable', [PostTemplateController::class, 'dataTable'])->name('post-template.data-table');
+        Route::post('/post-template/delete', [PostTemplateController::class, 'destroy'])->name('post-template.delete');
+        Route::post('/post-template/account-status', [PostTemplateController::class, 'changeStatus'])->name('post-template.change-status');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::get('/get/user', [RegisterController::class,'GetAllUser']);
+    Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
 });

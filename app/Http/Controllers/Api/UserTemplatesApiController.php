@@ -25,19 +25,19 @@ class UserTemplatesApiController extends Controller
         $search = $request->search ?? '';
 
         $userTemplates = UserTemplates::with('template.category')
-        ->when($search, function ($query) use ($search) {
-            $query->whereHas('template.category', function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%');
-            });
-        })
-        ->where('user_id', $user->id)
-        ->when($search, function ($query) use ($search) {
-            $query->where('template_name', 'like', '%' . $search . '%');
-        })
-        ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('template.category', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                });
+            })
+            ->where('user_id', $user->id)
+            ->when($search, function ($query) use ($search) {
+                $query->where('template_name', 'like', '%' . $search . '%');
+            })
+            ->get();
 
         if ($userTemplates->isEmpty()) {
-            return $this->error('User templates not found',404);
+            return $this->error('User templates not found', 404);
         }
 
         $returnData = [];
@@ -53,7 +53,7 @@ class UserTemplatesApiController extends Controller
             ];
         }
 
-        return $this->success($returnData,'User templates list');
+        return $this->success($returnData, 'User templates list');
     }
 
     public function get($id)
@@ -62,7 +62,7 @@ class UserTemplatesApiController extends Controller
         $userTemplate = UserTemplates::with('template.category')->find($decyptedId);
 
         if (!$userTemplate) {
-            return $this->error('User template not found',404);
+            return $this->error('User template not found', 404);
         }
 
         $returnData = [
@@ -73,7 +73,7 @@ class UserTemplatesApiController extends Controller
             'template_data' => $userTemplate->template_data,
         ];
 
-        return $this->success($returnData,'User template');
+        return $this->success($returnData, 'User template');
     }
 
     public function store(Request $request)
@@ -87,7 +87,7 @@ class UserTemplatesApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->validationError('Validation failed',$validator->errors());
+            return $this->validationError('Validation failed', $validator->errors());
         }
 
         $user = Auth::user();
@@ -97,7 +97,7 @@ class UserTemplatesApiController extends Controller
         // upload image
         $imageUrl = null;
         if ($request->has('template_image')) {
-            $imageUrl = Helpers::handleBase64Image($request->template_image,'user_template','images/user-template-images');
+            $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
         }
 
         $userTemplate = UserTemplates::create([
@@ -121,7 +121,7 @@ class UserTemplatesApiController extends Controller
             'template_data' => $userTemplate->template_data,
         ];
 
-        return $this->success($returnData,'User template saved successfully');
+        return $this->success($returnData, 'User template saved successfully');
     }
 
     public function delete(Request $request)
@@ -131,14 +131,14 @@ class UserTemplatesApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->validationError('Validation failed',$validator->errors());
+            return $this->validationError('Validation failed', $validator->errors());
         }
 
         $decyptedId = Helpers::decrypt($request->template_id);
         $userTemplate = UserTemplates::find($decyptedId);
 
         if (!$userTemplate) {
-            return $this->error('User template not found',404);
+            return $this->error('User template not found', 404);
         }
 
         if ($userTemplate->template_image && $userTemplate->template_image != null) {
@@ -147,7 +147,7 @@ class UserTemplatesApiController extends Controller
 
         $userTemplate->delete();
 
-        return $this->success([],'User template deleted successfully');
+        return $this->success([], 'User template deleted successfully');
     }
 
     /**
@@ -157,7 +157,7 @@ class UserTemplatesApiController extends Controller
      */
     public function sendTemplateMail($userTemplate)
     {
-        $user = User::select('id','email','first_name','last_name')->find($userTemplate->user_id);
+        $user = User::select('id', 'email', 'first_name', 'last_name')->find($userTemplate->user_id);
         if (!$user) {
             return false;
         }

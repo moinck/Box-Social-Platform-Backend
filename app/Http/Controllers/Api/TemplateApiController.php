@@ -33,7 +33,7 @@ class TemplateApiController extends Controller
 
         $imagePath = null;
         if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-            $imagePath = Helpers::handleBase64Image($request->template_image,'admin_template','images/admin-post-templates');
+            $imagePath = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
         }
 
         $tempObj = new PostTemplate();
@@ -78,12 +78,12 @@ class TemplateApiController extends Controller
             'brandkit_logo' => $brandkitData->logo ?? '',
         ];
 
-        $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
+        // $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
 
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
-            'template_data' => isset($tempObj->template_data) ? $processedTemplateData : [],
+            'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
 
         if (!empty($tempObj)) {
