@@ -24,7 +24,7 @@ class CategoriesController extends Controller
                 return $category->name;
             })
             ->addColumn('image', function ($category) {
-                return '<img src="'.asset($category->image).'" alt="'.$category->name.'" class="br-1" width="100" height="100">';
+                return '<img src="' . asset($category->image) . '" alt="' . $category->name . '" class="br-1" width="100" height="100">';
             })
             ->addColumn('description', function ($category) {
                 return $category->description;
@@ -40,8 +40,8 @@ class CategoriesController extends Controller
 
                 $categoryId = Helpers::encrypt($category->id);
                 return '<label class="switch">
-                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$categoryId.'" id="category-status">
-                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
+                            <input type="checkbox" class="switch-input" ' . $status . ' data-id="' . $categoryId . '" id="category-status">
+                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="' . $title . '">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
                             </span>
@@ -54,9 +54,9 @@ class CategoriesController extends Controller
                 $categoryId = Helpers::encrypt($category->id);
                 return '
                     <a href="javascript:;" title="edit category" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-category-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$categoryId.'"><i class="ri-edit-box-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="' . $categoryId . '"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" title="delete category" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-category-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="'.$categoryId.'"><i class="ri-delete-bin-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="' . $categoryId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['image', 'status', 'action'])

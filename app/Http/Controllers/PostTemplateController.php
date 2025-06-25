@@ -12,7 +12,7 @@ class PostTemplateController extends Controller
 {
     public function index()
     {
-        $categories = Categories::select(['id','name'])
+        $categories = Categories::select(['id', 'name'])
             ->where(function ($query) {
                 $query->where('status', true)
                     ->where('parent_id', null);
@@ -25,7 +25,7 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category','postContent','designStyle')
+        $postTemplates = PostTemplate::with('category', 'postContent', 'designStyle')
             ->where(function ($query) use ($request) {
                 if ($request->category) {
                     $query->where('category_id', $request->category);
@@ -40,7 +40,7 @@ class PostTemplateController extends Controller
             ->addIndexColumn()
             ->addColumn('template_image', function ($data) {
                 $categoryName = $data->category->name;
-                return '<img src="'.asset($data->template_image).'" alt="'.$data->template_name.'" class="br-1 template-image" data-category="'.$categoryName.'" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
+                return '<img src="' . asset($data->template_image) . '" alt="' . $data->template_name . '" class="br-1 template-image" data-category="' . $categoryName . '" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
             })
             ->addColumn('post_content', function ($data) {
                 return $data->postContent->title ?? "-";
@@ -62,8 +62,8 @@ class PostTemplateController extends Controller
 
                 $postTemplateId = Helpers::encrypt($data->id);
                 return '<label class="switch">
-                            <input type="checkbox" class="switch-input" '.$status.' data-id="'.$postTemplateId.'" id="post-template-status">
-                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'">
+                            <input type="checkbox" class="switch-input" ' . $status . ' data-id="' . $postTemplateId . '" id="post-template-status">
+                            <span class="switch-toggle-slider" data-bs-toggle="tooltip" data-bs-placement="bottom" title="' . $title . '">
                                 <span class="switch-on"></span>
                                 <span class="switch-off"></span>
                             </span>
@@ -79,12 +79,12 @@ class PostTemplateController extends Controller
                 $postTemplateId = Helpers::encrypt($data->id);
                 return '
                     <a href="javascript:;" title="edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="'.$postTemplateId.'"><i class="ri-edit-box-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" title="delete post template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="'.$postTemplateId.'"><i class="ri-delete-bin-line"></i></a>
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action','post_content','template_image','design_style','status','created_at'])
+            ->rawColumns(['action', 'post_content', 'template_image', 'design_style', 'status', 'created_at'])
             ->make(true);
     }
 
