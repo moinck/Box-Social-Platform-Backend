@@ -102,7 +102,7 @@ class BrnadKitApiController extends Controller
         }
 
         $brandKitObj->logo = $logoUrl;
-        $brandKitObj->base64_logo = $request->logo ?? null;
+        // $brandKitObj->base64_logo = $request->logo ?? null;
         $brandKitObj->user_id = $decryptedUserId;
         $brandKitObj->company_name = $request->company_name;
         $brandKitObj->email = $request->email;
