@@ -78,12 +78,12 @@ class TemplateApiController extends Controller
             'brandkit_logo' => $brandkitData->logo ?? '',
         ];
 
-        $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
+        // $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
 
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
-            'template_data' => isset($tempObj->template_data) ? $processedTemplateData : [],
+            'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
 
         if (!empty($tempObj)) {
