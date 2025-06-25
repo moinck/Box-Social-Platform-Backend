@@ -81,9 +81,10 @@ class UserManagementController extends Controller
             })
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);
+                $name = $user->first_name . ' ' . $user->last_name;
                 return '
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="'.$userId.'"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-id="'.$userId.'"><i class="ri-delete-bin-line"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-name="'.$name.'" data-user-id="'.$userId.'"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['name','company_name','email','fca_number','account_status','created_date','action','is_brandkit'])
