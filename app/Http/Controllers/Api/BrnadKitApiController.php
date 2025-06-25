@@ -222,6 +222,7 @@ class BrnadKitApiController extends Controller
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $base64Image,
+                "logo_url" => asset($brandKitObj->logo),
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,

@@ -27,16 +27,17 @@ class RegisterController extends Controller
         return view('content.authentications.auth-register-basic', ['pageConfigs' => $pageConfigs]);
     }
 
-    public function GetAllUser(){
+    public function GetAllUser()
+    {
         $userData = User::query();
         return DataTables::of($userData)
-        ->addColumn('name', function($data){
-            return $data['first_name'].' '.$data['last_name'] ;
-        })
-        ->addColumn('action', function($data){
-           return  '<a href="javascript:;" title="View" class="btn btn-sm btn-text-secondary rounded-pill btn-icon item-edit"><i class="ri-eye-line"></i></a>';
-        })
-        ->make(true);
+            ->addColumn('name', function ($data) {
+                return $data['first_name'] . ' ' . $data['last_name'];
+            })
+            ->addColumn('action', function ($data) {
+                return '<a href="javascript:;" title="View" class="btn btn-sm btn-text-secondary rounded-pill btn-icon item-edit"><i class="ri-eye-line"></i></a>';
+            })
+            ->make(true);
     }
 
     public function register(Request $request)
@@ -85,7 +86,7 @@ class RegisterController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             // Create the user
             $user = User::create([
                 'first_name' => $request->first_name,
@@ -102,10 +103,10 @@ class RegisterController extends Controller
             Helpers::sendNotification($user, "new-registration");
 
             // Send verification email
-            $token = Helpers::generateVarificationToken($user,$request,'email-verification');
-            Helpers::sendVerificationMail($user,$token);
+            $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
+            Helpers::sendVerificationMail($user, $token);
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'User registered successfully. Please check your email for verification link.',
@@ -124,10 +125,10 @@ class RegisterController extends Controller
                     'verification_token' => Helpers::encrypt($token),
                 ],
             ], 200);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Registration failed. Please try again.',
@@ -192,7 +193,7 @@ class RegisterController extends Controller
         //     ], 403);
         // }
         // For example, generate a token if using Laravel Sanctum or Passport
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
 
         // check does user have brandkit
         $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
@@ -201,27 +202,28 @@ class RegisterController extends Controller
             'success' => true,
             'message' => 'Login successfully.',
             'data' => [
-                    'user' => [
-                        'id' => Helpers::encrypt($user->id),
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'email' => $user->email,
-                        'company_name' => $user->company_name,
-                        'website' => $user->website,
-                        'fca_number' => $user->fca_number,
-                        'created_at' => $user->created_at->format('d-m-Y h:i A'),
-                        'is_verified' => $user->is_verified,
-                        'is_brandkit' => $isBrandkit,
-                    ],
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
+                'user' => [
+                    'id' => Helpers::encrypt($user->id),
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                    'company_name' => $user->company_name,
+                    'website' => $user->website,
+                    'fca_number' => $user->fca_number,
+                    'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                    'is_verified' => $user->is_verified,
+                    'is_brandkit' => $isBrandkit,
                 ],
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ],
 
         ], 200);
 
     }
 
-    public function checkFca(Request $request){
+    public function checkFca(Request $request)
+    {
         $fcaNumber = $request->fca_number;
 
         if (empty($fcaNumber)) {
@@ -237,20 +239,20 @@ class RegisterController extends Controller
             'x-auth-key' => config('app.FCA_Auth_KEY'),
             'Content-Type' => 'application/json',
         ];
-    
-        $response = Http::withHeaders($headers)->get('https://register.fca.org.uk/services/V0.1/Firm/'.$request->fca_number);
+
+        $response = Http::withHeaders($headers)->get('https://register.fca.org.uk/services/V0.1/Firm/' . $request->fca_number);
         $data = $response->json();
 
-        
-    
+
+
         if (!empty($data['Data'][0]["Name"])) {
             $nameUrl = $data['Data'][0]["Name"];
-    
+
             $responseName = Http::withHeaders($headers)->get($nameUrl);
             $nameData = $responseName->json();
-    
+
             $companyName = $nameData['Data'][0]['Current Names'][0]['Name'] ?? '';
-    
+
             $returnResponse = [
                 'status' => '1',
                 'Company Name' => $companyName
@@ -261,10 +263,10 @@ class RegisterController extends Controller
                 'Message' => 'Please Enter Valide FCA Number'
             ];
 
-            return response()->json($returnResponse,422);
+            return response()->json($returnResponse, 422);
         }
-    
-        return response()->json($returnResponse,200);
+
+        return response()->json($returnResponse, 200);
     }
 
     /**

@@ -64,7 +64,7 @@ class AuthApiController extends Controller
         }
 
         // gernerte token
-        $LoginToken = $user->createToken('auth_token')->plainTextToken;
+        $LoginToken = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
         // check does user have brandkit
         $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
 
@@ -136,7 +136,7 @@ class AuthApiController extends Controller
                 }
 
                 // Allow resending the verification email
-                $token = Helpers::generateVarificationToken($user, $request,'email-verification');
+                $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
                 Helpers::sendVerificationMail($user, $token);
 
                 // update old user token
@@ -176,12 +176,12 @@ class AuthApiController extends Controller
                 'user_id' => $user->id,
                 'type' => 'forget-password'
             ])->where('created_at', '>=', Carbon::now()->subMinutes(5))
-              ->count();
+                ->count();
 
             if ($recentTokens >= 3) {
                 // Log suspicious activity
                 Log::warning('Too many password reset attempts', [
-                    'user_id' => $user->id, 
+                    'user_id' => $user->id,
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent()
                 ]);
