@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthApiController extends Controller
 {
@@ -216,8 +217,27 @@ class AuthApiController extends Controller
             'password_confirmation' => $request->password_confirmation
         ], [
             'token' => 'required|string',
-            'password' => 'required|string|min:7',
-            'password_confirmation' => 'required|string|min:7|same:password',
+            'password' => [
+                'required',
+                'string',
+                Password::min(8)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(), // for additional security
+            ],
+            'password_confirmation' => 'required|same:password',
+        ],[
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.mixed' => 'Password must contain both uppercase and lowercase letters.',
+            'password.letters' => 'Password must contain at least one letter.',
+            'password.numbers' => 'Password must contain at least one number.',
+            'password.symbols' => 'Password must contain at least one symbol.',
+            'password.uncompromised' => 'Please choose a strong password for security reasons.',
+            'password_confirmation.required' => 'Password confirmation is required.',
+            'password_confirmation.same' => 'Password confirmation must match the password.',
         ]);
 
         if ($validator->fails()) {
