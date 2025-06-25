@@ -157,7 +157,7 @@ class UserTemplatesApiController extends Controller
      */
     public function sendTemplateMail($userTemplate)
     {
-        $user = User::find($userTemplate->user_id);
+        $user = User::select('id','email','first_name','last_name')->find($userTemplate->user_id);
         if (!$user) {
             return false;
         }
