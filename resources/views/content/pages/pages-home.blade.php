@@ -489,9 +489,10 @@
             // delete user 
             $(document).on('click', '.delete-user-btn', function() {
                 var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    text: "You want to delete " + userName + " account!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
