@@ -228,7 +228,7 @@ class AuthApiController extends Controller
                     ->uncompromised(), // for additional security
             ],
             'password_confirmation' => 'required|same:password',
-        ],[
+        ], [
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.mixed' => 'Password must contain both uppercase and lowercase letters.',

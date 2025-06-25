@@ -33,7 +33,7 @@ class TemplateApiController extends Controller
 
         $imagePath = null;
         if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-            $imagePath = Helpers::handleBase64Image($request->template_image,'admin_template','images/admin-post-templates');
+            $imagePath = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
         }
 
         $tempObj = new PostTemplate();

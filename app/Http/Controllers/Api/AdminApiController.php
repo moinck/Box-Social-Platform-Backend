@@ -13,7 +13,7 @@ class AdminApiController extends Controller
 {
     public function index()
     {
-        $designStyles = DesignStyles::select('id', 'name')->get()->map(function ($designStyle){
+        $designStyles = DesignStyles::select('id', 'name')->get()->map(function ($designStyle) {
             return [
                 'id' => Helpers::encrypt($designStyle->id),
                 'name' => $designStyle->name,
@@ -23,14 +23,14 @@ class AdminApiController extends Controller
         $categories = Categories::where('parent_id', null)
             ->select('id', 'name')
             ->get()
-            ->map(function ($category){
+            ->map(function ($category) {
                 return [
                     'id' => Helpers::encrypt($category->id),
                     'name' => $category->name,
                 ];
             });
 
-        $postContents = PostContent::select('id', 'category_id', 'title')->get()->map(function ($postContent){
+        $postContents = PostContent::select('id', 'category_id', 'title')->get()->map(function ($postContent) {
             return [
                 'id' => Helpers::encrypt($postContent->id),
                 'category_id' => Helpers::encrypt($postContent->category_id),
