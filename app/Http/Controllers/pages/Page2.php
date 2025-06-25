@@ -5,6 +5,8 @@ namespace App\Http\Controllers\pages;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Mail\RegisterVerificationMail;
+use App\Mail\UserTemplateSendMail;
+use App\Models\UserTemplates;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -27,7 +29,14 @@ class Page2 extends Controller
         $user = User::find(1);
         // return view('content.email.verify-email', compact('verification_link'));
         // return view('content.email.reset-password-email', compact('reset_password_link','user'));
-        return view('content.email.custom-email', compact('verification_link','user'));
+        // return view('content.email.custom-email', compact('verification_link','user'));
+
+        $data = [];
+        $data['user'] = $user;
+        $data['template'] = UserTemplates::find(3);
+        // Mail::to("pratikdev.iihglobal@gmail.com")->send(new UserTemplateSendMail($data));
+
+        return view('content.email.send-user-template', compact('data'));
     }
 
     // make test function to send mail

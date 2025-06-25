@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Mail\UserTemplateSendMail;
+use App\Models\User;
 use App\Models\UserTemplates;
 use App\ResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class UserTemplatesApiController extends Controller
@@ -80,6 +83,7 @@ class UserTemplatesApiController extends Controller
             'template_name' => 'required|string',
             'template_image' => 'required|string',
             'template_data' => 'required',
+            "send_mail" => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -103,6 +107,11 @@ class UserTemplatesApiController extends Controller
             'template_image' => $imageUrl ?? null,
             'template_data' => json_encode($request->template_data),
         ]);
+
+        // send mail
+        if ($request->send_mail && $request->send_mail == "1") {
+            $this->sendTemplateMail($userTemplate);
+        }
 
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
@@ -139,5 +148,24 @@ class UserTemplatesApiController extends Controller
         $userTemplate->delete();
 
         return $this->success([],'User template deleted successfully');
+    }
+
+    /**
+     * Function to send template mail
+     * @param mixed $userTemplate
+     * @return bool
+     */
+    public function sendTemplateMail($userTemplate)
+    {
+        $user = User::find($userTemplate->user_id);
+        if (!$user) {
+            return false;
+        }
+        $mailData = [];
+        $mailData['user'] = $user;
+        $mailData['template'] = $userTemplate;
+        Mail::to($user->email)->send(new UserTemplateSendMail($mailData));
+
+        return true;
     }
 }
