@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\PostTemplate;
 use Illuminate\Support\Facades\Auth;
-use PHPUnit\TextUI\Help;
 
 class TemplateApiController extends Controller
 {
@@ -21,10 +20,12 @@ class TemplateApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|string',
-            'template_image' => 'required|string',
+            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required', // or 'array' if JSON
             'design_style_id' => 'required|string',
             'post_content_id' => 'required|string',
+        ],[
+            'template_image.regex' => 'Invalid image format',
         ]);
 
         if ($validator->fails()) {
