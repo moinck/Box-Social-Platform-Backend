@@ -34,6 +34,7 @@ class UserTemplatesApiController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where('template_name', 'like', '%' . $search . '%');
             })
+            ->latest()
             ->get();
 
         if ($userTemplates->isEmpty()) {
@@ -81,9 +82,11 @@ class UserTemplatesApiController extends Controller
         $validator = Validator::make($request->all(), [
             'template_id' => 'required',
             'template_name' => 'required|string',
-            'template_image' => 'required|string',
+            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required',
             "send_mail" => 'nullable|string',
+        ],[
+            'template_image.regex' => 'Invalid image format',
         ]);
 
         if ($validator->fails()) {
@@ -96,7 +99,7 @@ class UserTemplatesApiController extends Controller
 
         // upload image
         $imageUrl = null;
-        if ($request->has('template_image')) {
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
             $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
         }
 
