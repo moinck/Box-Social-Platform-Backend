@@ -26,14 +26,14 @@ class UserTemplatesApiController extends Controller
 
         $userTemplates = UserTemplates::with('template.category')
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('template.category', function ($query) use ($search) {
-                    $query->where('name', 'like', '%' . $search . '%');
+                $query->where(function ($query) use ($search) {
+                    $query->whereHas('template.category', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('template_name', 'like', "%{$search}%");
                 });
             })
             ->where('user_id', $user->id)
-            ->when($search, function ($query) use ($search) {
-                $query->where('template_name', 'like', '%' . $search . '%');
-            })
             ->latest()
             ->get();
 
