@@ -41,14 +41,14 @@
 @endif
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-    <div class="alert alert-solid-danger d-flex align-items-center mb-0" role="alert">
+    {{-- <div class="alert alert-solid-danger d-flex align-items-center mb-0" role="alert">
         <span class="alert-icon rounded">
             <i class="ri-error-warning-line ri-22px"></i>
         </span>
         You are currently on the STAGING version of this site. Changes made here will not reflect on the live site.
         To visit the live version of this site, click <a href="javascript:void(0);" class="alert-link ms-1"
             style="text-decoration:underline;">here</a>.
-    </div>
+    </div> --}}
     <ul class="navbar-nav flex-row align-items-center ms-auto">
         {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-4 me-xl-1">
             <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
