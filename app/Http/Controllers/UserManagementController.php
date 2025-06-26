@@ -27,7 +27,7 @@ class UserManagementController extends Controller
             ->when($request->is_brandkit, function ($query) use ($request) {
                 if ($request->is_brandkit == 1) {
                     $query->whereHas('brandKit');
-                } else {
+                } else if($request->is_brandkit == 2) {
                     $query->whereDoesntHave('brandKit');
                 }
             })
