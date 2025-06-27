@@ -127,6 +127,64 @@ class UserTemplatesApiController extends Controller
         return $this->success($returnData, 'User template saved successfully');
     }
 
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'template_id' => 'required',
+            'template_name' => 'required|string',
+            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+            'template_data' => 'required',
+            "send_mail" => 'nullable|string',
+        ],[
+            'template_image.regex' => 'Invalid image format',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed', $validator->errors());
+        }
+
+        $decyptedId = Helpers::decrypt($request->template_id);
+
+        
+        $userTemplate = UserTemplates::find($decyptedId);
+        
+        if (!$userTemplate) {
+            return $this->error('User template not found', 404);
+        }
+        $oldTemplateImage = $userTemplate->template_image;
+        
+        // upload image
+        $imageUrl = null;
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+            $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
+            
+            if ($oldTemplateImage && $oldTemplateImage != null) {
+                Helpers::deleteImage($oldTemplateImage);
+            }
+        }
+
+        $userTemplate->template_name = $request->template_name;
+        $userTemplate->template_image = $imageUrl ?? null;
+        $userTemplate->template_data = json_encode($request->template_data);
+        $userTemplate->save();
+
+
+        // send mail
+        if ($request->send_mail && $request->send_mail == "1") {
+            $this->sendTemplateMail($userTemplate);
+        }
+
+        $returnData = [
+            'id' => Helpers::encrypt($userTemplate->id),
+            'category' => $userTemplate->template->category->name ?? null,
+            'template_name' => $userTemplate->template_name ?? null,
+            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+            'template_data' => $userTemplate->template_data,
+        ];
+
+        return $this->success($returnData, 'User template updated successfully');
+    }
+
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [

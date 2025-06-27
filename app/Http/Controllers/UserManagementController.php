@@ -171,6 +171,9 @@ class UserManagementController extends Controller
         $userId = Helpers::decrypt($request->user_id);
         $user = User::find($userId);
         if ($user) {
+            if ($user->profile_image != null) {
+                Helpers::deleteImage($user->profile_image);
+            }
             $user->delete();
             return response()->json([
                 'success' => true,
