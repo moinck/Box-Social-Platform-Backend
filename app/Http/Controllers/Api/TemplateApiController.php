@@ -104,7 +104,7 @@ class TemplateApiController extends Controller
             return $this->validationError('Validation failed', $validator->errors());
         }
 
-        $tempObj = PostTemplate::where('status', 1);
+        $tempObj = PostTemplate::with('category:id,name')->where('status', 1);
 
         if (!$tempObj) {
             return $this->error('Template not found', 404);
@@ -138,14 +138,14 @@ class TemplateApiController extends Controller
 
         $tempData = [];
         foreach ($tempObj as $key => $t) {
-            $categoryName = $t->category->name;
+            $categoryName = $t->category->name ?? 'Uncategorized';
 
             $tempData[$categoryName][] = [
                 'id' => Helpers::encrypt($t->id),
                 'category_id' => Helpers::encrypt($t->category_id),
                 'post_content_id' => Helpers::encrypt($t->post_content_id),
                 'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
-                'template_data' => isset($t->template_data) ? $t->template_data : [],
+                // 'template_data' => isset($t->template_data) ? $t->template_data : [],
             ];
         }
         $data = $tempData;

@@ -15,12 +15,14 @@ class UserTemplateSendMail extends Mailable
     use Queueable, SerializesModels;
 
     public $mailData;
+    public $type;
     /**
      * Create a new message instance.
      */
-    public function __construct($mailData)
+    public function __construct($mailData, $type)
     {
         $this->mailData = $mailData;
+        $this->type = $type;
     }
 
     /**
@@ -29,7 +31,7 @@ class UserTemplateSendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Template',
+            subject: $this->type == 'store' ? 'New Template Created' : 'Template Updated',
         );
     }
 
@@ -42,6 +44,7 @@ class UserTemplateSendMail extends Mailable
             view: 'content.email.send-user-template',
             with: [
                 'data' => $this->mailData,
+                'type' => $this->type,
             ],
         );
     }

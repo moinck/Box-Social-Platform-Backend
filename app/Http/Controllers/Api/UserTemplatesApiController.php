@@ -113,7 +113,7 @@ class UserTemplatesApiController extends Controller
 
         // send mail
         if ($request->send_mail && $request->send_mail == "1") {
-            $this->sendTemplateMail($userTemplate);
+            $this->sendTemplateMail($userTemplate, 'store');
         }
 
         return $this->success([], 'User template saved successfully');
@@ -163,7 +163,7 @@ class UserTemplatesApiController extends Controller
 
         // send mail
         if ($request->send_mail && $request->send_mail == "1") {
-            $this->sendTemplateMail($userTemplate);
+            $this->sendTemplateMail($userTemplate, 'update');
         }
 
         return $this->success([], 'User template updated successfully');
@@ -200,7 +200,7 @@ class UserTemplatesApiController extends Controller
      * @param mixed $userTemplate
      * @return bool
      */
-    public function sendTemplateMail($userTemplate)
+    public function sendTemplateMail($userTemplate, $type)
     {
         $user = User::select('id', 'email', 'first_name', 'last_name')->find($userTemplate->user_id);
         if (!$user) {
@@ -209,7 +209,7 @@ class UserTemplatesApiController extends Controller
         $mailData = [];
         $mailData['user'] = $user;
         $mailData['template'] = $userTemplate;
-        Mail::to($user->email)->send(new UserTemplateSendMail($mailData));
+        Mail::to($user->email)->send(new UserTemplateSendMail($mailData, $type));
 
         return true;
     }
