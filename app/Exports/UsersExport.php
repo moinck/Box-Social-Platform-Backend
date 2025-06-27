@@ -84,6 +84,30 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
                 ],
             ],
         ]);
+
+        // Get the highest row with data
+        $highestRow = $sheet->getHighestRow();
+
+        // Apply conditional formatting to the "Account Status" column (G)
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $statusCell = 'G' . $row;
+            $status = $sheet->getCell($statusCell)->getValue();
+
+            if ($status === 'Active') {
+                $sheet->getStyle($statusCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => '000000'], // Black color
+                    ],
+                ]);
+            } elseif ($status === 'Inactive') {
+                $sheet->getStyle($statusCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => 'FF6961'], // Red color
+                        'bold' => true,
+                    ],
+                ]);
+            }
+        }
     }
 
     /**
