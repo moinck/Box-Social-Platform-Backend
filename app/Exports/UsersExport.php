@@ -38,6 +38,8 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             'FCA Number',
             'Company Name',
             'Account Status',
+            'User BrandConfiguration',
+            'User Verified',
             'Created Date'
         ];
     }
@@ -61,6 +63,8 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             $user->fca_number,
             $user->company_name,
             $user->status == 'active' ? 'Active' : 'Inactive',
+            $user->hasBrandKit() ? 'Yes' : 'No',
+            $user->is_verified ? 'Yes' : 'No',
             \Carbon\Carbon::parse($user->created_at)->format('d-m-Y')
         ];
     }
@@ -72,7 +76,7 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
      */
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:H1')->applyFromArray([
+        $sheet->getStyle('A1:J1')->applyFromArray([
             'font' => [
                 'bold' => true,
             ],
@@ -102,8 +106,46 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             } elseif ($status === 'Inactive') {
                 $sheet->getStyle($statusCell)->applyFromArray([
                     'font' => [
-                        'color' => ['rgb' => 'FF6961'], // Red color
-                        'bold' => true,
+                        'color' => ['rgb' => 'FF0000'], // Red color
+                        // 'bold' => true,
+                    ],
+                ]);
+            }
+
+            // for row H
+            $brandConfigurationCell = 'H' . $row;
+            $brandConfiguration = $sheet->getCell($brandConfigurationCell)->getValue();
+    
+            if ($brandConfiguration === 'Yes') {
+                $sheet->getStyle($brandConfigurationCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => '000000'], // Black color
+                    ],
+                ]);
+            } elseif ($brandConfiguration === 'No') {
+                $sheet->getStyle($brandConfigurationCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => 'FF0000'], // Red color
+                        // 'bold' => true,
+                    ],
+                ]);
+            }
+
+            // for row I
+            $verifiedCell = 'I' . $row;
+            $verified = $sheet->getCell($verifiedCell)->getValue();
+    
+            if ($verified === 'Yes') {
+                $sheet->getStyle($verifiedCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => '000000'], // Black color
+                    ],
+                ]);
+            } elseif ($verified === 'No') {
+                $sheet->getStyle($verifiedCell)->applyFromArray([
+                    'font' => [
+                        'color' => ['rgb' => 'FF0000'], // Red color
+                        // 'bold' => true,
                     ],
                 ]);
             }
