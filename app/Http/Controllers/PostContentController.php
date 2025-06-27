@@ -102,7 +102,7 @@ class PostContentController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postContents = PostContent::with('category')->latest()->get();
+        $postContents = PostContent::with('category:id,name')->latest()->get();
 
         return DataTables::of($postContents)
             ->addIndexColumn()
@@ -110,7 +110,7 @@ class PostContentController extends Controller
                 return $postContent->title;
             })
             ->addColumn('post_category', function ($postContent) {
-                return $postContent->category->name;
+                return $postContent->category->name ?? "Uncategorized";
             })
             ->addColumn('post_description', function ($postContent) {
                 // just show some lines of description
