@@ -1,6 +1,6 @@
 @extends('layouts.email-layout')
 
-@section('title','New Template Created')
+@section('title', $type == 'store' ? 'New Template Created' : 'Template Updated')
 
 @section('main-content')
     <!-- Logo Section -->
@@ -13,7 +13,11 @@
     <!-- Title -->
     <div class="email-title"
         style="text-align: center; font-size: 26px; color: #222; font-weight: 600; margin-bottom: 10px; line-height: 1.3;">
-        New Template Created
+        @if ($type == 'store')
+            New Template Created
+        @else
+            Template Updated
+        @endif
     </div>
 
     <!-- Greeting -->
@@ -23,10 +27,17 @@
     </div>
 
     <!-- Description -->
-    <div class="email-description"
-        style="text-align: left; font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5;">
-        Thank you for creating a new template with us. Below are the details of your template:
-    </div>
+    @if ($type == 'store')
+        <div class="email-description"
+            style="text-align: left; font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5;">
+            Thank you for creating a new template with us. Below are the details of your template:
+        </div>
+    @else
+        <div class="email-description"
+            style="text-align: left; font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5;">
+            Thank you for updating a template with us. Below are the details of your template:
+        </div>
+    @endif
 
     <!-- Template Details -->
     <div class="email-description"
@@ -34,10 +45,17 @@
         <b>Template Name:</b> {{ $data['template']->template_name ?? "Template" }}
     </div>
 
-    <div class="email-description"
-        style="text-align: left; font-size: 16px; color: #555; margin-bottom: 10px; line-height: 1.5;">
-        <b>Created At:</b> {{ $data['template']->created_at->format('F j, Y \a\t g:i a') ?? now()->format('F j, Y \a\t g:i a') }}
-    </div>
+    @if ($type == 'store')
+        <div class="email-description"
+            style="text-align: left; font-size: 16px; color: #555; margin-bottom: 10px; line-height: 1.5;">
+            <b>Created At:</b> {{ $data['template']->created_at->format('F j, Y \a\t g:i a') ?? now()->format('F j, Y \a\t g:i a') }}
+        </div>
+    @else
+        <div class="email-description"
+            style="text-align: left; font-size: 16px; color: #555; margin-bottom: 10px; line-height: 1.5;">
+            <b>Updated At:</b> {{ $data['template']->updated_at->format('F j, Y \a\t g:i a') ?? now()->format('F j, Y \a\t g:i a') }}
+        </div>
+    @endif
 
     <div class="email-description"
         style="text-align: left; font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5;">
