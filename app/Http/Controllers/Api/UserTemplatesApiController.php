@@ -116,15 +116,7 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate);
         }
 
-        $returnData = [
-            'id' => Helpers::encrypt($userTemplate->id),
-            'category' => $userTemplate->template->category->name ?? null,
-            'template_name' => $userTemplate->template_name ?? null,
-            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
-            'template_data' => $userTemplate->template_data,
-        ];
-
-        return $this->success($returnData, 'User template saved successfully');
+        return $this->success([], 'User template saved successfully');
     }
 
     public function update(Request $request)
@@ -157,7 +149,7 @@ class UserTemplatesApiController extends Controller
         $imageUrl = null;
         if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
             $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
-            
+
             if ($oldTemplateImage && $oldTemplateImage != null) {
                 Helpers::deleteImage($oldTemplateImage);
             }
@@ -174,15 +166,7 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate);
         }
 
-        $returnData = [
-            'id' => Helpers::encrypt($userTemplate->id),
-            'category' => $userTemplate->template->category->name ?? null,
-            'template_name' => $userTemplate->template_name ?? null,
-            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
-            'template_data' => $userTemplate->template_data,
-        ];
-
-        return $this->success($returnData, 'User template updated successfully');
+        return $this->success([], 'User template updated successfully');
     }
 
     public function delete(Request $request)
