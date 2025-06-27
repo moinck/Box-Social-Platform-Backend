@@ -77,6 +77,7 @@ Route::group([
         Route::get('/user-template/list', [UserTemplatesApiController::class, 'list']);
         Route::get('/user-template/get/{id}', [UserTemplatesApiController::class, 'get']);
         Route::post('/user-template/store', [UserTemplatesApiController::class, 'store']);
+        Route::post('/user-template/update', [UserTemplatesApiController::class, 'update']);
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
 
         // get stock image
