@@ -45,12 +45,10 @@ class UserTemplatesApiController extends Controller
         foreach ($userTemplates as $key => $value) {
             $returnData[] = [
                 'id' => Helpers::encrypt($value->id),
-                // 'template_id' => Helpers::encrypt($value->template_id),
                 'category' => $value->template->category->name ?? null,
                 'template_name' => $value->template_name ?? null,
                 'template_image' => $value->template_image ? asset($value->template_image) : null,
                 'edited' => Carbon::parse($value->updated_at)->diffForHumans(),
-                // 'template_data' => $value->template_data,
             ];
         }
 
