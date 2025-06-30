@@ -72,6 +72,8 @@ Route::group([
         Route::post('/template/store', [TemplateApiController::class, 'store']);
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
+        Route::post('/template/update', [TemplateApiController::class, 'update']);
+        Route::post('/template/delete', [TemplateApiController::class, 'delete']);
 
         // User templates APIS
         Route::get('/user-template/list', [UserTemplatesApiController::class, 'list']);

@@ -67,22 +67,23 @@ class TemplateApiController extends Controller
             return $this->error('Template not found', 404);
         }
 
-        $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
+        // $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
 
-        $brandkitData = [
-            'name' => $brandkitData->user->first_name . ' ' . $brandkitData->user->last_name,
-            'email' => $brandkitData->user->email,
-            'phone' => $brandkitData->phone ?? '',
-            'company' => $brandkitData->company_name ?? '',
-            'address' => $brandkitData->address ?? '',
-            'website' => $brandkitData->website ?? '',
-            'brandkit_logo' => $brandkitData->logo ?? '',
-        ];
+        // $brandkitData = [
+        //     'name' => $brandkitData->user->first_name . ' ' . $brandkitData->user->last_name,
+        //     'email' => $brandkitData->user->email,
+        //     'phone' => $brandkitData->phone ?? '',
+        //     'company' => $brandkitData->company_name ?? '',
+        //     'address' => $brandkitData->address ?? '',
+        //     'website' => $brandkitData->website ?? '',
+        //     'brandkit_logo' => $brandkitData->logo ?? '',
+        // ];
 
         // $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
 
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
+            'category_id' => Helpers::encrypt($tempObj->category_id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
@@ -153,5 +154,74 @@ class TemplateApiController extends Controller
         if (!empty($tempObj)) {
             return $this->success($data, 'Template Fetch successfully');
         }
+    }
+
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'template_id' => 'required',
+            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+            'template_data' => 'required',
+        ],[
+            'template_image.regex' => 'Invalid image format',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed', $validator->errors());
+        }
+
+        $decyptedId = Helpers::decrypt($request->template_id);
+
+        
+        $userTemplate = PostTemplate::find($decyptedId);
+        
+        if (!$userTemplate) {
+            return $this->error('Template not found', 404);
+        }
+        $oldTemplateImage = $userTemplate->template_image;
+        
+        // upload image
+        $updateImageUrl = null;
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+            $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
+
+            if ($oldTemplateImage && $oldTemplateImage != null) {
+                Helpers::deleteImage($oldTemplateImage);
+            }
+        }
+
+        $userTemplate->template_image = $updateImageUrl ?? null;
+        $userTemplate->template_data = json_encode($request->template_data);
+        $userTemplate->save();
+
+
+        return $this->success([], 'Template updated successfully');
+    }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'template_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed', $validator->errors());
+        }
+
+        $decyptedId = Helpers::decrypt($request->template_id);
+
+        $template = PostTemplate::find($decyptedId);
+
+        if (!$template) {
+            return $this->error('Template not found', 404);
+        }
+
+        if ($template->template_image && $template->template_image != null) {
+            Helpers::deleteImage($template->template_image);
+        }
+
+        $template->delete();
+
+        return $this->success([], 'Template deleted successfully');
     }
 }
