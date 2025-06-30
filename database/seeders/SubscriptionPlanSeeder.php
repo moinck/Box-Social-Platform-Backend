@@ -55,9 +55,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'total_download_limit' => null,
                 'stripe_price_id' => 'price_1234567890', // Replace with your actual Stripe price ID
                 'stripe_product_id' => 'prod_1234567890', // Replace with your actual Stripe product ID
-                'is_active' => true,
+                'is_active' => false,
                 'is_trial' => false,
-                'is_popular' => true,
+                'is_popular' => false,
                 'features' => json_encode([
                     '40 downloads per day',
                     'Unlimited access for 1 year',
@@ -83,7 +83,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'total_download_limit' => null,
                 'stripe_price_id' => 'price_monthly_123', // Replace with actual Stripe price ID
                 'stripe_product_id' => 'prod_1234567890',
-                'is_active' => false, // Disabled for now
+                'is_active' => true, // Disabled for now
                 'is_trial' => false,
                 'is_popular' => false,
                 'features' => json_encode([
@@ -117,10 +117,8 @@ class SubscriptionPlanSeeder extends Seeder
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
                     'Ability to create and download 40 posts a day in just a few clicks',
-                    'AI Compliance checked social media content',
                     'Gain first access to no extra charge future developments',
                     'Additional Topics such as Commercial Finance, Bridging Finance, second charges',
-                    'PFA posts such as Tax, Business Protection, Investments, Will Writing, Pensions',
                     'Built-in scheduling tool for social media accounts',
                     'Content suitable for various platforms (Twitter & WhatsApp)',
                     '3 day free trial included'
