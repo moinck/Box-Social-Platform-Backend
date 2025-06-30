@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Mail\UserTemplateSendMail;
+use App\Models\PostTemplate;
 use App\Models\User;
 use App\Models\UserTemplates;
 use App\ResponseTrait;
@@ -24,10 +25,10 @@ class UserTemplatesApiController extends Controller
 
         $search = $request->search ?? '';
 
-        $userTemplates = UserTemplates::with('template.category')
+        $userTemplates = UserTemplates::with('category','template.category')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->whereHas('template.category', function ($query) use ($search) {
+                    $query->whereHas('category', function ($query) use ($search) {
                         $query->where('name', 'like', "%{$search}%");
                     })
                     ->orWhere('template_name', 'like', "%{$search}%");
@@ -43,9 +44,13 @@ class UserTemplatesApiController extends Controller
 
         $returnData = [];
         foreach ($userTemplates as $key => $value) {
+            $categoryName = $value->category->name ?? null;
+            if (empty($categoryName)) {
+                $categoryName = $value->template->category->name ?? null;
+            }
             $returnData[] = [
                 'id' => Helpers::encrypt($value->id),
-                'category' => $value->template->category->name ?? null,
+                'category' => $categoryName,
                 'template_name' => $value->template_name ?? null,
                 'template_image' => $value->template_image ? asset($value->template_image) : null,
                 'edited' => Carbon::parse($value->updated_at)->diffForHumans(),
@@ -58,15 +63,20 @@ class UserTemplatesApiController extends Controller
     public function get($id)
     {
         $decyptedId = Helpers::decrypt($id);
-        $userTemplate = UserTemplates::with('template.category')->find($decyptedId);
+        $userTemplate = UserTemplates::with('category','template.category')->find($decyptedId);
 
         if (!$userTemplate) {
             return $this->error('User template not found', 404);
         }
 
+        $categoryName = $userTemplate->category->name ?? null;
+        if (empty($categoryName)) {
+            $categoryName = $userTemplate->template->category->name ?? null;
+        }
+
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
-            'category' => $userTemplate->template->category->name ?? null,
+            'category' => $categoryName,
             'template_name' => $userTemplate->template_name ?? null,
             'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
             'template_data' => $userTemplate->template_data,
@@ -79,6 +89,7 @@ class UserTemplatesApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'template_id' => 'required',
+            'category_id' => 'nullable',
             'template_name' => 'required|string',
             'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required',
@@ -101,9 +112,17 @@ class UserTemplatesApiController extends Controller
             $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
         }
 
+        $categoryId = $request->category_id ?? null;
+        if (!empty($categoryId)) {
+            $categoryId = Helpers::decrypt($categoryId);
+        } else {
+            $categoryId = PostTemplate::find($decyptedId)->category_id;
+        }
+
         $userTemplate = UserTemplates::create([
             'user_id' => $user->id,
             'template_id' => $decyptedId,
+            'category_id' => $categoryId ?? null,
             'template_name' => $request->template_name,
             'template_image' => $imageUrl ?? null,
             'template_data' => json_encode($request->template_data),

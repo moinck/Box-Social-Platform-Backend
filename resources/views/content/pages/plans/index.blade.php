@@ -17,7 +17,7 @@
         <div class="card">
             <!-- Pricing Plans -->
             <div class="pb-sm-12 pb-2 rounded-top">
-                <div class="container py-12">
+                <div class="container py-6">
                     <h4 class="text-center mb-2 mt-0 mt-md-4">Pricing Plans</h4>
                     <p class="text-center mb-2">
                         This are the Basic Plans provided by <span>{{ config('app.name') }}</span>
