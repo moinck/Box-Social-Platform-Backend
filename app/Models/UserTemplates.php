@@ -11,6 +11,7 @@ class UserTemplates extends Model
     protected $fillable = [
         'user_id',
         'template_id',
+        'category_id',
         'template_name',
         'template_image',
         'template_data',
@@ -24,5 +25,10 @@ class UserTemplates extends Model
     public function template()
     {
         return $this->belongsTo(PostTemplate::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
     }
 }

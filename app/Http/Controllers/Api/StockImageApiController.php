@@ -19,7 +19,10 @@ class StockImageApiController extends Controller
     public function get(Request $request)
     {
         $adminId = User::where('role', 'admin')->first()->id;
-        $imageData = ImageStockManagement::all();
+        $searchQuery = $request->search ?? '';
+        $imageData = ImageStockManagement::when($searchQuery, function ($query) use ($searchQuery) {
+            $query->where('tag_name', 'like', "%{$searchQuery}%");
+        })->latest()->get();
 
         $authUser = Auth::user();
 
