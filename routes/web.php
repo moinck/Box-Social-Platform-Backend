@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\PostTemplateController;
+use App\Http\Controllers\SubscriptionPlansController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
@@ -65,6 +66,9 @@ Route::middleware('auth')->group(function () {
 
     // Only Admin access routes
     Route::middleware('checkRole:admin')->group(function () {
+        // subscription plan
+        Route::get('/subscription-plan', [SubscriptionPlansController::class, 'index'])->name('subscription-plan');
+        
         // categories controller
         Route::get('/categories', [CategoriesController::class, 'index'])->name('categories');
         Route::post('/categories/store', [CategoriesController::class, 'store'])->name('categories.store');

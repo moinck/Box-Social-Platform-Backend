@@ -159,10 +159,10 @@
                     </li>
                 @endif
                 <li>
-                    <a class="dropdown-item" href="javascript:void(0);">
+                    <a class="dropdown-item" href="{{ route('subscription-plan') }}">
                         <span class="d-flex align-items-center align-middle">
                             <i class="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
-                            <span class="flex-grow-1 align-middle">Billing</span>
+                            <span class="flex-grow-1 align-middle">Subscription Plans</span>
                         </span>
                     </a>
                 </li>
