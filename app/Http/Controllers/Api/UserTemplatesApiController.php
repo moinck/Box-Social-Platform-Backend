@@ -74,12 +74,14 @@ class UserTemplatesApiController extends Controller
             $categoryName = $userTemplate->template->category->name ?? null;
         }
 
+        $updatedTemplateData = helpers::replaceFabricTemplateData($userTemplate->template_data,[]);
+
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
             'category' => $categoryName,
             'template_name' => $userTemplate->template_name ?? null,
             'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
-            'template_data' => $userTemplate->template_data,
+            'template_data' => $updatedTemplateData,
         ];
 
         return $this->success($returnData, 'User template');
