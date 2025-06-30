@@ -622,6 +622,11 @@ class Helpers
                             break;
                     }
                 }
+
+                // for null replacement
+                if (isset($object['type']) && $object['type'] == 'Textbox' && $object['text'] == null) {
+                    $object['text'] = "";
+                }
             }
 
             // Return updated JSON
