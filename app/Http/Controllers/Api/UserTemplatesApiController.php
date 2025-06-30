@@ -34,7 +34,7 @@ class UserTemplatesApiController extends Controller
                 });
             })
             ->where('user_id', $user->id)
-            ->latest()
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         if ($userTemplates->isEmpty()) {
