@@ -205,6 +205,12 @@ $(function () {
         $.ajax({
             type: "GET",
             url: `/video-management/get/saved-videos`,
+            beforeSend: function () {
+                showBSPLoader();
+            },
+            complete: function () {
+                hideBSPLoader();
+            },
             success: function (response) {
                 var getData = response.data;
                 if (getData.length == 0) {
@@ -290,6 +296,12 @@ $(function () {
             },
             data: {
                 selectedVideos: selectedVideos,
+            },
+            beforeSend: function () {
+                showBSPLoader();
+            },
+            complete: function () {
+                hideBSPLoader();
             },
             success: function (response) {
                 if (response.success) {
