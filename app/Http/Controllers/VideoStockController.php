@@ -9,7 +9,7 @@ class VideoStockController extends Controller
 {
     public function index()
     {
-        $searchTopics = ['Nature', 'Places', 'Things', 'Activities','People','Rain','Sky','Money'];
+        $searchTopics = ['Nature','Background','Ai Generated','Digital Art','Animation','Light','Texture','People','Rain','Sky','Money'];
 
         $data = [];
         $data['searchTopics'] = $searchTopics;

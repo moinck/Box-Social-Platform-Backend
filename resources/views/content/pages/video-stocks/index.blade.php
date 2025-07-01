@@ -35,7 +35,7 @@
                                 <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
                                     data-bs-target="#navs-image-home-section" aria-controls="navs-image-home-section"
                                     aria-selected="true">
-                                    <i class="tf-icons ri-image-add-fill me-2"></i>
+                                    <i class="tf-icons ri-video-add-fill me-2"></i>
                                     Video Search
                                 </button>
                             </li>
