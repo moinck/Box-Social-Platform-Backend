@@ -113,6 +113,7 @@ $(function () {
                 var image = "";
                 var newImage = "";
                 var getData = "";
+                var video_tag_name = $("#video_tag_name").val();
                 if ($("#api_type").val() == "pexels") {
                     getData = response.data.videos;
                 } else {
@@ -145,7 +146,7 @@ $(function () {
                                     <input class="form-check-input search-image-checkbox" type="checkbox" name="selectedVideos[]" data-thumbnail="${video_thumbnail_url}" id="search-image-${id}" value="${video_url}"/>
                                     <label class="form-check-label custom-option-content" for="search-image-${id}">
                                     <span class="custom-option-body">
-                                        <img src="${video_thumbnail_url}" data-video-url="${video_url}" class="video-thumbnail" alt="cbImg" />
+                                        <img src="${video_thumbnail_url}" data-video-url="${video_url}" data-tag-name="${video_tag_name}" class="video-thumbnail" alt="video thumbnail" />
                                     </span>
                                     </label>
                                 </div>
@@ -204,6 +205,12 @@ $(function () {
         $.ajax({
             type: "GET",
             url: `/video-management/get/saved-videos`,
+            beforeSend: function () {
+                showBSPLoader();
+            },
+            complete: function () {
+                hideBSPLoader();
+            },
             success: function (response) {
                 var getData = response.data;
                 if (getData.length == 0) {
@@ -289,6 +296,12 @@ $(function () {
             },
             data: {
                 selectedVideos: selectedVideos,
+            },
+            beforeSend: function () {
+                showBSPLoader();
+            },
+            complete: function () {
+                hideBSPLoader();
             },
             success: function (response) {
                 if (response.success) {

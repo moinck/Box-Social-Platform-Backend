@@ -910,7 +910,7 @@
     "isEntry": true
   },
   "resources/assets/js/pages-images-stock.js": {
-    "file": "assets/pages-images-stock-DhcsNj2D.js",
+    "file": "assets/pages-images-stock-ORdmmHCZ.js",
     "name": "pages-images-stock",
     "src": "resources/assets/js/pages-images-stock.js",
     "isEntry": true
@@ -925,6 +925,12 @@
     "file": "assets/pages-profile-user-Di_PUTAL.js",
     "name": "pages-profile-user",
     "src": "resources/assets/js/pages-profile-user.js",
+    "isEntry": true
+  },
+  "resources/assets/js/pages-videos-stock.js": {
+    "file": "assets/pages-videos-stock-Dzpt6Kf8.js",
+    "name": "pages-videos-stock",
+    "src": "resources/assets/js/pages-videos-stock.js",
     "isEntry": true
   },
   "resources/assets/js/tables-datatables-advanced.js": {
