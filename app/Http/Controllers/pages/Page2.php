@@ -23,6 +23,9 @@ class Page2 extends Controller
         if ($request->has('send_mail') && $request->send_mail == 1) {
             return $this->testMail();
         }
+        if ($request->has('mail_logs') && $request->mail_logs == 1) {
+            return $this->mailLogs();
+        }
         // return view('content.pages.pages-page2');
         $verification_link = "www.youtube.com";
         $reset_password_link = "www.youtube.com";
@@ -34,9 +37,10 @@ class Page2 extends Controller
         $data = [];
         $data['user'] = $user;
         $data['template'] = UserTemplates::find(3);
+        $type = 'store';
         // Mail::to("pratikdev.iihglobal@gmail.com")->send(new UserTemplateSendMail($data));
 
-        return view('content.email.send-user-template', compact('data'));
+        return view('content.email.send-user-template', compact('data','type'));
     }
 
     // make test function to send mail
@@ -46,7 +50,8 @@ class Page2 extends Controller
         $verification_link = "www.youtube.com";
         // Mail::to($user->email)->send(new RegisterVerificationMail($verification_link));
         // $token = Helpers::sendVerificationMail($user,$verification_link);
-        Mail::to("pratikdev.iihglobal@gmail.com")->send(new RegisterVerificationMail($verification_link));
+        // Mail::to("pratikdev.iihglobal@gmail.com")->send(new RegisterVerificationMail($verification_link));
+        Helpers::sendMail(new RegisterVerificationMail($verification_link) ,"pratikdev.iihglobal@gmail.com");
 
         return response()->json([
             'success' => true,
@@ -73,5 +78,10 @@ class Page2 extends Controller
                 'name' => $user->first_name . ' ' . $user->last_name,
             ]
         ]);
+    }
+
+    public function mailLogs()
+    {
+        return view('content.pages.mail-logs');
     }
 }

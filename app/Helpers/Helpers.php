@@ -694,4 +694,17 @@ class Helpers
             $message->subject('New Error Report');
         });
     }
+
+    /**
+     * common function to send mail
+     * @param mixed $mailableClass
+     * @param mixed $to
+     * @return bool
+     */
+    public static function sendMail($mailableClass,$to)
+    {
+        Mail::to($to)->send($mailableClass);
+
+        return true;
+    }
 }
