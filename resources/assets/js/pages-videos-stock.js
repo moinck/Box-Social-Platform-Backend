@@ -29,7 +29,7 @@ $(function () {
         data.append("selectedVideos", JSON.stringify(selectedVideos));
         $.ajax({
             type: "POST",
-            url: `video-management/store`,
+            url: `/stock-video-management/store`,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
@@ -94,7 +94,7 @@ $(function () {
     function getVideosData() {
         $.ajax({
             type: "POST",
-            url: `get-video-management`,
+            url: `/stock-video-management/search`,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
@@ -204,7 +204,7 @@ $(function () {
     function loadSavedVideos() {
         $.ajax({
             type: "GET",
-            url: `/video-management/get/saved-videos`,
+            url: `/stock-video-management/get/saved-videos`,
             beforeSend: function () {
                 showBSPLoader();
             },
@@ -290,7 +290,7 @@ $(function () {
         });
         $.ajax({
             type: "POST",
-            url: `/video-management/delete/saved-videos`,
+            url: `/stock-video-management/delete/saved-videos`,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
