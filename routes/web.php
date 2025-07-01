@@ -17,6 +17,7 @@ use App\Http\Controllers\ImageStockManagementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostContentController;
 use App\Http\Controllers\ProfileManagementController;
+use App\Http\Controllers\VideoStockController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -79,6 +80,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/categories/account-status', [CategoriesController::class, 'changeStatus'])->name('categories.change-status');
         Route::get('/categories/export', [CategoriesController::class, 'export'])->name('categories.export');
 
+        // video stocks
+        Route::get('/stock-video-management', [VideoStockController::class, 'index'])->name('stock-video-management');
+        Route::post('/get-video-management', [VideoStockController::class, 'GetVideos']);
+        Route::get('/video-management/get/saved-videos', [VideoStockController::class, 'getSavedVideos'])->name('video-management.get.saved-videos');
+        Route::post('/video-management/store', [VideoStockController::class, 'store']);
+        Route::post('/video-management/delete/saved-videos', [VideoStockController::class, 'destroy'])->name('video-management.delete.saved-videos');
+        
         // brand configuration controller
         Route::get('/brand-configuration', [BrnadconfigurationController::class, 'index'])->name('brand-configuration');
         Route::get('/brand-configuration/show/{id}', [BrnadconfigurationController::class, 'show'])->name('brand-configuration.show');

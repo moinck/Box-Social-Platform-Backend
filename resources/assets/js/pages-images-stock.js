@@ -115,10 +115,10 @@ $(function () {
                     //     '</div>' +
                     //     '</div>';
 
-                    // in1 row show only 4 images
-                    if (i % 4 === 0) {
+                    // show 25 img in 1 column
+                    if (i % 25 === 0) {
                         newImage += `
-                            <div class="row">
+                            <div class="col-lg-3">
                         `;
                     }
                     newImage += `
@@ -133,7 +133,7 @@ $(function () {
                                 </div>
                             </div>
                     `;
-                    if (i % 4 === 3) {
+                    if (i % 25 === 24) {
                         newImage += `
                             </div>
                         `;
