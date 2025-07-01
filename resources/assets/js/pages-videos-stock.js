@@ -206,40 +206,55 @@ $(function () {
             url: `/video-management/get/saved-videos`,
             success: function (response) {
                 var getData = response.data;
-                var savedVideos = "";
-                var savedVideosCount = response.savedVideosCount;
-                $("#saved-video-count").text(savedVideosCount);
-                $.each(getData, function (i, data) {
-                    var video_url = data.video_url;
-                    var video_thumbnail_url = data.thumbnail_url;
-                    var video_tag_name = data.tag_name;
-                    var id = data.id;
-
-                    // show 25 img in 1 column
-                    if (i % 5 === 0) {
-                        savedVideos += `
-                            <div class="row">
-                        `;
-                    }
-                    savedVideos += `
-                            <div class="col-md mb-md-0 mb-5">
-                                <div class="form-check custom-option custom-option-image custom-option-image-check">
-                                    <input class="form-check-input saved-image-checkbox" type="checkbox" name="selectedSavedVideos[]" data-thumbnail="${video_thumbnail_url}" data-id="${id}" id="search-image-${id}" value="${video_url}"/>
-                                    <label class="form-check-label custom-option-content" for="search-image-${id}">
-                                    <span class="custom-option-body">
-                                        <img src="${video_thumbnail_url}" data-video-url="${video_url}" data-tag-name="${video_tag_name}" class="video-thumbnail" alt="cbImg" />
-                                    </span>
-                                    </label>
+                if (getData.length == 0) {
+                    var noDataDiv = "";
+                    noDataDiv += `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="tf-icons ri-image-add-fill me-2"></i>
+                                    No saved videos
                                 </div>
                             </div>
+                        </div>
                     `;
-                    if (i % 5 === 4) {
+                    $("#saved_videos").html(noDataDiv);
+                } else {
+                    var savedVideos = "";
+                    var savedVideosCount = response.savedVideosCount;
+                    $("#saved-video-count").text(savedVideosCount);
+                    $.each(getData, function (i, data) {
+                        var video_url = data.video_url;
+                        var video_thumbnail_url = data.thumbnail_url;
+                        var video_tag_name = data.tag_name;
+                        var id = data.id;
+
+                        // show 25 img in 1 column
+                        if (i % 5 === 0) {
+                            savedVideos += `
+                                <div class="row">
+                            `;
+                        }
                         savedVideos += `
-                            </div>
+                                <div class="col-md mb-md-0 mb-5">
+                                    <div class="form-check custom-option custom-option-image custom-option-image-check">
+                                        <input class="form-check-input saved-image-checkbox" type="checkbox" name="selectedSavedVideos[]" data-thumbnail="${video_thumbnail_url}" data-id="${id}" id="search-image-${id}" value="${video_url}"/>
+                                        <label class="form-check-label custom-option-content" for="search-image-${id}">
+                                        <span class="custom-option-body">
+                                            <img src="${video_thumbnail_url}" data-video-url="${video_url}" data-tag-name="${video_tag_name}" class="video-thumbnail" alt="cbImg" />
+                                        </span>
+                                        </label>
+                                    </div>
+                                </div>
                         `;
-                    }
-                });
-                $("#saved_videos").html(savedVideos);
+                        if (i % 5 === 4) {
+                            savedVideos += `
+                                </div>
+                            `;
+                        }
+                    });
+                    $("#saved_videos").html(savedVideos);
+                }
             },
             error: function (error) {
                 console.log(error);
