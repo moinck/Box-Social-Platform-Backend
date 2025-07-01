@@ -90,6 +90,7 @@ class VideoStockController extends Controller
         $videos = VideoStock::where('user_id', auth()->user()->id)->get();
         $returnData = [
             'success' => true,
+            'savedVideosCount' => count($videos) ?? 0,
             'data' => $videos
         ];
         return response()->json($returnData);
@@ -117,6 +118,27 @@ class VideoStockController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Videos saved successfully',
+                'savedVideosCount' => $savedVideosCount
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No videos selected'
+            ]);
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        $selectedVideos = $request->selectedVideos;
+        if (!empty($selectedVideos)) {
+            $videos = VideoStock::whereIn('id', $selectedVideos)->delete();
+
+            // update saved images count
+            $savedVideosCount = VideoStock::where('user_id', auth()->user()->id)->count() ?? 0;
+            return response()->json([
+                'success' => true,
+                'message' => 'Videos deleted successfully',
                 'savedVideosCount' => $savedVideosCount
             ]);
         } else {

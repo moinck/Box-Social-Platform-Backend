@@ -73,7 +73,7 @@
                                         <div class="form-floating form-floating-outline">
                                             <select id="api_type" class="select2-icons form-select" name="api_type">
                                                 <option value="pixabay" data-icon="ri-wordpress-fill" selected>Pixabay</option>
-                                                <option value="pexels" data-icon="ri-wordpress-fill">Pexels</option>
+                                                <option disabled value="pexels" data-icon="ri-wordpress-fill">Pexels</option>
                                             </select>
                                         </div>
                                     </div>
@@ -127,7 +127,7 @@
         </div>
     </div>
 
-    {{-- need a modal to show video --}}
+    {{-- Modal to show video --}}
     <div class="modal fade" id="template-video-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

@@ -5,6 +5,17 @@
 "use strict";
 
 $(function () {
+    // show - hide save select videos btn
+    $(document).on("change", ".search-image-checkbox", function () {
+        if ($(".search-image-checkbox:checked").length > 0) {
+            $(".save_select_videos").removeClass("d-none");
+        } else {
+            $(".save_select_videos").addClass("d-none");
+        }
+    });
+    // -----------------------------------------------------------------
+    
+    // save select videos
     $(document).on("click", ".save_select_videos", function () {
         const form = $("#stock_videos_management")[0]; // Get the DOM element
         const data = new FormData(form);
@@ -51,7 +62,9 @@ $(function () {
             },
         });
     });
-
+    // -----------------------------------------------------------------
+    
+    // next button
     $(document).on("click", "#nextButton", function (e) {
         e.preventDefault();
         var page = parseInt($("#total_page").val()) + parseInt(1);
@@ -62,7 +75,9 @@ $(function () {
             $('#previousButton').removeClass('disabled');
         }
     });
+    // -----------------------------------------------------------------
 
+    // previous button
     $(document).on("click", "#previousButton", function (e) {
         e.preventDefault();
         var page = parseInt($("#total_page").val()) - parseInt(1);
@@ -73,6 +88,7 @@ $(function () {
         $("#total_page").val(page);
         getVideosData();
     });
+    // -----------------------------------------------------------------
 
     // get videos data
     function getVideosData() {
@@ -149,6 +165,7 @@ $(function () {
             },
         });
     }
+    // -----------------------------------------------------------------
 
     // search videos
     $(document).on("click", ".search_btn", function (e) {
@@ -157,6 +174,7 @@ $(function () {
         $("#total_page").val(1);
         getVideosData();
     });
+    // -----------------------------------------------------------------
 
     // show video in modal
     $(document).on("click", ".video-thumbnail", function (e) {
@@ -169,6 +187,7 @@ $(function () {
         $("#template-video-modal").modal("show");
         $("#template-video-modal .template-modal-video").attr("src", video_url);
     });
+    // -----------------------------------------------------------------
 
     // get saved videos
     $(document).on(
@@ -178,6 +197,7 @@ $(function () {
             loadSavedVideos();
         }
     );
+    // -----------------------------------------------------------------
 
     // load saved videos
     function loadSavedVideos() {
@@ -187,6 +207,8 @@ $(function () {
             success: function (response) {
                 var getData = response.data;
                 var savedVideos = "";
+                var savedVideosCount = response.savedVideosCount;
+                $("#saved-video-count").text(savedVideosCount);
                 $.each(getData, function (i, data) {
                     var video_url = data.video_url;
                     var video_thumbnail_url = data.thumbnail_url;
@@ -202,7 +224,7 @@ $(function () {
                     savedVideos += `
                             <div class="col-md mb-md-0 mb-5">
                                 <div class="form-check custom-option custom-option-image custom-option-image-check">
-                                    <input class="form-check-input search-image-checkbox" type="checkbox" name="selectedSavedVideos[]" data-thumbnail="${video_thumbnail_url}" id="search-image-${id}" value="${video_url}"/>
+                                    <input class="form-check-input saved-image-checkbox" type="checkbox" name="selectedSavedVideos[]" data-thumbnail="${video_thumbnail_url}" data-id="${id}" id="search-image-${id}" value="${video_url}"/>
                                     <label class="form-check-label custom-option-content" for="search-image-${id}">
                                     <span class="custom-option-body">
                                         <img src="${video_thumbnail_url}" data-video-url="${video_url}" data-tag-name="${video_tag_name}" class="video-thumbnail" alt="cbImg" />
@@ -224,4 +246,49 @@ $(function () {
             },
         });
     }
+    // -----------------------------------------------------------------
+
+    // show delete btn 
+    $(document).on("click", ".saved-image-checkbox", function () {
+        if ($(".saved-image-checkbox:checked").length > 0) {
+            $(".delete_select_images").removeClass("d-none");
+        } else {
+            $(".delete_select_images").addClass("d-none");
+        }
+    });
+    // -----------------------------------------------------------------
+
+    // delete btn id = delete_select_images
+    $(document).on("click", ".delete_select_images", function (e) {
+        e.preventDefault();
+        var selectedVideos = [];
+        $.each($(".saved-image-checkbox:checked"), function () {
+            console.log($(this).data('id'));
+            selectedVideos.push($(this).data('id'));
+        });
+        $.ajax({
+            type: "POST",
+            url: `/video-management/delete/saved-videos`,
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            data: {
+                selectedVideos: selectedVideos,
+            },
+            success: function (response) {
+                if (response.success) {
+                    // clear the selected checkboxes
+                    $(".saved-image-checkbox").prop("checked", false);
+                    loadSavedVideos();
+                    showSweetAlert("success", "Delete!", response.message);
+                } else {
+                    showSweetAlert("error", "Info!", response.message);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            },
+        });
+    });
+    // -----------------------------------------------------------------
 });
