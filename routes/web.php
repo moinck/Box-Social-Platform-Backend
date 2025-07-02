@@ -82,10 +82,10 @@ Route::middleware('auth')->group(function () {
 
         // video stocks
         Route::get('/stock-video-management', [VideoStockController::class, 'index'])->name('stock-video-management');
-        Route::post('/get-video-management', [VideoStockController::class, 'GetVideos']);
-        Route::get('/video-management/get/saved-videos', [VideoStockController::class, 'getSavedVideos'])->name('video-management.get.saved-videos');
-        Route::post('/video-management/store', [VideoStockController::class, 'store']);
-        Route::post('/video-management/delete/saved-videos', [VideoStockController::class, 'destroy'])->name('video-management.delete.saved-videos');
+        Route::post('/stock-video-management/search', [VideoStockController::class, 'GetVideos']);
+        Route::get('/stock-video-management/get/saved-videos', [VideoStockController::class, 'getSavedVideos'])->name('stock-video-management.get.saved-videos');
+        Route::post('/stock-video-management/store', [VideoStockController::class, 'store']);
+        Route::post('/stock-video-management/delete/saved-videos', [VideoStockController::class, 'destroy'])->name('stock-video-management.delete.saved-videos');
         
         // brand configuration controller
         Route::get('/brand-configuration', [BrnadconfigurationController::class, 'index'])->name('brand-configuration');
