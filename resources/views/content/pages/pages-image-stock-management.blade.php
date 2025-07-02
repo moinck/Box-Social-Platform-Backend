@@ -120,7 +120,7 @@
                                 <button type="button" id="saved-img-tab-btn" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-saved-image-section" aria-controls="navs-saved-image-section" aria-selected="false">
                                     <i class="tf-icons ri-save-3-line me-2"></i>
                                     Saved Images 
-                                    <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-success ms-2 pt-50" id="saved-img-count">{{ @$savedImagesCount ?? 0 }}</span>
+                                    <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-success ms-2 pt-50" style="width: fit-content !important;" id="saved-img-count">{{ @$savedImagesCount ?? 0 }}</span>
                                 </button>
                             </li>
                         </ul>
@@ -148,7 +148,6 @@
                                     <div class="col-md-2 mb-2">
                                         <div class="form-floating form-floating-outline">
                                             <select id="api_type" class="select2-icons form-select" name="api_type">
-                
                                                 <option value="pixabay" data-icon="ri-wordpress-fill" selected>Pixabay</option>
                                                 <option value="pexels" data-icon="ri-wordpress-fill">Pexels</option>
                                             </select>
