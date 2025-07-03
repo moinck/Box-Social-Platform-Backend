@@ -28,6 +28,9 @@ class ContactUsController extends Controller
 
         return DataTables::of($contactUs)
             ->addIndexColumn()
+            ->addColumn('checkbox', function ($contactUs) {
+                return '<input type="checkbox" class="form-check-input contact-us-checkbox" name="contact_us_id[]" value="' . $contactUs->id . '">';
+            })
             ->addColumn('name', function ($contactUs) {
                 return $contactUs->name;
             })
@@ -43,6 +46,7 @@ class ContactUsController extends Controller
             ->addColumn('created_date', function ($contactUs) {
                 return Helpers::dateFormate($contactUs->created_at);
             })
+            ->rawColumns(['checkbox'])
             ->make(true);
     }
 
@@ -87,5 +91,21 @@ class ContactUsController extends Controller
     {
         $contactUs = ContactUs::latest()->first();
         return view('content.email.contact-us-email', compact('contactUs'));
+    }
+
+    public function destroy(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'contact_us_ids' => 'required|array',
+            'contact_us_ids.*' => 'exists:contact_us,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation errors', $validator->errors(), 422);
+        }
+
+        $contactUs = ContactUs::whereIn('id', $request->contact_us_ids)->delete();
+
+        return $this->success([], 'Feedback deleted successfully');
     }
 }

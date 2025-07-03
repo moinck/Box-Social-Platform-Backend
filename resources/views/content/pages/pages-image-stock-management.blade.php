@@ -6,7 +6,8 @@
 @section('vendor-style')
     @vite([
             'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-            'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+            'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
+            'resources/assets/vendor/libs/select2/select2.scss'
         ])
 @endsection
 
@@ -16,7 +17,8 @@
         'resources/assets/vendor/libs/@form-validation/popular.js',
         'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
         'resources/assets/vendor/libs/@form-validation/auto-focus.js',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
+        'resources/assets/vendor/libs/select2/select2.js'
     ])
     
 @endsection
@@ -133,7 +135,7 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-6">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="select2Icons" class="select2-icons form-select" name="select2Icons">
+                                            <select id="select2Icons" class="select2-icons form-select tag-name-select" name="select2Icons" data-allow-clear="true">
                                                 @foreach ($topics as $key => $subtopics)
                                                     <optgroup label="{{ strtoupper($key) }}">
                                                         @foreach ($subtopics as $subkey => $subtopic)
@@ -221,6 +223,20 @@
 
     <script>
         $(document).ready(function() {
+
+            var select2 = $('.tag-name-select');
+            // add select2
+            if (select2.length) {
+                select2.each(function () {
+                    var $this = $(this);
+                    select2Focus($this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Select Search Topic',
+                        dropdownParent: $this.parent()
+                    });
+                });
+            }
+
             $(document).on('click', '#saved-img-tab-btn', function (e) {
                 e.preventDefault();
             });
