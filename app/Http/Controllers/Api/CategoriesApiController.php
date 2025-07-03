@@ -18,7 +18,7 @@ class CategoriesApiController extends Controller
         $categories = Categories::where(function ($query) {
             $query->where('status', true)
                 ->where('parent_id', null);
-        })->with('children:id,name,parent_id')->latest()->get();
+        })->with('children:id,name,parent_id,is_comming_soon')->latest()->get();
 
         // send data to resource
         // $categoryCollection = CategoryResource::collection($categories);
@@ -39,6 +39,7 @@ class CategoriesApiController extends Controller
                         return [
                             'id' => Helpers::encrypt($child->id),
                             'name' => $child->name,
+                            'is_comming_soon' => $child->is_comming_soon,
                         ];
                     }),
                 ];
@@ -52,6 +53,7 @@ class CategoriesApiController extends Controller
                         return [
                             'id' => Helpers::encrypt($child->id),
                             'name' => $child->name,
+                            'is_comming_soon' => $child->is_comming_soon,
                         ];
                     }),
                 ];

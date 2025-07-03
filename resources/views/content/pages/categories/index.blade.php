@@ -517,7 +517,6 @@
                                                     <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
                                                 </li>
                                             </ul>
-                                            <hr>
                                         </div>
                                     `;
 
@@ -636,7 +635,7 @@
                     // Find the corresponding checkbox within the same parent container
                     var $parentLi = $(this).closest('li');
                     var isComingSoon = $parentLi.find('input[type="checkbox"]').is(':checked');
-                    
+
                     subcategoryIds.push({
                         id: $(this).data('subcategory-id') ?? 0,
                         name: $(this).val(),
@@ -750,7 +749,6 @@
                                 <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
                             </li>
                         </ul>
-                        <hr>
                     </div>
                 `;
                 subcategoriesContainer.append(subcategoryHtml);
@@ -807,7 +805,6 @@
                                 </span>
                             </li>
                         </ul>
-                        <hr>
                     </div>
                 `;
                 editSubcategoriesContainer.append(subcategoryHtml);
