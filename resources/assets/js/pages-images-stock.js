@@ -2,22 +2,22 @@
  * DataTables Extensions (jquery)
  */
 
-'use strict';
+"use strict";
 
 $(function () {
-    $(document).on('click', '.save_select_images', function () {
+    $(document).on("click", ".save_select_images", function () {
         const form = $("#stock_images_management")[0]; // Get the DOM element
         const data = new FormData(form);
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: `image-management/store`,
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
             data: data,
             processData: false,
             data: data,
-            dataType: 'json',
+            dataType: "json",
             contentType: false,
             beforeSend: function () {
                 showBSPLoader();
@@ -28,59 +28,63 @@ $(function () {
             success: function (response) {
                 if (response.success) {
                     // clear the selected checkboxes
-                    $('.search-image-checkbox').prop('checked', false);
-                    $('#saved-img-count').text(response.savedImagesCount);
-                    $('.save_select_images').addClass('d-none');
-                    
-                    showSweetAlert('success', 'Store!', 'Your image has been successfully saved to your design template!.');
+                    $(".search-image-checkbox").prop("checked", false);
+                    $("#saved-img-count").text(response.savedImagesCount);
+                    $(".save_select_images").addClass("d-none");
+
+                    showSweetAlert(
+                        "success",
+                        "Store!",
+                        "Your image has been successfully saved to your design template!."
+                    );
                 } else {
-                    showSweetAlert('error', 'Info!', 'Please select 1 image.');
+                    showSweetAlert("error", "Info!", "Please select 1 image.");
                 }
             },
             error: function (xhr, status, error) {
                 hideBSPLoader();
                 console.log(xhr.responseText);
-                showSweetAlert('error', 'Error!', 'Something went wrong.');
-            }
+                showSweetAlert("error", "Error!", "Something went wrong.");
+            },
         });
-    })
+    });
 
-    $(document).on('click', '#nextButton', function (e) {
+    $(document).on("click", "#nextButton", function (e) {
         e.preventDefault();
         var select2Icons = $("#select2Icons").val();
         if (select2Icons == null) {
-            toastr.error('Please select 1 topic to search images.');
+            toastr.error("Please select 1 topic to search images.");
             return;
         }
         var page = parseInt($("#total_page").val()) + parseInt(1);
         $("#total_page").val(page);
         getImages();
-    })
+    });
 
-    $(document).on('click', '#previousButton', function (e) {
+    $(document).on("click", "#previousButton", function (e) {
         e.preventDefault();
         var select2Icons = $("#select2Icons").val();
         if (select2Icons == null) {
-            toastr.error('Please select 1 topic to search images.');
+            toastr.error("Please select 1 topic to search images.");
             return;
         }
         var page = parseInt($("#total_page").val()) - parseInt(1);
         $("#total_page").val(page);
 
         getImages();
-    })
+    });
 
     function getImages() {
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: `get-image-management`,
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
             data: {
-                'type': $("#select2Icons").val(),
-                'page': $("#total_page").val(),
-                'api_type': $("#api_type").val()
+                type: $("#select2Icons").val(),
+                page: $("#total_page").val(),
+                api_type: $("#api_type").val(),
             },
             beforeSend: function () {
                 showBSPLoader();
@@ -89,15 +93,13 @@ $(function () {
                 hideBSPLoader();
             },
             success: function (response) {
-
                 var image = "";
                 var newImage = "";
                 var getData = "";
                 if ($("#api_type").val() == "pexels") {
-                    getData = response['photos'];
+                    getData = response["photos"];
                 } else {
-
-                    getData = response['hits'];
+                    getData = response["hits"];
                 }
 
                 // console.log(getData);
@@ -148,30 +150,120 @@ $(function () {
                             </div>
                         `;
                     }
-
-                })
+                });
                 $("#sortable-cards").html(newImage);
             },
             error: function (error) {
                 hideBSPLoader();
                 console.log(error);
-            }
+            },
         });
     }
 
-    $(document).on('click', '.search_btn', function (e) {
+    $(document).on("click", ".search_btn", function (e) {
         e.preventDefault();
         var select2Icons = $("#select2Icons").val();
-        if (select2Icons == null) {
+        if (select2Icons.length == 0) {
             toastr.options = {
-                "progressBar": true,
+                progressBar: true,
             };
-            toastr.error('Please select 1 topic to search images.');
+            toastr.error("Please select 1 topic to search images.");
             return;
         }
 
         $("#total_page").val(1);
-        getImages()
-
+        getImages();
     });
+
+    // String Matcher function
+    var substringMatcher = function (strs) {
+        return function findMatches(q, cb) {
+            var matches, substrRegex;
+            matches = [];
+            substrRegex = new RegExp(q, "i");
+            $.each(strs, function (i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+            });
+
+            cb(matches);
+        };
+    };
+
+    var searchTopics = [
+        'first time buyer mortgages',
+        'happy young person with door key',
+        'happy young couple standing outside house',
+        'holding door key',
+        'happy person with thumbs up',
+        'confused person',
+        'person with question mark',
+        'remortgage',
+        'piggy bank',
+        'save money',
+        'savings',
+        'clock',
+        'times up',
+        'time is now',
+        'mortgage broker',
+        'happy person or couple with thumbs up',
+        'move home',
+        'moving home',
+        'for sale sign outside house',
+        'life insurance',
+        'critical illness',
+        'health',
+        'family protection',
+        'income protection',
+        'protect income',
+        'protect house',
+        'protect family',
+        'national day',
+        'protect home',
+        'home insurance',
+        'accidents in the home',
+        'bad credit',
+        'poor credit',
+        'credit score',
+        'happy person with thumbs up',
+        'confused person',
+        'person with question mark',
+        'sad person',
+        'business owner',
+        'self employed',
+        'boss',
+        'manager',
+        'company accounts',
+        'hmrc',
+        'tax return',
+        'happy middle-aged person with thumbs up',
+        'key workers',
+        'nurses',
+        'doctors',
+        'uk police',
+        'uk firefighters',
+        'uk military',
+        'armed forces',
+        'right to buy',
+        'happy couple over 60 years old',
+    ];
+
+    if (isRtl) {
+        $(".typeahead-search").attr("dir", "rtl");
+    }
+
+    // Basic
+    // --------------------------------------------------------------------
+    $(".typeahead-search").typeahead(
+        {
+            hint: !isRtl,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+            name: "searchTopics",
+            source: substringMatcher(searchTopics),
+        }
+    );
 });
