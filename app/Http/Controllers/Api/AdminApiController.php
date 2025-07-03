@@ -29,6 +29,17 @@ class AdminApiController extends Controller
                     'name' => $category->name,
                 ];
             });
+        
+        $subCategories = Categories::whereNotNull('parent_id')
+            ->select('id', 'name','parent_id')
+            ->get()
+            ->map(function ($subCategory) {
+                return [
+                    'id' => Helpers::encrypt($subCategory->id),
+                    'name' => $subCategory->name,
+                    'parent_id' => Helpers::encrypt($subCategory->parent_id),
+                ];
+            });
 
         $postContents = PostContent::select('id', 'category_id', 'title')->get()->map(function ($postContent) {
             return [
@@ -44,6 +55,7 @@ class AdminApiController extends Controller
             'data' => [
                 'designStyles' => $designStyles,
                 'categories' => $categories,
+                'subCategories' => $subCategories,
                 'postContents' => $postContents,
             ],
         ]);

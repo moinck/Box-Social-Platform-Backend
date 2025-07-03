@@ -67,4 +67,46 @@ class CategoriesApiController extends Controller
 
         return $this->success($returnData, 'Categories list.');
     }
+
+    /**
+     * Get list of all subcategories
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function subList(Request $request)
+    {
+        $subCategories = Categories::whereNotNull('parent_id')
+            ->select('id', 'name')
+            ->get()
+            ->map(function ($subCategory) {
+                return [
+                    'id' => Helpers::encrypt($subCategory->id),
+                    'name' => $subCategory->name,
+                ];
+            });
+
+        return $this->success($subCategories, 'Sub categories list.');
+    }
+
+    /**
+     * Get sub-categories of 1 main category
+     * @param mixed $id
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function getSubCategory($id)
+    {
+        $decryptId = Helpers::decrypt($id);
+
+        $subCategory = Categories::where('parent_id', $decryptId)
+            ->select('id', 'name')
+            ->get()
+            ->map(function ($subCategory) {
+                return [
+                    'id' => Helpers::encrypt($subCategory->id),
+                    'name' => $subCategory->name,
+                ];
+            });
+
+        return $this->success($subCategory, 'Sub category fetch successfully!.');
+    }
 }
