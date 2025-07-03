@@ -280,9 +280,9 @@
             $(document).on('click','.template-image', function () {
                 var image = $(this).attr('src');
                 var category = $(this).data('category');
-                $('#template-image-modal').modal('show');
                 $('#template-image-modal .modal-body img').attr('src', image);
                 $('#template-image-modal .modal-header .modal-title').text(category);
+                $('#template-image-modal').modal('show');
             });
             // ----------------------------------------------------------
         });
