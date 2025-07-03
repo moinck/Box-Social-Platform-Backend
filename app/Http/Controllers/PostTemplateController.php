@@ -25,7 +25,7 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name')
+        $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
             ->where(function ($query) use ($request) {
                 if ($request->category) {
                     $query->where('category_id', $request->category);
@@ -47,6 +47,9 @@ class PostTemplateController extends Controller
             })
             ->addColumn('category', function ($data) {
                 return $data->category->name;
+            })
+            ->addColumn('sub_category', function ($data) {
+                return $data->subCategory->name ?? "-";
             })
             ->addColumn('design_style', function ($data) {
                 return $data->designStyle->name ?? "-";
