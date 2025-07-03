@@ -93,6 +93,13 @@ $(function () {
                 hideBSPLoader();
             },
             success: function (response) {
+                console.log(response);
+
+                var totalCount = response["total"];
+                if (totalCount == 0) {
+                    showSweetAlert("info", "Oops!", "No images were found. try different search.");
+                    return;
+                }
                 var image = "";
                 var newImage = "";
                 var getData = "";

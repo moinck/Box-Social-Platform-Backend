@@ -14,6 +14,11 @@
         'resources/assets/vendor/libs/@form-validation/form-validation.scss',
         'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
     ])
+    <style>
+        table.dataTable thead tr th.checkbox-th:before {
+            opacity: 0;
+        }
+    </style>
 @endsection
 
 <!-- Vendor Scripts -->
@@ -39,7 +44,7 @@
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
-                    <button class="btn btn-secondary btn-danger waves-effect waves-light" type="button" id="contact-us-delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Delete User Feedback Data">
+                    <button class="btn btn-secondary btn-danger waves-effect waves-light d-none" type="button" id="contact-us-delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Delete User Feedback Data">
                         <span>
                             <i class="ri-delete-bin-line ri-16px me-sm-2" style="vertical-align: baseline;"></i>
                             <span class="d-none d-sm-inline-block">Delete</span>
@@ -53,7 +58,7 @@
                 <thead>
                     <tr>
                         <th class="col-1 checkbox-th">
-                            <input type="checkbox" class="form-check-input" id="select-all" title="Select All">
+                            <input type="checkbox" class="form-check-input" id="select-all" title="Select All" style="width: 1.1rem;">
                         </th>
                         <th>Name</th>
                         <th>Email</th>
@@ -117,42 +122,76 @@
             }
             // -------------------------------------------
 
+            // show hide btn
+            $(document).on('change', '.contact-us-checkbox', function () {
+                if ($('.contact-us-checkbox:checked').length > 0) {
+                    $('#contact-us-delete-btn').removeClass('d-none');
+                } else {
+                    $('#contact-us-delete-btn').addClass('d-none');
+                }
+            });
+
             // select all
             $(document).on('click', '#select-all', function () {
                 $('.contact-us-checkbox').prop('checked', this.checked);
+                if ($('.contact-us-checkbox:checked').length > 0) {
+                    $('#contact-us-delete-btn').removeClass('d-none');
+                } else {
+                    $('#contact-us-delete-btn').addClass('d-none');
+                }
             });
             // -------------------------------------------
 
             // delete selected feedback
             $(document).on('click', '#contact-us-delete-btn', function () {
-                var selectedIds = $('.contact-us-checkbox:checked').map(function () {
-                    return $(this).val();
-                }).get();
-
-                if (selectedIds.length === 0) {
-                    toastr.error('Please select at least one feedback');
-                    return;
-                }
-                
-                $.ajax({
-                    url: "{{ route('feedback-management.delete') }}",
-                    type: "POST",
-                    data: {
-                        contact_us_ids: selectedIds,
-                        _token: "{{ csrf_token() }}"
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
                     },
-                    beforeSend: function() {
-                        showBSPLoader();
-                    },
-                    complete: function() {
-                        hideBSPLoader();
-                    },
-                    success: function (response) {
-                        showSweetAlert('success', 'Deleted!', response.message);
-                        ContactUsDataTable();
-                    },
-                    error: function (xhr, status, error) {
-                        toastr.error(error);
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {                        
+                        var selectedIds = $('.contact-us-checkbox:checked').map(function () {
+                            return $(this).val();
+                        }).get();
+        
+                        if (selectedIds.length === 0) {
+                            toastr.error('Please select at least one feedback');
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url: "{{ route('feedback-management.delete') }}",
+                            type: "POST",
+                            data: {
+                                contact_us_ids: selectedIds,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            beforeSend: function() {
+                                showBSPLoader();
+                            },
+                            complete: function() {
+                                hideBSPLoader();
+                            },
+                            success: function (response) {
+                                showSweetAlert('success', 'Deleted!', response.message);
+                                ContactUsDataTable();
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.error(error);
+                            }
+                        });
+                    } else {
+                        // unchecked all
+                        $('#select-all').prop('checked', false);
+                        $('.contact-us-checkbox').prop('checked', false);
+                        $('#contact-us-delete-btn').addClass('d-none');
                     }
                 });
             });
