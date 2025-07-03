@@ -47,6 +47,11 @@ $(function () {
 
     $(document).on('click', '#nextButton', function (e) {
         e.preventDefault();
+        var select2Icons = $("#select2Icons").val();
+        if (select2Icons == null) {
+            toastr.error('Please select 1 topic to search images.');
+            return;
+        }
         var page = parseInt($("#total_page").val()) + parseInt(1);
         $("#total_page").val(page);
         getImages();
@@ -54,6 +59,11 @@ $(function () {
 
     $(document).on('click', '#previousButton', function (e) {
         e.preventDefault();
+        var select2Icons = $("#select2Icons").val();
+        if (select2Icons == null) {
+            toastr.error('Please select 1 topic to search images.');
+            return;
+        }
         var page = parseInt($("#total_page").val()) - parseInt(1);
         $("#total_page").val(page);
 
@@ -151,6 +161,14 @@ $(function () {
 
     $(document).on('click', '.search_btn', function (e) {
         e.preventDefault();
+        var select2Icons = $("#select2Icons").val();
+        if (select2Icons == null) {
+            toastr.options = {
+                "progressBar": true,
+            };
+            toastr.error('Please select 1 topic to search images.');
+            return;
+        }
 
         $("#total_page").val(1);
         getImages()

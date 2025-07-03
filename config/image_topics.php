@@ -48,6 +48,9 @@ return [
         'protect house',
         'protect family',
     ],
+    'Days' => [
+        'national day',
+    ],
     'General Insurance' => [
         'protect home',
         'home insurance',
