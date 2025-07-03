@@ -61,7 +61,7 @@ class ImageStockManagementController extends Controller
         
         // dd(env('PEXELS'));
         if($request->api_type == "pexels"){
-            $url = "https://api.pexels.com/v1/search?query=".urlencode($request->type)."&per_page=10&page=".$request->page;
+            $url = "https://api.pexels.com/v1/search?query=".urlencode($request->type)."&per_page=100&page=".$request->page;
             
             $ch = curl_init();
 

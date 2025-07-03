@@ -93,10 +93,17 @@ class CategoriesController extends Controller
 
         // add subcategories
         if ($request->has('subcategory_name')) {
-            foreach ($request->subcategory_name as $subcategory_name) {
+            foreach ($request->subcategory_name as $index => $subcategory_name) {
                 $subcategory = new Categories();
                 $subcategory->name = $subcategory_name;
                 $subcategory->parent_id = $category->id;
+
+                // Check if 'subcategory_coming_soon' is set and if the current index has 'on' value
+                if ($request->has('subcategory_coming_soon') && isset($request->subcategory_coming_soon[$index]) && $request->subcategory_coming_soon[$index] == 'on') {
+                    $subcategory->is_comming_soon = true;
+                } else {
+                    $subcategory->is_comming_soon = false;
+                }
                 $subcategory->save();
             }
         }
@@ -110,7 +117,7 @@ class CategoriesController extends Controller
     public function edit($id)
     {
         $categoryId = Helpers::decrypt($id);
-        $category = Categories::with('children:id,name,parent_id')->find($categoryId);
+        $category = Categories::with('children:id,name,parent_id,is_comming_soon')->find($categoryId);
         if ($category) {
             return response()->json([
                 'success' => true,

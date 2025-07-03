@@ -713,19 +713,27 @@
                 var subcategoriesContainer = $('#subcategories-container');
                 var subcategoryHtml = `
                     <div class="col-12 mt-2 subcategory-item">
-                        <div class="input-group input-group-merge">
-                            <div class="form-floating form-floating-outline">
-                                <input
-                                    type="text"
-                                    class="form-control subcategory-name"
-                                    id="subcategory_name_${subcategoryCount}"
-                                    name="subcategory_name[${subcategoryCount}]"
-                                    placeholder="Subcategory Name"
-                                    aria-describedby="subcategory_name_${subcategoryCount}" />
-                                <label for="subcategory_name_${subcategoryCount}">Subcategory Name ${subcategoryCount}</label>
-                            </div>
-                            <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
-                        </div>
+                        <ul style="padding-left:0;">
+                            <li class="mb-2 d-flex align-items-center justify-content-between">
+                                <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline">
+                                        <input
+                                            type="text"
+                                            class="form-control subcategory-name"
+                                            id="subcategory_name_${subcategoryCount}"
+                                            name="subcategory_name[${subcategoryCount}]"
+                                            placeholder="Subcategory Name"
+                                            aria-describedby="subcategory_name_${subcategoryCount}" />
+                                        <label for="subcategory_name_${subcategoryCount}">Subcategory Name ${subcategoryCount}</label>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch mx-2" style="width: 30%;">
+                                    <input class="form-check-input" type="checkbox" name="subcategory_coming_soon[${subcategoryCount}]" id="subcategory_coming_soon_${subcategoryCount}" />
+                                    <label class="form-check-label" for="subcategory_coming_soon_${subcategoryCount}">Coming Soon</label>
+                                </div>
+                                <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
+                            </li>
+                        </ul>
                     </div>
                 `;
                 subcategoriesContainer.append(subcategoryHtml);
