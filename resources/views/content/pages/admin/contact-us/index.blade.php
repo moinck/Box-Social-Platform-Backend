@@ -37,12 +37,24 @@
             <div class="head-label">
                 <h5 class="card-title mb-0">Feedback Management</h5>
             </div>
+            <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons btn-group flex-wrap"> 
+                    <button class="btn btn-secondary btn-danger waves-effect waves-light" type="button" id="contact-us-delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Delete User Feedback Data">
+                        <span>
+                            <i class="ri-delete-bin-line ri-16px me-sm-2" style="vertical-align: baseline;"></i>
+                            <span class="d-none d-sm-inline-block">Delete</span>
+                        </span>
+                    </button> 
+                </div>
+            </div>
         </div>
         <div class="card-datatable table-responsive">
             <table class="dt-fixedheader table table-bordered" id="contact-us-data-table">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th class="col-1 checkbox-th">
+                            <input type="checkbox" class="form-check-input" id="select-all" title="Select All">
+                        </th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Company Name</th>
@@ -88,7 +100,7 @@
                         }
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
                         { data: 'name', name: 'name'},
                         { data: 'email', name: 'email'},
                         { data: 'company_name', name: 'company_name'},
@@ -103,6 +115,47 @@
                     }
                 });
             }
+            // -------------------------------------------
+
+            // select all
+            $(document).on('click', '#select-all', function () {
+                $('.contact-us-checkbox').prop('checked', this.checked);
+            });
+            // -------------------------------------------
+
+            // delete selected feedback
+            $(document).on('click', '#contact-us-delete-btn', function () {
+                var selectedIds = $('.contact-us-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+
+                if (selectedIds.length === 0) {
+                    toastr.error('Please select at least one feedback');
+                    return;
+                }
+                
+                $.ajax({
+                    url: "{{ route('feedback-management.delete') }}",
+                    type: "POST",
+                    data: {
+                        contact_us_ids: selectedIds,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    beforeSend: function() {
+                        showBSPLoader();
+                    },
+                    complete: function() {
+                        hideBSPLoader();
+                    },
+                    success: function (response) {
+                        showSweetAlert('success', 'Deleted!', response.message);
+                        ContactUsDataTable();
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error(error);
+                    }
+                });
+            });
             // -------------------------------------------
         });
     </script>

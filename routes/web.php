@@ -99,6 +99,7 @@ Route::middleware('auth')->group(function () {
         // user feedback-management controller
         Route::get('/feedback-management', [ContactUsController::class, 'index'])->name('feedback-management');
         Route::get('/feedback-management/datatable', [ContactUsController::class, 'contactUsDataTable'])->name('feedback-management.data-table');
+        Route::post('/feedback-management/delete', [ContactUsController::class, 'destroy'])->name('feedback-management.delete');
         Route::get('/feedback-management/mail-preview', [ContactUsController::class, 'mailPreview'])->name('feedback-management.mail-preview');
 
         // post content controller
