@@ -177,10 +177,12 @@ class CategoriesController extends Controller
                         $subcategory = new Categories();
                         $subcategory->name = $subCategory['name'];
                         $subcategory->parent_id = $category->id;
+                        $subcategory->is_comming_soon = $subCategory['coming_soon'];
                         $subcategory->save();
                     } else {
                         $subcategory = Categories::where('id', $subCategory['id'])->first();
                         $subcategory->name = $subCategory['name'];
+                        $subcategory->is_comming_soon = $subCategory['coming_soon'];
                         $subcategory->save();
                     }
                 }

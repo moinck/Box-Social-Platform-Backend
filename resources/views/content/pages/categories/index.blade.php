@@ -490,23 +490,34 @@
                             if (subcategories.length > 0) {
                                 subcategories.forEach(function(subcategory) {
                                     editSubcategoryCount++;
+                                    var subcategoryComingSoon = subcategory.is_comming_soon;
+
                                     subcategoriesEditHtml += `
                                         <div class="col-12 mt-2 edit-subcategory-item">
-                                            <div class="input-group input-group-merge">
-                                                <div class="form-floating form-floating-outline">
-                                                    <input
-                                                        type="text"
-                                                        class="form-control edit-subcategory-name"
-                                                        id="edit_subcategory_name_${editSubcategoryCount}"
-                                                        name="edit_subcategory_name[${editSubcategoryCount}]"
-                                                        data-subcategory-id="${subcategory.id}"
-                                                        placeholder="Subcategory ${editSubcategoryCount} Name"
-                                                        value="${subcategory.name}"
-                                                        aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
-                                                    <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory ${editSubcategoryCount} Name</label>
-                                                </div>
-                                                <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
-                                            </div>
+                                            <ul style="padding-left:0;">
+                                                <li class="mb-2 d-flex align-items-center justify-content-between">
+                                                    <div class="input-group input-group-merge">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input
+                                                                type="text"
+                                                                class="form-control edit-subcategory-name"
+                                                                id="edit_subcategory_name_${editSubcategoryCount}"
+                                                                name="edit_subcategory_name[${editSubcategoryCount}]"
+                                                                data-subcategory-id="${subcategory.id}"
+                                                                placeholder="Subcategory ${editSubcategoryCount} Name"
+                                                                value="${subcategory.name}"
+                                                                aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
+                                                            <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory ${editSubcategoryCount} Name</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check form-switch mx-2" style="width: 30%;">
+                                                        <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${subcategoryCount}]" ${subcategoryComingSoon == true ? 'checked' : ''} id="edit_subcategory_coming_soon_${subcategoryCount}" />
+                                                        <label class="form-check-label" for="edit_subcategory_coming_soon_${subcategoryCount}">Coming Soon</label>
+                                                    </div>
+                                                    <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
+                                                </li>
+                                            </ul>
+                                            <hr>
                                         </div>
                                     `;
 
@@ -622,9 +633,14 @@
                 // get subcategory ids with name in array
                 var subcategoryIds = [];
                 $('.edit-subcategory-name').each(function() {
+                    // Find the corresponding checkbox within the same parent container
+                    var $parentLi = $(this).closest('li');
+                    var isComingSoon = $parentLi.find('input[type="checkbox"]').is(':checked');
+                    
                     subcategoryIds.push({
                         id: $(this).data('subcategory-id') ?? 0,
-                        name: $(this).val()
+                        name: $(this).val(),
+                        coming_soon: isComingSoon ? true : false
                     });
                 });
                 formData.append('edit_subcategory_ids', JSON.stringify(subcategoryIds));
@@ -734,6 +750,7 @@
                                 <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
                             </li>
                         </ul>
+                        <hr>
                     </div>
                 `;
                 subcategoriesContainer.append(subcategoryHtml);
@@ -752,7 +769,7 @@
 
             // remove subcategory
             $(document).on('click', '.remove-subcategory-btn', function() {
-                $(this).parent().parent().remove();
+                $(this).parent().parent().parent().remove();
                 subcategoryCount--;
                 addCategoryFV.removeField(`subcategory_name[${subcategoryCount}]`);
             });
@@ -766,20 +783,31 @@
                 var editSubcategoriesContainer = $('#edit-subcategories-container');
                 var subcategoryHtml = `
                     <div class="col-12 mt-2 edit-subcategory-item">
-                        <div class="input-group input-group-merge">
-                            <div class="form-floating form-floating-outline">
-                                <input
-                                    type="text"
-                                    class="form-control edit-subcategory-name"
-                                    id="edit_subcategory_name_${editSubcategoryCount}"
-                                    name="edit_subcategory_name[${editSubcategoryCount}]"
-                                    data-subcategory-id="0"
-                                    placeholder="Subcategory Name"
-                                    aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
-                                <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory Name ${editSubcategoryCount}</label>
-                            </div>
-                            <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
-                        </div>
+                        <ul style="padding-left:0;">
+                            <li class="mb-2 d-flex align-items-center justify-content-between">
+                                <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline">
+                                        <input
+                                            type="text"
+                                            class="form-control edit-subcategory-name"
+                                            id="edit_subcategory_name_${editSubcategoryCount}"
+                                            name="edit_subcategory_name[${editSubcategoryCount}]"
+                                            data-subcategory-id="0"
+                                            placeholder="Subcategory ${editSubcategoryCount} Name"
+                                            aria-describedby="edit_subcategory_name_${editSubcategoryCount}" />
+                                        <label for="edit_subcategory_name_${editSubcategoryCount}">Subcategory ${editSubcategoryCount} Name</label>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch mx-2" style="width: 30%;">
+                                    <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${editSubcategoryCount}]" id="edit_subcategory_coming_soon_${editSubcategoryCount}" />
+                                    <label class="form-check-label" for="edit_subcategory_coming_soon_${editSubcategoryCount}">Coming Soon</label>
+                                </div>
+                                <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="0">
+                                    <i class="ri-delete-bin-line"></i>
+                                </span>
+                            </li>
+                        </ul>
+                        <hr>
                     </div>
                 `;
                 editSubcategoriesContainer.append(subcategoryHtml);
@@ -798,7 +826,7 @@
             
             // remove edit subcategory
             $(document).on('click', '.remove-edit-subcategory-btn', function() {
-                $(this).parent().parent().remove();
+                $(this).parent().parent().parent().remove();
                 editSubcategoryCount--;
                 categoryEditFV.removeField(`edit_subcategory_name[${editSubcategoryCount}]`);
             });
