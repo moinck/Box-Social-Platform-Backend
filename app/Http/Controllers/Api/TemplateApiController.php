@@ -20,6 +20,7 @@ class TemplateApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|string',
+            'sub_category_id' => 'nullable|string',
             'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required', // or 'array' if JSON
             'design_style_id' => 'required|string',
@@ -41,10 +42,16 @@ class TemplateApiController extends Controller
         $tempObj->category_id = Helpers::decrypt($request->category_id);
         $tempObj->template_image = $imagePath;
         $tempObj->template_data = json_encode($request->template_data);
+
+        if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
+            $tempObj->sub_category_id = Helpers::decrypt($request->sub_category_id);
+        }
+
         if ($request->has('design_style_id') && $request->design_style_id) {
             $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
             $tempObj->design_style_id = $decryptedDesignStyleId;
         }
+
         if ($request->has('post_content_id') && $request->post_content_id) {
             $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
             $tempObj->post_content_id = $decryptedPostContentId;
@@ -97,6 +104,7 @@ class TemplateApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'category_ids' => 'nullable|array',
+            'sub_category_ids' => 'nullable|array',
             'template_ids' => 'nullable|array',
             'post_content_ids' => 'nullable|array',
         ]);
@@ -117,6 +125,14 @@ class TemplateApiController extends Controller
                 return Helpers::decrypt($id);
             }, $request->category_ids);
             $tempObj->whereIn('category_id', $decryptedCategoryIds);
+        }
+
+        // filter bt sub categories
+        if ($request->has('sub_category_ids') && $request->sub_category_ids != []) {
+            $decryptedSubCategoryIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->sub_category_ids);
+            $tempObj->whereIn('sub_category_id', $decryptedSubCategoryIds);
         }
 
         // filter by selected templates
