@@ -52,7 +52,7 @@ $(function () {
     $(document).on("click", "#nextButton", function (e) {
         e.preventDefault();
         var select2Icons = $("#select2Icons").val();
-        if (select2Icons == null) {
+        if (select2Icons.length == 0) {
             toastr.error("Please select 1 topic to search images.");
             return;
         }
@@ -64,7 +64,7 @@ $(function () {
     $(document).on("click", "#previousButton", function (e) {
         e.preventDefault();
         var select2Icons = $("#select2Icons").val();
-        if (select2Icons == null) {
+        if (select2Icons.length == 0) {
             toastr.error("Please select 1 topic to search images.");
             return;
         }

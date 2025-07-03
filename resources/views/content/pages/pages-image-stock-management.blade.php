@@ -168,6 +168,7 @@
 
     <script>
         $(document).ready(function () {
+            // var searchTopics = @json(config('image_topics'));
 
             var select2 = $('.tag-name-select');
             // add select2
