@@ -48,6 +48,8 @@ Route::group([
 
         // category list
         Route::get('/category/list', [CategoriesApiController::class, 'list']);
+        Route::get('/sub-category/list', [CategoriesApiController::class, 'subList']);
+        Route::get('/sub-category/get/{id}', [CategoriesApiController::class, 'getSubCategory']);
 
         // brandkit api
         Route::get('/brandkit/get', [BrnadKitApiController::class, 'get']);

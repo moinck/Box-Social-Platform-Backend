@@ -57,10 +57,11 @@
                         <th>Template</th>
                         <th>Post Content</th>
                         <th>Category</th>
+                        <th>Sub Category</th>
                         <th>Style</th>
                         <th>Status</th>
                         <th>Created Date</th>
-                        <th>Action</th>
+                        <th class="col-1">Action</th>
                     </tr>
                 </thead>
             </table>
@@ -160,6 +161,7 @@
                         { data: 'template_image', name: 'template_image'},
                         { data: 'post_content', name: 'post_content'},
                         { data: 'category', name: 'category'},
+                        { data: 'sub_category', name: 'sub_category'},
                         { data: 'design_style', name: 'design_style'},
                         { data: 'status', name: 'status'},
                         { data: 'created_at', name: 'created_at'},
