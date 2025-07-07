@@ -28,8 +28,9 @@ class PostContentImport implements ToCollection
                 if ($category) {
                     PostContent::create([
                         'category_id' => $category->id,
-                        'title' => $row[2],
-                        'description' => $row[3],
+                        'title' => $row[2] ?? null,
+                        'description' => $row[3] ?? null,
+                        'warning_message' => $row[4] ?? null,
                     ]);
                 }
             }
