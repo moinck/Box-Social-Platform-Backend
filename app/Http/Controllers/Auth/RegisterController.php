@@ -144,8 +144,12 @@ class RegisterController extends Controller
     {
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'password' => 'required|string',
+        ],[
+            'email.required' => 'Email is required.',
+            'email.email' => 'Email is invalid.',
+            'password.required' => 'Password is required.',
         ]);
 
         // Check if validation fails
