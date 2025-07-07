@@ -80,8 +80,10 @@ class PostTemplateController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
+                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId;
+
                 return '
-                    <a href="javascript:;" title="edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
+                    <a href="' . $editUrl . '" title="edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" title="delete post template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
