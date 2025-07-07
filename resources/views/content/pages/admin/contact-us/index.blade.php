@@ -117,6 +117,10 @@
                             next: '<i class="ri-arrow-right-s-line"></i>',
                             previous: '<i class="ri-arrow-left-s-line"></i>'
                         }
+                    },
+                    drawCallback: function(settings) {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                        $('#select-all').prop('checked', false);
                     }
                 });
             }
