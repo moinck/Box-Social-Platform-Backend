@@ -97,9 +97,9 @@ class ImageStockManagementController extends Controller
             curl_setopt($ch, CURLOPT_HTTPGET, true);
             // Execute cURL request
             $response = curl_exec($ch);
+            $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             // Close cURL session
             curl_close($ch);
-            $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     
             // check the status code
             if ($httpStatus != 200) {
