@@ -38,7 +38,7 @@ Route::get('/user', function (Request $request) {
 
 // Auth Routes
 Route::group([
-    'middleware' => ['auth:sanctum']
+    'middleware' => ['auth:sanctum', 'checkUserStatus']
 ], function () {
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
