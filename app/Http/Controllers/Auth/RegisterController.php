@@ -298,4 +298,34 @@ class RegisterController extends Controller
             'message' => 'Logout successfully.',
         ], 200);
     }
+
+
+    /**
+     * Check user account status
+     */
+    public function statusCheck(Request $request)
+    {
+        $user = Auth::user();
+        $accountStatus = $user->status;
+
+        $returnData = [];
+
+        if ($accountStatus == 'active') {
+            $returnData = [
+                'status' => true,
+                'message' => 'Account is active.',
+            ];
+        } else {
+            $returnData = [
+                'status' => false,
+                'message' => 'Account is inactive.',
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account status checked successfully.',
+            'data' => $returnData,
+        ], 200);
+    }
 }

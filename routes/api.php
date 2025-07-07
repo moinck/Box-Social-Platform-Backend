@@ -42,6 +42,7 @@ Route::group([
 ], function () {
     Route::group([], function () {
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
+        Route::get('/account-status-check', [RegisterController::class, 'statusCheck']);
 
         // admin api
         Route::get('/admin/template-data', [AdminApiController::class, 'index']);

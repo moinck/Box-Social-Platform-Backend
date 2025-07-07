@@ -39,7 +39,7 @@
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
-                    <a href="http://178.128.45.173:9163/admin" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
+                    <a href="http://178.128.45.173:9163/admin/create-templates" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Template">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
