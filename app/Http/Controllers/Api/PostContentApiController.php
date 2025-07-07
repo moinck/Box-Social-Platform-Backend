@@ -71,19 +71,32 @@ class PostContentApiController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'category_ids' => 'required|array',
+            'category_ids' => 'nullable|array',
+            'sub_category_ids' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
             return $this->validationError('Validation Error', $validator->errors());
         }
-        $requestCategoryIds = $request->category_ids;
 
-        foreach ($requestCategoryIds as $key => $value) {
-            $requestCategoryIds[$key] = Helpers::decrypt($value);
+        $postContent = PostContent::withCount('category');
+
+        // filter bt categories
+        if ($request->has('category_ids') && $request->category_ids != []) {
+            $decryptedCategoryIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->category_ids);
+            $postContent->whereIn('category_id', $decryptedCategoryIds);
         }
 
-        $postContent = PostContent::withCount('category')->whereIn('category_id', $requestCategoryIds)->get();
+        if ($request->has('sub_category_ids') && $request->sub_category_ids != []) {
+            $decryptedSubCategoryIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->sub_category_ids);
+            $postContent->whereIn('sub_category_id', $decryptedSubCategoryIds);
+        }
+        $postContent = $postContent->get();
+
         if (!$postContent) {
             return $this->error('Post content not found', 404);
         }
