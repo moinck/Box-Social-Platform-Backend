@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Models\BrandKit;
+use App\ResponseTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -21,6 +22,8 @@ use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
+    use ResponseTrait;
+
     public function index()
     {
         $pageConfigs = ['myLayout' => 'blank'];
@@ -143,6 +146,10 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string',
+        ],[
+            'email.required' => 'Email is required.',
+            'email.email' => 'Email is invalid.',
+            'password.required' => 'Password is required.',
         ]);
 
         // Check if validation fails
@@ -154,27 +161,36 @@ class RegisterController extends Controller
             ], 422);
         }
 
+        // Attempt to authenticate the user
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials.',
+            ], 400);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email is not registered.',
+                'message' => 'User Not Found.',
                 'data' => []
             ], 404);
         }
 
-        // Attempt to authenticate the user
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        // check account status
+        if ($user->status != 'active') {
             return response()->json([
                 'success' => false,
-                'message' => 'Incorrect password.',
-            ], 400);
+                'message' => 'Your account is inactive.',
+                'data' => []
+            ], 403);
         }
 
         // Authentication passed, generate token or proceed as needed
         // $user = Auth::user();
-        $user = User::where('email', $request->email)->first();
+        // $user = User::where('email', $request->email)->first();
 
         // Check if email is verified
         // if (!$user->hasVerifiedEmail()) {
