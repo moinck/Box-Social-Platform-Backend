@@ -59,7 +59,7 @@
                         <th>description</th>
                         <th>status</th>
                         <th>created Date</th>
-                        <th>Action</th>
+                        <th class="table-action-col">Action</th>
                     </tr>
                 </thead>
             </table>
