@@ -74,10 +74,16 @@ class ImageStockManagementController extends Controller
                     'data' => json_decode($response, true)
                 ];
             } else {
+                $returndata =   [
+                    "page" => 0,
+                    "per_page" => 0,
+                    "photos" => [],
+                    "total_results" => 0,
+                ];
                 return [
                     'success' => false,
                     'message' => 'Request failed',
-                    'data' => null
+                    'data' => $returndata
                 ];
             }
         } else {
@@ -94,10 +100,15 @@ class ImageStockManagementController extends Controller
             curl_close($ch);
     
             if (curl_errno($ch)) {
+                $returndata =   [
+                    "total" => 0,
+                    "totalHits" => 0,
+                    "hits" => []
+                ];
                 return [
                     'success' => false,
                     'message' => 'cURL Error: ' . curl_error($ch),
-                    'data' => null
+                    'data' => $returndata
                 ];
             } else {
                 // Decode JSON response
