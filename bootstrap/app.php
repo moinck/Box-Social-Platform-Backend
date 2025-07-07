@@ -2,6 +2,7 @@
 
 use App\Console\Commands\CleanExpiredTokens;
 use App\Http\Middleware\CheckRoleMiddleware;
+use App\Http\Middleware\CheckUserStatus;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'checkRole' => CheckRoleMiddleware::class,
             'verified' => EnsureEmailIsVerified::class,
+            'checkUserStatus' => CheckUserStatus::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {
