@@ -93,24 +93,34 @@ $(function () {
                 hideBSPLoader();
             },
             success: function (response) {
-                console.log(response);
+                // console.log(response);
 
-                var totalCount = response["total"];
-                if (totalCount == 0) {
-                    showSweetAlert("info", "Oops!", "No images were found. try different search.");
+                // Check if the request was successful
+                if (!response.success) {
+                    showSweetAlert("error", "Error", response.message);
                     return;
                 }
-                var image = "";
-                var newImage = "";
-                var getData = "";
+
+                // Access the data from the response
+                var getData = response.data;
+                var totalCount = 0;
+
+                // Determine the total count based on the API type
                 if ($("#api_type").val() == "pexels") {
-                    getData = response["photos"];
+                    totalCount = getData.photos ? getData.photos.length : 0;
+                    getData = getData.photos;
                 } else {
-                    getData = response["hits"];
+                    totalCount = getData.hits ? getData.hits.length : 0;
+                    getData = getData.hits;
                 }
 
-                // console.log(getData);
+                if (totalCount == 0) {
+                    showSweetAlert("info", "Oops!", "No images were found. Try a different search.");
+                    return;
+                }
+                var newImage = "";
 
+                // console.log(getData);
                 $.each(getData, function (i, settings) {
                     var image_url = "";
                     var id = "";

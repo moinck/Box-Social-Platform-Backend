@@ -53,62 +53,65 @@ class ImageStockManagementController extends Controller
 
     public function GetImages(Request $request)
     {
-
-        $pixabay_api_key = config('app.pixabay_api_key');
-        $pexels_api_key = config('app.pexels_api_key');
-        
-        $url = "https://pixabay.com/api/?key=".env('PIXABAY')."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
-        
-        // dd(env('PEXELS'));
         if($request->api_type == "pexels"){
             $url = "https://api.pexels.com/v1/search?query=".urlencode($request->type)."&per_page=100&page=".$request->page;
-            
+    
             $ch = curl_init();
-
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 "Authorization:  ".env('PEXELS')
             ]);
-
+    
             $response = curl_exec($ch);
             $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
-
+    
             if ($httpStatus == 200) {
-                return json_decode($response, true);
+                return [
+                    'success' => true,
+                    'message' => 'Request successful',
+                    'data' => json_decode($response, true)
+                ];
             } else {
                 return [
-                    'error' => 'Request failed',
-                    'status' => $httpStatus
+                    'success' => false,
+                    'message' => 'Request failed',
+                    'data' => null
                 ];
             }
-        }else{
+        } else {
+            $url = "https://pixabay.com/api/?key=".env('PIXABAY')."&q=".urlencode($request->type)."&image_type=photo&pretty=true&page=$request->page&per_page=100";
+
             // Initialize cURL
             $ch = curl_init($url);
-
             // Set cURL options
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPGET, true);
-
             // Execute cURL request
             $response = curl_exec($ch);
-            // dd($response);
-
-            // Check for errors
+            // Close cURL session
+            curl_close($ch);
+    
             if (curl_errno($ch)) {
-                echo "cURL Error: " . curl_error($ch);
+                return [
+                    'success' => false,
+                    'message' => 'cURL Error: ' . curl_error($ch),
+                    'data' => null
+                ];
             } else {
                 // Decode JSON response
                 $data = json_decode($response, true);
-               
-               return $data;
+                return [
+                    'success' => true,
+                    'message' => 'Request successful',
+                    'data' => $data
+                ];
             }
 
-            // Close cURL session
-            curl_close($ch);
         }
     }
+    
 
     public function savedImages()
     {

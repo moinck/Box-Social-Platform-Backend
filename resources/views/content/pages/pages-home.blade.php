@@ -61,7 +61,7 @@
                         <th>FCA number</th>
                         <th>Created Date</th>
                         <th>Account Status</th>
-                        <th>Action</th>
+                        <th class="table-action-col">Action</th>
                     </tr>
                 </thead>
             </table>
