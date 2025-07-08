@@ -26,13 +26,11 @@ class PostTemplateController extends Controller
     public function dataTable(Request $request)
     {
         $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
-            ->where(function ($query) use ($request) {
-                if ($request->category) {
-                    $query->where('category_id', $request->category);
-                }
-                if ($request->has('status') && $request->status != '') {
-                    $query->where('status', $request->status);
-                }
+            ->when($request->has('category') && $request->category != '', function ($query) use ($request) {
+                $query->where('category_id', $request->category);
+            })
+            ->when($request->has('status') && $request->status != '', function ($query) use ($request) {
+                $query->where('status', $request->status);
             })
             ->latest()->get();
 

@@ -68,12 +68,20 @@ class TemplateApiController extends Controller
     public function getTemplate(Request $request, $id)
     {
 
-        $tempObj = PostTemplate::where('id', Helpers::decrypt($id))->first();
+        $tempObj = PostTemplate::with('postContent')
+            ->where('id', Helpers::decrypt($id))->first();
 
         if (!$tempObj) {
             return $this->error('Template not found', 404);
         }
 
+        // post content data
+        $postTemplateData = $tempObj->postContent;
+        $postContentData = [
+            "id" => Helpers::encrypt($postTemplateData->id),
+            "title" => $postTemplateData->title,
+            "warning_message" => $postTemplateData->warning_message ? $postTemplateData->warning_message : '',
+        ];
         // $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
 
         // $brandkitData = [
@@ -92,6 +100,7 @@ class TemplateApiController extends Controller
             'id' => Helpers::encrypt($tempObj->id),
             'category_id' => Helpers::encrypt($tempObj->category_id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
+            'post_content_data' => isset($postContentData) ? $postContentData : [],
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
 
@@ -133,21 +142,18 @@ class TemplateApiController extends Controller
                 return Helpers::decrypt($id);
             }, $request->sub_category_ids);
             
-            $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds);
-            });
+            // $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
+            // });
+            $tempObj->whereIn('sub_category_id', $decryptedSubCategoryIds);
         }
 
         // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
-        // if ($request->has('post_content_ids') && $request->post_content_ids != []) {
-        //     $decryptedPostContentIds = array_map(function ($id) {
-        //         return Helpers::decrypt($id);
-        //     }, $request->post_content_ids);
-            
-        //     $tempObj->orWhere(function ($query) use ($decryptedPostContentIds) {
-        //         $query->whereIn('post_content_id', $decryptedPostContentIds);
-        //     });
-        // }
+        if ($request->has('post_content_ids') && $request->post_content_ids != []) {
+            $decryptedPostContentIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->post_content_ids);
+            $tempObj->whereIn('post_content_id', $decryptedPostContentIds);
+        }
 
         // filter by selected templates
         if ($request->has('template_ids') && $request->template_ids != []) {
