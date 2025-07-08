@@ -50,7 +50,7 @@ class BrnadKitApiController extends Controller
             'show_website_on_post' => 'nullable|boolean',
             'social_media_icon_show' => 'nullable|array',
             'show_address_on_post' => 'nullable|boolean',
-            'design_style' => 'required|string|exists:design_styles,name',
+            // 'design_style' => 'required|string|exists:design_styles,name',
         ];
 
         $messages = [
@@ -59,8 +59,8 @@ class BrnadKitApiController extends Controller
             'company_name.required' => 'The company name is required.',
             'user_id.required' => 'User ID is required.',
             'user_id.exists' => 'User does not exist.',
-            'design_style.required' => 'Design style is required.',
-            'design_style.exists' => 'Design style does not exist.',
+            // 'design_style.required' => 'Design style is required.',
+            // 'design_style.exists' => 'Design style does not exist.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -95,10 +95,10 @@ class BrnadKitApiController extends Controller
             }
         }
 
-        $designStyle = DesignStyles::where('name','like', "%$request->design_style%")->first();
-        if (empty($designStyle)) {
-            $designStyle = null;
-        }
+        // $designStyle = DesignStyles::where('name','like', "%$request->design_style%")->first();
+        // if (empty($designStyle)) {
+        //     $designStyle = null;
+        // }
 
         $brandKitObj->logo = $logoUrl;
         // $brandKitObj->base64_logo = $request->logo ?? null;
@@ -117,8 +117,8 @@ class BrnadKitApiController extends Controller
         $brandKitObj->show_address_on_post = $request->show_address_on_post;
         $brandKitObj->color = json_encode($request->color);
         $brandKitObj->font = json_encode($request->font);
-        $brandKitObj->design_style = $request->design_style;
-        $brandKitObj->design_style_id = $designStyle->id ?? null;
+        // $brandKitObj->design_style = $request->design_style;
+        // $brandKitObj->design_style_id = $designStyle->id ?? null;
         $brandKitObj->save();
 
         if ($oldLogoUrl) {
@@ -172,7 +172,7 @@ class BrnadKitApiController extends Controller
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
-                "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null)
+                // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null)
             ],
         ], 200);
     }
@@ -237,7 +237,7 @@ class BrnadKitApiController extends Controller
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
-                "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
+                // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
             ],
         ], 200);
     }
