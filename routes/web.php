@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/post-template/datatable', [PostTemplateController::class, 'dataTable'])->name('post-template.data-table');
         Route::post('/post-template/delete', [PostTemplateController::class, 'destroy'])->name('post-template.delete');
         Route::post('/post-template/account-status', [PostTemplateController::class, 'changeStatus'])->name('post-template.change-status');
+        Route::post('/post-template/create/duplicate', [PostTemplateController::class, 'duplicate'])->name('post-template.create-duplicate');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
