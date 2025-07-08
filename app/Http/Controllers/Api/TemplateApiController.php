@@ -133,9 +133,9 @@ class TemplateApiController extends Controller
                 return Helpers::decrypt($id);
             }, $request->sub_category_ids);
             
-            $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds);
-            });
+            // $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
+            // });
+            $tempObj->whereIn('sub_category_id', $decryptedSubCategoryIds);
         }
 
         // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
