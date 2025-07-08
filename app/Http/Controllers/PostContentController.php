@@ -14,7 +14,15 @@ class PostContentController extends Controller
 {
     public function index()
     {
-        return view('content.pages.admin.post-content.index');
+        $categories = Categories::select(['id', 'name'])
+            ->where(function ($query) {
+                $query->where('status', true)
+                    ->where('parent_id', null);
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+            
+        return view('content.pages.admin.post-content.index', compact('categories'));
     }
 
     public function create()
