@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Models\Categories;
 use App\Models\PostTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Yajra\DataTables\Facades\DataTables;
 
 class PostTemplateController extends Controller
@@ -81,9 +82,11 @@ class PostTemplateController extends Controller
                 $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId;
 
                 return '
-                    <a href="' . $editUrl . '" title="edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
+                    <a href="javascript::void(0);" title="Duplicate post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon duplicate-post-template-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-copy-line"></i></a>
+                    <a href="' . $editUrl . '" title="Edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" title="delete post template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
+                    <a href="javascript:;" title="Delete post template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
@@ -121,6 +124,39 @@ class PostTemplateController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Post Template status changed successfully.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Post Template not found.'
+            ]);
+        }
+    }
+
+    public function duplicate(Request $request)
+    {
+        $decryptedId = Helpers::decrypt($request->post_template_id);
+        $postTemplate = PostTemplate::find($decryptedId);
+        // dd($postTemplate);
+        if ($postTemplate) {
+            $templateImage = $postTemplate->template_image;
+
+        // Generate new unique filename
+        $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
+        $newFilename = 'admin_template_'.time().'.'.$extension;
+        
+        $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
+
+        $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
+
+        // Create the duplicate record
+        $newPostTemplate = $postTemplate->replicate();
+        $newPostTemplate->template_image = $newUrl;
+        $newPostTemplate->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Duplicate Post Template created successfully.'
             ]);
         } else {
             return response()->json([

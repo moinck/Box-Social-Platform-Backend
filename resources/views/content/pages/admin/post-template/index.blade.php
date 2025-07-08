@@ -61,7 +61,7 @@
                         <th>Style</th>
                         <th>Status</th>
                         <th>Created Date</th>
-                        <th class="col-1">Action</th>
+                        <th class="" style="width: 130px;">Action</th>
                     </tr>
                 </thead>
             </table>
@@ -287,6 +287,55 @@
                 $('#template-image-modal').modal('show');
             });
             // ----------------------------------------------------------
+
+            // delete post template
+            $(document).on('click', '.duplicate-post-template-btn', function() {
+                var postTemplateId = $(this).data('post-template-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to create duplicate of this post template!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, duplicate it!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('post-template.create-duplicate') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                post_template_id: postTemplateId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    PostTemplateDataTable();
+                                    showSweetAlert('success', 'Created!', 'Duplicate Post Template has been created.');
+                                } else {
+                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+            });
+            // ----------------------------------------------------------
+
         });
     </script>
 @endsection

@@ -43,7 +43,7 @@ class BrnadKitApiController extends Controller
             'state' => 'nullable|string|max:100',
             'phone' => 'nullable|string|min:10|max:13',
             'country' => 'nullable|string|max:100',
-            'website' => 'nullable|url',
+            'website' => 'nullable|string',
             'postal_code' => 'nullable|string|min:4|max:20',
             'show_email_on_post' => 'nullable|boolean',
             'show_phone_number_on_post' => 'nullable|boolean',
@@ -59,7 +59,6 @@ class BrnadKitApiController extends Controller
             'company_name.required' => 'The company name is required.',
             'user_id.required' => 'User ID is required.',
             'user_id.exists' => 'User does not exist.',
-            'website.url' => 'Please enter a valid URL.',
             'design_style.required' => 'Design style is required.',
             'design_style.exists' => 'Design style does not exist.',
         ];
