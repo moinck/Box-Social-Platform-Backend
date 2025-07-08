@@ -139,15 +139,12 @@ class TemplateApiController extends Controller
         }
 
         // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
-        // if ($request->has('post_content_ids') && $request->post_content_ids != []) {
-        //     $decryptedPostContentIds = array_map(function ($id) {
-        //         return Helpers::decrypt($id);
-        //     }, $request->post_content_ids);
-            
-        //     $tempObj->orWhere(function ($query) use ($decryptedPostContentIds) {
-        //         $query->whereIn('post_content_id', $decryptedPostContentIds);
-        //     });
-        // }
+        if ($request->has('post_content_ids') && $request->post_content_ids != []) {
+            $decryptedPostContentIds = array_map(function ($id) {
+                return Helpers::decrypt($id);
+            }, $request->post_content_ids);
+            $tempObj->whereIn('post_content_id', $decryptedPostContentIds);
+        }
 
         // filter by selected templates
         if ($request->has('template_ids') && $request->template_ids != []) {
