@@ -68,12 +68,20 @@ class TemplateApiController extends Controller
     public function getTemplate(Request $request, $id)
     {
 
-        $tempObj = PostTemplate::where('id', Helpers::decrypt($id))->first();
+        $tempObj = PostTemplate::with('postContent')
+            ->where('id', Helpers::decrypt($id))->first();
 
         if (!$tempObj) {
             return $this->error('Template not found', 404);
         }
 
+        // post content data
+        $postTemplateData = $tempObj->postContent;
+        $postContentData = [
+            "id" => Helpers::encrypt($postTemplateData->id),
+            "title" => $postTemplateData->title,
+            "warning_message" => $postTemplateData->warning_message ? $postTemplateData->warning_message : '',
+        ];
         // $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
 
         // $brandkitData = [
@@ -92,6 +100,7 @@ class TemplateApiController extends Controller
             'id' => Helpers::encrypt($tempObj->id),
             'category_id' => Helpers::encrypt($tempObj->category_id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
+            'post_content_data' => isset($postContentData) ? $postContentData : [],
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
 
