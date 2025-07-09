@@ -12,7 +12,8 @@
         'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss',
         'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss',
         'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
+        'resources/assets/vendor/libs/select2/select2.scss',
     ])
 @endsection
 
@@ -23,7 +24,8 @@
         'resources/assets/vendor/libs/@form-validation/popular.js',
         'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
         'resources/assets/vendor/libs/@form-validation/auto-focus.js',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
+        'resources/assets/vendor/libs/select2/select2.js',
     ])
 @endsection
 
@@ -171,10 +173,16 @@
 
                         // Parse the categories JSON data
                         var categories = JSON.parse('{!! addslashes($categories) !!}');
+                        var subCategories = JSON.parse('{!! addslashes($subCategories) !!}');
 
                         // Populate the category select with categories
                         $.each(categories, function(index, obj) {
                             $('#category_filter').append('<option data-id="' + obj.id + '" value="' + obj.id + '">' + obj.name + '</option>');
+                        });
+                        
+                        // Populate the sub category select with sub categories
+                        $.each(subCategories, function(index, obj) {
+                            $('#sub_category_filter').append('<option data-id="' + obj.id + '" value="' + obj.id + '">' + obj.name + '</option>');
                         });
 
                         // Filter results on category select change
@@ -186,6 +194,31 @@
                         $('#sub_category_filter').on('change', function() {
                             PostContentTable.draw();
                         });
+
+                        // select2
+                        var select2_category = $('#category_filter');
+                        var select2_sub_category = $('#sub_category_filter');
+                        // add select2
+                        if (select2_category.length) {
+                            select2_category.each(function () {
+                                var $this = $(this);
+                                select2Focus($this);
+                                $this.wrap('<div class="position-relative"></div>').select2({
+                                    placeholder: 'Select Category',
+                                    dropdownParent: $this.parent()
+                                });
+                            });
+                        }
+                        if (select2_sub_category.length) {
+                            select2_sub_category.each(function () {
+                                var $this = $(this);
+                                select2Focus($this);
+                                $this.wrap('<div class="position-relative"></div>').select2({
+                                    placeholder: 'Select Sub Category',
+                                    dropdownParent: $this.parent()
+                                });
+                            });
+                        }
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -289,7 +322,6 @@
                             $('#sub_category_filter').html(option);
                         } else {
                             $('#sub_category_filter').html(
-                                '<option value="">All Sub Categories</option>'+
                                 '<option value="">No Sub Categories</option>'
                             );
                         }

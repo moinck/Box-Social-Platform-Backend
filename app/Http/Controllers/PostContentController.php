@@ -15,8 +15,12 @@ class PostContentController extends Controller
     public function index()
     {
         $categories = Categories::getActiveCategoeyList();
+        $subCategories = Categories::whereNotNull(columns: 'parent_id')
+            ->where('is_comming_soon', false)
+            ->select('id', 'name')
+            ->get();
         
-        return view('content.pages.admin.post-content.index', compact('categories'));
+        return view('content.pages.admin.post-content.index', compact('categories', 'subCategories'));
     }
 
     public function create()
