@@ -121,6 +121,7 @@
                     drawCallback: function(settings) {
                         $('[data-bs-toggle="tooltip"]').tooltip();
                         $('#select-all').prop('checked', false);
+                        $('#contact-us-delete-btn').addClass('d-none');
                     }
                 });
             }
