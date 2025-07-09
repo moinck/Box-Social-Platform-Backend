@@ -231,6 +231,9 @@ div.font-icon-btns {
 .table-action-col {
     width: 80px !important;
 }
+.table-date-col {
+    width: 190px !important;
+}
 
 .table-images {
     width: 100px;

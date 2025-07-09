@@ -64,7 +64,7 @@
                         <th>Email</th>
                         <th>Company Name</th>
                         <th>Message</th>
-                        <th>Created Date</th>
+                        <th class="table-date-col">Created Date</th>
                     </tr>
                 </thead>
             </table>
