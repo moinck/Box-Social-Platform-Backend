@@ -46,7 +46,8 @@ class PostContentController extends Controller
         if ($categories->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No Subcategory Found'
+                'message' => 'No Subcategory Found',
+                'data' => []
             ]);
         }
 
@@ -113,7 +114,14 @@ class PostContentController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postContents = PostContent::with('category:id,name')->latest()->get();
+        $postContents = PostContent::with('category:id,name','subCategory:id,name')
+            ->when($request->category_id, function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            })
+            ->when($request->sub_category_id, function ($query) use ($request) {
+                $query->where('sub_category_id', $request->sub_category_id);
+            })
+            ->latest()->get();
 
         return DataTables::of($postContents)
             ->addIndexColumn()
@@ -122,6 +130,9 @@ class PostContentController extends Controller
             })
             ->addColumn('post_category', function ($postContent) {
                 return $postContent->category->name ?? "Uncategorized";
+            })
+            ->addColumn('post_sub_category', function ($postContent) {
+                return $postContent->subCategory->name ?? "-";
             })
             ->addColumn('post_description', function ($postContent) {
                 // just show some lines of description

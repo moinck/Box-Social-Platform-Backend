@@ -64,6 +64,7 @@
                         <th>No</th>
                         <th>Post Title</th>
                         <th>Post Category</th>
+                        <th>Post Sub Category</th>
                         <th>Post Description</th>
                         <th>Created Date</th>
                         <th>Updated Date</th>
@@ -135,6 +136,10 @@
                     pageLength: 10,
                     ajax: {
                         url: "{{ route('post-content.data-table') }}",
+                        data: function (d) {
+                            d.category_id = $('#category_filter').val();
+                            d.sub_category_id = $('#sub_category_filter').val();
+                        },
                         beforeSend: function () {
                             showBSPLoader();
                         },
@@ -148,28 +153,45 @@
                         targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
 
                         // Create a row to hold the two md-3 divs
-                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div></div>');
+                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div><div class="col-md-6" id="sub-category-filter-dropdown"></div></div>');
 
                         // Append category filter
-                        $('#category-filter-container').append('<select class="form-select input-sm" id="category_filter"><option value="">Categories</option></select>');
+                        $('#category-filter-container').append(`
+                            <select class="form-select input-sm" id="category_filter">
+                                <option value="">All Categories</option>
+                            </select>
+                        `);
+
+                        // Append sub category filter
+                        $('#sub-category-filter-dropdown').append(`
+                            <select class="form-select input-sm" id="sub_category_filter">
+                                <option value="">All Sub Categories</option>
+                            </select>
+                        `);
 
                         // Parse the categories JSON data
                         var categories = JSON.parse('{!! addslashes($categories) !!}');
 
                         // Populate the category select with categories
                         $.each(categories, function(index, obj) {
-                            $('#category_filter').append('<option value="' + obj.name + '">' + obj.name + '</option>');
+                            $('#category_filter').append('<option data-id="' + obj.id + '" value="' + obj.id + '">' + obj.name + '</option>');
                         });
 
                         // Filter results on category select change
                         $('#category_filter').on('change', function() {
-                            PostContentTable.columns(2).search(this.value).draw();
+                            PostContentTable.draw();
+                        });
+
+                        // Filter results on sub category select change
+                        $('#sub_category_filter').on('change', function() {
+                            PostContentTable.draw();
                         });
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'post_title', name: 'post_title'},
                         { data: 'post_category', name: 'post_category'},
+                        { data: 'post_sub_category', name: 'post_sub_category'},
                         { data: 'post_description', name: 'post_description'},
                         { data: 'created_date', name: 'created_date'},
                         { data: 'updated_date', name: 'updated_date'},
@@ -239,6 +261,42 @@
             $(document).on('click', '#post-content-import-btn', function() {
                 $('#data-import-modal').modal('show');
             });
+
+            // sub category filter
+            $(document).on('change','#category_filter', function() {
+                // PostContentDataTable();
+                $.ajax({
+                    url: '{{ route('post-content.sub-category.get.data') }}',
+                    type: 'GET',
+                    data: {
+                        category_id: $(this).val()
+                    },
+                    beforeSend: function() {
+                        showBSPLoader();
+                    },
+                    complete: function() {
+                        hideBSPLoader();
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            var responseData = data.data;
+                            var option = '';
+                            option += '<option value="">All Sub Categories</option>';
+                            responseData.forEach(function(item) {
+                                option += '<option value="' + item.id + '">' + item
+                                    .name + '</option>';
+                            });
+                            $('#sub_category_filter').html(option);
+                        } else {
+                            $('#sub_category_filter').html(
+                                '<option value="">All Sub Categories</option>'+
+                                '<option value="">No Sub Categories</option>'
+                            );
+                        }
+                    }
+                });
+            });
+            // -------------------------------------------
         });
     </script>
 @endsection
