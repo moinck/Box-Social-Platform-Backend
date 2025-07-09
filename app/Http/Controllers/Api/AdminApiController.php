@@ -20,8 +20,12 @@ class AdminApiController extends Controller
             ];
         });
 
-        $categories = Categories::where('parent_id', null)
-            ->select('id', 'name')
+        $categories = Categories::select('id', 'name')
+            ->where(function ($query) {
+                $query->where('status', true)
+                    ->where('parent_id', null)
+                    ->where('is_comming_soon', false);
+            })
             ->get()
             ->map(function ($category) {
                 return [
@@ -30,14 +34,18 @@ class AdminApiController extends Controller
                 ];
             });
         
-        $subCategories = Categories::whereNotNull('parent_id')
-            ->select('id', 'name','parent_id')
+        $subCategories = Categories::select('id', 'name','parent_id')
+            ->where(function ($query) {
+                $query->whereNotNull('parent_id')
+                    ->where('status', true)
+                    ->where('is_comming_soon', false);
+            })
             ->get()
             ->map(function ($subCategory) {
                 return [
                     'id' => Helpers::encrypt($subCategory->id),
                     'name' => $subCategory->name,
-                    'parent_id' => Helpers::encrypt($subCategory->parent_id),
+                    'parent_id' => $subCategory->parent_id ? Helpers::encrypt($subCategory->parent_id) : null,
                 ];
             });
 
