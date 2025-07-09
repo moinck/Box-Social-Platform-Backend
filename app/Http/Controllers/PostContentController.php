@@ -39,7 +39,7 @@ class PostContentController extends Controller
 
     public function subCategoryData(Request $request)
     {
-        $categories = Categories::with('children:id,name,parent_id')
+        $categories = Categories::whereNotNull(columns: 'parent_id')
             ->where(function ($query) use ($request) {
                 $query->where('parent_id', $request->category_id)
                     ->where('is_comming_soon', false);
