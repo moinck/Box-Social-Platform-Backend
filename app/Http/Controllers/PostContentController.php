@@ -119,10 +119,10 @@ class PostContentController extends Controller
     public function dataTable(Request $request)
     {
         $postContents = PostContent::with('category:id,name','subCategory:id,name')
-            ->when($request->category_id, function ($query) use ($request) {
+            ->when($request->category_id && $request->category_id != 0, function ($query) use ($request) {
                 $query->where('category_id', $request->category_id);
             })
-            ->when($request->sub_category_id, function ($query) use ($request) {
+            ->when($request->sub_category_id && $request->sub_category_id != 0, function ($query) use ($request) {
                 $query->where('sub_category_id', $request->sub_category_id);
             })
             ->latest()->get();

@@ -155,7 +155,7 @@
                         targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
 
                         // Create a row to hold the two md-3 divs
-                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div><div class="col-md-6" id="sub-category-filter-dropdown"></div></div>');
+                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div><div class="col-md-6 d-none" id="sub-category-filter-dropdown"></div></div>');
 
                         // Append category filter
                         $('#category-filter-container').append(`
@@ -312,17 +312,19 @@
                     },
                     success: function(data) {
                         if (data.success) {
+                            $('#sub-category-filter-dropdown').removeClass('d-none');
                             var responseData = data.data;
                             var option = '';
-                            option += '<option value="">All Sub Categories</option>';
+                            option += '<option value="0">Sub Categories</option>';
                             responseData.forEach(function(item) {
                                 option += '<option value="' + item.id + '">' + item
                                     .name + '</option>';
                             });
                             $('#sub_category_filter').html(option);
                         } else {
+                            $('#sub-category-filter-dropdown').addClass('d-none');
                             $('#sub_category_filter').html(
-                                '<option value="">No Sub Categories</option>'
+                                '<option value="0">No Sub Categories</option>'
                             );
                         }
                     }
