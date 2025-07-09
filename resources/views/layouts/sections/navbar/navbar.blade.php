@@ -3,6 +3,14 @@
     use Illuminate\Support\Facades\Route;
     $containerNav = $configData['contentLayout'] === 'compact' ? 'container-xxl' : 'container-fluid';
     $navbarDetached = $navbarDetached ?? '';
+    $appType = env('APP_ENV');
+    if ($appType == 'local') {
+        $appType = 'LOCAL';
+    } elseif ($appType == 'stage') {
+        $appType = 'STAGING';
+    } elseif ($appType == 'production') {
+        $appType = 'PRODUCTION';
+    }
 @endphp
 
 <!-- Navbar -->
@@ -45,7 +53,7 @@
         <span class="alert-icon rounded">
             <i class="ri-error-warning-line ri-22px"></i>
         </span>
-        You are currently on the <span class="fw-semibold mx-1 text-uppercase">{{ env('APP_ENV') ?? 'Staging' }}</span> version of this site. Changes made here will not reflect on the live site.
+        You are currently on the {{ $appType }} version of this site. Changes made here will not reflect on the live site.
         To visit the live version of this site, click <a href="javascript:void(0);" class="alert-link ms-1"
             style="text-decoration:underline;">here</a>.
     </div>

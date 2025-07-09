@@ -98,6 +98,11 @@
     }
 }
 
+/* Update the default width of container */
+.container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
+    max-width: 1550px !important;
+}
+
 /*
 * Layout demo
 ******************************************************************************/
@@ -231,6 +236,9 @@ div.font-icon-btns {
 .table-action-col {
     width: 80px !important;
 }
+.table-date-col {
+    width: 190px !important;
+}
 
 .table-images {
     width: 100px;
@@ -244,6 +252,9 @@ div.font-icon-btns {
 .table-bordered.dataTable tbody {
     text-align: center !important;
 }
+/* .table-bordered.dataTable tbody td {
+    padding: 0.7813rem 0.25rem !important;
+} */
 
 .template-image {
     cursor: pointer;

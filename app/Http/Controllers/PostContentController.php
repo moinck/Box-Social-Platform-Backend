@@ -15,8 +15,12 @@ class PostContentController extends Controller
     public function index()
     {
         $categories = Categories::getActiveCategoeyList();
+        $subCategories = Categories::whereNotNull(columns: 'parent_id')
+            ->where('is_comming_soon', false)
+            ->select('id', 'name')
+            ->get();
         
-        return view('content.pages.admin.post-content.index', compact('categories'));
+        return view('content.pages.admin.post-content.index', compact('categories', 'subCategories'));
     }
 
     public function create()
@@ -35,7 +39,7 @@ class PostContentController extends Controller
 
     public function subCategoryData(Request $request)
     {
-        $categories = Categories::with('children:id,name,parent_id')
+        $categories = Categories::whereNotNull(columns: 'parent_id')
             ->where(function ($query) use ($request) {
                 $query->where('parent_id', $request->category_id)
                     ->where('is_comming_soon', false);
@@ -46,7 +50,8 @@ class PostContentController extends Controller
         if ($categories->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No Subcategory Found'
+                'message' => 'No Subcategory Found',
+                'data' => []
             ]);
         }
 
@@ -113,7 +118,14 @@ class PostContentController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postContents = PostContent::with('category:id,name')->latest()->get();
+        $postContents = PostContent::with('category:id,name','subCategory:id,name')
+            ->when($request->category_id, function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            })
+            ->when($request->sub_category_id, function ($query) use ($request) {
+                $query->where('sub_category_id', $request->sub_category_id);
+            })
+            ->latest()->get();
 
         return DataTables::of($postContents)
             ->addIndexColumn()
@@ -122,6 +134,9 @@ class PostContentController extends Controller
             })
             ->addColumn('post_category', function ($postContent) {
                 return $postContent->category->name ?? "Uncategorized";
+            })
+            ->addColumn('post_sub_category', function ($postContent) {
+                return $postContent->subCategory->name ?? "-";
             })
             ->addColumn('post_description', function ($postContent) {
                 // just show some lines of description
