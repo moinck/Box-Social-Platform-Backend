@@ -25,4 +25,17 @@ class Categories extends Model
     {
         return $this->hasMany(Categories::class, 'parent_id');
     }
+
+    /**
+     * get List Of Active Categoey
+     * @return \Illuminate\Database\Eloquent\Collection<int, Categories>
+     */
+    public static function getActiveCategoeyList()
+    {
+        return Categories::select(['id', 'name'])->where(function ($query) {
+            $query->where('status', true)
+                ->where('parent_id', null)
+                ->where('is_comming_soon', false);
+        })->orderBy('name', 'asc')->get();
+    }
 }

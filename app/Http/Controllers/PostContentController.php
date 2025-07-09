@@ -14,20 +14,19 @@ class PostContentController extends Controller
 {
     public function index()
     {
-        $categories = Categories::select(['id', 'name'])
-            ->where(function ($query) {
-                $query->where('status', true)
-                    ->where('parent_id', null);
-            })
-            ->orderBy('name', 'asc')
-            ->get();
-            
+        $categories = Categories::getActiveCategoeyList();
+        
         return view('content.pages.admin.post-content.index', compact('categories'));
     }
 
     public function create()
     {
-        $categories = Categories::with('children:id,name,parent_id')->where('parent_id', null)
+        $categories = Categories::with('children:id,name,parent_id')
+            ->where(function ($query) {
+                $query->where('status', true)
+                    ->where('parent_id', null)
+                    ->where('is_comming_soon', false);
+            })
             ->orderBy('name', 'asc')
             ->get();
 
@@ -36,7 +35,11 @@ class PostContentController extends Controller
 
     public function subCategoryData(Request $request)
     {
-        $categories = Categories::with('children:id,name,parent_id')->where('parent_id', $request->category_id)
+        $categories = Categories::with('children:id,name,parent_id')
+            ->where(function ($query) use ($request) {
+                $query->where('parent_id', $request->category_id)
+                    ->where('is_comming_soon', false);
+            })
             ->orderBy('name', 'asc')
             ->get();
 

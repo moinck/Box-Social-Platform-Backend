@@ -13,13 +13,7 @@ class PostTemplateController extends Controller
 {
     public function index()
     {
-        $categories = Categories::select(['id', 'name'])
-            ->where(function ($query) {
-                $query->where('status', true)
-                    ->where('parent_id', null);
-            })
-            ->orderBy('name', 'asc')
-            ->get();
+        $categories = Categories::getActiveCategoeyList();
 
         return view('content.pages.admin.post-template.index', compact('categories'));
     }
