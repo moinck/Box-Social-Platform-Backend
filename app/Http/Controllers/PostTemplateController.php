@@ -33,6 +33,17 @@ class PostTemplateController extends Controller
             ->when($request->has('status') && $request->status != '', function ($query) use ($request) {
                 $query->where('status', $request->status);
             })
+            ->select([
+                'id',
+                'template_name',
+                'template_image',
+                'category_id',
+                'sub_category_id',
+                'design_style_id',
+                'post_content_id',
+                'status',
+                'created_at',
+            ])
             ->latest()->get();
 
         return DataTables::of($postTemplates)
