@@ -142,6 +142,30 @@
                             hideBSPLoader();
                         }
                     },
+                    initComplete: function(settings, json) {
+                        // Target the first col-md-6 div within the DataTable wrapper
+                        var targetDiv = $('#post-content-data-table_wrapper .row:first .col-sm-12.col-md-6:first-child');
+                        targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
+
+                        // Create a row to hold the two md-3 divs
+                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div></div>');
+
+                        // Append category filter
+                        $('#category-filter-container').append('<select class="form-select input-sm" id="category_filter"><option value="">Categories</option></select>');
+
+                        // Parse the categories JSON data
+                        var categories = JSON.parse('{!! addslashes($categories) !!}');
+
+                        // Populate the category select with categories
+                        $.each(categories, function(index, obj) {
+                            $('#category_filter').append('<option value="' + obj.name + '">' + obj.name + '</option>');
+                        });
+
+                        // Filter results on category select change
+                        $('#category_filter').on('change', function() {
+                            PostContentTable.columns(2).search(this.value).draw();
+                        });
+                    },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'post_title', name: 'post_title'},
