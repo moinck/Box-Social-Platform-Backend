@@ -314,7 +314,7 @@
                         if (data.success) {
                             var responseData = data.data;
                             var option = '';
-                            option += '<option value="">All Sub Categories</option>';
+                            option += '<option value="0">All Sub Categories</option>';
                             responseData.forEach(function(item) {
                                 option += '<option value="' + item.id + '">' + item
                                     .name + '</option>';
@@ -322,7 +322,7 @@
                             $('#sub_category_filter').html(option);
                         } else {
                             $('#sub_category_filter').html(
-                                '<option value="">No Sub Categories</option>'
+                                '<option value="0">No Sub Categories</option>'
                             );
                         }
                     }
