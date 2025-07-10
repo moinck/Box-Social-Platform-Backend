@@ -142,13 +142,14 @@ class TemplateApiController extends Controller
                 return Helpers::decrypt($id);
             }, $request->sub_category_ids);
             
-            $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds);
+            $tempObj->where(function ($query) use ($decryptedSubCategoryIds) {
+                $query->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                    ->orWhereNull('sub_category_id');
             });
         }
 
         // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
-        if ($request->has('post_content_ids') && $request->post_content_ids != []) {
+        if ($request->has('post_content_ids') && $request->post_content_ids != [] && $request->template_ids == []) {
             $decryptedPostContentIds = array_map(function ($id) {
                 return Helpers::decrypt($id);
             }, $request->post_content_ids);
@@ -172,14 +173,21 @@ class TemplateApiController extends Controller
             $tempData[$categoryName][] = [
                 'id' => Helpers::encrypt($t->id),
                 'category_id' => Helpers::encrypt($t->category_id),
+                'sub_category_id' => $t->sub_category_id ? Helpers::encrypt($t->sub_category_id) : null,
                 'post_content_id' => Helpers::encrypt($t->post_content_id),
                 'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
             ];
         }
         $data = $tempData;
+        $returnData = [];
+        $returnData = [
+            'total' => $tempObj->count(),
+            'data' => $tempData,
+        ];
+        
 
         if (!empty($tempObj)) {
-            return $this->success($data, 'Template Fetch successfully');
+            return $this->success($returnData, 'Template Fetch successfully');
         }
     }
 

@@ -24,11 +24,15 @@ class AdminApiController extends Controller
             ];
         });
 
+        // get only those categories which post-content data are created
+        $categoryIds = PostContent::select('category_id')->distinct()->get()->pluck('category_id');
+
         $categories = Categories::select('id', 'name')
-            ->where(function ($query) {
+            ->where(function ($query) use ($categoryIds) {
                 $query->where('status', true)
                     ->where('parent_id', null)
-                    ->where('is_comming_soon', false);
+                    ->where('is_comming_soon', false)
+                    ->whereIn('id', $categoryIds);
             })
             ->get()
             ->map(function ($category) {
