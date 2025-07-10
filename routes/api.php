@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
+use App\Http\Controllers\Api\UserTemplateDownloadController;
 use App\Http\Controllers\Api\UserTemplatesApiController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactUsController;
@@ -46,7 +47,7 @@ Route::group([
 
         // admin api
         Route::get('/admin/template-data', [AdminApiController::class, 'index']);
-        Route::get('/admin/download/document/{id}', [AdminApiController::class, 'downloadDocument']);
+        // Route::get('/admin/download/document/{id}', [AdminApiController::class, 'downloadDocument']);
 
         // category list
         Route::get('/category/list', [CategoriesApiController::class, 'list']);
@@ -85,6 +86,7 @@ Route::group([
         Route::post('/user-template/store', [UserTemplatesApiController::class, 'store']);
         Route::post('/user-template/update', [UserTemplatesApiController::class, 'update']);
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
+        Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
 
         // get stock image
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
