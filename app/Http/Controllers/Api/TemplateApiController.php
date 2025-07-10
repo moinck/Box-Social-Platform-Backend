@@ -142,13 +142,14 @@ class TemplateApiController extends Controller
                 return Helpers::decrypt($id);
             }, $request->sub_category_ids);
             
-            $tempObj->orWhere(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds);
+            $tempObj->where(function ($query) use ($decryptedSubCategoryIds) {
+                $query->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                    ->orWhereNull('sub_category_id');
             });
         }
 
         // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
-        if ($request->has('post_content_ids') && $request->post_content_ids != []) {
+        if ($request->has('post_content_ids') && $request->post_content_ids != [] && $request->template_ids == []) {
             $decryptedPostContentIds = array_map(function ($id) {
                 return Helpers::decrypt($id);
             }, $request->post_content_ids);
