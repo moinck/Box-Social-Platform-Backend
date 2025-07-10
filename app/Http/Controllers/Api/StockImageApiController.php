@@ -20,6 +20,9 @@ class StockImageApiController extends Controller
     {
         $adminIds = User::where('role', 'admin')->get()->pluck('id');
         $searchQuery = $request->search ?? '';
+        // $limit = $request->limit ?? 25; // default to 25 if not provided
+        // $page = $request->offset ?? 1;  // treat 'offset' as page number
+        // $realOffset = ($page - 1) * $limit;
         $adminImages = ImageStockManagement::select('id','image_url','tag_name')
             ->whereIn('user_id', $adminIds)
             ->when($searchQuery, function ($query) use ($searchQuery) {
@@ -39,6 +42,8 @@ class StockImageApiController extends Controller
         $returnData = [];
         $adminImagesData = [];
         $userImagesData = [];
+
+        // admin images
         foreach ($adminImages as $key => $value) {
             $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
             // "jpeg?auto=compress&cs=tinysrgb&h=650&w=940", only take extension name
@@ -46,16 +51,20 @@ class StockImageApiController extends Controller
 
             $adminImagesData[] = [
                 'id' => Helpers::encrypt($value->id),
-                'image_url' => $value->image_url,
+                'image_url' => $value->image_url ? $value->image_url : '',
                 'tag_name' => $value->tag_name,
                 'fileType' => $fileExtension,
             ];
         }
+
+        // auth user images
         foreach ($authUserImages as $key => $value) {
+            $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
+            $fileExtension = "image/" . explode('?', $fileExtension)[0];
             $userImagesData[] = [
                 'id' => Helpers::encrypt($value->id),
-                'image_url' => asset($value->image_url),
-                'fileType' => "image/" . pathinfo($value->image_url, PATHINFO_EXTENSION),
+                'image_url' => $value->image_url ? asset($value->image_url) : '',
+                'fileType' => $fileExtension,
             ];
         }
 
