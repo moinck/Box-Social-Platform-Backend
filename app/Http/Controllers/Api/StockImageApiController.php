@@ -20,43 +20,43 @@ class StockImageApiController extends Controller
     {
         $adminId = User::where('role', 'admin')->first()->id;
         $searchQuery = $request->search ?? '';
-        $imageData = ImageStockManagement::when($searchQuery, function ($query) use ($searchQuery) {
+        $adminImages = ImageStockManagement::when($searchQuery, function ($query) use ($searchQuery) {
             $query->where('tag_name', 'like', "%{$searchQuery}%");
         })->latest()->get();
+
+        $authUserImages = ImageStockManagement::where('user_id', Auth::user()->id)->get();
 
         $authUser = Auth::user();
 
         $returnData = [];
-        $admin = [];
-        $user = [];
-        foreach ($imageData as $key => $value) {
-            if ($value->user_id == $adminId) {
+        $adminImagesData = [];
+        $userImagesData = [];
+        foreach ($adminImages as $key => $value) {
+            $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
+            // "jpeg?auto=compress&cs=tinysrgb&h=650&w=940", only take extension name
+            $fileExtension = "image/" . explode('?', $fileExtension)[0];
 
-                $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
-                // "jpeg?auto=compress&cs=tinysrgb&h=650&w=940", only take extension name
-                $fileExtension = "image/" . explode('?', $fileExtension)[0];
-
-                $admin[] = [
-                    'id' => Helpers::encrypt($value->id),
-                    'image_url' => $value->image_url,
-                    'tag_name' => $value->tag_name,
-                    'fileType' => $fileExtension,
-                    'created_at' => $value->created_at,
-                    'updated_at' => $value->updated_at,
-                ];
-            } else if ($value->user_id == $authUser->id) {
-                $user[] = [
-                    'id' => Helpers::encrypt($value->id),
-                    'image_url' => asset($value->image_url),
-                    'fileType' => "image/" . pathinfo($value->image_url, PATHINFO_EXTENSION),
-                    'created_at' => $value->created_at,
-                    'updated_at' => $value->updated_at,
-                ];
-            }
+            $adminImagesData[] = [
+                'id' => Helpers::encrypt($value->id),
+                'image_url' => $value->image_url,
+                'tag_name' => $value->tag_name,
+                'fileType' => $fileExtension,
+                'created_at' => $value->created_at,
+                'updated_at' => $value->updated_at,
+            ];
+        }
+        foreach ($authUserImages as $key => $value) {
+            $userImagesData[] = [
+                'id' => Helpers::encrypt($value->id),
+                'image_url' => asset($value->image_url),
+                'fileType' => "image/" . pathinfo($value->image_url, PATHINFO_EXTENSION),
+                'created_at' => $value->created_at,
+                'updated_at' => $value->updated_at,
+            ];
         }
 
-        $returnData['admin'] = $admin;
-        $returnData['user'] = $user;
+        $returnData['admin'] = $adminImagesData;
+        $returnData['user'] = $userImagesData;
 
         return $this->success($returnData, 'Stock Image Fetch successfully');
     }
