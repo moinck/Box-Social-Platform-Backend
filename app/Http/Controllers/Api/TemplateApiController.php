@@ -178,15 +178,9 @@ class TemplateApiController extends Controller
             ];
         }
         $data = $tempData;
-        $returnData = [];
-        $returnData = [
-            'total' => $tempObj->count(),
-            'data' => $tempData,
-        ];
-        
 
         if (!empty($tempObj)) {
-            return $this->success($returnData, 'Template Fetch successfully');
+            return $this->success($data, 'Template Fetch successfully');
         }
     }
 
