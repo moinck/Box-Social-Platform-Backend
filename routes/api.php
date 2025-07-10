@@ -46,6 +46,7 @@ Route::group([
 
         // admin api
         Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+        Route::get('/admin/download/document/{id}', [AdminApiController::class, 'downloadDocument']);
 
         // category list
         Route::get('/category/list', [CategoriesApiController::class, 'list']);

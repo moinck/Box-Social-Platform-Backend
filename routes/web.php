@@ -17,6 +17,7 @@ use App\Http\Controllers\ImageStockManagementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostContentController;
 use App\Http\Controllers\ProfileManagementController;
+use App\Http\Controllers\ProjectTestController;
 use App\Http\Controllers\VideoStockController;
 
 Route::middleware('guest')->group(function () {
@@ -51,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
     // Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
     // Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
+
+    Route::get('/download/document/{id}', [ProjectTestController::class, 'downloadDocument'])->name('download.document');
 
     // User Management Controller
     Route::get('/user', [UserManagementController::class, 'index'])->name('user');
