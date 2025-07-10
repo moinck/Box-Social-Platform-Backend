@@ -85,6 +85,9 @@ class PostTemplateController extends Controller
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
                 $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId;
+                // $downloadUrl = route('download.document', $postTemplateId);
+                // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
+                //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
 
                 return '
                     <a href="javascript::void(0);" title="Duplicate post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon duplicate-post-template-btn"

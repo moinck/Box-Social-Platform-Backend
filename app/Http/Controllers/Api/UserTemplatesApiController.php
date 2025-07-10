@@ -135,7 +135,12 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate, 'store');
         }
 
-        return $this->success([], 'User template saved successfully');
+        $returnData = [
+            'id' => Helpers::encrypt($userTemplate->id),
+            'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+        ];
+
+        return $this->success($returnData, 'User template saved successfully');
     }
 
     public function update(Request $request)

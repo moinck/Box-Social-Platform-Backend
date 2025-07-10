@@ -85,7 +85,7 @@
                                                     </optgroup>
                                                 @endforeach
                                             </select> --}}
-                                            <input id="select2Icons" class="form-control typeahead-search" type="text" autocomplete="off" placeholder="Enter search topic" />
+                                            <input id="select2Icons" name="select2Icons" class="form-control typeahead-search" type="text" autocomplete="off" placeholder="Enter search topic" />
                                         </div>
                                     </div>
                                     <div class="col-md-2 mb-2">
