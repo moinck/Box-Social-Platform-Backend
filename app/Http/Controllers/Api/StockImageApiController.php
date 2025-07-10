@@ -20,13 +20,13 @@ class StockImageApiController extends Controller
     {
         $adminId = User::where('role', 'admin')->first()->id;
         $searchQuery = $request->search ?? '';
-        $adminImages = ImageStockManagement::when($searchQuery, function ($query) use ($searchQuery) {
+        $adminImages = ImageStockManagement::select('id','image_url','tag_name')
+        ->when($searchQuery, function ($query) use ($searchQuery) {
             $query->where('tag_name', 'like', "%{$searchQuery}%");
         })->latest()->get();
 
-        $authUserImages = ImageStockManagement::where('user_id', Auth::user()->id)->get();
-
-        $authUser = Auth::user();
+        $authUserImages = ImageStockManagement::select('id','image_url')
+            ->where('user_id', Auth::user()->id)->get();
 
         $returnData = [];
         $adminImagesData = [];
@@ -41,8 +41,6 @@ class StockImageApiController extends Controller
                 'image_url' => $value->image_url,
                 'tag_name' => $value->tag_name,
                 'fileType' => $fileExtension,
-                'created_at' => $value->created_at,
-                'updated_at' => $value->updated_at,
             ];
         }
         foreach ($authUserImages as $key => $value) {
@@ -50,8 +48,6 @@ class StockImageApiController extends Controller
                 'id' => Helpers::encrypt($value->id),
                 'image_url' => asset($value->image_url),
                 'fileType' => "image/" . pathinfo($value->image_url, PATHINFO_EXTENSION),
-                'created_at' => $value->created_at,
-                'updated_at' => $value->updated_at,
             ];
         }
 
