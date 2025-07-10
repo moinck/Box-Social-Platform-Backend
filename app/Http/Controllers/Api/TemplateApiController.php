@@ -173,7 +173,6 @@ class TemplateApiController extends Controller
             $tempData[$categoryName][] = [
                 'id' => Helpers::encrypt($t->id),
                 'category_id' => Helpers::encrypt($t->category_id),
-                'sub_category_id' => $t->sub_category_id ? Helpers::encrypt($t->sub_category_id) : null,
                 'post_content_id' => Helpers::encrypt($t->post_content_id),
                 'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
             ];
