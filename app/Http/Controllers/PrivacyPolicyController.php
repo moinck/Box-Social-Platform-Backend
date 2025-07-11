@@ -39,11 +39,12 @@ class PrivacyPolicyController extends Controller
                 $id = Helpers::encrypt($row->id);
                 $editUrl = route('privacy-policy.edit', $id);
 
+                $deleteBtn = '<a href="javascript:;" title="delete privacy policy" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-privacy-policy-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-privacy-policy-id="' . $id . '"><i class="ri-delete-bin-line"></i></a>';
+
                 return '
                     <a href="' . $editUrl . '" title="edit privacy policy" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
                         data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" title="delete privacy policy" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-privacy-policy-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-privacy-policy-id="' . $id . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
             ->rawColumns(['title', 'created_date', 'updated_date', 'action'])
