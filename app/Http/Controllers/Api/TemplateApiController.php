@@ -96,11 +96,19 @@ class TemplateApiController extends Controller
 
         // $processedTemplateData = Helpers::replaceFabricTemplateData($tempObj->template_data, $brandkitData);
 
+        $adminTemplateData = [
+            'category_id' => Helpers::encrypt($tempObj->category_id),
+            'sub_category_id' => $tempObj->sub_category_id ? Helpers::encrypt($tempObj->sub_category_id) : null,
+            'post_content_id' => Helpers::encrypt($tempObj->post_content_id),
+            'design_style_id' => Helpers::encrypt($tempObj->design_style_id),
+        ];
+
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
             'category_id' => Helpers::encrypt($tempObj->category_id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
             'post_content_data' => isset($postContentData) ? $postContentData : [],
+            'admin_template_data' => isset($adminTemplateData) ? $adminTemplateData : [],
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
 
@@ -190,6 +198,10 @@ class TemplateApiController extends Controller
             'template_id' => 'required',
             'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required',
+            'category_id' => 'required|string',
+            'sub_category_id' => 'nullable|string',
+            'design_style_id' => 'required|string',
+            'post_content_id' => 'required|string',
         ],[
             'template_image.regex' => 'Invalid image format',
         ]);
@@ -201,12 +213,12 @@ class TemplateApiController extends Controller
         $decyptedId = Helpers::decrypt($request->template_id);
 
         
-        $userTemplate = PostTemplate::find($decyptedId);
+        $adminTemplate = PostTemplate::find($decyptedId);
         
-        if (!$userTemplate) {
+        if (!$adminTemplate) {
             return $this->error('Template not found', 404);
         }
-        $oldTemplateImage = $userTemplate->template_image;
+        $oldTemplateImage = $adminTemplate->template_image;
         
         // upload image
         $updateImageUrl = null;
@@ -218,9 +230,23 @@ class TemplateApiController extends Controller
             }
         }
 
-        $userTemplate->template_image = $updateImageUrl ?? null;
-        $userTemplate->template_data = json_encode($request->template_data);
-        $userTemplate->save();
+        if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
+            $adminTemplate->sub_category_id = Helpers::decrypt($request->sub_category_id);
+        }
+
+        if ($request->has('design_style_id') && $request->design_style_id) {
+            $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
+            $adminTemplate->design_style_id = $decryptedDesignStyleId;
+        }
+
+        if ($request->has('post_content_id') && $request->post_content_id) {
+            $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
+            $adminTemplate->post_content_id = $decryptedPostContentId;
+        }
+
+        $adminTemplate->template_image = $updateImageUrl ?? null;
+        $adminTemplate->template_data = json_encode($request->template_data);
+        $adminTemplate->save();
 
 
         return $this->success([], 'Template updated successfully');
