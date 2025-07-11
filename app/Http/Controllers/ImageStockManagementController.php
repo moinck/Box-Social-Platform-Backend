@@ -26,7 +26,7 @@ class ImageStockManagementController extends Controller
         ],[
             'selectImages.required' => 'Please select images',
             'selectImages.unique' => 'Some of Selected image already exists. please select different images',
-            'select2Icons.required' => 'Please select icons',
+            'select2Icons.required' => 'Please select tag name',
         ]);
 
         $selectImages = $request->selectImages;
