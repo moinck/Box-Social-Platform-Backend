@@ -29,14 +29,11 @@ class PrivacyPolicyController extends Controller
             ->addColumn('title', function ($row) {
                 return $row->title;
             })
-            ->addColumn('description', function ($row) {
-                return $row->description ? Str::limit($row->description, 20) : 'N/A';
-            })
             ->addColumn('created_date', function ($row) {
-                return $row->created_at->format('Y-m-d');
+                return Helpers::dateFormate($row->created_at);
             })
             ->addColumn('updated_date', function ($row) {
-                return $row->updated_at->format('Y-m-d');
+                return Helpers::dateFormate($row->updated_at);
             })
             ->addColumn('action', function ($row) {
                 $id = Helpers::encrypt($row->id);
@@ -49,7 +46,7 @@ class PrivacyPolicyController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-privacy-policy-id="' . $id . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['title', 'description', 'created_date', 'updated_date', 'action'])
+            ->rawColumns(['title', 'created_date', 'updated_date', 'action'])
             ->make(true);
     }
 
@@ -70,22 +67,25 @@ class PrivacyPolicyController extends Controller
 
     public function edit($id)
     {
+        $encryptedEditId = $id;
         $id = Helpers::decrypt($id);
         $privacyPolicy = PrivacyPolicy::find($id);
 
-        return view('content.pages.privacy-policy.edit', compact('privacyPolicy'));
+        return view('content.pages.privacy-policy.edit', compact('privacyPolicy', 'encryptedEditId'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
             'title' => 'required',
-            'description' => 'required',
+            'privacy_policy_edit_description' => 'required',
         ]);
 
-        PrivacyPolicy::find($request->privacy_policy_id)->update([
+        $id = Helpers::decrypt($request->privacy_policy_id);
+
+        PrivacyPolicy::find($id)->update([
             'title' => $request->title,
-            'description' => $request->description,
+            'description' => $request->privacy_policy_edit_description,
         ]);
 
         return redirect()->route('privacy-policy')->with('success', 'Privacy Policy updated successfully');
