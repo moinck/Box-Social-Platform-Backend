@@ -60,7 +60,6 @@
                     <tr>
                         <th>No</th>
                         <th>title</th>
-                        <th>description</th>
                         <th>Created Date</th>
                         <th>Updated Date</th>
                         <th>Action</th>
@@ -106,7 +105,6 @@
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'title', name: 'title'},
-                        { data: 'description', name: 'description'},
                         { data: 'created_date', name: 'created_date'},
                         { data: 'updated_date', name: 'updated_date'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
