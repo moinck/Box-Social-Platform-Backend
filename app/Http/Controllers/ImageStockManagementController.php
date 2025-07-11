@@ -20,6 +20,14 @@ class ImageStockManagementController extends Controller
 
     public function imagesStore(Request $request)
     {
+        $request->validate([
+            'selectImages' => 'required|unique:image_stock_management,image_url',
+            'select2Icons' => 'required',
+        ],[
+            'selectImages.required' => 'Please select images',
+            'selectImages.unique' => 'Some of Selected image already exists. please select different images',
+            'select2Icons.required' => 'Please select tag name',
+        ]);
 
         $selectImages = $request->selectImages;
         if (!empty($selectImages)) {

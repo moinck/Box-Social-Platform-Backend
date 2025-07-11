@@ -44,7 +44,11 @@ $(function () {
             error: function (xhr, status, error) {
                 hideBSPLoader();
                 console.log(xhr.responseText);
-                showSweetAlert("error", "Error!", "Something went wrong.");
+                if (xhr.status == 422) {
+                    showSweetAlert("error", "Oops!", xhr.responseJSON.message);
+                } else {
+                    showSweetAlert("error", "Oops!", "Something went wrong.");
+                }
             },
         });
     });

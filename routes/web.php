@@ -16,6 +16,7 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ImageStockManagementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostContentController;
+use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileManagementController;
 use App\Http\Controllers\ProjectTestController;
 use App\Http\Controllers\VideoStockController;
@@ -122,6 +123,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-template/delete', [PostTemplateController::class, 'destroy'])->name('post-template.delete');
         Route::post('/post-template/account-status', [PostTemplateController::class, 'changeStatus'])->name('post-template.change-status');
         Route::post('/post-template/create/duplicate', [PostTemplateController::class, 'duplicate'])->name('post-template.create-duplicate');
+
+        // privacy policy controller
+        Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
+        Route::get('/privacy-policy/create', [PrivacyPolicyController::class, 'create'])->name('privacy-policy.create');
+        Route::post('/privacy-policy/store', [PrivacyPolicyController::class, 'store'])->name('privacy-policy.store');
+        Route::get('/privacy-policy/edit/{id}', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
+        Route::post('/privacy-policy/update', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
+        Route::get('/privacy-policy/datatable', [PrivacyPolicyController::class, 'dataTable'])->name('privacy-policy.data-table');
+        Route::post('/privacy-policy/delete', [PrivacyPolicyController::class, 'destroy'])->name('privacy-policy.delete');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');

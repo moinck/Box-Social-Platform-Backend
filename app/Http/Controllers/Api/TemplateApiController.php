@@ -230,8 +230,15 @@ class TemplateApiController extends Controller
             }
         }
 
+        // nullable
         if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
             $adminTemplate->sub_category_id = Helpers::decrypt($request->sub_category_id);
+        } else {
+            $adminTemplate->sub_category_id = null;
+        }
+
+        if ($request->has('category_id') && $request->category_id !== null) {
+            $adminTemplate->category_id = Helpers::decrypt($request->category_id);
         }
 
         if ($request->has('design_style_id') && $request->design_style_id) {
