@@ -132,11 +132,6 @@
                     direction: 'rtl'
                 }],
                 ['link', 'image', 'video', 'formula'],
-                [
-                    {'insert-name': 'Name'},
-                    {'insert-phone': 'Phone'},
-                    // {'insert-description': 'Description'}
-                ],
                 ['clean']
             ];
 
@@ -145,21 +140,10 @@
                 placeholder: 'Type Something...',
                 modules: {
                     formula: true,
-                    toolbar: {
-                        container: fullToolbar,
-                        handlers: {
-                            'insert-name': function() {
-                                const cursorPosition = this.quill.getSelection().index;
-                                this.quill.insertText(cursorPosition, '|name|');
-                                this.quill.setSelection(cursorPosition + 6);
-                            },
-                        }
-                    }
+                    toolbar: fullToolbar
                 },
                 theme: 'snow'
             });
-            $('.ql-insert-name').attr('title', 'Click to insert Name');
-            $('.ql-insert-phone').attr('title', 'Click to insert Phone');
             // update hidden post description
             createPrivacyPolicyDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
