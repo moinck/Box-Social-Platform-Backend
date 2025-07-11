@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\PostContentApiController;
+use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
@@ -101,5 +102,4 @@ Route::group([
 });
 
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
-
-
+Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
