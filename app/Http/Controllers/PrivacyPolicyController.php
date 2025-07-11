@@ -97,6 +97,9 @@ class PrivacyPolicyController extends Controller
         $privacyPolicy = PrivacyPolicy::find($id);
         $privacyPolicy->delete();
 
-        return redirect()->route('privacy-policy')->with('success', 'Privacy Policy deleted successfully');
+        return response()->json([
+            'success' => true,
+            'message' => 'Privacy Policy deleted successfully',
+        ]);
     }
 }
