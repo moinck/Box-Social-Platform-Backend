@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Helpers;
 use App\Models\PrivacyPolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class PrivacyPolicyController extends Controller
@@ -29,7 +30,7 @@ class PrivacyPolicyController extends Controller
                 return $row->title;
             })
             ->addColumn('description', function ($row) {
-                return $row->description;
+                return $row->description ? Str::limit($row->description, 20) : 'N/A';
             })
             ->addColumn('created_date', function ($row) {
                 return $row->created_at->format('Y-m-d');
@@ -56,12 +57,12 @@ class PrivacyPolicyController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'description' => 'required',
+            'privacy_policy_description' => 'required',
         ]);
 
         PrivacyPolicy::create([
             'title' => $request->title,
-            'description' => $request->description,
+            'description' => $request->privacy_policy_description,
         ]);
 
         return redirect()->route('privacy-policy')->with('success', 'Privacy Policy created successfully');

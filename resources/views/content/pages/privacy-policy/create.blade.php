@@ -37,7 +37,7 @@
                     <h4 class="card-title mb-0">Create Privacy Policy</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="create-privacy-policy-form" action="{{ route('post-content.store') }}" class="row g-5"
+                    <form id="create-privacy-policy-form" action="{{ route('privacy-policy.store') }}" class="row g-5"
                         method="POST" enctype="multipart/form-data">
                         @csrf
 
@@ -164,9 +164,9 @@
             createPrivacyPolicyDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 $('.ql-editor').hasClass('ql-blank') ?
-                    $('#hiddenPostDescription').val('') :
-                    $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
-                validator.revalidateField('post_description');
+                    $('#hiddenPrivacyPolicyDescription').val('') :
+                    $('#hiddenPrivacyPolicyDescription').val(createPrivacyPolicyDescription.root.innerHTML);
+                validator.revalidateField('privacy_policy_description');
             });
 
             // cancel create post content
@@ -178,17 +178,17 @@
             const formValidationExamples = document.getElementById('create-privacy-policy-form');
             const validator = FormValidation.formValidation(formValidationExamples, {
                 fields: {
-                    post_title: {
+                    title: {
                         validators: {
                             notEmpty: {
-                                message: 'Please enter post title'
+                                message: 'Please enter title'
                             }
                         }
                     },
-                    post_category: {
+                    privacy_policy_description: {
                         validators: {
                             notEmpty: {
-                                message: 'Please select category'
+                                message: 'Please enter description'
                             }
                         }
                     }
@@ -198,7 +198,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
-                            if (['post_title', 'post_description'].includes(
+                            if (['title', 'privacy_policy_description'].includes(
                                     field)) {
                                 return '.col-12';
                             }
