@@ -62,6 +62,13 @@
             "icon": "menu-icon tf-icons ri-book-3-line",
             "slug": "privacy-policy",
             "role": ["admin"]
+        },
+        {
+            "url": "/terms-and-condition",
+            "name": "Terms and Condition",
+            "icon": "menu-icon tf-icons ri-file-lock-line",
+            "slug": "terms-and-condition",
+            "role": ["admin"]
         }
     ]
 }
