@@ -135,7 +135,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/privacy-policy/delete', [PrivacyPolicyController::class, 'destroy'])->name('privacy-policy.delete');
 
         // terms and condition controller
-        Route::get('/terms-and-condition', [TermsAndConditionController::class, 'index'])->name('terms-and-condition');
+        // Route::get('/terms-and-condition', [TermsAndConditionController::class, 'index'])->name('terms-and-condition');
         Route::get('/terms-and-condition/create', [TermsAndConditionController::class, 'create'])->name('terms-and-condition.create');
         Route::post('/terms-and-condition/store', [TermsAndConditionController::class, 'store'])->name('terms-and-condition.store');
         Route::get('/terms-and-condition/edit/{id}', [TermsAndConditionController::class, 'edit'])->name('terms-and-condition.edit');

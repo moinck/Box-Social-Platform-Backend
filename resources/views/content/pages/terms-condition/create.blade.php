@@ -155,7 +155,6 @@
 
             // cancel create post content
             $('#cancelCreateTermsConditionBtn').click(function() {
-                window.location.href = '{{ route('terms-and-condition') }}';
             });
 
             // profile form validation
