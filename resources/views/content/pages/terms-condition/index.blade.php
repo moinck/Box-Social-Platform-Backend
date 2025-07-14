@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Privacy Policy')
+@section('title', 'Terms and Condition')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -40,22 +40,22 @@
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row border-bottom user-table-header">
             <div class="head-label">
-                <h5 class="card-title mb-0">Privacy Policy</h5>
+                <h5 class="card-title mb-0">Terms and Condition</h5>
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
-                    <a href="{{ route('privacy-policy.create') }}" class="btn btn-secondary btn-primary waves-effect waves-light" 
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Privacy Policy">
+                    <a href="{{ route('terms-and-condition.create') }}" class="btn btn-secondary btn-primary waves-effect waves-light" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Terms and Condition">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">Create Privacy Policy</span>
+                            <span class="d-none d-sm-inline-block">Create Terms and Condition</span>
                         </span>
                     </a>
                 </div>
             </div>
         </div>
         <div class="card-datatable table-responsive">
-            <table class="dt-fixedheader table table-bordered" id="privacy-policy-data-table">
+            <table class="dt-fixedheader table table-bordered" id="terms-and-condition-data-table">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -79,11 +79,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-            PrivacyPolicyDataTable();
+            TermsAndConditionDataTable();
 
             // contact data table function
-            function PrivacyPolicyDataTable() {
-                var ContactTable = $('#privacy-policy-data-table').DataTable({
+            function TermsAndConditionDataTable() {
+                var ContactTable = $('#terms-and-condition-data-table').DataTable({
                     bLengthChange: false,
                     searchable: true,
                     serverSide: true,
@@ -94,7 +94,7 @@
                     paging: true,
                     pageLength: 10,
                     ajax: {
-                        url: "{{ route('privacy-policy.data-table') }}",
+                        url: "{{ route('terms-and-condition.data-table') }}",
                         beforeSend: function () {
                             showBSPLoader();
                         },
@@ -123,8 +123,8 @@
             // -------------------------------------------
 
             // delete privacy policy
-            $(document).on('click', '.delete-privacy-policy-btn', function() {
-                var privacyPolicyId = $(this).data('privacy-policy-id');
+            $(document).on('click', '.delete-terms-and-condition-btn', function() {
+                var termsAndConditionId = $(this).data('terms-and-condition-id');
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -139,11 +139,11 @@
                 }).then(function(result) {
                     if (result.value) {
                         $.ajax({
-                            url: "{{ route('privacy-policy.delete') }}",
+                            url: "{{ route('terms-and-condition.delete') }}",
                             type: "POST",
                             data: {
                                 _token: '{{ csrf_token() }}',
-                                privacy_policy_id: privacyPolicyId
+                                terms_and_condition_id: termsAndConditionId
                             },
                             beforeSend: function () {
                                 showBSPLoader();
@@ -153,8 +153,8 @@
                             },
                             success: function(response) {
                                 if (response.success == true) {
-                                    showSweetAlert('success', 'Deleted!', 'Privacy Policy has been deleted.');
-                                    PrivacyPolicyDataTable();
+                                    showSweetAlert('success', 'Deleted!', 'Terms and Condition has been deleted.');
+                                    TermsAndConditionDataTable();
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }

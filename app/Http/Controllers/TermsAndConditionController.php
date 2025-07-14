@@ -3,28 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
-use App\Models\PrivacyPolicy;
+use App\Models\TermsAndCondition;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
-class PrivacyPolicyController extends Controller
+class TermsAndConditionController extends Controller
 {
     public function index()
     {
-        return view('content.pages.privacy-policy.index');
+        return view('content.pages.terms-condition.index');
     }
 
     public function create()
     {
-        return view('content.pages.privacy-policy.create');
+        return view('content.pages.terms-condition.create');
     }
 
     public function dataTable()
     {
-        $privacyPolicy = PrivacyPolicy::all();
+        $TermsAndCondition = TermsAndCondition::all();
 
-        return DataTables::of($privacyPolicy)
+        return DataTables::of($TermsAndCondition)
             ->addIndexColumn()
             ->addColumn('title', function ($row) {
                 return $row->title;
@@ -37,10 +36,10 @@ class PrivacyPolicyController extends Controller
             })
             ->addColumn('action', function ($row) {
                 $id = Helpers::encrypt($row->id);
-                $editUrl = route('privacy-policy.edit', $id);
+                $editUrl = route('terms-and-condition.edit', $id);
 
-                $deleteBtn = '<a href="javascript:;" title="delete privacy policy" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-privacy-policy-btn"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-privacy-policy-id="' . $id . '"><i class="ri-delete-bin-line"></i></a>';
+                $deleteBtn = '<a href="javascript:;" title="delete privacy policy" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-terms-and-condition-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-terms-and-condition-id="' . $id . '"><i class="ri-delete-bin-line"></i></a>';
 
                 return '
                     <a href="' . $editUrl . '" title="edit privacy policy" class="btn btn-sm btn-text-secondary rounded-pill btn-icon"
@@ -55,52 +54,52 @@ class PrivacyPolicyController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'privacy_policy_description' => 'required',
+            'terms_condition_description' => 'required',
         ]);
 
-        PrivacyPolicy::create([
+        TermsAndCondition::create([
             'title' => $request->title,
-            'description' => $request->privacy_policy_description,
+            'description' => $request->terms_condition_description,
         ]);
 
-        return redirect()->route('privacy-policy')->with('success', 'Privacy Policy created successfully');
+        return redirect()->route('terms-and-condition')->with('success', 'Terms and Condition created successfully');
     }
 
     public function edit($id)
     {
         $encryptedEditId = $id;
         $id = Helpers::decrypt($id);
-        $privacyPolicy = PrivacyPolicy::find($id);
+        $termsAndCondition = TermsAndCondition::find($id);
 
-        return view('content.pages.privacy-policy.edit', compact('privacyPolicy', 'encryptedEditId'));
+        return view('content.pages.terms-condition.edit', compact('termsAndCondition', 'encryptedEditId'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
             'title' => 'required',
-            'privacy_policy_edit_description' => 'required',
+            'terms_condition_edit_description' => 'required',
         ]);
 
-        $id = Helpers::decrypt($request->privacy_policy_id);
+        $id = Helpers::decrypt($request->terms_condition_id);
 
-        PrivacyPolicy::find($id)->update([
+        TermsAndCondition::find($id)->update([
             'title' => $request->title,
-            'description' => $request->privacy_policy_edit_description,
+            'description' => $request->terms_condition_edit_description,
         ]);
 
-        return redirect()->route('privacy-policy')->with('success', 'Privacy Policy updated successfully');
+        return redirect()->route('terms-and-condition')->with('success', 'Terms and Condition updated successfully');
     }
 
     public function destroy(Request $request)
     {
-        $id = Helpers::decrypt($request->privacy_policy_id);
-        $privacyPolicy = PrivacyPolicy::find($id);
-        $privacyPolicy->delete();
+        $id = Helpers::decrypt($request->terms_condition_id);
+        $termsAndCondition = TermsAndCondition::find($id);
+        $termsAndCondition->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Privacy Policy deleted successfully',
+            'message' => 'Terms and Condition deleted successfully',
         ]);
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Create Privacy Policy')
+@section('title', 'Edit Terms and Condition')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -34,31 +34,33 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Create Privacy Policy</h4>
+                    <h4 class="card-title mb-0">Edit Terms and Condition</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="create-privacy-policy-form" action="{{ route('privacy-policy.store') }}" class="row g-5"
+                    <form id="edit-terms-condition-form" action="{{ route('terms-and-condition.update') }}" class="row g-5"
                         method="POST" enctype="multipart/form-data">
                         @csrf
+
+                        <input type="hidden" name="terms_condition_id" value="{{ $encryptedEditId }}" />
 
                         {{-- title --}}
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="title" name="title" class="form-control"
-                                    placeholder="Title" />
+                                    placeholder="Title" value="{{ $termsAndCondition->title }}" />
                                 <label for="title">Title</label>
                             </div>
                         </div>
 
                         {{-- quill text description --}}
                         <div class="col-12">
-                            <div id="privacy_policy_description">{{ old('privacy_policy_description') }}</div>
-                            <input type="hidden" name="privacy_policy_description" id="hiddenPrivacyPolicyDescription"
-                                value="{{ old('privacy_policy_description') }}" />
+                            <div id="terms_condition_edit_description">{!! $termsAndCondition->description !!}</div>
+                            <input type="hidden" name="terms_condition_edit_description" id="hiddenTermsConditionDescription"
+                                value="{{ $termsAndCondition->description }}" />
                         </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <button type="reset" class="btn btn-outline-secondary" id="cancelCreatePrivacyPolicyBtn">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="reset" class="btn btn-outline-secondary" id="cancelEditTermsConditionBtn">
                                 Cancel
                             </button>
                         </div>
@@ -135,8 +137,8 @@
                 ['clean']
             ];
 
-            const createPrivacyPolicyDescription = new Quill('#privacy_policy_description', {
-                bounds: '#privacy_policy_description',
+            const createTermsConditionDescription = new Quill('#terms_condition_edit_description', {
+                bounds: '#terms_condition_edit_description',
                 placeholder: 'Type Something...',
                 modules: {
                     formula: true,
@@ -145,21 +147,21 @@
                 theme: 'snow'
             });
             // update hidden post description
-            createPrivacyPolicyDescription.on('text-change', function() {
+            createTermsConditionDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 $('.ql-editor').hasClass('ql-blank') ?
-                    $('#hiddenPrivacyPolicyDescription').val('') :
-                    $('#hiddenPrivacyPolicyDescription').val(createPrivacyPolicyDescription.root.innerHTML);
-                validator.revalidateField('privacy_policy_description');
+                    $('#hiddenTermsConditionDescription').val('') :
+                    $('#hiddenTermsConditionDescription').val(createTermsConditionDescription.root.innerHTML);
+                validator.revalidateField('terms_condition_edit_description');
             });
 
             // cancel create post content
-            $('#cancelCreatePrivacyPolicyBtn').click(function() {
-                window.location.href = '{{ route('privacy-policy') }}';
+            $('#cancelCreateTermsConditionBtn').click(function() {
+                window.location.href = '{{ route('terms-and-condition') }}';
             });
 
             // profile form validation
-            const formValidationExamples = document.getElementById('create-privacy-policy-form');
+            const formValidationExamples = document.getElementById('edit-terms-condition-form');
             const validator = FormValidation.formValidation(formValidationExamples, {
                 fields: {
                     title: {
@@ -169,7 +171,7 @@
                             }
                         }
                     },
-                    privacy_policy_description: {
+                    terms_condition_edit_description: {
                         validators: {
                             notEmpty: {
                                 message: 'Please enter description'
@@ -182,7 +184,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
-                            if (['title', 'privacy_policy_description'].includes(
+                            if (['title', 'terms_condition_edit_description'].includes(
                                     field)) {
                                 return '.col-12';
                             }
@@ -193,7 +195,7 @@
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 }
             }).on('core.form.valid', function() {
-                $('#create-privacy-policy-form').submit();
+                $('#edit-terms-condition-form').submit();
             });
             // -----------------------------------------------------
         });
