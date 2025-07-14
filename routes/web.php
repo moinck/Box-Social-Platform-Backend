@@ -19,6 +19,7 @@ use App\Http\Controllers\PostContentController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileManagementController;
 use App\Http\Controllers\ProjectTestController;
+use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\VideoStockController;
 
 Route::middleware('guest')->group(function () {
@@ -132,6 +133,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/privacy-policy/update', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
         Route::get('/privacy-policy/datatable', [PrivacyPolicyController::class, 'dataTable'])->name('privacy-policy.data-table');
         Route::post('/privacy-policy/delete', [PrivacyPolicyController::class, 'destroy'])->name('privacy-policy.delete');
+
+        // terms and condition controller
+        Route::get('/terms-and-condition', [TermsAndConditionController::class, 'index'])->name('terms-and-condition');
+        Route::get('/terms-and-condition/create', [TermsAndConditionController::class, 'create'])->name('terms-and-condition.create');
+        Route::post('/terms-and-condition/store', [TermsAndConditionController::class, 'store'])->name('terms-and-condition.store');
+        Route::get('/terms-and-condition/edit/{id}', [TermsAndConditionController::class, 'edit'])->name('terms-and-condition.edit');
+        Route::post('/terms-and-condition/update', [TermsAndConditionController::class, 'update'])->name('terms-and-condition.update');
+        Route::get('/terms-and-condition/datatable', [TermsAndConditionController::class, 'dataTable'])->name('terms-and-condition.data-table');
+        Route::post('/terms-and-condition/delete', [TermsAndConditionController::class, 'destroy'])->name('terms-and-condition.delete');
     });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
