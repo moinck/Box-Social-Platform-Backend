@@ -63,7 +63,9 @@ class PrivacyPolicyController extends Controller
             'description' => $request->privacy_policy_description,
         ]);
 
-        return redirect()->route('privacy-policy')->with('success', 'Privacy Policy created successfully');
+        $firstDataId = PrivacyPolicy::first()->id;
+
+        return redirect()->route('privacy-policy.edit', Helpers::encrypt($firstDataId))->with('success', 'Privacy Policy created successfully');
     }
 
     public function edit($id)
@@ -71,6 +73,9 @@ class PrivacyPolicyController extends Controller
         $encryptedEditId = $id;
         $id = Helpers::decrypt($id);
         $privacyPolicy = PrivacyPolicy::find($id);
+        if (!$privacyPolicy) {
+            return redirect()->route('privacy-policy.create')->with('info', 'Privacy Policy not found');
+        }
 
         return view('content.pages.privacy-policy.edit', compact('privacyPolicy', 'encryptedEditId'));
     }
@@ -89,7 +94,7 @@ class PrivacyPolicyController extends Controller
             'description' => $request->privacy_policy_edit_description,
         ]);
 
-        return redirect()->route('privacy-policy')->with('success', 'Privacy Policy updated successfully');
+        return redirect()->route('privacy-policy.edit', Helpers::encrypt($id))->with('success', 'Privacy Policy updated successfully');
     }
 
     public function destroy(Request $request)
