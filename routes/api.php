@@ -47,8 +47,7 @@ Route::group([
         Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
         Route::get('/account-status-check', [RegisterController::class, 'statusCheck']);
 
-        // admin api
-        Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+
         // Route::get('/admin/download/document/{id}', [AdminApiController::class, 'downloadDocument']);
 
         // category list
@@ -73,13 +72,11 @@ Route::group([
         // Route::get('/post-content/get/all', [PostContentApiController::class, 'index']);
         // Route::get('/post-content/get/{id}', [PostContentApiController::class, 'show']);
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
-        Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
+        // Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
 
-        // Admin Create Template 
-        Route::post('/template/store', [TemplateApiController::class, 'store']);
-        Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
+
+        // admin-template API
         Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
-        Route::post('/template/update', [TemplateApiController::class, 'update']);
         Route::post('/template/delete', [TemplateApiController::class, 'delete']);
 
         // User templates APIS
@@ -105,3 +102,14 @@ Route::group([
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
 Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
+
+// admin api
+Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+
+// Admin Create Template 
+Route::post('/template/store', [TemplateApiController::class, 'store']);
+Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
+Route::post('/template/update', [TemplateApiController::class, 'update']);
+
+// post content api
+Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
