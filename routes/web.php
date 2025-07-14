@@ -126,7 +126,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-template/create/duplicate', [PostTemplateController::class, 'duplicate'])->name('post-template.create-duplicate');
 
         // privacy policy controller
-        Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
+        // Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
         Route::get('/privacy-policy/create', [PrivacyPolicyController::class, 'create'])->name('privacy-policy.create');
         Route::post('/privacy-policy/store', [PrivacyPolicyController::class, 'store'])->name('privacy-policy.store');
         Route::get('/privacy-policy/edit/{id}', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
@@ -135,7 +135,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/privacy-policy/delete', [PrivacyPolicyController::class, 'destroy'])->name('privacy-policy.delete');
 
         // terms and condition controller
-        Route::get('/terms-and-condition', [TermsAndConditionController::class, 'index'])->name('terms-and-condition');
+        // Route::get('/terms-and-condition', [TermsAndConditionController::class, 'index'])->name('terms-and-condition');
         Route::get('/terms-and-condition/create', [TermsAndConditionController::class, 'create'])->name('terms-and-condition.create');
         Route::post('/terms-and-condition/store', [TermsAndConditionController::class, 'store'])->name('terms-and-condition.store');
         Route::get('/terms-and-condition/edit/{id}', [TermsAndConditionController::class, 'edit'])->name('terms-and-condition.edit');

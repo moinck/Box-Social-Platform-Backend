@@ -57,16 +57,16 @@
             "role": ["admin"]
         },
         {
-            "url": "/privacy-policy",
+            "url": "/privacy-policy/edit/TTJ0UTNQeWt1WWhYSEF5cWxtbGVLZz09",
             "name": "Privacy Policy",
             "icon": "menu-icon tf-icons ri-book-3-line",
             "slug": "privacy-policy",
             "role": ["admin"]
         },
         {
-            "url": "/terms-and-condition",
+            "url": "/terms-and-condition/edit/TTJ0UTNQeWt1WWhYSEF5cWxtbGVLZz09",
             "name": "Terms and Condition",
-            "icon": "menu-icon tf-icons ri-file-lock-line",
+            "icon": "menu-icon tf-icons ri-newspaper-line",
             "slug": "terms-and-condition",
             "role": ["admin"]
         }

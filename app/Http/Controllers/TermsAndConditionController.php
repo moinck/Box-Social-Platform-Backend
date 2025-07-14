@@ -62,7 +62,9 @@ class TermsAndConditionController extends Controller
             'description' => $request->terms_condition_description,
         ]);
 
-        return redirect()->route('terms-and-condition')->with('success', 'Terms and Condition created successfully');
+        $firstDataId = TermsAndCondition::first()->id;
+
+        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($firstDataId))->with('success', 'Terms and Condition created successfully');
     }
 
     public function edit($id)
@@ -70,6 +72,9 @@ class TermsAndConditionController extends Controller
         $encryptedEditId = $id;
         $id = Helpers::decrypt($id);
         $termsAndCondition = TermsAndCondition::find($id);
+        if (!$termsAndCondition) {
+            return redirect()->route('terms-and-condition.create')->with('info', 'Terms and Condition not found, please create first');
+        }
 
         return view('content.pages.terms-condition.edit', compact('termsAndCondition', 'encryptedEditId'));
     }
@@ -88,7 +93,7 @@ class TermsAndConditionController extends Controller
             'description' => $request->terms_condition_edit_description,
         ]);
 
-        return redirect()->route('terms-and-condition')->with('success', 'Terms and Condition updated successfully');
+        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($id))->with('success', 'Terms and Condition updated successfully');
     }
 
     public function destroy(Request $request)

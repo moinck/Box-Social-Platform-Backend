@@ -157,7 +157,7 @@
 
             // cancel create post content
             $('#cancelCreatePrivacyPolicyBtn').click(function() {
-                window.location.href = '{{ route('privacy-policy') }}';
+                window.location.reload();
             });
 
             // profile form validation
