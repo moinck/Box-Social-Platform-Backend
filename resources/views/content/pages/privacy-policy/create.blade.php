@@ -153,11 +153,6 @@
                 validator.revalidateField('privacy_policy_description');
             });
 
-            // cancel create post content
-            $('#cancelCreatePrivacyPolicyBtn').click(function() {
-                window.location.href = '{{ route('privacy-policy') }}';
-            });
-
             // profile form validation
             const formValidationExamples = document.getElementById('create-privacy-policy-form');
             const validator = FormValidation.formValidation(formValidationExamples, {

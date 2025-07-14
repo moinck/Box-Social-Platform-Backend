@@ -126,7 +126,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-template/create/duplicate', [PostTemplateController::class, 'duplicate'])->name('post-template.create-duplicate');
 
         // privacy policy controller
-        Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
+        // Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
         Route::get('/privacy-policy/create', [PrivacyPolicyController::class, 'create'])->name('privacy-policy.create');
         Route::post('/privacy-policy/store', [PrivacyPolicyController::class, 'store'])->name('privacy-policy.store');
         Route::get('/privacy-policy/edit/{id}', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
