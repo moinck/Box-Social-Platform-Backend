@@ -15,6 +15,10 @@ class PrivacyPolicyApiController extends Controller
     {
         $privacyPolicy = PrivacyPolicy::first();
 
-        return $this->success($privacyPolicy, 'Privacy Policy fetched successfully');
+        $returnData = [];
+        $returnData['title'] = $privacyPolicy->title;
+        $returnData['description'] = $privacyPolicy->description;
+
+        return $this->success($returnData, 'Privacy Policy fetched successfully');
     }
 }

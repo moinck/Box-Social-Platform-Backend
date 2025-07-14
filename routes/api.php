@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
+use App\Http\Controllers\Api\TermsAndConditionApiController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
 use App\Http\Controllers\Api\UserTemplatesApiController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -103,3 +104,4 @@ Route::group([
 
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
+Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
