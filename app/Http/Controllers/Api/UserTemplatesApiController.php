@@ -25,11 +25,14 @@ class UserTemplatesApiController extends Controller
 
         $search = $request->search ?? '';
 
-        $userTemplates = UserTemplates::with('category','template.category')
+        $userTemplates = UserTemplates::with('category','template.category','template.postContent')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->whereHas('category', function ($query) use ($search) {
                         $query->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('template.postContent', function ($query) use ($search) {
+                        $query->where('title', 'like', "%{$search}%");
                     })
                     ->orWhere('template_name', 'like', "%{$search}%");
                 });
@@ -45,12 +48,14 @@ class UserTemplatesApiController extends Controller
         $returnData = [];
         foreach ($userTemplates as $key => $value) {
             $categoryName = $value->category->name ?? null;
+            $postContentTitle = $value->template->postContent->title ?? "-";
             if (empty($categoryName)) {
                 $categoryName = $value->template->category->name ?? null;
             }
             $returnData[] = [
                 'id' => Helpers::encrypt($value->id),
                 'category' => $categoryName,
+                'post_title' => $postContentTitle,
                 'template_name' => $value->template_name ?? null,
                 'template_image' => $value->template_image ? asset($value->template_image) : null,
                 'edited' => Carbon::parse($value->updated_at)->diffForHumans(),
