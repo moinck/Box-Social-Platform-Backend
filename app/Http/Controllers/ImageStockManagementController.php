@@ -16,6 +16,7 @@ class ImageStockManagementController extends Controller
         $savedImagesCount = ImageStockManagement::myImageCount();
 
         $savedImageTopics = ImageStockManagement::where('user_id', auth()->user()->id)
+            ->latest()
             ->pluck('tag_name')
             ->unique()
             ->toArray();
@@ -26,6 +27,7 @@ class ImageStockManagementController extends Controller
     public function getSavedTopics()
     {
         $savedImageTopics = ImageStockManagement::where('user_id', auth()->user()->id)
+            ->latest()
             ->pluck('tag_name')
             ->unique()
             ->toArray();

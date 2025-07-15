@@ -68,6 +68,7 @@ class StockImageApiController extends Controller
         $returnData = [];
         $adminImagesData = [];
         $userImagesData = [];
+        $searchTopics = [];
 
         // admin images
         foreach ($adminImages as $key => $value) {
@@ -94,8 +95,17 @@ class StockImageApiController extends Controller
             ];
         }
 
+        // search topics
+        $searchTopics = ImageStockManagement::select('tag_name')
+            ->whereNotNull('tag_name')
+            ->latest()
+            ->pluck('tag_name')
+            ->unique()
+            ->toArray();
+
         $returnData['admin'] = $adminImagesData;
         $returnData['user'] = $userImagesData;
+        $returnData['searchTopics'] = $searchTopics;
 
         return $this->success($returnData, 'Stock Image Fetch successfully');
     }
