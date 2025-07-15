@@ -87,8 +87,6 @@ Route::group([
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
         Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
 
-        // get stock image
-        Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
 
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
@@ -113,3 +111,6 @@ Route::post('/template/update', [TemplateApiController::class, 'update']);
 
 // post content api
 Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
+
+// get stock image
+Route::get('/stock-image/get', [StockImageApiController::class, 'get']);

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,13 +32,38 @@ class StockImageApiController extends Controller
             ->latest()
             ->get();
 
-        $authUserImages = ImageStockManagement::select('id','image_url')
-            ->where('user_id', Auth::user()->id)
-            ->when($searchQuery, function ($query) use ($searchQuery) {
-                $query->where('tag_name', 'like', "%{$searchQuery}%");
-            })
-            ->latest()
-            ->get();
+        if ($request->bearerToken()) {
+            $token = $request->bearerToken();
+            $tokenId = explode('|', $token)[0];
+            $authUser = DB::table('personal_access_tokens')
+                ->where('id', $tokenId)
+                ->first();
+            if (empty($authUser)) {
+                $authUserImages = ImageStockManagement::select('id','image_url')
+                    ->whereNotIn('user_id',$adminIds)
+                    ->when($searchQuery, function ($query) use ($searchQuery) {
+                        $query->where('tag_name', 'like', "%{$searchQuery}%");
+                    })
+                    ->latest()
+                    ->get();
+            } else {
+                $authUserImages = ImageStockManagement::select('id','image_url')
+                    ->where('user_id', $authUser->tokenable_id)
+                    ->when($searchQuery, function ($query) use ($searchQuery) {
+                        $query->where('tag_name', 'like', "%{$searchQuery}%");
+                    })
+                    ->latest()
+                    ->get();
+            }
+        } else {
+            $authUserImages = ImageStockManagement::select('id','image_url')
+                ->whereNotIn('user_id',$adminIds)
+                ->when($searchQuery, function ($query) use ($searchQuery) {
+                    $query->where('tag_name', 'like', "%{$searchQuery}%");
+                })
+                ->latest()
+                ->get();
+        }
 
         $returnData = [];
         $adminImagesData = [];
