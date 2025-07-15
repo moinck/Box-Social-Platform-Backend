@@ -299,6 +299,7 @@
                             var image_url = settings.image_url;
                             var imageId = settings.id;
                             var imageExists = settings.image_exists;
+                            var tagName = settings.tag_name;
 
                             // if image does not exist then show not available image
                             if (imageExists != true) {
@@ -317,7 +318,7 @@
                                             <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
                                             <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
                                             <span class="custom-option-body">
-                                                <img src="${image_url}" alt="saved-image"/>
+                                                <img src="${image_url}" alt="${tagName}"/>
                                             </span>
                                             </label>
                                         </div>

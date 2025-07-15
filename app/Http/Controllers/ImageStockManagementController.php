@@ -150,6 +150,7 @@ class ImageStockManagementController extends Controller
         ->map(function ($image) {
             return [
                 'id' => $image->id,
+                'tag_name' => $image->tag_name,
                 'image_url' => $image->image_url,
                 'image_exists' => pathinfo($image->image_url, PATHINFO_EXTENSION) ? true : false,
             ];
