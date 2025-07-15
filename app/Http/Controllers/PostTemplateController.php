@@ -55,9 +55,9 @@ class PostTemplateController extends Controller
             ->addColumn('sub_category', function ($data) {
                 return $data->subCategory->name ?? "-";
             })
-            ->addColumn('design_style', function ($data) {
-                return $data->designStyle->name ?? "-";
-            })
+            // ->addColumn('design_style', function ($data) {
+            //     return $data->designStyle->name ?? "-";
+            // })
             ->addColumn('status', function ($data) {
                 $status = $data->status == true ? 'checked' : '';
                 $title = '';
@@ -98,7 +98,7 @@ class PostTemplateController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_content', 'template_image', 'design_style', 'status', 'created_at'])
+            ->rawColumns(['action', 'post_content', 'template_image', 'status', 'created_at'])
             ->make(true);
     }
 

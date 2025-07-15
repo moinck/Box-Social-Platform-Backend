@@ -242,6 +242,7 @@
             // load image when user comes to saved images tab
             $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-image-section"]', function (e) {
                 loadSavedImages();
+                GetSavedTopics();
             });
 
             // on change of tab hide delete button
@@ -299,6 +300,7 @@
                             var image_url = settings.image_url;
                             var imageId = settings.id;
                             var imageExists = settings.image_exists;
+                            var tagName = settings.tag_name ?? 'Saved-image';
 
                             // if image does not exist then show not available image
                             if (imageExists != true) {
@@ -317,7 +319,7 @@
                                             <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
                                             <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
                                             <span class="custom-option-body">
-                                                <img src="${image_url}" alt="saved-image"/>
+                                                <img src="${image_url}" alt="${tagName}"/>
                                             </span>
                                             </label>
                                         </div>
@@ -331,6 +333,39 @@
                         });
 
                         $("#saved_images").html(newImage);
+                    },
+                    error: function (error) {
+                        hideBSPLoader();
+                        console.log(error);
+                    }
+                });
+            }
+            // --------------------------------------------------
+
+            // get saved image topics
+            function GetSavedTopics() {
+                var url = "{{ route('stock-image-management.get.saved-topics') }}";
+                $.ajax({
+                    type: 'get',
+                    url: url,
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            var savedTopics = data.data;
+                            var savedTopicsList = "";
+                            savedTopicsList += `<option value="0">Select Tags to search</option>`;
+                            $.each(savedTopics, function (i, settings) {
+                                savedTopicsList += `<option value="${settings}">${settings}</option>`;
+                            });
+                            $("#saved_topics_list").html(savedTopicsList);
+                        } else {
+                            showSweetAlert('error', 'Info!', 'Something went wrong.');
+                        }
                     },
                     error: function (error) {
                         hideBSPLoader();
@@ -389,6 +424,7 @@
                     success: function (data) {
                         if (data.success) {
                             loadSavedImages();
+                            GetSavedTopics();
                             $('#saved-img-count').text(data.savedImagesCount);
                             showSweetAlert('success', 'Delete!', 'Image deleted successfully.');
                         } else {
