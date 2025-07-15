@@ -23,7 +23,7 @@ class TemplateApiController extends Controller
             'sub_category_id' => 'nullable|string',
             'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required', // or 'array' if JSON
-            'design_style_id' => 'required|string',
+            'design_style_id' => 'nullable|string',
             'post_content_id' => 'required|string',
         ],[
             'template_image.regex' => 'Invalid image format',
@@ -200,7 +200,7 @@ class TemplateApiController extends Controller
             'template_data' => 'required',
             'category_id' => 'required|string',
             'sub_category_id' => 'nullable|string',
-            'design_style_id' => 'required|string',
+            'design_style_id' => 'nullable|string',
             'post_content_id' => 'required|string',
         ],[
             'template_image.regex' => 'Invalid image format',
