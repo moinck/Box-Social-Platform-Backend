@@ -299,7 +299,7 @@
                             var image_url = settings.image_url;
                             var imageId = settings.id;
                             var imageExists = settings.image_exists;
-                            var tagName = settings.tag_name;
+                            var tagName = settings.tag_name ?? 'Saved-image';
 
                             // if image does not exist then show not available image
                             if (imageExists != true) {
