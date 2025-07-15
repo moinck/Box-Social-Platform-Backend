@@ -190,7 +190,12 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate, 'update');
         }
 
-        return $this->success([], 'User template updated successfully');
+        $returnData = [
+            'id' => Helpers::encrypt($userTemplate->id),
+            'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+        ];
+
+        return $this->success($returnData, 'User template updated successfully');
     }
 
     public function delete(Request $request)

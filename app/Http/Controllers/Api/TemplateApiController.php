@@ -172,7 +172,7 @@ class TemplateApiController extends Controller
             $tempObj->whereIn('id', $decryptedTemplateIds);
         }
 
-        $tempObj = $tempObj->get();
+        $tempObj = $tempObj->latest()->get();
 
         $tempData = [];
         foreach ($tempObj as $key => $t) {
