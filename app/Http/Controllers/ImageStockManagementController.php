@@ -14,8 +14,13 @@ class ImageStockManagementController extends Controller
     {
         $topics = config('image_topics');
         $savedImagesCount = ImageStockManagement::myImageCount();
+
+        $savedImageTopics = ImageStockManagement::where('user_id', auth()->user()->id)
+            ->pluck('tag_name')
+            ->unique()
+            ->toArray();
        
-        return view('content.pages.pages-image-stock-management', compact('topics', 'savedImagesCount'));
+        return view('content.pages.pages-image-stock-management', compact('topics', 'savedImagesCount', 'savedImageTopics'));
     }
 
     public function imagesStore(Request $request)
@@ -135,9 +140,13 @@ class ImageStockManagementController extends Controller
     }
     
 
-    public function savedImages()
+    public function savedImages(Request $request)
     {
-        $images = ImageStockManagement::where('user_id', auth()->user()->id)->latest()->get()
+        $images = ImageStockManagement::where('user_id', auth()->user()->id)
+        ->when($request->selectedTopic != null && $request->selectedTopic != 0, function ($query) use ($request) {
+            return $query->where('tag_name', $request->selectedTopic);
+        })
+        ->latest()->get()
         ->map(function ($image) {
             return [
                 'id' => $image->id,

@@ -146,8 +146,31 @@
                             </form>
                         </div>
                         <div class="tab-pane fade" id="navs-saved-image-section" role="tabpanel">
-                            <!-- Saved images will be loaded here -->
-                            <div class="row" id="saved_images">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            {{-- saved topics dropdown --}}
+                                            <div class="col-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="saved_topics_list" class="select2-icons form-select tag-name-select" name="saved_topics_list" data-allow-clear="true">
+                                                        @forelse ($savedImageTopics as $index => $item)
+                                                            @if ($index == 0)
+                                                                <option value="0">Select Tags to search</option>
+                                                            @endif
+                                                            <option value="{{ $item }}">{{ $item }}</option>
+                                                        @empty
+                                                            <option value="">No saved topics</option>
+                                                        @endforelse
+                                                    </select>
+                                                    <label for="saved_topics_list">Saved Tags</label>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-5" id="saved_images">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -155,37 +178,6 @@
             </div>
         </div>
     </div>
-
-    {{-- custom tag name modal --}}
-    {{-- <div class="modal fade" id="save-data-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body p-0">
-                    <div class="text-center mb-6">
-                        <h4 class="mb-2">Add New Tag Name</h4>
-                        <p>Add new tag name</p>
-                    </div>
-                    <form id="addNewTagNameForm" class="row g-5">
-                        <div class="col-12">
-                            <div class="input-group input-group-merge">
-                                <div class="form-floating form-floating-outline">
-                                    <input id="custom_tag_name" name="custom_tag_name" class="form-control " type="text" placeholder="Enter tag name">
-                                    <label for="custom_tag_name">Tag Name</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="button" id="save-image-data-btn" class="btn btn-primary waves-effect waves-light">Save Images</button>
-                            <button type="button" class="btn btn-outline-secondary btn-reset waves-effect" data-bs-dismiss="modal" aria-label="Close">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
         {{-- data export modal --}}
         <div class="modal fade" id="save-data-modal" tabindex="-1" aria-hidden="true">
@@ -271,14 +263,27 @@
                 $('#save-data-modal').modal('show');
             })
 
+            // on change of saved topics list
+            $(document).on('change', '#saved_topics_list', function () {
+                var selectedTopic = $(this).val();
+                if (selectedTopic != 0) {
+                    loadSavedImages(selectedTopic);
+                } else {
+                    loadSavedImages();
+                }
+            })
+
             // Function to load saved images
-            function loadSavedImages() {
+            function loadSavedImages(selectedTopic = null) {
                 // hide delete button
                 $('.delete_select_images').addClass('d-none');
                 var url = "{{ route('image-management.get.saved-images') }}";
                 $.ajax({
                     type: 'get',
                     url: url,
+                    data: {
+                        selectedTopic: selectedTopic
+                    },
                     beforeSend: function () {
                         showBSPLoader();
                     },
