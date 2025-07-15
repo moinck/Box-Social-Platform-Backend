@@ -93,9 +93,9 @@ class PostContentApiController extends Controller
             $decryptedSubCategoryIds = array_map(function ($id) {
                 return Helpers::decrypt($id);
             }, $request->sub_category_ids);
-            $postContent->orWhere(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds);
-            });
+            // $postContent->orWhere(function ($query) use ($decryptedSubCategoryIds) {
+            // });
+            $postContent->whereIn('sub_category_id', $decryptedSubCategoryIds);
         }
         $postContent = $postContent->get();
 
