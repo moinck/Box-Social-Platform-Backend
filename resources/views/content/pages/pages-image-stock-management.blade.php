@@ -156,6 +156,66 @@
         </div>
     </div>
 
+    {{-- custom tag name modal --}}
+    {{-- <div class="modal fade" id="save-data-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body p-0">
+                    <div class="text-center mb-6">
+                        <h4 class="mb-2">Add New Tag Name</h4>
+                        <p>Add new tag name</p>
+                    </div>
+                    <form id="addNewTagNameForm" class="row g-5">
+                        <div class="col-12">
+                            <div class="input-group input-group-merge">
+                                <div class="form-floating form-floating-outline">
+                                    <input id="custom_tag_name" name="custom_tag_name" class="form-control " type="text" placeholder="Enter tag name">
+                                    <label for="custom_tag_name">Tag Name</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center gap-4 row-gap-4">
+                            <button type="button" id="save-image-data-btn" class="btn btn-primary waves-effect waves-light">Save Images</button>
+                            <button type="button" class="btn btn-outline-secondary btn-reset waves-effect" data-bs-dismiss="modal" aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
+        {{-- data export modal --}}
+        <div class="modal fade" id="save-data-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="modalCenterTitle">Add New Tag Name</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addNewTagNameForm" class="row g-5">
+                            <div class="col-12">
+                                <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline">
+                                        <input id="custom_tag_name" name="custom_tag_name" class="form-control " type="text" placeholder="Enter tag name">
+                                        <label for="custom_tag_name">Tag Name</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex flex-wrap justify-content-center gap-4 row-gap-4 mt-5">
+                                <button type="button" id="save-image-data-btn" class="btn btn-primary waves-effect waves-light">Save Images</button>
+                                <button type="button" class="btn btn-outline-secondary btn-reset waves-effect" data-bs-dismiss="modal" aria-label="Close">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!--/ Fixed Header -->
     <!--/ Select -->
 @endsection
@@ -206,6 +266,10 @@
                 }
             });
             // --------------------------------------------------
+
+            $(document).on('click', '.save_select_images', function () {
+                $('#save-data-modal').modal('show');
+            })
 
             // Function to load saved images
             function loadSavedImages() {

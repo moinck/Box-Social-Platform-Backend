@@ -22,11 +22,11 @@ class ImageStockManagementController extends Controller
     {
         $request->validate([
             'selectImages' => 'required|unique:image_stock_management,image_url',
-            'select2Icons' => 'required',
+            'custom_tag_name' => 'required',
         ],[
             'selectImages.required' => 'Please select images',
             'selectImages.unique' => 'Some of Selected image already exists. please select different images',
-            'select2Icons.required' => 'Please select tag name',
+            'custom_tag_name.required' => 'Please select tag name',
         ]);
 
         $selectImages = $request->selectImages;
@@ -37,7 +37,7 @@ class ImageStockManagementController extends Controller
                         'image_url' => $value
                     ], 
                     [
-                        'tag_name' => $request->select2Icons,
+                        'tag_name' => $request->custom_tag_name,
                         'user_id' => auth()->user()->id
                     ]
                 );

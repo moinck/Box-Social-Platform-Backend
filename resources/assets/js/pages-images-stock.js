@@ -5,9 +5,15 @@
 "use strict";
 
 $(function () {
-    $(document).on("click", ".save_select_images", function () {
+    $(document).on("click", "#save-image-data-btn", function () {
+        var custom_tag_name = $("#custom_tag_name").val();
+        if (custom_tag_name.length == 0) {
+            toastr.error("Please enter tag name.");
+            return;
+        }
         const form = $("#stock_images_management")[0]; // Get the DOM element
         const data = new FormData(form);
+        data.append("custom_tag_name", custom_tag_name);
         $.ajax({
             type: "POST",
             url: `image-management/store`,
@@ -16,7 +22,6 @@ $(function () {
             },
             data: data,
             processData: false,
-            data: data,
             dataType: "json",
             contentType: false,
             beforeSend: function () {
@@ -31,7 +36,7 @@ $(function () {
                     $(".search-image-checkbox").prop("checked", false);
                     $("#saved-img-count").text(response.savedImagesCount);
                     $(".save_select_images").addClass("d-none");
-
+                    $("#save-data-modal").modal("hide");
                     showSweetAlert(
                         "success",
                         "Store!",
