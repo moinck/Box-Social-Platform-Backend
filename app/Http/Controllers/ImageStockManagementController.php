@@ -23,6 +23,19 @@ class ImageStockManagementController extends Controller
         return view('content.pages.pages-image-stock-management', compact('topics', 'savedImagesCount', 'savedImageTopics'));
     }
 
+    public function getSavedTopics()
+    {
+        $savedImageTopics = ImageStockManagement::where('user_id', auth()->user()->id)
+            ->pluck('tag_name')
+            ->unique()
+            ->toArray();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $savedImageTopics
+        ]);
+    }
+
     public function imagesStore(Request $request)
     {
         $request->validate([

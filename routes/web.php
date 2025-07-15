@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
     // Stock image Management
     Route::get('/stock-image-management', [ImageStockManagementController::class, 'index'])->name('stock-image-management');
+    Route::get('/stock-image-management/get/saved-topics', [ImageStockManagementController::class, 'getSavedTopics'])->name('stock-image-management.get.saved-topics');
     Route::post('/get-image-management', [ImageStockManagementController::class, 'GetImages']);
     Route::post('/image-management/store', [ImageStockManagementController::class, 'imagesStore']);
     Route::get('/image-management/get/saved-images', [ImageStockManagementController::class, 'savedImages'])->name('image-management.get.saved-images');
