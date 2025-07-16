@@ -570,58 +570,58 @@ class Helpers
             // Process each object
             foreach ($data['objects'] as &$object) {
 
-                // for text replacement
-                if (isset($object['boxType']) && isset($object['text'])) {
-                    $boxType = $object['boxType'];
-                    // Replace text based on boxType
-                    switch ($boxType) {
-                        case 'email':
-                            if (isset($brandkitData['email'])) {
-                                $object['text'] = $brandkitData['email'];
-                            }
-                            break;
-                        case 'phone':
-                            if (isset($brandkitData['phone'])) {
-                                $object['text'] = $brandkitData['phone'];
-                            }
-                            break;
-                        case 'name':
-                            if (isset($brandkitData['name'])) {
-                                $object['text'] = $brandkitData['name'];
-                            }
-                            break;
-                        case 'company':
-                            if (isset($brandkitData['company'])) {
-                                $object['text'] = $brandkitData['company'];
-                            }
-                            break;
-                        case 'address':
-                            if (isset($brandkitData['address'])) {
-                                $object['text'] = $brandkitData['address'];
-                            }
-                            break;
-                        case 'website':
-                            if (isset($brandkitData['website'])) {
-                                $object['text'] = $brandkitData['website'];
-                            }
-                            break;
-                    }
-                }
+                // // for text replacement
+                // if (isset($object['boxType']) && isset($object['text'])) {
+                //     $boxType = $object['boxType'];
+                //     // Replace text based on boxType
+                //     switch ($boxType) {
+                //         case 'email':
+                //             if (isset($brandkitData['email'])) {
+                //                 $object['text'] = $brandkitData['email'];
+                //             }
+                //             break;
+                //         case 'phone':
+                //             if (isset($brandkitData['phone'])) {
+                //                 $object['text'] = $brandkitData['phone'];
+                //             }
+                //             break;
+                //         case 'name':
+                //             if (isset($brandkitData['name'])) {
+                //                 $object['text'] = $brandkitData['name'];
+                //             }
+                //             break;
+                //         case 'company':
+                //             if (isset($brandkitData['company'])) {
+                //                 $object['text'] = $brandkitData['company'];
+                //             }
+                //             break;
+                //         case 'address':
+                //             if (isset($brandkitData['address'])) {
+                //                 $object['text'] = $brandkitData['address'];
+                //             }
+                //             break;
+                //         case 'website':
+                //             if (isset($brandkitData['website'])) {
+                //                 $object['text'] = $brandkitData['website'];
+                //             }
+                //             break;
+                //     }
+                // }
 
-                // for image replacement
-                if (isset($object['type']) && $object['type'] == 'Image' && isset($object['boxType'])) {
-                    $boxType = $object['boxType'];
-                    switch ($boxType) {
-                        case 'brandkit_logo':
-                            if (isset($brandkitData['brandkit_logo'])) {
-                                $height = $object['height'];
-                                $width = $object['width'];
-                                $base64Logo = self::imageToBase64($brandkitData['brandkit_logo'],$height,$width);
-                                $object['src'] = $base64Logo;
-                            }
-                            break;
-                    }
-                }
+                // // for image replacement
+                // if (isset($object['type']) && $object['type'] == 'Image' && isset($object['boxType'])) {
+                //     $boxType = $object['boxType'];
+                //     switch ($boxType) {
+                //         case 'brandkit_logo':
+                //             if (isset($brandkitData['brandkit_logo'])) {
+                //                 $height = $object['height'];
+                //                 $width = $object['width'];
+                //                 $base64Logo = self::imageToBase64($brandkitData['brandkit_logo'],$height,$width);
+                //                 $object['src'] = $base64Logo;
+                //             }
+                //             break;
+                //     }
+                // }
 
                 // for null replacement
                 if (isset($object['type']) && $object['type'] == 'Textbox' && $object['text'] == null) {

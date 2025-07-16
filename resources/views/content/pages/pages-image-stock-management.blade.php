@@ -190,11 +190,8 @@
                     <div class="modal-body">
                         <form id="addNewTagNameForm" class="row g-5">
                             <div class="col-12">
-                                <div class="input-group input-group-merge">
-                                    <div class="form-floating form-floating-outline">
-                                        <input id="custom_tag_name" name="custom_tag_name" class="form-control " type="text" placeholder="Enter tag name">
-                                        <label for="custom_tag_name">Tag Name</label>
-                                    </div>
+                                <div class="input-group-1">
+                                    <input id="custom_tag_name" name="custom_tag_name" class="form-control typeahead-saved-tag-search" type="text" placeholder="Enter tag name">
                                 </div>
                             </div>
                             <div class="col-12 d-flex flex-wrap justify-content-center gap-4 row-gap-4 mt-5">

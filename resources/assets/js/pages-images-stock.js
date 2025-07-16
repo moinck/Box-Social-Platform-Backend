@@ -216,6 +216,20 @@ $(function () {
             cb(matches);
         };
     };
+    var substringMatcher1 = function (strs) {
+        return function findMatches(q, cb) {
+            var matches, substrRegex;
+            matches = [];
+            substrRegex = new RegExp(q, "i");
+            $.each(strs, function (i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+            });
+
+            cb(matches);
+        };
+    };
 
     var searchTopics = [
         'first time buyer mortgages',
@@ -277,6 +291,7 @@ $(function () {
 
     if (isRtl) {
         $(".typeahead-search").attr("dir", "rtl");
+        $(".typeahead-saved-tag-search").attr("dir", "rtl");
     }
 
     // Basic
@@ -292,4 +307,31 @@ $(function () {
             source: substringMatcher(searchTopics),
         }
     );
+
+    // saved topics typeahead
+    var savedTopics = [];
+    $(document).on('click', '.save_select_images', function () {
+        $(".typeahead-saved-tag-search").val('');
+        $.ajax({
+            type: "GET",
+            url: `/stock-image-management/get/saved-topics`,
+            success: function (response) {
+                Object.entries(response.data).forEach(([key, value]) => {
+                    savedTopics.push(value);
+                });
+            },
+        });
+        $(".typeahead-saved-tag-search").typeahead(
+            {
+                hint: !isRtl,
+                highlight: true,
+                minLength: 1,
+            },
+            {
+                name: "savedTopics",
+                source: substringMatcher1(savedTopics),
+            }
+        );
+    });
+    // --------------------------------------------------------------------
 });
