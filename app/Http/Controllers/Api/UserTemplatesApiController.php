@@ -24,6 +24,7 @@ class UserTemplatesApiController extends Controller
         $user = Auth::user();
 
         $search = $request->search ?? '';
+        $category = $request->category_id ?? '';
 
         $userTemplates = UserTemplates::with('category','template.category','template.postContent')
             ->when($search, function ($query) use ($search) {
@@ -36,6 +37,9 @@ class UserTemplatesApiController extends Controller
                     })
                     ->orWhere('template_name', 'like', "%{$search}%");
                 });
+            })
+            ->when($category && $category != "", function ($query) use ($category) {
+                $query->where('category_id', Helpers::decrypt($category));
             })
             ->where('user_id', $user->id)
             ->orderBy('updated_at', 'desc')
