@@ -140,7 +140,7 @@ class TemplateApiController extends Controller
         }
     
         // Fetch the categories from DB
-        $categories = Categories::whereIn('id', $decryptedCategoryIds)->get();
+        $categories = Categories::select('id','name')->whereIn('id', $decryptedCategoryIds)->get();
     
         // Decrypt sub category and post content IDs
         $decryptedSubCategoryIds = $request->has('sub_category_ids') ? array_map([Helpers::class, 'decrypt'], $request->sub_category_ids) : [];
