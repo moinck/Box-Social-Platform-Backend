@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
+use App\Models\Categories;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -125,72 +126,69 @@ class TemplateApiController extends Controller
             'template_ids' => 'nullable|array',
             'post_content_ids' => 'nullable|array',
         ]);
-
+    
         if ($validator->fails()) {
             return $this->validationError('Validation failed', $validator->errors());
         }
-
-        $tempObj = PostTemplate::with('category:id,name')->where('status', 1);
-
-        if (!$tempObj) {
-            return $this->error('Template not found', 404);
-        }
-
-        // filter by categories
-        if ($request->has('category_ids') && $request->category_ids != []) {
+    
+        // Decrypt category IDs
+        $decryptedCategoryIds = [];
+        if ($request->has('category_ids') && !empty($request->category_ids)) {
             $decryptedCategoryIds = array_map(function ($id) {
                 return Helpers::decrypt($id);
             }, $request->category_ids);
-            $tempObj->whereIn('category_id', $decryptedCategoryIds);
         }
-
-        // filter by sub categories (include records with matching sub_category_id OR null sub_category_id)
-        if ($request->has('sub_category_ids') && $request->sub_category_ids != [] && $request->template_ids == []) {
-            $decryptedSubCategoryIds = array_map(function ($id) {
-                return Helpers::decrypt($id);
-            }, $request->sub_category_ids);
-            
-            $tempObj->where(function ($query) use ($decryptedSubCategoryIds) {
-                $query->whereIn('sub_category_id', $decryptedSubCategoryIds)
-                    ->orWhereNull('sub_category_id');
-            });
-        }
-
-        // filter by selected post contents (include records with matching post_content_id OR null post_content_id)
-        if ($request->has('post_content_ids') && $request->post_content_ids != [] && $request->template_ids == []) {
-            $decryptedPostContentIds = array_map(function ($id) {
-                return Helpers::decrypt($id);
-            }, $request->post_content_ids);
-            $tempObj->whereIn('post_content_id', $decryptedPostContentIds);
-        }
-
-        // filter by selected templates
-        if ($request->has('template_ids') && $request->template_ids != []) {
-            $decryptedTemplateIds = array_map(function ($id) {
-                return Helpers::decrypt($id);
-            }, $request->template_ids);
-            $tempObj->whereIn('id', $decryptedTemplateIds);
-        }
-
-        $tempObj = $tempObj->latest()->get();
-
+    
+        // Fetch the categories from DB
+        $categories = Categories::whereIn('id', $decryptedCategoryIds)->get();
+    
+        // Decrypt sub category and post content IDs
+        $decryptedSubCategoryIds = $request->has('sub_category_ids') ? array_map([Helpers::class, 'decrypt'], $request->sub_category_ids) : [];
+        $decryptedPostContentIds = $request->has('post_content_ids') ? array_map([Helpers::class, 'decrypt'], $request->post_content_ids) : [];
+        $decryptedTemplateIds = $request->has('template_ids') ? array_map([Helpers::class, 'decrypt'], $request->template_ids) : [];
+    
         $tempData = [];
-        foreach ($tempObj as $key => $t) {
-            $categoryName = $t->category->name ?? 'Uncategorized';
-
-            $tempData[$categoryName][] = [
-                'id' => Helpers::encrypt($t->id),
-                'category_id' => Helpers::encrypt($t->category_id),
-                'post_content_id' => Helpers::encrypt($t->post_content_id),
-                'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
-            ];
+    
+        foreach ($categories as $category) {
+            $query = PostTemplate::with('category:id,name')
+                ->where('status', 1)
+                ->where('category_id', $category->id);
+    
+            // Apply sub_category filter if needed
+            if (!empty($decryptedSubCategoryIds) && empty($decryptedTemplateIds)) {
+                $query->where(function ($q) use ($decryptedSubCategoryIds) {
+                    $q->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                        ->orWhereNull('sub_category_id');
+                });
+            }
+    
+            // Apply post_content filter if needed
+            if (!empty($decryptedPostContentIds) && empty($decryptedTemplateIds)) {
+                $query->whereIn('post_content_id', $decryptedPostContentIds);
+            }
+    
+            // Apply template_ids filter (if provided)
+            if (!empty($decryptedTemplateIds)) {
+                $query->whereIn('id', $decryptedTemplateIds);
+            }
+    
+            $templates = $query->latest()->get();
+    
+            $categoryName = $category->name ?? 'Uncategorized';
+    
+            $tempData[$categoryName] = $templates->map(function ($t) {
+                return [
+                    'id' => Helpers::encrypt($t->id),
+                    'category_id' => Helpers::encrypt($t->category_id),
+                    'post_content_id' => Helpers::encrypt($t->post_content_id),
+                    'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
+                ];
+            })->toArray();
         }
-        $data = $tempData;
-
-        if (!empty($tempObj)) {
-            return $this->success($data, 'Template Fetch successfully');
-        }
+    
+        return $this->success($tempData, 'Template fetched successfully');
     }
+    
 
     public function update(Request $request)
     {
