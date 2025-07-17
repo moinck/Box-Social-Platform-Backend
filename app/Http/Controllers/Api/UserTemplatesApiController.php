@@ -144,9 +144,16 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate, 'store');
         }
 
+        $postContentData = $userTemplate->template->postContent ?? null;
+        $postContentArray = [
+            'title' => $postContentData->title ?? null,
+            'description' => $postContentData->description ?? null,
+        ];
+
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
             'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+            'post_content_data' => $postContentArray,
         ];
 
         return $this->success($returnData, 'User template saved successfully');
@@ -171,7 +178,7 @@ class UserTemplatesApiController extends Controller
         $decyptedId = Helpers::decrypt($request->template_id);
 
         
-        $userTemplate = UserTemplates::find($decyptedId);
+        $userTemplate = UserTemplates::with('template.postContent')->find($decyptedId);
         
         if (!$userTemplate) {
             return $this->error('User template not found', 404);
@@ -199,9 +206,16 @@ class UserTemplatesApiController extends Controller
             $this->sendTemplateMail($userTemplate, 'update');
         }
 
+        $postContentData = $userTemplate->template->postContent ?? null;
+        $postContentArray = [
+            'title' => $postContentData->title ?? null,
+            'description' => $postContentData->description ?? null,
+        ];
+
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
             'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+            'post_content_data' => $postContentArray,
         ];
 
         return $this->success($returnData, 'User template updated successfully');

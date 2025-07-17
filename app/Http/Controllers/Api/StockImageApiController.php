@@ -26,6 +26,8 @@ class StockImageApiController extends Controller
         $page = $request->offset ?? 1; // treat 'offset' as page number
         $realOffset = ($page - 1) * $limit;
 
+        $totalAdminImageCount = ImageStockManagement::whereIn('user_id', $adminIds)->count();
+
         $adminImages = ImageStockManagement::select('id','image_url','tag_name')
             ->whereIn('user_id', $adminIds)
             ->when($searchQuery, function ($query) use ($searchQuery) {
@@ -107,7 +109,8 @@ class StockImageApiController extends Controller
             ->unique()
             ->toArray();
 
-        $returnData['total_admin_images'] = $adminImages->count();
+        $returnData['limit'] = $limit;
+        $returnData['total_images'] = $totalAdminImageCount;
         $returnData['page'] = $page;
         $returnData['admin'] = $adminImagesData;
         $returnData['user'] = $userImagesData;
