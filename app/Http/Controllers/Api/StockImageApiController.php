@@ -21,15 +21,19 @@ class StockImageApiController extends Controller
     {
         $adminIds = User::where('role', 'admin')->get()->pluck('id');
         $searchQuery = $request->search ?? '';
-        // $limit = $request->limit ?? 25; // default to 25 if not provided
-        // $page = $request->offset ?? 1;  // treat 'offset' as page number
-        // $realOffset = ($page - 1) * $limit;
+
+        $limit = $request->limit ?? 25; // default to 25 if not provided
+        $page = $request->offset ?? 1; // treat 'offset' as page number
+        $realOffset = ($page - 1) * $limit;
+
         $adminImages = ImageStockManagement::select('id','image_url','tag_name')
             ->whereIn('user_id', $adminIds)
             ->when($searchQuery, function ($query) use ($searchQuery) {
                 $query->where('tag_name', 'like', "%{$searchQuery}%");
             })
             ->latest()
+            ->offset($realOffset)
+            ->limit($limit)
             ->get();
 
         if ($request->bearerToken()) {
@@ -103,6 +107,8 @@ class StockImageApiController extends Controller
             ->unique()
             ->toArray();
 
+        $returnData['total_admin_images'] = $adminImages->count();
+        $returnData['page'] = $page;
         $returnData['admin'] = $adminImagesData;
         $returnData['user'] = $userImagesData;
         $returnData['searchTopics'] = $searchTopics;
