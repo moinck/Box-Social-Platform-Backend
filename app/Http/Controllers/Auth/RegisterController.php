@@ -56,8 +56,7 @@ class RegisterController extends Controller
                     ->mixedCase()
                     ->letters()
                     ->numbers()
-                    ->symbols()
-                    ->uncompromised(), // check if password was leaked in data breaches
+                    ->symbols(),
             ],
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
@@ -70,7 +69,6 @@ class RegisterController extends Controller
             'password.letters' => 'Password must contain at least one letter.',
             'password.numbers' => 'Password must contain at least one number.',
             'password.symbols' => 'Password must contain at least one symbol.',
-            'password.uncompromised' => 'Please choose a strong password for security reasons.',
         ]);
 
         $messages = [

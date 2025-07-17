@@ -224,8 +224,7 @@ class AuthApiController extends Controller
                     ->mixedCase()
                     ->letters()
                     ->numbers()
-                    ->symbols()
-                    ->uncompromised(), // for additional security
+                    ->symbols(),
             ],
             'password_confirmation' => 'required|same:password',
         ], [
@@ -235,7 +234,6 @@ class AuthApiController extends Controller
             'password.letters' => 'Password must contain at least one letter.',
             'password.numbers' => 'Password must contain at least one number.',
             'password.symbols' => 'Password must contain at least one symbol.',
-            'password.uncompromised' => 'Please choose a strong password for security reasons.',
             'password_confirmation.required' => 'Password confirmation is required.',
             'password_confirmation.same' => 'Password confirmation must match the password.',
         ]);
