@@ -100,7 +100,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'name' => 'Box Socials Premium Plan',
                 'slug' => 'box-socials-premium-plan',
                 'description' => 'Premium annual plan with comprehensive social media features',
-                'price' => 65.00,
+                'price' => 780.00,
                 'currency' => 'GBP', // Based on £65 in the image
                 'interval' => 'year',
                 'interval_count' => 1,
@@ -113,12 +113,15 @@ class SubscriptionPlanSeeder extends Seeder
                 'is_trial' => false,
                 'is_popular' => true,
                 'features' => json_encode([
+                    '£65 GBP per month (65*12 = 780 GBP)',
                     'Thousands of social media content written by financial services experts',
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
                     'Ability to create and download 40 posts a day in just a few clicks',
+                    'PFA posts such as Tax, Business Protection, Investments, Will Writing, Pensions',
                     'Gain first access to no extra charge future developments',
-                    'Additional Topics such as Commercial Finance, Bridging Finance, second charges',
+                    'Additional Topics such as Commercial Finance, Bridging Finance, Second Charges',
+                    'AI Compliance checked social media content',
                     'Built-in scheduling tool for social media accounts',
                     'Content suitable for various platforms (Twitter & WhatsApp)',
                     '3 day free trial included'

@@ -143,9 +143,12 @@ class TemplateApiController extends Controller
         $categories = Categories::select('id','name')->whereIn('id', $decryptedCategoryIds)->get();
     
         // Decrypt sub category and post content IDs
-        $decryptedSubCategoryIds = $request->has('sub_category_ids') ? array_map([Helpers::class, 'decrypt'], $request->sub_category_ids) : [];
-        $decryptedPostContentIds = $request->has('post_content_ids') ? array_map([Helpers::class, 'decrypt'], $request->post_content_ids) : [];
-        $decryptedTemplateIds = $request->has('template_ids') ? array_map([Helpers::class, 'decrypt'], $request->template_ids) : [];
+        $decryptedSubCategoryIds = $request->has('sub_category_ids') && !empty($request->sub_category_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->sub_category_ids) : [];
+        $decryptedPostContentIds = $request->has('post_content_ids') && !empty($request->post_content_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->post_content_ids) : [];
+        $decryptedTemplateIds = $request->has('template_ids') && !empty($request->template_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->template_ids) : [];
     
         $tempData = [];
     
