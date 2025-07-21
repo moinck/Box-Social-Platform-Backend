@@ -68,15 +68,15 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::beginTransaction();
 
-            // Create pending subscription in DB
+            // Create incomplete subscription in DB
             $newSubscription = new UserSubscription();
             $newSubscription->user_id = $userId;
             $newSubscription->plan_id = $planId;
             $newSubscription->stripe_customer_id = $userStripeCustomerId;
             $newSubscription->stripe_price_id = $subscriptionPlanDetail->stripe_price_id;
-            $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit;
-            $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit;
-            $newSubscription->status = 'pending'; // Important: Set as pending
+            $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit ?? 0;
+            $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit ?? 0;
+            $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
             $encyptedId = Helpers::encrypt($newSubscription->id);
@@ -122,7 +122,7 @@ class UserSubscriptionNewApiController extends Controller
             Log::error('Subscription create error: ' . $e->getMessage(), ['function' => 'subscribe', 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'status' => false,
-                'message' => 'Failed to create subscription: ' . $e->getMessage()
+                'message' => 'Oops!Failed to create subscription'
             ], 500);
         }
     }
@@ -146,9 +146,11 @@ class UserSubscriptionNewApiController extends Controller
                 return redirect(config('app.frontend_url') . '/subscription/error?message=Payment not completed');
             }
 
+            $descyptedSubscriptionId = Helpers::decrypt($subscriptionId);
+
             DB::beginTransaction();
 
-            $userSubscription = UserSubscription::find(Helpers::decrypt($subscriptionId));
+            $userSubscription = UserSubscription::find($descyptedSubscriptionId);
             
             if (!$userSubscription || $userSubscription->stripe_checkout_session_id !== $sessionId) {
                 return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid subscription');
@@ -156,25 +158,30 @@ class UserSubscriptionNewApiController extends Controller
 
             // Get subscription details from Stripe
             $stripeSubscription = $session->subscription;
+
+            $subscriptionItem = $stripeSubscription->items->data[0] ?? null;
+            $trailStart = $stripeSubscription->trial_start;
+            
+
+            if ($subscriptionItem) {
+                $userSubscription->current_period_start = date('Y-m-d H:i:s', $subscriptionItem->current_period_start);
+                $userSubscription->current_period_end = date('Y-m-d H:i:s', $subscriptionItem->current_period_end);
+            }
             
             // Update subscription with Stripe data
             $userSubscription->stripe_subscription_id = $stripeSubscription->id;
             $userSubscription->stripe_status = $stripeSubscription->status;
             $userSubscription->status = 'active';
-            $userSubscription->current_period_start = date('Y-m-d H:i:s', $stripeSubscription->current_period_start);
-            $userSubscription->current_period_end = date('Y-m-d H:i:s', $stripeSubscription->current_period_end);
             $userSubscription->amount_paid = $session->amount_total / 100; // Convert from cents
-            $userSubscription->currency = $session->currency;
+            $userSubscription->currency = $session->currency;            
+            $userSubscription->trial_start = date('Y-m-d H:i:s', $trailStart);         
             
             if (!empty($stripeSubscription->default_payment_method)) {
                 $userSubscription->stripe_payment_method_id = $stripeSubscription->default_payment_method;
             }
 
-            $userSubscription->response_meta = json_encode([
-                'session_id' => $sessionId,
-                'customer_email' => $session->customer_details->email ?? null,
-                'payment_intent' => $session->payment_intent ?? null
-            ]);
+            // store full response from stripe
+            $userSubscription->response_meta = json_encode($session, JSON_PRETTY_PRINT);
             
             $userSubscription->save();
 
@@ -199,7 +206,7 @@ class UserSubscriptionNewApiController extends Controller
             
             if ($subscriptionId) {
                 $userSubscription = UserSubscription::find(Helpers::decrypt($subscriptionId));
-                if ($userSubscription && $userSubscription->status === 'pending') {
+                if ($userSubscription && $userSubscription->status === 'incomplete') {
                     $userSubscription->status = 'cancelled';
                     $userSubscription->stripe_status = 'canceled';
                     $userSubscription->save();
@@ -256,7 +263,7 @@ class UserSubscriptionNewApiController extends Controller
 
         $customer = $this->stripe->customers->create([
             'email' => $user->email,
-            'name' => $user->name,
+            'name' => $user->first_name . ' ' . $user->last_name,
             'metadata' => [
                 'user_id' => $user->id
             ]
@@ -306,5 +313,47 @@ class UserSubscriptionNewApiController extends Controller
             $subscription->ends_at = now();
             $subscription->save();
         }
+    }
+
+
+    public function getCurrentSubscription()
+    {
+        $subscription = UserSubscription::with('plan:id,name,price')
+            ->where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->first();
+
+        $planDetails = [];
+        if($subscription){
+            $planDetails = [
+                'id' => Helpers::encrypt($subscription->plan->id),
+                'name' => $subscription->plan->name,
+                'price' => $subscription->plan->price,
+            ];
+        }
+            
+        $returnData = [];
+        if($subscription){
+            $returnData = [
+                'id' => Helpers::encrypt($subscription->id),
+                'user_id' => $subscription->user_id,
+                'status' => $subscription->status,
+                'amount_paid' => $subscription->amount_paid,
+                'currency' => $subscription->currency,
+                'current_period_start' => $subscription->current_period_start,
+                'current_period_end' => $subscription->current_period_end,
+                'total_download_limit' => $subscription->total_download_limit,
+                'daily_download_limit' => $subscription->daily_download_limit,
+                'download_used_today' => $subscription->downloads_used_today ?? 0,
+                'remaining_download_limit' => abs($subscription->daily_download_limit - ($subscription->downloads_used_today ?? 0)),
+                'plan_details' => $planDetails,
+            ];
+        }
+        // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);
+        return response()->json([
+            'status' => true,
+            'data' => $returnData,
+            'stripe_subscription' => []
+        ]);
     }
 }
