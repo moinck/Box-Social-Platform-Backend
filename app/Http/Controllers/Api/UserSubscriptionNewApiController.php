@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Helpers\Helpers;
@@ -9,11 +9,12 @@ use Stripe\StripeClient;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserSubscription;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class UserSubscriptionApiController extends Controller
+class UserSubscriptionNewApiController extends Controller
 {
     private $stripe;
 
