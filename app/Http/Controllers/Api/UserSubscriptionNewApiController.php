@@ -121,6 +121,7 @@ class UserSubscriptionNewApiController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Subscription create error: ' . $e->getMessage(), ['function' => 'subscribe', 'trace' => $e->getTraceAsString()]);
+            Helpers::sendErrorMailToDeveloper($e);
             return response()->json([
                 'status' => false,
                 'message' => 'Oops!Failed to create subscription'
@@ -151,7 +152,7 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::beginTransaction();
 
-            $userSubscription = UserSubscription::find($descyptedSubscriptionId);
+            $userSubscription = UserSubscription::with('plan:id,name,price')->find($descyptedSubscriptionId);
             
             if (!$userSubscription || $userSubscription->stripe_checkout_session_id !== $sessionId) {
                 return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid subscription');
@@ -192,7 +193,7 @@ class UserSubscriptionNewApiController extends Controller
             // create new payments record
             $newPayment = new Payments();
             $newPayment->user_id = $userSubscription->user_id;
-            $newPayment->plan_name = $userSubscription->plan_name;
+            $newPayment->plan_name = $userSubscription->plan->name ?? "Subscription Plan";
             $newPayment->status = 'completed';
             $newPayment->amount = $session->amount_total / 100;
             $newPayment->currency =  $session->currency ?? 'GBP';
@@ -203,12 +204,21 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::commit();
 
-            return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
+            // return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
+            return response()->json([
+                'status' => true,
+                'message' => 'Subscription Created successfully',
+            ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Subscription success error: ' . $e->getMessage(),['function' => 'success', 'data' => $e->getTraceAsString()]);
-            return redirect(config('app.frontend_url') . '/subscription/error?message=Processing failed');
+            Helpers::sendErrorMailToDeveloper($e);
+            // return redirect(config('app.frontend_url') . '/subscription/error?message=Processing failed');
+            return response()->json([
+                'status' => false,
+                'message' => 'Subscription creation failed',
+            ]);
         }
     }
 
@@ -226,11 +236,20 @@ class UserSubscriptionNewApiController extends Controller
                 }
             }
 
-            return redirect(config('app.frontend_url') . '/subscription/cancelled');
+            // return redirect(config('app.frontend_url') . '/subscription/cancelled');
+            return response()->json([
+                'status' => true,
+                'message' => 'Subscription cancelled successfully',
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
-            return redirect(config('app.frontend_url') . '/subscription/error?message=Cancellation failed');
+            // return redirect(config('app.frontend_url') . '/subscription/error?message=Cancellation failed');
+            Helpers::sendErrorMailToDeveloper($e);
+            return response()->json([
+                'status' => false,
+                'message' => 'Subscription cancellation failed',
+            ]);
         }
     }
 
