@@ -341,7 +341,6 @@ class UserSubscriptionNewApiController extends Controller
             $planDetails = [
                 'id' => Helpers::encrypt($subscription->plan->id),
                 'name' => $subscription->plan->name,
-                'price' => $subscription->plan->price,
             ];
         }
             
@@ -349,12 +348,11 @@ class UserSubscriptionNewApiController extends Controller
         if($subscription){
             $returnData = [
                 'id' => Helpers::encrypt($subscription->id),
-                'user_id' => $subscription->user_id,
                 'status' => $subscription->status,
                 'amount_paid' => $subscription->amount_paid,
                 'currency' => $subscription->currency,
-                'current_period_start' => $subscription->current_period_start,
-                'current_period_end' => $subscription->current_period_end,
+                'current_period_start' => date("Y-m-d",strtotime($subscription->current_period_start)),
+                'current_period_end' => date("Y-m-d",strtotime($subscription->current_period_end)),
                 'total_download_limit' => $subscription->total_download_limit,
                 'daily_download_limit' => $subscription->daily_download_limit,
                 'download_used_today' => $subscription->downloads_used_today ?? 0,
