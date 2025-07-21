@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Http\Controllers\Controller;
+use App\Models\Payments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -187,6 +188,18 @@ class UserSubscriptionNewApiController extends Controller
 
             // Reset usage counters for new subscription
             // $userSubscription->resetUsageCounters();
+
+            // create new payments record
+            $newPayment = new Payments();
+            $newPayment->user_id = $userSubscription->user_id;
+            $newPayment->plan_name = $userSubscription->plan_name;
+            $newPayment->status = 'completed';
+            $newPayment->amount = $session->amount_total / 100;
+            $newPayment->currency =  $session->currency ?? 'GBP';
+            $newPayment->payment_type = 'subscription';
+            $newPayment->payment_method = $session->payment_settings->payment_method_types[0] ?? 'card';
+            $newPayment->stripe_payment_intent_id = $session->payment_intent ?? ($userSubscription->stripe_payment_method_id ?? null);
+            $newPayment->save();
 
             DB::commit();
 
