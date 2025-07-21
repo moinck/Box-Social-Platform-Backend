@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
+use App\Http\Controllers\Api\UserSubscriptionController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
 use App\Http\Controllers\Api\UserTemplatesApiController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -87,6 +88,8 @@ Route::group([
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
         Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
 
+        // user subscription api
+        Route::post('/user-subscription/subscribe', [UserSubscriptionController::class, 'subscribe']);
 
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);

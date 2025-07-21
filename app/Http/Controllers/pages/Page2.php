@@ -46,7 +46,7 @@ class Page2 extends Controller
     // make test function to send mail
     public function testMail()
     {
-        $user = User::find(4);
+        $user = User::find(1);
         $verification_link = "www.youtube.com";
         // Mail::to($user->email)->send(new RegisterVerificationMail($verification_link));
         // $token = Helpers::sendVerificationMail($user,$verification_link);
