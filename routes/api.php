@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
+use App\Http\Controllers\Api\UserSubscriptionApiController;
 use App\Http\Controllers\Api\UserSubscriptionController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
 use App\Http\Controllers\Api\UserTemplatesApiController;
@@ -89,7 +90,7 @@ Route::group([
         Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
 
         // user subscription api
-        Route::post('/user-subscription/subscribe', [UserSubscriptionController::class, 'subscribe']);
+        Route::post('/user-subscription/subscribe', [UserSubscriptionApiController::class, 'subscribe']);
 
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
@@ -117,3 +118,10 @@ Route::post('/post-content/get/category', [PostContentApiController::class, 'get
 
 // get stock image
 Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+
+// Public routes (no authentication required - for Stripe redirects)
+Route::get('/user-subscription/success', [UserSubscriptionApiController::class, 'success']);
+Route::get('/user-subscription/cancel', [UserSubscriptionApiController::class, 'cancel']);
+
+// Webhook route (no authentication, but signature verification)
+Route::post('/stripe/webhook', [UserSubscriptionApiController::class, 'webhook']);

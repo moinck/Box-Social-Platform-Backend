@@ -27,8 +27,8 @@ class SubscriptionPlanSeeder extends Seeder
                 'trial_period_days' => 3,
                 'daily_download_limit' => null,
                 'total_download_limit' => 3,
-                'stripe_price_id' => null,
-                'stripe_product_id' => null,
+                'stripe_price_id' => 'price_1RZWqLR0DcXT6U52RNFuFUkY',
+                'stripe_product_id' => 'prod_SUVsWY6A37Y6CS',
                 'is_active' => true,
                 'is_trial' => true,
                 'is_popular' => false,
@@ -107,8 +107,8 @@ class SubscriptionPlanSeeder extends Seeder
                 'trial_period_days' => 3, // Free 3 day trial mentioned
                 'daily_download_limit' => 40, // Based on "40 posts a day" feature
                 'total_download_limit' => null,
-                'stripe_price_id' => 'price_box_socials_premium', // Replace with actual Stripe price ID
-                'stripe_product_id' => 'prod_box_socials_premium', // Replace with actual Stripe product ID
+                'stripe_price_id' => 'price_1Rm6spR0DcXT6U527MVUtt9v', // Replace with actual Stripe price ID
+                'stripe_product_id' => 'prod_ShVuLFcw5okX2y', // Replace with actual Stripe product ID
                 'is_active' => true,
                 'is_trial' => false,
                 'is_popular' => true,

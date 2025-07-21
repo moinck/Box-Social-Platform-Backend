@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Stripe\StripeClient;
 
-class UserSubscriptionController extends Controller
+class UserSubscriptionApiController extends Controller
 {
 
+    
 }
