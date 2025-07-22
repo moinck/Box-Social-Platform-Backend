@@ -275,7 +275,7 @@ div.font-icon-btns {
 .ql-insert-phone {
     width: max-content !important;
 }
-.ql-insert-description {
+.ql-insert-website {
     width: max-content !important;
 }
 .ql-insert-name::before {
@@ -303,8 +303,8 @@ div.font-icon-btns {
     border-radius: 10px !important;
     background-color: #F4D106 !important;
 }
-.ql-insert-description::before {
-    content: "Description";
+.ql-insert-website::before {
+    content: "Website";
     /* to add custom icon */
     /* content: "\1F4DD"; */
     padding: 5px;
