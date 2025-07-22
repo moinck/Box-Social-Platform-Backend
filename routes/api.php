@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
+use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
 use App\Http\Controllers\Api\UserSubscriptionNewApiController;
@@ -92,6 +93,9 @@ Route::group([
         Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
         Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
+
+        // subscription plan api
+        Route::get('/subscription-plan/list', [SubscriptionPlanApiController::class, 'list']);
 
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
