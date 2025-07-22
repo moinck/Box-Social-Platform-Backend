@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
         // users subscription routes
         Route::get('/subscription-management', [UserSubscriptionController::class, 'index'])->name('subscription-management');
         Route::get('/subscription-management/datatable', [UserSubscriptionController::class, 'dataTable'])->name('subscription-management.data-table');
+        Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
         
         

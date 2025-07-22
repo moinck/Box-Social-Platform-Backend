@@ -17,7 +17,7 @@
         {
             "url": "/subscription-management",
             "name": "Subscription Management",
-            "icon": "menu-icon tf-icons ri-store-3-line",
+            "icon": "menu-icon tf-icons ri-suitcase-3-line",
             "slug": "subscription-management",
             "role": ["admin"]
         },

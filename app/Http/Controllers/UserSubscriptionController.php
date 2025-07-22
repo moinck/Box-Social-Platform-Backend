@@ -53,8 +53,12 @@ class UserSubscriptionController extends Controller
             })
             ->addColumn('action', function ($subscription) {
                 $id = Helpers::encrypt($subscription->id);
+                $showRoute = route('subscription-management.show',$id);
 
                 return '
+                    <a href="' . $showRoute . '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Show">
+                        <i class="ri-eye-line"></i>
+                    </a>
                     <a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                         <i class="ri-delete-bin-line"></i>
                     </a>
@@ -62,5 +66,14 @@ class UserSubscriptionController extends Controller
             })
             ->rawColumns(['user', 'plan', 'status', 'start_date', 'end_date', 'created_date', 'updated_date', 'action'])
             ->make(true);
+    }
+
+    public function show($id)
+    {
+        $decyptId = Helpers::decrypt($id);
+
+        $subscriptionData = UserSubscription::with('user:id,first_name,last_name','plan:id,name,price,features,currency')->findOrFail($decyptId);
+
+        return view('content.pages.user-subscription.show', compact('subscriptionData'));
     }
 }
