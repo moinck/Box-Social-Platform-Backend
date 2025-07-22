@@ -148,9 +148,10 @@ class PostContentApiController extends Controller
 
         $categoryId = $request->category_id;
         $subCategoryId = $request->sub_category_id;
-        $postContent = PostContent::where(function ($query) use ($categoryId, $subCategoryId) {
-            $query->where('category_id', Helpers::decrypt($categoryId))
-                ->where('sub_category_id', Helpers::decrypt($subCategoryId));
+        $postContent = PostContent::when($categoryId, function ($query) use ($categoryId) {
+            return $query->where('category_id', Helpers::decrypt($categoryId));
+        })->when($subCategoryId, function ($query) use ($subCategoryId) {
+            return $query->where('sub_category_id', Helpers::decrypt($subCategoryId));
         })->get();
 
         if (!$postContent) {
