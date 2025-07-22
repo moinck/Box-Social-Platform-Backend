@@ -103,7 +103,7 @@
                                         </span>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block">Renewal Date</small>
+                                        <small class="text-muted d-block">End Date</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
                                                 {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}

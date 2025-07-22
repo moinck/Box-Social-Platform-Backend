@@ -414,6 +414,7 @@ class UserSubscriptionNewApiController extends Controller
         $userSubscription->status = 'active';
         $userSubscription->amount_paid = 0;
         $userSubscription->currency = 'GBP';
+        $userSubscription->total_download_limit = 3;
         $userSubscription->current_period_start = now();
         $userSubscription->current_period_end = now()->addDays(3);
         $userSubscription->trial_start = now();
