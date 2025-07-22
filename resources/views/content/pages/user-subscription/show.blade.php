@@ -27,13 +27,13 @@
                             <ul
                                 class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-4">
                                 <li class="list-inline-item">
-                                    <i class="ri-user-line me-2 ri-24px"></i>
-                                    <span class="fw-medium">{{ $subscriptionData->user->role }}</span>
+                                    <i class="ri-mail-check-fill me-2 ri-24px"></i>
+                                    <span class="fw-medium">{{ $subscriptionData->user->email }}</span>
                                 </li>
                                 <li class="list-inline-item">
                                     <i class="ri-calendar-line me-2 ri-24px"></i>
                                     <span class="fw-medium">Joined |
-                                        {{ $subscriptionData->created_at->format('d F Y') }}</span>
+                                        {{ $subscriptionData->user->created_at->format('d F Y') }}</span>
                                 </li>
                             </ul>
 

@@ -54,13 +54,13 @@ class UserSubscriptionController extends Controller
             ->addColumn('action', function ($subscription) {
                 $id = Helpers::encrypt($subscription->id);
                 $showRoute = route('subscription-management.show',$id);
+                $deleteBtn = '<a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+                        <i class="ri-delete-bin-line"></i>
+                    </a>';
 
                 return '
                     <a href="' . $showRoute . '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Show">
                         <i class="ri-eye-line"></i>
-                    </a>
-                    <a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
-                        <i class="ri-delete-bin-line"></i>
                     </a>
                 ';
             })
@@ -72,7 +72,7 @@ class UserSubscriptionController extends Controller
     {
         $decyptId = Helpers::decrypt($id);
 
-        $subscriptionData = UserSubscription::with('user:id,first_name,last_name','plan:id,name,price,features,currency')->findOrFail($decyptId);
+        $subscriptionData = UserSubscription::with('user:id,first_name,last_name,email,created_at','plan:id,name,price,features,currency')->findOrFail($decyptId);
 
         return view('content.pages.user-subscription.show', compact('subscriptionData'));
     }
