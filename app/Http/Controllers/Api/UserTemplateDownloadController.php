@@ -12,6 +12,7 @@ use PhpOffice\PhpWord\IOFactory;
 use App\Models\PostTemplate;
 use App\Helpers\Helpers;
 use App\Models\BrandKit;
+use App\Models\UserSubscription;
 
 class UserTemplateDownloadController extends Controller
 {
@@ -171,6 +172,12 @@ class UserTemplateDownloadController extends Controller
         $filename = $userTemplate->template_name . '-document-' . time() . '.docx';
 
         unlink($imagePath);
+
+        // UPDATE DOWNLOAD LIMIT
+        $userSubscription = UserSubscription::where('user_id', $userTemplate->user_id)->where('status', 'active')->first();
+        if (!empty($userSubscription)) {
+            $userSubscription->updateDailyDownloadLimit();
+        }
         
         // Return the file as a download response
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);

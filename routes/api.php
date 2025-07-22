@@ -93,6 +93,7 @@ Route::group([
         Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
         Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
+        Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
 
         // subscription plan api
         Route::get('/subscription-plan/list', [SubscriptionPlanApiController::class, 'list']);
