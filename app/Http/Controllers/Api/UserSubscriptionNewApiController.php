@@ -386,4 +386,35 @@ class UserSubscriptionNewApiController extends Controller
             'stripe_subscription' => []
         ]);
     }
+
+    public function cancelSubscription()
+    {
+        $authUser = Auth::user();
+        $subscription = UserSubscription::where('user_id', $authUser->id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($subscription) {
+            $subscription->status = 'cancelled';
+            $subscription->stripe_status = 'canceled';
+            $subscription->cancelled_at = now();
+            $subscription->ends_at = now();
+            $subscription->save();
+
+            $cancelationDetail = [
+                'user_id' => $authUser->id,
+                'subscription_id' => $subscription->id,
+                'cancelation_reason' => 'User requested cancellation',
+                'cancelation_date' => now(),
+            ];
+
+            $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Subscription cancelled successfully',
+        ]);
+    }
+    
 }

@@ -91,6 +91,7 @@ Route::group([
         // user subscription api
         Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
+        Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
 
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
