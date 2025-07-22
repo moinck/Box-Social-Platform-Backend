@@ -171,7 +171,7 @@
                 [
                     {'insert-name': 'Name'},
                     {'insert-phone': 'Phone'},
-                    // {'insert-description': 'Description'}
+                    {'insert-website': 'Website'},
                 ],
                 ['clean']
             ];
@@ -192,11 +192,11 @@
                             'insert-phone': function() {
                                 const cursorPosition = this.quill.getSelection().index;
                                 this.quill.insertText(cursorPosition, '|phone|');
-                                this.quill.setSelection(cursorPosition + 6);
+                                this.quill.setSelection(cursorPosition + 7);
                             },
-                            'insert-description': function() {
+                            'insert-website': function() {
                                 const cursorPosition = this.quill.getSelection().index;
-                                this.quill.insertText(cursorPosition, '|description|');
+                                this.quill.insertText(cursorPosition, '|website|');
                                 this.quill.setSelection(cursorPosition + 13);
                             }
                         }
@@ -206,6 +206,7 @@
             });
             $('.ql-insert-name').attr('title', 'Click to insert Name');
             $('.ql-insert-phone').attr('title', 'Click to insert Phone');
+            $('.ql-insert-website').attr('title', 'Click to insert Website');
             // update hidden post description
             createPostDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);

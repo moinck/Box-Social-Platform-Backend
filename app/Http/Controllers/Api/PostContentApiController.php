@@ -139,6 +139,7 @@ class PostContentApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'category_id' => 'nullable|string',
+            'sub_category_id' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -146,7 +147,13 @@ class PostContentApiController extends Controller
         }
 
         $categoryId = $request->category_id;
-        $postContent = PostContent::where('category_id', Helpers::decrypt($categoryId))->get();
+        $subCategoryId = $request->sub_category_id;
+        $postContent = PostContent::when($categoryId, function ($query) use ($categoryId) {
+            return $query->where('category_id', Helpers::decrypt($categoryId));
+        })->when($subCategoryId, function ($query) use ($subCategoryId) {
+            return $query->where('sub_category_id', Helpers::decrypt($subCategoryId));
+        })->get();
+
         if (!$postContent) {
             return $this->error('Post content not found', 404);
         }

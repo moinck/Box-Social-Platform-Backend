@@ -11,15 +11,22 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use App\Models\PostTemplate;
 use App\Helpers\Helpers;
+use App\Models\BrandKit;
 
 class UserTemplateDownloadController extends Controller
 {
     public function downloadDocument($id)
     {
         $id = Helpers::decrypt($id);
-        $userTemplate = UserTemplates::select('id','template_id','category_id','template_name','template_image')
+        $userTemplate = UserTemplates::select('id','template_id','category_id','template_name','template_image','user_id')
             ->with('template.postContent','category:id,name')
             ->find($id);
+        
+        // get user brandkit data
+        $brnadKitData = BrandKit::select(['id','company_name','email','phone','website'])
+            ->where('user_id', $userTemplate->user_id)
+            ->first()
+            ->toArray();
         
         if (!$userTemplate) {
             return response()->json([
@@ -31,10 +38,15 @@ class UserTemplateDownloadController extends Controller
         $mainTemplateData = $userTemplate->template ?? null;
         $postContentData = $mainTemplateData->postContent ?? null;
 
+        $updatedDescription = null;
+        if (!empty($postContentData->description)) {
+            $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'], [$brnadKitData['company_name'] ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''], $postContentData->description);
+        }
+
         $writtenData = [
             "title" => $postContentData->title ?? $userTemplate->template_name,
             "category_name" => $userTemplate->category->name ?? 'Uncategorized',
-            "description" => $postContentData->description ?? "No description provided",
+            "description" => $updatedDescription ?? "No description provided",
             "warning_message" => $postContentData->warning_message ?? "No warning message provided",
         ];
     

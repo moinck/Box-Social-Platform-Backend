@@ -686,13 +686,14 @@ class Helpers
         ];
 
         $view = view('content.email.error-report-email', compact('newErrorData'))->render();
-        
-        // send mail to developer
-        Mail::send([], [], function ($message) use ($view) {
-            $message->html($view);
-            $message->to('pratikdev.iihglobal@gmail.com');
-            $message->subject('New Error Report');
-        });
+        if (env('APP_ENV') != 'local') {
+            // send mail to developer
+            Mail::send([], [], function ($message) use ($view) {
+                $message->html($view);
+                $message->to('pratikdev.iihglobal@gmail.com');
+                $message->subject('New Error Report');
+            });
+        }
     }
 
     /**

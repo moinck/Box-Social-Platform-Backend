@@ -177,6 +177,15 @@ class RegisterController extends Controller
             ], 404);
         }
 
+        // check user is verified
+        // if (!$user->hasVerifiedEmail()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Your Account is not verified. Please verify your email first.',
+        //         'data' => []
+        //     ], 403);
+        // }
+
         // check account status
         if ($user->status != 'active') {
             return response()->json([
