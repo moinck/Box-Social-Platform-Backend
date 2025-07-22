@@ -38,7 +38,7 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         try {
-            $userId = Auth::id();
+            $userId = 9;
             $user = User::find($userId);
 
             // Check for existing active subscription
@@ -80,6 +80,23 @@ class UserSubscriptionNewApiController extends Controller
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
+            if ($subscriptionPlanDetail->slug == 'free-trial') {
+                $this->createFreeTrialSubscription($userId,$newSubscription->id);
+
+                DB::commit();
+
+                // return success response
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Subscription created successfully',
+                    'data' => [
+                        'subscription_plan' => 'free-trial',
+                        'subscription_id' => Helpers::encrypt($newSubscription->id),
+                        'subscription_status' => $newSubscription->status
+                    ]
+                ]);
+            }
+
             $encyptedId = Helpers::encrypt($newSubscription->id);
 
             $successUrl = url(config('app.frontend_url') . '/user-subscription/success') . '?session_id={CHECKOUT_SESSION_ID}&subscription_id=' . $encyptedId;
@@ -113,6 +130,7 @@ class UserSubscriptionNewApiController extends Controller
                 'status' => true,
                 'message' => 'Checkout session created successfully',
                 'data' => [
+                    'subscription_plan' => 'premium-plan',
                     'checkout_url' => $checkoutSession->url,
                     'session_id' => $checkoutSession->id
                 ]
@@ -387,6 +405,24 @@ class UserSubscriptionNewApiController extends Controller
         ]);
     }
 
+    /**
+     * Create free trial subscription
+     */
+    private function createFreeTrialSubscription($userId,$subscriptionId)
+    {
+        $userSubscription = UserSubscription::find($subscriptionId);
+        $userSubscription->status = 'active';
+        $userSubscription->amount_paid = 0;
+        $userSubscription->currency = 'GBP';
+        $userSubscription->current_period_start = now();
+        $userSubscription->current_period_end = now()->addDays(3);
+        $userSubscription->trial_start = now();
+        $userSubscription->trial_end = now()->addDays(3);
+        $userSubscription->save();
+
+        return true;
+    }
+
     public function cancelSubscription()
     {
         $authUser = Auth::user();
@@ -395,20 +431,31 @@ class UserSubscriptionNewApiController extends Controller
             ->first();
 
         if ($subscription) {
-            $subscription->status = 'cancelled';
-            $subscription->stripe_status = 'canceled';
-            $subscription->cancelled_at = now();
-            $subscription->ends_at = now();
-            $subscription->save();
 
-            $cancelationDetail = [
-                'user_id' => $authUser->id,
-                'subscription_id' => $subscription->id,
-                'cancelation_reason' => 'User requested cancellation',
-                'cancelation_date' => now(),
-            ];
-
-            $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
+            // get plan detais
+            $plan = SubscriptionPlans::where('id', $subscription->plan_id)->first();
+            if ($plan->slug == 'free-trial') {
+                $subscription->status = 'cancelled';
+                $subscription->stripe_status = 'canceled';
+                $subscription->cancelled_at = now();
+                $subscription->ends_at = now();
+                $subscription->save();
+            }else{
+                $subscription->status = 'cancelled';
+                $subscription->stripe_status = 'canceled';
+                $subscription->cancelled_at = now();
+                $subscription->ends_at = now();
+                $subscription->save();
+                
+                $cancelationDetail = [
+                    'user_id' => $authUser->id,
+                    'subscription_id' => $subscription->id,
+                    'cancelation_reason' => 'User requested cancellation',
+                    'cancelation_date' => now(),
+                ];
+    
+                $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
+            }
         }
 
         return response()->json([
