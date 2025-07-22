@@ -38,7 +38,7 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         try {
-            $userId = 9;
+            $userId = Auth::user()->id;
             $user = User::find($userId);
 
             // Check for existing active subscription
