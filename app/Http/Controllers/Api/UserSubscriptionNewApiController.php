@@ -222,11 +222,11 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::commit();
 
-            // return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
-            return response()->json([
-                'status' => true,
-                'message' => 'Subscription Created successfully',
-            ]);
+            return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Subscription Created successfully',
+            // ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -254,11 +254,11 @@ class UserSubscriptionNewApiController extends Controller
                 }
             }
 
-            // return redirect(config('app.frontend_url') . '/subscription/cancelled');
-            return response()->json([
-                'status' => true,
-                'message' => 'Subscription cancelled successfully',
-            ]);
+            return redirect(config('app.frontend_url') . '/subscription/cancelled');
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Subscription cancelled successfully',
+            // ]);
 
         } catch (\Exception $e) {
             Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
