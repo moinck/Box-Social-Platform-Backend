@@ -13,6 +13,8 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\IconManagementController;
+use App\Http\Controllers\IconMangementsController;
 use App\Http\Controllers\ImageStockManagementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostContentController;
@@ -83,6 +85,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
         
+        // icon management controller
+        Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');
+        Route::post('/icon-management/store', [IconManagementController::class, 'store'])->name('icon-management.store');
+        Route::get('/icon-management/datatable', [IconManagementController::class, 'dataTable'])->name('icon-management.data-table');
+        Route::get('/icon-management/edit/{id}', [IconManagementController::class, 'edit'])->name('icon-management.edit');
+        Route::post('/icon-management/update', [IconManagementController::class, 'update'])->name('icon-management.update');
+        Route::post('/icon-management/delete', [IconManagementController::class, 'destroy'])->name('icon-management.delete');
         
         // categories controller
         Route::get('/categories', [CategoriesController::class, 'index'])->name('categories');
