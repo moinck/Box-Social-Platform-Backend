@@ -209,6 +209,54 @@ class AuthApiController extends Controller
 
     }
 
+    public function resendForgetPassword(Request $request)
+    {
+        $validator = Validator::make([
+            'email' => $request->email
+        ], [
+            'email' => 'required|email|exists:users,email'
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->validationError('Invalid email', $validator->errors());
+        }
+    
+        $user = User::where('email', $request->email)->first();
+    
+        if (!$user) {
+            return $this->error('Invalid email id', 404);
+        }
+    
+        // Check if a recent token exists within last 5 minutes
+        $recentToken = UserTokens::where([
+            'user_id' => $user->id,
+            'type' => 'forget-password'
+        ])
+        ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+        ->latest()
+        ->first();
+    
+        if ($recentToken) {
+            return $this->error('You can only resend a password reset email after 5 minutes.', 429);
+        }
+    
+        // Invalidate all previous tokens
+        UserTokens::where([
+            'user_id' => $user->id,
+            'type' => 'forget-password'
+        ])->update(['is_used' => true]);
+    
+        // Generate and send new token
+        $token = Helpers::generateVarificationToken($user, $request, 'forget-password');
+        $encyptedToken = Helpers::encrypt($token);
+        Mail::to($user->email)->send(new ForgetPasswordMail($encyptedToken, $user));
+    
+        return $this->success([
+            'verification_token' => $encyptedToken
+        ], 'Password reset email resent successfully');
+    }
+    
+
     public function resetPassword(Request $request)
     {
         $validator = Validator::make([
