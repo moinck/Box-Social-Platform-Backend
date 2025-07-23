@@ -15,6 +15,13 @@
             "role": ["admin","customer"]
         },
         {
+            "url": "/subscription-management",
+            "name": "Subscription Management",
+            "icon": "menu-icon tf-icons ri-suitcase-3-line",
+            "slug": "subscription-management",
+            "role": ["admin"]
+        },
+        {
             "url": "/stock-image-management",
             "name": "Stock Image Management",
             "icon": "menu-icon tf-icons ri-folder-image-line",

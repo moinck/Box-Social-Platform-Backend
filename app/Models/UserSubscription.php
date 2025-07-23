@@ -53,4 +53,11 @@ class UserSubscription extends Model
     {
         return $this->belongsTo(SubscriptionPlans::class);
     }
+
+    // UPDATE DAILY DOWNLOAD LIMIT
+    public function updateDailyDownloadLimit()
+    {
+        $this->downloads_used_today = $this->downloads_used_today + 1;
+        $this->save();
+    }
 }

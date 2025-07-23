@@ -20,6 +20,7 @@ use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileManagementController;
 use App\Http\Controllers\ProjectTestController;
 use App\Http\Controllers\TermsAndConditionController;
+use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
 
 Route::middleware('guest')->group(function () {
@@ -75,6 +76,13 @@ Route::middleware('auth')->group(function () {
     Route::middleware('checkRole:admin')->group(function () {
         // subscription plan
         Route::get('/subscription-plan', [SubscriptionPlansController::class, 'index'])->name('subscription-plan');
+
+        // users subscription routes
+        Route::get('/subscription-management', [UserSubscriptionController::class, 'index'])->name('subscription-management');
+        Route::get('/subscription-management/datatable', [UserSubscriptionController::class, 'dataTable'])->name('subscription-management.data-table');
+        Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
+        Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
+        
         
         // categories controller
         Route::get('/categories', [CategoriesController::class, 'index'])->name('categories');

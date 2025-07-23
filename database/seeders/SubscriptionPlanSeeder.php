@@ -83,7 +83,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'total_download_limit' => null,
                 'stripe_price_id' => 'price_monthly_123', // Replace with actual Stripe price ID
                 'stripe_product_id' => 'prod_1234567890',
-                'is_active' => true, // Disabled for now
+                'is_active' => false, // Disabled for now
                 'is_trial' => false,
                 'is_popular' => false,
                 'features' => json_encode([

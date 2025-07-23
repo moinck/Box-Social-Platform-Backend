@@ -222,11 +222,11 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::commit();
 
-            // return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
-            return response()->json([
-                'status' => true,
-                'message' => 'Subscription Created successfully',
-            ]);
+            return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Subscription Created successfully',
+            // ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -254,11 +254,11 @@ class UserSubscriptionNewApiController extends Controller
                 }
             }
 
-            // return redirect(config('app.frontend_url') . '/subscription/cancelled');
-            return response()->json([
-                'status' => true,
-                'message' => 'Subscription cancelled successfully',
-            ]);
+            return redirect(config('app.frontend_url') . '/subscription/cancelled');
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Subscription cancelled successfully',
+            // ]);
 
         } catch (\Exception $e) {
             Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
@@ -414,6 +414,9 @@ class UserSubscriptionNewApiController extends Controller
         $userSubscription->status = 'active';
         $userSubscription->amount_paid = 0;
         $userSubscription->currency = 'GBP';
+        $userSubscription->total_download_limit = 3;
+        $userSubscription->daily_download_limit = 3;
+        $userSubscription->downloads_used_today = 0;
         $userSubscription->current_period_start = now();
         $userSubscription->current_period_end = now()->addDays(3);
         $userSubscription->trial_start = now();
@@ -461,6 +464,56 @@ class UserSubscriptionNewApiController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Subscription cancelled successfully',
+        ]);
+    }
+
+
+    public function downloadLimit(Request $request)
+    {
+        $authUser = Auth::user();
+        $subscription = UserSubscription::select('id','total_download_limit','daily_download_limit','downloads_used_today')
+            ->where('user_id', $authUser->id)
+            ->where('status', 'active')
+            ->first();
+        
+        $totalDownloadLimit = $subscription->total_download_limit;
+        $dailyDownloadLimit = $subscription->daily_download_limit;
+        $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+
+        if ($subscription) {
+            if ($dailyDownloadLimit > 0) {
+                // $subscription->daily_download_limit = $subscription->daily_download_limit - 1;
+                $subscription->downloads_used_today = $subscription->downloads_used_today + 1;
+                $subscription->save();
+
+                $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Daily download limit exceeded',
+                    'data' => [
+                        'total_download_limit' => $totalDownloadLimit,
+                        'daily_download_limit' => $dailyDownloadLimit,
+                        'downloads_used_today' => $subscription->downloads_used_today,
+                        'remaining_download_limit' => $remainingDownloadLimit,
+                    ]
+                ]);
+            }
+
+            $dailyDownloadLimit = $subscription->daily_download_limit;
+        }
+
+        $returnData = [
+            'total_download_limit' => $totalDownloadLimit,
+            'daily_download_limit' => $dailyDownloadLimit,
+            'downloads_used_today' => $subscription->downloads_used_today,
+            'remaining_download_limit' => $remainingDownloadLimit,
+        ];
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Subscription download limit updated successfully',
+            'data' => $returnData,
         ]);
     }
     

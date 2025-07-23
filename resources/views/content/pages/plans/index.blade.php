@@ -69,7 +69,7 @@
                                             @endforeach
                                         </ul>
 
-                                        <a href="javascript::void(0)" class="btn btn-outline-success d-grid w-100">Select Plan</a>
+                                        {{-- <a href="javascript::void(0)" class="btn btn-outline-success d-grid w-100">Select Plan</a> --}}
                                     </div>
                                 </div>
                             </div>
