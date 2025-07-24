@@ -328,19 +328,24 @@
                         },
                         success: function (response) {
                             var searchIcons = response.icons;
-                            iconsContainer.empty();
-                            searchIcons.forEach(function (icon) {
-                                iconsContainer.append(`
-                                        <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
-                                            <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
-                                            <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
-                                            <span class="custom-option-body">
-                                                <img src="https://api.iconify.design/${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}">
-                                            </span>
-                                            </label>
-                                        </div>
-                                    `);
-                            });
+                            if (searchIcons.length > 0) {                                
+                                iconsContainer.empty();
+                                searchIcons.forEach(function (icon) {
+                                    iconsContainer.append(`
+                                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                                <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
+                                                <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
+                                                <span class="custom-option-body">
+                                                    <img src="https://api.iconify.design/${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}">
+                                                </span>
+                                                </label>
+                                            </div>
+                                        `);
+                                });
+                            } else {
+                                iconsContainer.empty();
+                                toastr.info('No icons found.try Something different.');
+                            }
                         }
                     });
                 } else {
@@ -397,6 +402,7 @@
                                 $('#custom_tag_name').val('');
                                 $('#icons-container').empty();
                                 icon_search_input.val('');
+                                resetIconsContainer();
                                 loadIcons();
                                 showSweetAlert("success", "Store!", "Your icon has been successfully saved.")
                             }
