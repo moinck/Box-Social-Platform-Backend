@@ -27,11 +27,18 @@ class IconManagementAPiController extends Controller
             ->limit($limit)
             ->get();
 
+        $iconTagNameList = IconManagement::select('tag_name')
+            ->distinct()
+            ->get()
+            ->pluck('tag_name')
+            ->toArray();
+
         $returnData = [];
         $returnData['limit'] = $limit;
         $returnData['total_icons'] = $totalIconCount;
         $returnData['page'] = $page;
         $returnData['icons'] = $icons;
+        $returnData['icon_tag_name_list'] = $iconTagNameList;
 
         return $this->success($returnData, 'Icons list fetched successfully');
     }
