@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\CleanExpiredTokens;
+use App\Http\Middleware\AdminTokenMiddleware;
 use App\Http\Middleware\CheckRoleMiddleware;
 use App\Http\Middleware\CheckUserStatus;
 use App\Http\Middleware\EnsureEmailIsVerified;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkRole' => CheckRoleMiddleware::class,
             'verified' => EnsureEmailIsVerified::class,
             'checkUserStatus' => CheckUserStatus::class,
+            'adminToken' => AdminTokenMiddleware::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {

@@ -5,17 +5,47 @@ namespace App\Http\Controllers;
 use App\Helpers\Helpers;
 use App\Models\Categories;
 use App\Models\PostTemplate;
+use App\Models\UserTokens;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class PostTemplateController extends Controller
 {
     public function index()
     {
+        // Mark old tokens as used and delete
+        UserTokens::where('type', 'admin-access-token')
+            ->where('is_used', false)
+            ->where('created_at', '<', Carbon::now()->subDay())
+            ->update(['is_used' => true]);
+
+        // Get the latest unused token created within last 1 day
+        $adminToken = UserTokens::where('type', 'admin-access-token')
+            ->where('is_used', false)
+            ->where('created_at', '>=', Carbon::now()->subDay())
+            ->latest()
+            ->first();
+
+        // If no valid token, create new one
+        if (!$adminToken) {
+            $adminToken = UserTokens::create([
+                'user_id' => 1,
+                'token' => Str::random(60),
+                'type' => 'admin-access-token',
+                'is_used' => false,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        }
+
+        $currentAdminToken = $adminToken->token;
         $categories = Categories::getActiveCategoeyList();
 
-        return view('content.pages.admin.post-template.index', compact('categories'));
+        return view('content.pages.admin.post-template.index', compact('categories', 'currentAdminToken'));
     }
 
     public function dataTable(Request $request)

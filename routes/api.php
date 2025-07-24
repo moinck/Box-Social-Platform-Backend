@@ -108,11 +108,13 @@ Route::group([
         Route::post('/logout', [RegisterController::class, 'logout']);
     });
 });
+// ======================================================================================================
 
-Route::post('/store/contact-us', [ContactUsController::class, 'store']);
-Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
-Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
-
+// only admin access routes
+Route::group([
+    'middleware' => 'adminToken'
+], function () {
+});
 // admin api
 Route::get('/admin/template-data', [AdminApiController::class, 'index']);
 
@@ -129,6 +131,14 @@ Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
 
 // icon management api
 Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
+// ====================================================================================================== 
+
+// public routes
+Route::post('/store/contact-us', [ContactUsController::class, 'store']);
+Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
+Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
+
+
 
 // Public routes (no authentication required - for Stripe redirects)
 Route::get('/user-subscription/success', [UserSubscriptionNewApiController::class, 'success']);
