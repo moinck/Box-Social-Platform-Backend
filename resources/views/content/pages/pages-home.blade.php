@@ -538,16 +538,54 @@
             // export user 
             $(document).on('click', '#user-export-btn', function() {
                 $('#data-export-modal').modal('show');
-
-                $('#csv-export-btn').on('click', function() {
-                    window.location.href = "{{ route('user.export') }}?format=csv";
-                    $('#data-export-modal').modal('hide');
-                });
-                $('#excel-export-btn').on('click', function() {
-                    window.location.href = "{{ route('user.export') }}?format=xlsx";
-                    $('#data-export-modal').modal('hide');
-                });
             });
+            $('#csv-export-btn').on('click', function() {
+                ExportUserData('csv');
+            });
+            $('#excel-export-btn').on('click', function() {
+                ExportUserData('xlsx');
+            });
+            // ----------------------------------------------------------
+
+            // export user function
+            function ExportUserData(format) {
+                var exportFormData = new FormData();
+                exportFormData.append('format', format);
+                exportFormData.append('_token', '{{ csrf_token() }}');
+                exportFormData.append('is_brandkit', $('#brandkit_filter').val());
+                exportFormData.append('account_status', $('#account_status_filter').val());
+                exportFormData.append('user_table_search', $('input[type="search"]').val());
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "{{ route('user.export') }}", true);
+                xhr.responseType = 'blob';
+
+                xhr.onload = function () {
+                    hideBSPLoader();
+                    if (xhr.status === 200) {
+                        var blob = xhr.response;
+                        var url = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'users_' + new Date().getTime() + '.' + format;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                        $('#data-export-modal').modal('hide');
+                    } else {
+                        showSweetAlert('error', 'Error!', 'Something went wrong.');
+                    }
+                };
+
+                xhr.onerror = function () {
+                    hideBSPLoader();
+                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                };
+
+                showBSPLoader();
+                xhr.send(exportFormData);
+            }
             // ----------------------------------------------------------
         });
     </script>
