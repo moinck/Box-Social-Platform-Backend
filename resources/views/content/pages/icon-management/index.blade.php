@@ -41,14 +41,14 @@
                             </li>
                             <li class="nav-item">
                                 <button type="button" id="saved-img-tab-btn" class="nav-link" role="tab"
-                                    data-bs-toggle="tab" data-bs-target="#navs-saved-image-section"
-                                    aria-controls="navs-saved-image-section" aria-selected="false">
+                                    data-bs-toggle="tab" data-bs-target="#navs-saved-icon-section"
+                                    aria-controls="navs-saved-icon-section" aria-selected="false">
                                     <i class="tf-icons ri-save-3-line me-2"></i>
                                     Saved Icons
                                     <span
                                         class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-success ms-2 pt-50"
                                         style="width: fit-content !important;"
-                                        id="saved-img-count">{{ @$savedImagesCount ?? 0 }}</span>
+                                        id="saved-icon-count">{{ @$savedIconsCount ?? 0 }}</span>
                                 </button>
                             </li>
                         </ul>
@@ -56,6 +56,7 @@
                 </div>
                 <div class="card-body pt-5">
                     <div class="tab-content p-0">
+                        {{-- Icon Search tab --}}
                         <div class="tab-pane fade show active" id="navs-image-home-section" role="tabpanel">
                             <div class="row">
                                 <div class="col-12">
@@ -97,7 +98,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="navs-saved-image-section" role="tabpanel">
+
+                        {{-- Saved Icons tab --}}
+                        <div class="tab-pane fade" id="navs-saved-icon-section" role="tabpanel">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
@@ -105,15 +108,15 @@
                                             {{-- saved topics dropdown --}}
                                             <div class="col-6">
                                                 <div class="form-floating form-floating-outline">
-                                                    <select id="saved_topics_list"
-                                                        class="select2-icons form-select tag-name-select"
-                                                        name="saved_topics_list" data-allow-clear="true">
-                                                        <option value="">No saved topics</option>
+                                                    <select id="saved_tag_list"
+                                                        class="select2-icons form-select tag-icon-name-select"
+                                                        name="saved_tag_list" data-allow-clear="true">
+                                                        <option value="">Select Tags to search</option>
                                                     </select>
-                                                    <label for="saved_topics_list">Saved Tags</label>
+                                                    <label for="saved_tag_list">Saved Tags</label>
                                                 </div>
                                             </div>
-                                            <div class="row mt-5" id="saved_images">
+                                            <div class="row mt-5" id="saved_icon_container" style="max-height: 500px; overflow-y: scroll;gap:1rem">
                                             </div>
                                         </div>
                                     </div>
@@ -164,6 +167,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
+            var select2 = $('.tag-icon-name-select');
+            // add select2
+            if (select2.length) {
+                select2.each(function () {
+                    var $this = $(this);
+                    select2Focus($this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Select Search Topic',
+                        dropdownParent: $this.parent()
+                    });
+                });
+            }
+            
             var icon_search_input = $('#icon_search_input');
             var loadCollectionUrl = "https://api.iconify.design/collection?prefix=mdi";
             var iconsContainer = $('#icons-container');
@@ -206,7 +222,7 @@
                 iconsToRender.forEach(function (icon) {
                     iconsContainer.append(`
                             <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
-                                <input class="form-check-input saved-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
+                                <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
                                 <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
                                     <span class="custom-option-body">
                                         <img src="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}"/>
@@ -239,7 +255,7 @@
                             searchIcons.forEach(function (icon) {
                                 iconsContainer.append(`
                                         <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
-                                            <input class="form-check-input saved-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
+                                            <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
                                             <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
                                             <span class="custom-option-body">
                                                 <img src="https://api.iconify.design/${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}">
@@ -252,10 +268,12 @@
                     });
                 }
             });
+            // -----------------------------------------------------
+
 
             // only show save button if any image is selected
-            $(document).on('change', '.saved-icon-checkbox', function () {
-                if ($('.saved-icon-checkbox:checked').length > 0) {
+            $(document).on('change', '.new-icon-checkbox', function () {
+                if ($('.new-icon-checkbox:checked').length > 0) {
                     $('.save_select_icons').removeClass('d-none');
                 } else {
                     $('.save_select_icons').addClass('d-none');
@@ -293,7 +311,7 @@
                         success: function (response) {
                             if (response.success) {
                                 $('#save-icon-modal').modal('hide');
-                                $('.saved-icon-checkbox:checked').each(function () {
+                                $('.new-icon-checkbox:checked').each(function () {
                                     $(this).prop('checked', false);
                                 });
                                 $('.save_select_icons').addClass('d-none');
@@ -312,6 +330,93 @@
                 }
             });
             // --------------------------------------------------
+
+            // load image when user comes to saved images tab
+            $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-icon-section"]', function (e) {
+                loadSavedIcons();
+                loadSavedTags();
+            });
+
+            function loadSavedIcons(filterTag = null) {
+                $.ajax({
+                    url: "{{ route('icon-management.get.saved-icon') }}",
+                    type: "GET",
+                    data: {
+                        filterTag: filterTag
+                    },
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#saved-icon-count').text(response.savedIconsCount);
+                            var savedIconData = response.data;
+                            var savedIconHtml = '';
+                            savedIconData.forEach(function (icon) {
+                                savedIconHtml += `
+                                    <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                        <input class="form-check-input saved-icon-checkbox" type="checkbox" name="savedSelectedIcons[]" data-icon-id="${icon.id}" value="${icon.icon_url}" id="saved-icon-${icon.id}"/>
+                                        <label class="form-check-label custom-option-content" for="saved-icon-${icon.id}">
+                                            <span class="custom-option-body">
+                                                <img src="${icon.icon_url}" data-icon-name="${icon.tag_name}" alt="${icon.tag_name}"/>
+                                            </span>
+                                        </label>
+                                    </div>
+                                `;
+                            });
+                            $('#saved_icon_container').html(savedIconHtml);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                        showSweetAlert("error", "Error!", "Something went wrong.");
+                    }
+                });
+            }
+            // -----------------------------------------------------
+
+            function loadSavedTags() {
+                $.ajax({
+                    url: "{{ route('icon-management.get.saved-tag') }}",
+                    type: "GET",
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            var savedTagNames = response.data;
+                            var savedTopicsList = "";
+                            savedTopicsList += `<option value="0">Select Tags to search</option>`;
+                            $.each(savedTagNames, function (i, tagName) {
+                                savedTopicsList += `<option value="${tagName}">${tagName}</option>`;
+                            });
+                            $('#saved_tag_list').html(savedTopicsList);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                        showSweetAlert("error", "Error!", "Something went wrong.");
+                    }
+                });
+            }
+
+            // on change of saved topics list
+            $(document).on('change', '#saved_tag_list', function () {
+                var selectedTopic = $(this).val();
+                if (selectedTopic != 0) {
+                    loadSavedIcons(selectedTopic);
+                } else {
+                    loadSavedIcons();
+                }
+            })
+
+            
         });
     </script>
 @endsection

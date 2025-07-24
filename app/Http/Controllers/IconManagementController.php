@@ -9,7 +9,9 @@ class IconManagementController extends Controller
 {
     public function index()
     {
-        return view('content.pages.icon-management.index');
+        $savedTagNames = IconManagement::select('tag_name')->pluck('tag_name')->unique()->toArray();
+        $savedIconsCount = IconManagement::count();
+        return view('content.pages.icon-management.index', compact('savedTagNames', 'savedIconsCount'));
     }
 
     public function store(Request $request)
@@ -39,17 +41,34 @@ class IconManagementController extends Controller
         ]);
     }
 
-    public function getSavedIcon()
+    public function getSavedIcon(Request $request)
     {
-        $icons = IconManagement::select('icon_url', 'tag_name')->get();
+        $icons = IconManagement::select('id','icon_url', 'tag_name')
+            ->when($request->filterTag, function ($query) use ($request) {
+                $query->where('tag_name','LIKE',"%".$request->filterTag."%");
+            })
+            ->get();
 
-        $savedTagNames = $icons->pluck('tag_name')->unique();
+        $savedTagNames = $icons->pluck('tag_name')->unique()->toArray();
 
         return response()->json([
             'success' => true,
             'data' => $icons,
             'savedIconsCount' => $icons->count(),
             'savedTagNames' => $savedTagNames
+        ]);
+    }
+
+    public function getSavedTag(Request $request)
+    {
+        $savedTagNames = IconManagement::select('id','tag_name')
+            ->pluck('tag_name')
+            ->unique()
+            ->toArray();
+
+        return response()->json([
+            'success' => true,
+            'data' => $savedTagNames,
         ]);
     }
 
