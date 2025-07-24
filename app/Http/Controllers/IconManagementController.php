@@ -84,4 +84,17 @@ class IconManagementController extends Controller
             'savedIconsCount' => IconManagement::count()
         ]);
     }
+
+    public function deleteSavedIcon(Request $request)
+    {
+        $request->validate([
+            'deleteIconIds' => 'required',
+        ]);
+        IconManagement::whereIn('id', $request->deleteIconIds)->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Icons deleted successfully',
+            'savedIconsCount' => IconManagement::count()
+        ]);
+    }
 }

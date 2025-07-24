@@ -21,9 +21,9 @@
                 <h5 class="mb-0">Icon Management</h5>
                 {{-- <small class="text-muted float-end">Default label</small> --}}
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-danger me-4 delete_select_images d-none"
+                    <button type="button" class="btn btn-danger me-4 delete_select_icons d-none"
                         style="float: inline-end;">
-                        <span class="tf-icons ri-delete-bin-line ri-16px me-2"></span>Delete Select Images
+                        <span class="tf-icons ri-delete-bin-line ri-16px me-2"></span>Delete Select Icons
                     </button>
                 </div>
             </div>
@@ -405,6 +405,7 @@
                     }
                 });
             }
+            // -----------------------------------------------------
 
             // on change of saved topics list
             $(document).on('change', '#saved_tag_list', function () {
@@ -415,8 +416,62 @@
                     loadSavedIcons();
                 }
             })
+            // -----------------------------------------------------
 
-            
+            // only show save button if any image is selected
+            $(document).on('change', '.saved-icon-checkbox', function () {
+                if ($('.saved-icon-checkbox:checked').length > 0) {
+                    $('.delete_select_icons').removeClass('d-none');
+                } else {
+                    $('.delete_select_icons').addClass('d-none');
+                }
+            });
+            // -----------------------------------------------------
+
+            // delete saved icons
+            $(document).on('click', '.delete_select_icons', function () {
+                var deleteIconIds = [];
+                $('.saved-icon-checkbox:checked').each(function () {
+                    deleteIconIds.push($(this).data('icon-id'));
+                });
+                if (deleteIconIds.length > 0) {
+                    $.ajax({
+                        url: "{{ route('icon-management.delete.saved-icon') }}",
+                        type: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        },
+                        data: {
+                            deleteIconIds: deleteIconIds
+                        },
+                        beforeSend: function () {
+                            showBSPLoader();
+                        },
+                        complete: function () {
+                            hideBSPLoader();
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                $('#saved-icon-count').text(response.savedIconsCount);
+                                $('.saved-icon-checkbox:checked').each(function () {
+                                    $(this).prop('checked', false);
+                                });
+                                $('.delete_select_icons').addClass('d-none');
+                                loadSavedIcons();
+                                loadSavedTags();
+                                showSweetAlert("success", "Delete!", "Your icon has been successfully deleted.")
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                            showSweetAlert("error", "Error!", "Something went wrong.");
+                        }
+                    });
+                } else {
+                    showSweetAlert('error', 'Info!', 'Please select 1 icon.');
+                }
+            });
+            // -----------------------------------------------------
         });
     </script>
 @endsection

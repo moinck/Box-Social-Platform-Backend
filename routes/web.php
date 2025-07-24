@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/icon-management/get/saved-icon', [IconManagementController::class, 'getSavedIcon'])->name('icon-management.get.saved-icon');
         Route::get('/icon-management/get/saved-tag', [IconManagementController::class, 'getSavedTag'])->name('icon-management.get.saved-tag');
         Route::post('/icon-management/delete', [IconManagementController::class, 'destroy'])->name('icon-management.delete');
+        Route::post('/icon-management/delete/saved-icon', [IconManagementController::class, 'deleteSavedIcon'])->name('icon-management.delete.saved-icon');
         
         // categories controller
         Route::get('/categories', [CategoriesController::class, 'index'])->name('categories');
