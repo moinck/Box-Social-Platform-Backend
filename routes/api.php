@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
+use App\Http\Controllers\Api\IconManagementAPiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
@@ -125,6 +126,9 @@ Route::post('/post-content/get/category', [PostContentApiController::class, 'get
 
 // get stock image
 Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+
+// icon management api
+Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
 
 // Public routes (no authentication required - for Stripe redirects)
 Route::get('/user-subscription/success', [UserSubscriptionNewApiController::class, 'success']);
