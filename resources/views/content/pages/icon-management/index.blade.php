@@ -185,12 +185,14 @@
             var iconsContainer = $('#icons-container');
             var IconData = [];
             var currentPage = 0;
-            var itemsPerPage = 516; // Adjust as needed
+            var itemsPerPage = 120; // Reduced for better lazy loading experience
+            var isLoading = false;
+            var allIconsLoaded = false;
 
-            // if search is empty , then load all icons
+            // If search is empty, then load all icons
             $(document).on('input', "#icon_search_input", function () {
                 if (icon_search_input.val().length == 0) {
-                    iconsContainer.empty();
+                    resetIconsContainer();
                     loadIcons();
                 }
             });
@@ -208,19 +210,45 @@
                 success: function (data) {
                     IconData = data.uncategorized;
                     loadIcons(); // Load first page
+                    setupLazyLoading(); // Setup scroll listener
                 }
             });
 
+            // Function to reset icons container
+            function resetIconsContainer() {
+                iconsContainer.empty();
+                currentPage = 0;
+                allIconsLoaded = false;
+                isLoading = false;
+            }
+
             // Function to render icons per page
             function loadIcons() {
+                if (isLoading || allIconsLoaded) return;
+                
+                isLoading = true;
+                
                 var start = currentPage * itemsPerPage;
                 var end = start + itemsPerPage;
                 var iconsToRender = IconData.slice(start, end);
-                // console.log("start,end", start + "-" + end);
                 
-
-                iconsToRender.forEach(function (icon) {
-                    iconsContainer.append(`
+                // Check if we've loaded all icons
+                if (iconsToRender.length === 0 || end >= IconData.length) {
+                    allIconsLoaded = true;
+                    hideBSPLoader();
+                    isLoading = false;
+                    return;
+                }
+                
+                // Show loading indicator if not first page
+                if (currentPage > 0) {
+                    showBSPLoader();
+                }
+                
+                // Simulate a small delay for better UX (optional)
+                setTimeout(function() {
+                    iconsToRender.forEach(function (icon) {
+                        iconsContainer.append(`
                             <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
                                 <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
                                 <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
@@ -230,13 +258,62 @@
                                 </label>
                             </div>
                         `);
-                });
-
-                // currentPage++;
+                    });
+                    
+                    currentPage++;
+                    isLoading = false;
+                    hideBSPLoader();
+                    
+                    // Check if we've loaded all icons after this batch
+                    if (end >= IconData.length) {
+                        allIconsLoaded = true;
+                    }
+                }, 100); // Small delay for smooth loading
             }
+
+            // Function to setup lazy loading scroll listener
+            function setupLazyLoading() {
+                iconsContainer.on('scroll', function() {
+                    var container = $(this);
+                    var scrollTop = container.scrollTop();
+                    var scrollHeight = container[0].scrollHeight;
+                    var containerHeight = container.height();
+                    
+                    // Load more when user scrolls to 80% of the content
+                    var threshold = 0.8;
+                    var triggerPoint = (scrollHeight - containerHeight) * threshold;
+                    
+                    if (scrollTop >= triggerPoint && !isLoading && !allIconsLoaded) {
+                        loadIcons();
+                    }
+                });
+            }
+
+            // Function to show loading indicator
+            // function showLoadingIndicator() {
+            //     if ($('#icons-loading-indicator').length === 0) {
+            //         iconsContainer.append(`
+            //             <div id="icons-loading-indicator" class="w-100 text-center py-3">
+            //                 <div class="spinner-border spinner-border-sm text-primary" role="status">
+            //                     <span class="visually-hidden">Loading...</span>
+            //                 </div>
+            //                 <small class="text-muted ms-2">Loading more icons...</small>
+            //             </div>
+            //         `);
+            //     }
+            // }
+
+            // Function to remove loading indicator
+            // function removeLoadingIndicator() {
+            //     $('#icons-loading-indicator').remove();
+            // }
 
             // for searching icons
             $(document).on('click', '.search_icon_btn', function () {
+                // make loading false
+                isLoading = false;
+                allIconsLoaded = true;
+                hideBSPLoader();
                 var searchInput = icon_search_input.val();
                 var searchUrl = "https://api.iconify.design/search?query=" + searchInput + "&prefix=mdi"
                 if (searchInput.length > 0) {
@@ -266,6 +343,8 @@
                             });
                         }
                     });
+                } else {
+                    toastr.error('Please enter search keyword');
                 }
             });
             // -----------------------------------------------------
