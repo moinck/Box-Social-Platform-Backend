@@ -218,12 +218,49 @@ class UserManagementController extends Controller
      */
     public function export(Request $request)
     {
+        $request->validate([
+            'format' => 'required|in:csv,xlsx',
+            'is_brandkit' => 'nullable|in:1,2',
+            'account_status' => 'nullable|in:1,2',
+            'user_table_search' => 'nullable|string',
+        ]);
+
+        $users = User::query()
+            ->when($request->is_brandkit, function ($query) use ($request) {
+                if ($request->is_brandkit == 1) {
+                    $query->whereHas('brandKit');
+                } else if($request->is_brandkit == 2) {
+                    $query->whereDoesntHave('brandKit');
+                }
+            })
+            ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
+                if ($request->account_status == 1) {
+                    $query->where('status', '=', 'active');
+                } elseif ($request->account_status == 2) {
+                    $query->where('status', '=', 'inactive');
+                }
+            })
+            ->when($request->user_table_search && $request->user_table_search != null, function ($query) use ($request) {
+                $query->where(function ($query) use ($request) {
+                    $query->where('first_name', 'like', '%' . $request->user_table_search . '%')
+                        ->orWhere('last_name', 'like', '%' . $request->user_table_search . '%')
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $request->user_table_search . '%'])
+                        ->orWhere('company_name', 'like', '%' . $request->user_table_search . '%')
+                        ->orWhere('email', 'like', '%' . $request->user_table_search . '%')
+                        ->orWhere('created_at', 'like', '%' . $request->user_table_search . '%')
+                        ->orWhere('fca_number', 'like', '%' . $request->user_table_search . '%');
+                });
+            })
+            ->where('role', 'customer')
+            ->latest()
+            ->get();
+
         $format = $request->format;
         $name = 'users_' . date('Y-m-d_g-s');
         if ($format == 'csv') {
-            return Excel::download(new UsersExport, $name . '.csv');
+            return Excel::download(new UsersExport($users), $name . '.csv');
         } else {
-            return Excel::download(new UsersExport, $name . '.xlsx');
+            return Excel::download(new UsersExport($users), $name . '.xlsx');
         }
     }
 }

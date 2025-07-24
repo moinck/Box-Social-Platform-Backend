@@ -15,12 +15,17 @@ use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 
 class UsersExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithStyles, WithCustomValueBinder
 {
+    public $users;
+    public function __construct($users)
+    {
+        $this->users = $users;
+    }
     /**
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return User::where('role', 'customer')->latest()->get();
+        return $this->users;
     }
 
     /**
