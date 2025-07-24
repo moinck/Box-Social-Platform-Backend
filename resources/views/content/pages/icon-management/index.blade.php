@@ -394,6 +394,7 @@
                         },
                         success: function (response) {
                             if (response.success) {
+                                $('#saved-icon-count').text(response.savedIconsCount);
                                 $('#save-icon-modal').modal('hide');
                                 $('.new-icon-checkbox:checked').each(function () {
                                     $(this).prop('checked', false);
