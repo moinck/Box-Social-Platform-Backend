@@ -132,20 +132,20 @@
                         @if (!empty($fontsData))
                             <div class="row">
                                 <div class="row mb-5 gx-5">
-                                    <div class="col-6">
+                                    <div class="col-8">
                                         <div class="form-floating form-floating-outline">
                                             <input type="email" class="form-control" id="font_family" placeholder="00000"
                                                 name="font_family" value="{{ $fontsData['family'] ?? '' }}" aria-label="Font Family" readonly />
                                             <label for="font_family">Font Family</label>
                                         </div>
                                     </div>
-                                    <div class="col-2">
+                                    {{-- <div class="col-2">
                                         <div class="form-floating form-floating-outline">
                                             <input type="number" class="form-control" id="font_size" placeholder="0123-4567"
                                                 name="font_size" value="{{ $fontsData['size'] ?? '' }}" aria-label="Font Size" readonly />
                                             <label for="font_size">Font Size</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-4 font-icon-btns">
                                         @if (!empty($fontsData['font_bold']) && $fontsData['font_bold'] == "true")
                                             <button type="button" class="btn btn-icon btn-primary waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Font Bold">

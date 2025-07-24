@@ -372,6 +372,14 @@ class UserSubscriptionNewApiController extends Controller
             ->where('user_id', Auth::id())
             ->where('status', 'active')
             ->first();
+        if (empty($subscription)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found',
+                'data' => [],
+                'stripe_subscription' => []
+            ]);
+        }
 
         $planDetails = [];
         if($subscription){
@@ -400,6 +408,7 @@ class UserSubscriptionNewApiController extends Controller
         // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);
         return response()->json([
             'status' => true,
+            'message' => 'Subscription fetched successfully',
             'data' => $returnData,
             'stripe_subscription' => []
         ]);
@@ -433,6 +442,14 @@ class UserSubscriptionNewApiController extends Controller
             ->where('status', 'active')
             ->first();
 
+        if (empty($subscription)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found',
+                'data' => []
+            ]);
+        }
+
         if ($subscription) {
 
             // get plan detais
@@ -457,13 +474,15 @@ class UserSubscriptionNewApiController extends Controller
                     'cancelation_date' => now(),
                 ];
     
-                $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
+                // cancel subscription from stripe
+                // $this->stripe->subscriptions->cancel($subscription->stripe_subscription_id);
             }
         }
 
         return response()->json([
             'status' => true,
             'message' => 'Subscription cancelled successfully',
+            'data' => [],
         ]);
     }
 
@@ -475,6 +494,14 @@ class UserSubscriptionNewApiController extends Controller
             ->where('user_id', $authUser->id)
             ->where('status', 'active')
             ->first();
+        
+        if (empty($subscription)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found',
+                'data' => []
+            ]);
+        }
         
         $totalDownloadLimit = $subscription->total_download_limit;
         $dailyDownloadLimit = $subscription->daily_download_limit;
