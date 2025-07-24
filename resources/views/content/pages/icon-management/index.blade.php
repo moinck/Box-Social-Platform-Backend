@@ -116,7 +116,7 @@
                                                     <label for="saved_tag_list">Saved Tags</label>
                                                 </div>
                                             </div>
-                                            <div class="row mt-5" id="saved_icon_container" style="max-height: 500px; overflow-y: scroll;gap:1rem">
+                                            <div class="d-flex flex-wrap mt-5" id="saved_icon_container" style="max-height: 500px; overflow-y: scroll;gap:1rem">
                                             </div>
                                         </div>
                                     </div>

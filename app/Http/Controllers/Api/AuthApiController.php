@@ -163,50 +163,54 @@ class AuthApiController extends Controller
             'email' => $request->email
         ], [
             'email' => 'required|email|exists:users,email'
+        ],[
+            'email.required' => 'Email is required',
+            'email.email' => 'Email is invalid',
+            'email.exists' => 'Email does not exist',
         ]);
-
+    
         if ($validator->fails()) {
-            return $this->validationError('Invalid email', $validator->errors());
+            return $this->validationError('Validation error', $validator->errors());
         }
-
+    
         $user = User::where('email', $request->email)->first();
-
+    
         if ($user) {
-            // Check rate limiting per user
-            $recentTokens = UserTokens::where([
+            // Check if ANY recent token exists within last 5 minutes
+            $recentToken = UserTokens::where([
                 'user_id' => $user->id,
                 'type' => 'forget-password'
             ])->where('created_at', '>=', Carbon::now()->subMinutes(5))
-                ->count();
-
-            if ($recentTokens >= 3) {
+                ->first(); 
+    
+            // Check if ANY recent token exists within last 5 minutes
+            if ($recentToken) {
                 // Log suspicious activity
-                Log::warning('Too many password reset attempts', [
+                Log::warning('Password reset attempt within 5 minutes', [
                     'user_id' => $user->id,
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent()
                 ]);
-
-                return $this->error('Too many password reset attempts', 400);
+    
+                return $this->error('You can only request a password reset email after 5 minutes from the last request.', 429);
             } else {
                 // Invalidate previous tokens
                 UserTokens::where([
                     'user_id' => $user->id,
                     'type' => 'forget-password'
                 ])->update(['is_used' => true]);
-
+    
                 $token = Helpers::generateVarificationToken($user, $request, 'forget-password');
                 $encyptedToken = Helpers::encrypt($token);
                 Mail::to($user->email)->send(new ForgetPasswordMail($encyptedToken, $user));
-
+    
                 return $this->success([
                     'verification_token' => $encyptedToken
                 ], 'Password reset email sent successfully');
             }
         } else {
-            return $this->error('Invalid email id', 404);
+            return $this->error('User Not Found', 404);
         }
-
     }
 
     public function resendForgetPassword(Request $request)
@@ -215,16 +219,20 @@ class AuthApiController extends Controller
             'email' => $request->email
         ], [
             'email' => 'required|email|exists:users,email'
+        ],[
+            'email.required' => 'Email is required',
+            'email.email' => 'Email is invalid',
+            'email.exists' => 'Email does not exist',
         ]);
     
         if ($validator->fails()) {
-            return $this->validationError('Invalid email', $validator->errors());
+            return $this->validationError('Validation error', $validator->errors());
         }
     
         $user = User::where('email', $request->email)->first();
     
         if (!$user) {
-            return $this->error('Invalid email id', 404);
+            return $this->error('User Not Found', 404);
         }
     
         // Check if a recent token exists within last 5 minutes
