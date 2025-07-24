@@ -88,9 +88,7 @@ Route::middleware('auth')->group(function () {
         // icon management controller
         Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');
         Route::post('/icon-management/store', [IconManagementController::class, 'store'])->name('icon-management.store');
-        Route::get('/icon-management/datatable', [IconManagementController::class, 'dataTable'])->name('icon-management.data-table');
-        Route::get('/icon-management/edit/{id}', [IconManagementController::class, 'edit'])->name('icon-management.edit');
-        Route::post('/icon-management/update', [IconManagementController::class, 'update'])->name('icon-management.update');
+        Route::get('/icon-management/get/saved-icon', [IconManagementController::class, 'getSavedIcon'])->name('icon-management.get.saved-icon');
         Route::post('/icon-management/delete', [IconManagementController::class, 'destroy'])->name('icon-management.delete');
         
         // categories controller

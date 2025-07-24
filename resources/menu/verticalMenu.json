@@ -29,6 +29,13 @@
             "role": ["admin","customer"]
         },
         {
+            "url": "/icon-management",
+            "name": "Icon Management",
+            "icon": "menu-icon tf-icons ri-image-add-fill",
+            "slug": "icon-management",
+            "role": ["admin"]
+        },
+        {
             "url": "/categories",
             "name": "Categories",
             "icon": "menu-icon tf-icons ri-archive-stack-line",

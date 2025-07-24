@@ -1,0 +1,317 @@
+@extends('layouts/layoutMaster')
+
+@section('title', 'Icon Management')
+
+<!-- Vendor Styles -->
+@section('vendor-style')
+    @vite(['resources/assets/vendor/libs/@form-validation/form-validation.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss', 'resources/assets/vendor/libs/select2/select2.scss', 'resources/assets/vendor/libs/typeahead-js/typeahead.scss'])
+@endsection
+
+<!-- Vendor Scripts -->
+@section('vendor-script')
+    @vite(['resources/assets/vendor/libs/@form-validation/popular.js', 'resources/assets/vendor/libs/@form-validation/bootstrap5.js', 'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js', 'resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/typeahead-js/typeahead.js'])
+@endsection
+
+
+@section('content')
+    {{-- main content --}}
+    <div class="row mt-5 mb-5">
+        <div class="card mb-6">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Icon Management</h5>
+                {{-- <small class="text-muted float-end">Default label</small> --}}
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-danger me-4 delete_select_images d-none"
+                        style="float: inline-end;">
+                        <span class="tf-icons ri-delete-bin-line ri-16px me-2"></span>Delete Select Images
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card-header p-0">
+                    <div class="nav-align-top">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                    data-bs-target="#navs-image-home-section" aria-controls="navs-image-home-section"
+                                    aria-selected="true">
+                                    <i class="tf-icons ri-image-add-fill me-2"></i>
+                                    Icon Search
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button type="button" id="saved-img-tab-btn" class="nav-link" role="tab"
+                                    data-bs-toggle="tab" data-bs-target="#navs-saved-image-section"
+                                    aria-controls="navs-saved-image-section" aria-selected="false">
+                                    <i class="tf-icons ri-save-3-line me-2"></i>
+                                    Saved Icons
+                                    <span
+                                        class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-success ms-2 pt-50"
+                                        style="width: fit-content !important;"
+                                        id="saved-img-count">{{ @$savedImagesCount ?? 0 }}</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body pt-5">
+                    <div class="tab-content p-0">
+                        <div class="tab-pane fade show active" id="navs-image-home-section" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            {{-- search form --}}
+                                            <form id="stock_icon_management" role="form" enctype="multipart/form-data" onsubmit="return false;">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-6">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input id="icon_search_input" name="icon_search_input"
+                                                                class="form-control typeahead-search" type="search"
+                                                                autocomplete="off" placeholder="Enter search topic" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1 col-sm-12">
+                                                        <button type="button"
+                                                            class="clipboard-btn btn btn-primary me-2 waves-effect waves-light search_icon_btn">
+                                                            Search
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-5 col-sm-12">
+                                                        <button type="button"
+                                                            class="btn btn-primary me-4 d-none save_select_icons"
+                                                            style=" float: inline-end;">
+                                                            <i class="ri-save-3-line me-sm-1 me-0"></i>
+                                                            Save Select Icons
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <br>
+                                                <div class="mb-6 d-flex flex-wrap" id="icons-container"
+                                                    style="max-height: 500px; overflow-y: scroll;gap:1rem">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navs-saved-image-section" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            {{-- saved topics dropdown --}}
+                                            <div class="col-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="saved_topics_list"
+                                                        class="select2-icons form-select tag-name-select"
+                                                        name="saved_topics_list" data-allow-clear="true">
+                                                        <option value="">No saved topics</option>
+                                                    </select>
+                                                    <label for="saved_topics_list">Saved Tags</label>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-5" id="saved_images">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- icon save modal --}}
+    <div class="modal fade" id="save-icon-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalCenterTitle">Add New Tag Name</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addNewTagNameForm" class="row g-5">
+                        <div class="col-12">
+                            <div class="input-group-1">
+                                <input id="custom_tag_name" name="custom_tag_name"
+                                    class="form-control typeahead-saved-icon-tag-search" type="text"
+                                    placeholder="Enter tag name">
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center gap-4 row-gap-4 mt-5">
+                            <button type="button" id="save-icon-data-btn"
+                                class="btn btn-primary waves-effect waves-light">Save Icons</button>
+                            <button type="button" class="btn btn-outline-secondary btn-reset waves-effect"
+                                data-bs-dismiss="modal" aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ Fixed Header -->
+    <!--/ Select -->
+@endsection
+
+@section('page-script')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var icon_search_input = $('#icon_search_input');
+            var loadCollectionUrl = "https://api.iconify.design/collection?prefix=mdi";
+            var iconsContainer = $('#icons-container');
+            var IconData = [];
+            var currentPage = 0;
+            var itemsPerPage = 516; // Adjust as needed
+
+            // if search is empty , then load all icons
+            $(document).on('input', "#icon_search_input", function () {
+                if (icon_search_input.val().length == 0) {
+                    iconsContainer.empty();
+                    loadIcons();
+                }
+            });
+
+            // Load all icons once (since API returns all)
+            $.ajax({
+                url: loadCollectionUrl,
+                type: 'GET',
+                beforeSend: function () {
+                    showBSPLoader();
+                },
+                complete: function () {
+                    hideBSPLoader();
+                },
+                success: function (data) {
+                    IconData = data.uncategorized;
+                    loadIcons(); // Load first page
+                }
+            });
+
+            // Function to render icons per page
+            function loadIcons() {
+                var start = currentPage * itemsPerPage;
+                var end = start + itemsPerPage;
+                var iconsToRender = IconData.slice(start, end);
+                // console.log("start,end", start + "-" + end);
+                
+
+                iconsToRender.forEach(function (icon) {
+                    iconsContainer.append(`
+                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                <input class="form-check-input saved-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
+                                <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
+                                    <span class="custom-option-body">
+                                        <img src="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}"/>
+                                    </span>
+                                </label>
+                            </div>
+                        `);
+                });
+
+                // currentPage++;
+            }
+
+            // for searching icons
+            $(document).on('click', '.search_icon_btn', function () {
+                var searchInput = icon_search_input.val();
+                var searchUrl = "https://api.iconify.design/search?query=" + searchInput + "&prefix=mdi"
+                if (searchInput.length > 0) {
+                    $.ajax({
+                        url: searchUrl,
+                        type: "GET",
+                        beforeSend: function () {
+                            showBSPLoader();
+                        },
+                        complete: function () {
+                            hideBSPLoader();
+                        },
+                        success: function (response) {
+                            var searchIcons = response.icons;
+                            iconsContainer.empty();
+                            searchIcons.forEach(function (icon) {
+                                iconsContainer.append(`
+                                        <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                            <input class="form-check-input saved-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
+                                            <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
+                                            <span class="custom-option-body">
+                                                <img src="https://api.iconify.design/${icon}.svg?color=%23656565" data-icon-name="${icon}" alt="${icon}">
+                                            </span>
+                                            </label>
+                                        </div>
+                                    `);
+                            });
+                        }
+                    });
+                }
+            });
+
+            // only show save button if any image is selected
+            $(document).on('change', '.saved-icon-checkbox', function () {
+                if ($('.saved-icon-checkbox:checked').length > 0) {
+                    $('.save_select_icons').removeClass('d-none');
+                } else {
+                    $('.save_select_icons').addClass('d-none');
+                }
+            });
+            // --------------------------------------------------
+
+
+            $(document).on('click', '.save_select_icons', function () {
+                $('.typeahead-saved-icon-tag-search').typeahead('destroy');
+                $('#save-icon-modal').modal('show');
+            });
+
+            $(document).on('click', '#save-icon-data-btn', function () {
+                const form = $("#stock_icon_management")[0]; // Get the DOM element
+                const data = new FormData(form);
+                data.append("custom_tag_name", $('#custom_tag_name').val());
+                if (data.get("custom_tag_name").length > 0) {
+                    $.ajax({
+                        url: "{{ route('icon-management.store') }}",
+                        type: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        },
+                        data: data,
+                        processData: false,
+                        dataType: "json",
+                        contentType: false,
+                        beforeSend: function () {
+                            showBSPLoader();
+                        },
+                        complete: function () {
+                            hideBSPLoader();
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                $('#save-icon-modal').modal('hide');
+                                $('.saved-icon-checkbox:checked').each(function () {
+                                    $(this).prop('checked', false);
+                                });
+                                $('.save_select_icons').addClass('d-none');
+                                $('#custom_tag_name').val('');
+                                $('#icons-container').empty();
+                                icon_search_input.val('');
+                                loadIcons();
+                                showSweetAlert("success", "Store!", "Your icon has been successfully saved.")
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                            showSweetAlert("error", "Error!", "Something went wrong.");
+                        }
+                    });
+                }
+            });
+            // --------------------------------------------------
+        });
+    </script>
+@endsection
