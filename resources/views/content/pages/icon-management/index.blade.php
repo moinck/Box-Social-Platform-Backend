@@ -21,8 +21,7 @@
                 <h5 class="mb-0">Icon Management</h5>
                 {{-- <small class="text-muted float-end">Default label</small> --}}
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-danger me-4 delete_select_icons d-none"
-                        style="float: inline-end;">
+                    <button type="button" class="btn btn-danger me-4 delete_select_icons d-none" style="float: inline-end;">
                         <span class="tf-icons ri-delete-bin-line ri-16px me-2"></span>Delete Select Icons
                     </button>
                 </div>
@@ -63,7 +62,8 @@
                                     <div class="card">
                                         <div class="card-body">
                                             {{-- search form --}}
-                                            <form id="stock_icon_management" role="form" enctype="multipart/form-data" onsubmit="return false;">
+                                            <form id="stock_icon_management" role="form" enctype="multipart/form-data"
+                                                onsubmit="return false;">
                                                 <div class="row">
                                                     <div class="col-md-6 mb-6">
                                                         <div class="form-floating form-floating-outline">
@@ -116,7 +116,8 @@
                                                     <label for="saved_tag_list">Saved Tags</label>
                                                 </div>
                                             </div>
-                                            <div class="d-flex flex-wrap mt-5" id="saved_icon_container" style="max-height: 500px; overflow-y: scroll;gap:1rem">
+                                            <div class="d-flex flex-wrap mt-5" id="saved_icon_container"
+                                                style="max-height: 500px; overflow-y: scroll;gap:1rem">
                                             </div>
                                         </div>
                                     </div>
@@ -166,11 +167,11 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             var select2 = $('.tag-icon-name-select');
             // add select2
             if (select2.length) {
-                select2.each(function () {
+                select2.each(function() {
                     var $this = $(this);
                     select2Focus($this);
                     $this.wrap('<div class="position-relative"></div>').select2({
@@ -179,7 +180,8 @@
                     });
                 });
             }
-            
+            // --------------------------------------------------
+
             var icon_search_input = $('#icon_search_input');
             var loadCollectionUrl = "https://api.iconify.design/collection?prefix=mdi";
             var iconsContainer = $('#icons-container');
@@ -190,29 +192,31 @@
             var allIconsLoaded = false;
 
             // If search is empty, then load all icons
-            $(document).on('input', "#icon_search_input", function () {
+            $(document).on('input', "#icon_search_input", function() {
                 if (icon_search_input.val().length == 0) {
                     resetIconsContainer();
                     loadIcons();
                 }
             });
+            // --------------------------------------------------
 
             // Load all icons once (since API returns all)
             $.ajax({
                 url: loadCollectionUrl,
                 type: 'GET',
-                beforeSend: function () {
+                beforeSend: function() {
                     showBSPLoader();
                 },
-                complete: function () {
+                complete: function() {
                     hideBSPLoader();
                 },
-                success: function (data) {
+                success: function(data) {
                     IconData = data.uncategorized;
                     loadIcons(); // Load first page
                     setupLazyLoading(); // Setup scroll listener
                 }
             });
+            // --------------------------------------------------
 
             // Function to reset icons container
             function resetIconsContainer() {
@@ -221,17 +225,18 @@
                 allIconsLoaded = false;
                 isLoading = false;
             }
+            // --------------------------------------------------
 
             // Function to render icons per page
             function loadIcons() {
                 if (isLoading || allIconsLoaded) return;
-                
+
                 isLoading = true;
-                
+
                 var start = currentPage * itemsPerPage;
                 var end = start + itemsPerPage;
                 var iconsToRender = IconData.slice(start, end);
-                
+
                 // Check if we've loaded all icons
                 if (iconsToRender.length === 0 || end >= IconData.length) {
                     allIconsLoaded = true;
@@ -239,15 +244,15 @@
                     isLoading = false;
                     return;
                 }
-                
+
                 // Show loading indicator if not first page
                 if (currentPage > 0) {
                     showBSPLoader();
                 }
-                
+
                 // Simulate a small delay for better UX (optional)
                 setTimeout(function() {
-                    iconsToRender.forEach(function (icon) {
+                    iconsToRender.forEach(function(icon) {
                         iconsContainer.append(`
                             <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
                                 <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
@@ -259,17 +264,18 @@
                             </div>
                         `);
                     });
-                    
+
                     currentPage++;
                     isLoading = false;
                     hideBSPLoader();
-                    
+
                     // Check if we've loaded all icons after this batch
                     if (end >= IconData.length) {
                         allIconsLoaded = true;
                     }
                 }, 100); // Small delay for smooth loading
             }
+            // --------------------------------------------------
 
             // Function to setup lazy loading scroll listener
             function setupLazyLoading() {
@@ -278,28 +284,29 @@
                     var scrollTop = container.scrollTop();
                     var scrollHeight = container[0].scrollHeight;
                     var containerHeight = container.height();
-                    
+
                     // Load more when user scrolls to 80% of the content
                     var threshold = 0.8;
                     var triggerPoint = (scrollHeight - containerHeight) * threshold;
-                    
+
                     if (scrollTop >= triggerPoint && !isLoading && !allIconsLoaded) {
                         loadIcons();
                     }
                 });
             }
+            // --------------------------------------------------
 
             // Function to show loading indicator
             // function showLoadingIndicator() {
             //     if ($('#icons-loading-indicator').length === 0) {
             //         iconsContainer.append(`
-            //             <div id="icons-loading-indicator" class="w-100 text-center py-3">
-            //                 <div class="spinner-border spinner-border-sm text-primary" role="status">
-            //                     <span class="visually-hidden">Loading...</span>
-            //                 </div>
-            //                 <small class="text-muted ms-2">Loading more icons...</small>
-            //             </div>
-            //         `);
+        //             <div id="icons-loading-indicator" class="w-100 text-center py-3">
+        //                 <div class="spinner-border spinner-border-sm text-primary" role="status">
+        //                     <span class="visually-hidden">Loading...</span>
+        //                 </div>
+        //                 <small class="text-muted ms-2">Loading more icons...</small>
+        //             </div>
+        //         `);
             //     }
             // }
 
@@ -309,28 +316,45 @@
             // }
 
             // for searching icons
-            $(document).on('click', '.search_icon_btn', function () {
+            $(document).on('click', '.search_icon_btn', function() {
                 // make loading false
                 isLoading = false;
                 allIconsLoaded = true;
                 hideBSPLoader();
+                searchFormSubmit();
+            });
+            // -----------------------------------------------------
+
+            // search form submit
+            $(document).on('submit', '#stock_icon_management', function(e) {
+                e.preventDefault();
+                // make loading false
+                isLoading = false;
+                allIconsLoaded = true;
+                hideBSPLoader();
+                searchFormSubmit();
+            });
+            // -----------------------------------------------------
+
+            // search form submit function
+            function searchFormSubmit() {
                 var searchInput = icon_search_input.val();
                 var searchUrl = "https://api.iconify.design/search?query=" + searchInput + "&prefix=mdi"
                 if (searchInput.length > 0) {
                     $.ajax({
                         url: searchUrl,
                         type: "GET",
-                        beforeSend: function () {
+                        beforeSend: function() {
                             showBSPLoader();
                         },
-                        complete: function () {
+                        complete: function() {
                             hideBSPLoader();
                         },
-                        success: function (response) {
+                        success: function(response) {
                             var searchIcons = response.icons;
-                            if (searchIcons.length > 0) {                                
+                            if (searchIcons.length > 0) {
                                 iconsContainer.empty();
-                                searchIcons.forEach(function (icon) {
+                                searchIcons.forEach(function(icon) {
                                     iconsContainer.append(`
                                             <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
                                                 <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23656565" id="saved-icon-${icon}"/>
@@ -351,12 +375,12 @@
                 } else {
                     toastr.error('Please enter search keyword');
                 }
-            });
-            // -----------------------------------------------------
+            }
+            // ------------------------------------------------------
 
 
             // only show save button if any image is selected
-            $(document).on('change', '.new-icon-checkbox', function () {
+            $(document).on('change', '.new-icon-checkbox', function() {
                 if ($('.new-icon-checkbox:checked').length > 0) {
                     $('.save_select_icons').removeClass('d-none');
                 } else {
@@ -365,13 +389,15 @@
             });
             // --------------------------------------------------
 
-
-            $(document).on('click', '.save_select_icons', function () {
+            // show save icon modal
+            $(document).on('click', '.save_select_icons', function() {
                 $('.typeahead-saved-icon-tag-search').typeahead('destroy');
                 $('#save-icon-modal').modal('show');
             });
+            // --------------------------------------------------
 
-            $(document).on('click', '#save-icon-data-btn', function () {
+            // save icon Data
+            $(document).on('click', '#save-icon-data-btn', function() {
                 const form = $("#stock_icon_management")[0]; // Get the DOM element
                 const data = new FormData(form);
                 data.append("custom_tag_name", $('#custom_tag_name').val());
@@ -386,17 +412,17 @@
                         processData: false,
                         dataType: "json",
                         contentType: false,
-                        beforeSend: function () {
+                        beforeSend: function() {
                             showBSPLoader();
                         },
-                        complete: function () {
+                        complete: function() {
                             hideBSPLoader();
                         },
-                        success: function (response) {
+                        success: function(response) {
                             if (response.success) {
                                 $('#saved-icon-count').text(response.savedIconsCount);
                                 $('#save-icon-modal').modal('hide');
-                                $('.new-icon-checkbox:checked').each(function () {
+                                $('.new-icon-checkbox:checked').each(function() {
                                     $(this).prop('checked', false);
                                 });
                                 $('.save_select_icons').addClass('d-none');
@@ -405,10 +431,11 @@
                                 icon_search_input.val('');
                                 resetIconsContainer();
                                 loadIcons();
-                                showSweetAlert("success", "Store!", "Your icon has been successfully saved.")
+                                showSweetAlert("success", "Store!",
+                                    "Your icon has been successfully saved.")
                             }
                         },
-                        error: function (xhr, status, error) {
+                        error: function(xhr, status, error) {
                             console.log(error);
                             showSweetAlert("error", "Error!", "Something went wrong.");
                         }
@@ -417,12 +444,14 @@
             });
             // --------------------------------------------------
 
-            // load image when user comes to saved images tab
-            $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-icon-section"]', function (e) {
+            // load saved icons and tags when tabs change
+            $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-icon-section"]', function(e) {
                 loadSavedIcons();
                 loadSavedTags();
             });
+            // --------------------------------------------------
 
+            // load saved icons
             function loadSavedIcons(filterTag = null) {
                 $.ajax({
                     url: "{{ route('icon-management.get.saved-icon') }}",
@@ -430,18 +459,18 @@
                     data: {
                         filterTag: filterTag
                     },
-                    beforeSend: function () {
+                    beforeSend: function() {
                         showBSPLoader();
                     },
-                    complete: function () {
+                    complete: function() {
                         hideBSPLoader();
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             $('#saved-icon-count').text(response.savedIconsCount);
                             var savedIconData = response.data;
                             var savedIconHtml = '';
-                            savedIconData.forEach(function (icon) {
+                            savedIconData.forEach(function(icon) {
                                 savedIconHtml += `
                                     <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
                                         <input class="form-check-input saved-icon-checkbox" type="checkbox" name="savedSelectedIcons[]" data-icon-id="${icon.id}" value="${icon.icon_url}" id="saved-icon-${icon.id}"/>
@@ -456,7 +485,7 @@
                             $('#saved_icon_container').html(savedIconHtml);
                         }
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         console.log(error);
                         showSweetAlert("error", "Error!", "Something went wrong.");
                     }
@@ -464,28 +493,30 @@
             }
             // -----------------------------------------------------
 
+            // load saved tags
             function loadSavedTags() {
                 $.ajax({
                     url: "{{ route('icon-management.get.saved-tag') }}",
                     type: "GET",
-                    beforeSend: function () {
+                    beforeSend: function() {
                         showBSPLoader();
                     },
-                    complete: function () {
+                    complete: function() {
                         hideBSPLoader();
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             var savedTagNames = response.data;
                             var savedTopicsList = "";
                             savedTopicsList += `<option value="0">Select Tags to search</option>`;
-                            $.each(savedTagNames, function (i, tagName) {
-                                savedTopicsList += `<option value="${tagName}">${tagName}</option>`;
+                            $.each(savedTagNames, function(i, tagName) {
+                                savedTopicsList +=
+                                    `<option value="${tagName}">${tagName}</option>`;
                             });
                             $('#saved_tag_list').html(savedTopicsList);
                         }
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         console.log(error);
                         showSweetAlert("error", "Error!", "Something went wrong.");
                     }
@@ -494,7 +525,7 @@
             // -----------------------------------------------------
 
             // on change of saved topics list
-            $(document).on('change', '#saved_tag_list', function () {
+            $(document).on('change', '#saved_tag_list', function() {
                 var selectedTopic = $(this).val();
                 if (selectedTopic != 0) {
                     loadSavedIcons(selectedTopic);
@@ -505,7 +536,7 @@
             // -----------------------------------------------------
 
             // only show save button if any image is selected
-            $(document).on('change', '.saved-icon-checkbox', function () {
+            $(document).on('change', '.saved-icon-checkbox', function() {
                 if ($('.saved-icon-checkbox:checked').length > 0) {
                     $('.delete_select_icons').removeClass('d-none');
                 } else {
@@ -515,9 +546,9 @@
             // -----------------------------------------------------
 
             // delete saved icons
-            $(document).on('click', '.delete_select_icons', function () {
+            $(document).on('click', '.delete_select_icons', function() {
                 var deleteIconIds = [];
-                $('.saved-icon-checkbox:checked').each(function () {
+                $('.saved-icon-checkbox:checked').each(function() {
                     deleteIconIds.push($(this).data('icon-id'));
                 });
                 if (deleteIconIds.length > 0) {
@@ -530,25 +561,26 @@
                         data: {
                             deleteIconIds: deleteIconIds
                         },
-                        beforeSend: function () {
+                        beforeSend: function() {
                             showBSPLoader();
                         },
-                        complete: function () {
+                        complete: function() {
                             hideBSPLoader();
                         },
-                        success: function (response) {
+                        success: function(response) {
                             if (response.success) {
                                 $('#saved-icon-count').text(response.savedIconsCount);
-                                $('.saved-icon-checkbox:checked').each(function () {
+                                $('.saved-icon-checkbox:checked').each(function() {
                                     $(this).prop('checked', false);
                                 });
                                 $('.delete_select_icons').addClass('d-none');
                                 loadSavedIcons();
                                 loadSavedTags();
-                                showSweetAlert("success", "Delete!", "Your icon has been successfully deleted.")
+                                showSweetAlert("success", "Delete!",
+                                    "Your icon has been successfully deleted.")
                             }
                         },
-                        error: function (xhr, status, error) {
+                        error: function(xhr, status, error) {
                             console.log(error);
                             showSweetAlert("error", "Error!", "Something went wrong.");
                         }
