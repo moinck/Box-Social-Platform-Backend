@@ -43,6 +43,8 @@ class PostTemplateController extends Controller
         }
 
         $currentAdminToken = $adminToken->token;
+        // set token in session
+        Session::put('admin_access_token', $currentAdminToken);
         $categories = Categories::getActiveCategoeyList();
 
         return view('content.pages.admin.post-template.index', compact('categories', 'currentAdminToken'));
@@ -114,7 +116,8 @@ class PostTemplateController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
-                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId;
+                $adminAccessToken = Session::get('admin_access_token') ?? '';
+                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
                 // $downloadUrl = route('download.document', $postTemplateId);
                 // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
                 //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
