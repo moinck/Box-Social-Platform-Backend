@@ -21,7 +21,7 @@ class PostTemplateController extends Controller
         UserTokens::where('type', 'admin-access-token')
             ->where('is_used', false)
             ->where('created_at', '<', Carbon::now()->subDay())
-            ->update(['is_used' => true]);
+            ->delete();
 
         // Get the latest unused token created within last 1 day
         $adminToken = UserTokens::where('type', 'admin-access-token')
@@ -43,6 +43,8 @@ class PostTemplateController extends Controller
         }
 
         $currentAdminToken = $adminToken->token;
+        // set token in session
+        Session::put('admin_access_token', $currentAdminToken);
         $categories = Categories::getActiveCategoeyList();
 
         return view('content.pages.admin.post-template.index', compact('categories', 'currentAdminToken'));
@@ -114,7 +116,8 @@ class PostTemplateController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
-                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId;
+                $adminAccessToken = Session::get('admin_access_token') ?? '';
+                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
                 // $downloadUrl = route('download.document', $postTemplateId);
                 // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
                 //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
@@ -175,22 +178,21 @@ class PostTemplateController extends Controller
     {
         $decryptedId = Helpers::decrypt($request->post_template_id);
         $postTemplate = PostTemplate::find($decryptedId);
-        // dd($postTemplate);
-        if ($postTemplate) {
+        if (!empty($postTemplate)) {
             $templateImage = $postTemplate->template_image;
 
-        // Generate new unique filename
-        $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
-        $newFilename = 'admin_template_'.time().'.'.$extension;
-        
-        $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
+            // Generate new unique filename
+            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
+            $newFilename = 'admin_template_'.time().'.'.$extension;
+            
+            $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
 
-        $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
+            $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
 
-        // Create the duplicate record
-        $newPostTemplate = $postTemplate->replicate();
-        $newPostTemplate->template_image = $newUrl;
-        $newPostTemplate->save();
+            // Create the duplicate record
+            $newPostTemplate = $postTemplate->replicate();
+            $newPostTemplate->template_image = $newUrl;
+            $newPostTemplate->save();
             
             return response()->json([
                 'success' => true,

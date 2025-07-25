@@ -317,3 +317,13 @@ div.font-icon-btns {
     border-radius: 10px !important;
     background-color: #F4D106 !important;
 }
+
+/* over write CSS of sweet-alert */
+.swal2-modal.swal2-popup .swal2-title{
+    margin: 0.5rem auto 0.5rem !important;
+    line-height: 1 !important;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+    padding: 0.8em 1em 0 !important;
+}

@@ -24,7 +24,7 @@
         {
             "url": "/icon-management",
             "name": "Icon Management",
-            "icon": "menu-icon tf-icons ri-image-add-fill",
+            "icon": "menu-icon tf-icons ri-layout-grid-line",
             "slug": "icon-management",
             "role": ["admin"]
         },
