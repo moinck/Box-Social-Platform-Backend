@@ -19,7 +19,11 @@ class BrnadconfigurationController extends Controller
 
     public function dataTable()
     {
-        $data = BrandKit::with('user:id,first_name,last_name,company_name,email')->latest()->get();
+        $data = BrandKit::with('user:id,first_name,last_name,company_name,email')
+            ->whereHas('user', function ($query) {
+                $query->where('role', 'customer');
+            })
+            ->latest()->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
