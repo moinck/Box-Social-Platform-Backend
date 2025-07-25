@@ -67,7 +67,9 @@ class HomePage extends Controller
 		$postTemplate = PostTemplate::count();
 
 		// brand-kit count
-		$brandConfigurationCount = BrandKit::count();
+		$brandConfigurationCount = BrandKit::whereHas('user', function ($query) {
+			$query->where('role', 'customer');
+		})->count();
 
 		// feedback count
 		$feedbackCount = ContactUs::count();
