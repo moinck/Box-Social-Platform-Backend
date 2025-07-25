@@ -21,7 +21,7 @@ class PostTemplateController extends Controller
         UserTokens::where('type', 'admin-access-token')
             ->where('is_used', false)
             ->where('created_at', '<', Carbon::now()->subDay())
-            ->update(['is_used' => true]);
+            ->delete();
 
         // Get the latest unused token created within last 1 day
         $adminToken = UserTokens::where('type', 'admin-access-token')
@@ -175,22 +175,21 @@ class PostTemplateController extends Controller
     {
         $decryptedId = Helpers::decrypt($request->post_template_id);
         $postTemplate = PostTemplate::find($decryptedId);
-        // dd($postTemplate);
-        if ($postTemplate) {
+        if (!empty($postTemplate)) {
             $templateImage = $postTemplate->template_image;
 
-        // Generate new unique filename
-        $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
-        $newFilename = 'admin_template_'.time().'.'.$extension;
-        
-        $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
+            // Generate new unique filename
+            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
+            $newFilename = 'admin_template_'.time().'.'.$extension;
+            
+            $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
 
-        $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
+            $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
 
-        // Create the duplicate record
-        $newPostTemplate = $postTemplate->replicate();
-        $newPostTemplate->template_image = $newUrl;
-        $newPostTemplate->save();
+            // Create the duplicate record
+            $newPostTemplate = $postTemplate->replicate();
+            $newPostTemplate->template_image = $newUrl;
+            $newPostTemplate->save();
             
             return response()->json([
                 'success' => true,
