@@ -174,7 +174,7 @@ class UserManagementController extends Controller
             if ($user->profile_image != null) {
                 Helpers::deleteImage($user->profile_image);
             }
-            $user->brandKit()->delete();
+            $user->hasBrandKit() ? $user->brandKit()->delete() : null;
             $user->delete();
             return response()->json([
                 'success' => true,
