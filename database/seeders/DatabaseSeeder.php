@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('adminbox123'),
             'status' => 'active',
             'role' => 'admin',
+            'is_verified' => true,
+            'email_verified_at' => now(),
         ]);
 
 
