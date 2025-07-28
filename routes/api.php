@@ -129,7 +129,7 @@ Route::post('/post-content/get/category', [PostContentApiController::class, 'get
 
 // get stock image
 Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
-Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
+Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get'])->middleware('adminToken');
 
 // icon management api
 Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);

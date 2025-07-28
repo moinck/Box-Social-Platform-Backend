@@ -24,7 +24,7 @@ class StockImageApiController extends Controller
 
         $limit = $request->limit ?? 25; // default to 25 if not provided
         $page = $request->offset ?? 1; // treat 'offset' as page number
-        $realOffset = ($page - 1) * $limit;
+        $realOffset = $request->offset;
 
         $totalAdminImageCount = ImageStockManagement::whereIn('user_id', $adminIds)->count();
 

@@ -16,13 +16,14 @@ class IconManagementAPiController extends Controller
         $searchQuery = $request->search;
         $limit = $request->limit ?? 25; // default to 25 if not provided
         $page = $request->offset ?? 1; // treat 'offset' as page number
-        $realOffset = ($page - 1) * $limit;
+        $realOffset = $request->offset;
         $totalIconCount = IconManagement::count();
 
         $icons = IconManagement::select('icon_url', 'tag_name')
             ->when($searchQuery, function ($query) use ($searchQuery) {
                 $query->where('tag_name','LIKE',"%".$searchQuery."%");
             })
+            ->latest()
             ->offset($realOffset)
             ->limit($limit)
             ->get();
