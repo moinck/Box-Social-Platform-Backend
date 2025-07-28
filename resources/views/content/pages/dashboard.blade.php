@@ -158,6 +158,52 @@
                 </div>
             </a>
         </div>
+
+        {{-- Stock Image count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('stock-image-management') }}" title="Go to Stock Image Management">
+                <div class="card card-border-shadow-success">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-success rounded-3">
+                                    <i class="ri-folder-image-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['imageCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Stock Image</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Icon count --}}
+        <div class="col-lg-3 col-sm-6">
+            <a href="{{ route('icon-management') }}" title="Go to Icon Management">
+                <div class="card card-border-shadow-info">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="avatar me-4">
+                                <div class="avatar-initial bg-label-info rounded-3">
+                                    <i class="ri-layout-grid-line ri-24px"> </i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-2">{{ $pageData['iconsCount'] ?? 0 }}</h5>
+                                </div>
+                                <p class="mb-0">Icon Management</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <div class="row g-6">
