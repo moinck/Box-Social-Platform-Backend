@@ -312,6 +312,7 @@ $(function () {
     var savedTopics = [];
     $(document).on('click', '.save_select_images', function () {
         $(".typeahead-saved-tag-search").val('');
+        $('.typeahead-saved-tag-search').typeahead('destroy');
         $.ajax({
             type: "GET",
             url: `/stock-image-management/get/saved-topics`,
