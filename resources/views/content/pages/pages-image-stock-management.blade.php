@@ -258,7 +258,6 @@
             // --------------------------------------------------
 
             $(document).on('click', '.save_select_images', function () {
-                $('.typeahead-saved-tag-search').typeahead('destroy');
                 $('#save-data-modal').modal('show');
             })
 

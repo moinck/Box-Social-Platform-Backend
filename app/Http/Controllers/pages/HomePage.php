@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
 use App\Models\Categories;
 use App\Models\ContactUs;
+use App\Models\IconManagement;
+use App\Models\ImageStockManagement;
 use App\Models\PostContent;
 use App\Models\PostTemplate;
 use App\Models\User;
@@ -74,6 +76,15 @@ class HomePage extends Controller
 		// feedback count
 		$feedbackCount = ContactUs::count();
 
+		// image count
+		$imageCount = ImageStockManagement::where(function ($query) {
+			$query->whereNotNull('user_id')
+				->where('user_id', "=",1);
+		})->count();
+
+		// icons count
+		$iconsCount = IconManagement::whereNotNull('tag_name')->count();
+
 		$pageData['totalUser'] = $users->total;
 		$pageData['activeUser'] = $users->active;
 		$pageData['inactiveUser'] = $users->inactive;
@@ -83,6 +94,8 @@ class HomePage extends Controller
 		$pageData['postTemplateCount'] = $postTemplate;
 		$pageData['brandConfigurationCount'] = $brandConfigurationCount;
 		$pageData['feedbackCount'] = $feedbackCount;
+		$pageData['imageCount'] = $imageCount;
+		$pageData['iconsCount'] = $iconsCount;
 
 		$recentUsers = User::where('role', "customer")->latest()->take(7)->get();
 		$pageData['recentUsers'] = $recentUsers;
