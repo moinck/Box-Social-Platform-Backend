@@ -121,6 +121,7 @@ Route::get('/admin/template-data', [AdminApiController::class, 'index']);
 // Admin Create Template 
 Route::post('/template/store', [TemplateApiController::class, 'store']);
 Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
+Route::get('/admin-template/get/{id}', [TemplateApiController::class, 'getTemplate']);
 Route::post('/template/update', [TemplateApiController::class, 'update']);
 
 // post content api
@@ -128,6 +129,7 @@ Route::post('/post-content/get/category', [PostContentApiController::class, 'get
 
 // get stock image
 Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
 
 // icon management api
 Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
