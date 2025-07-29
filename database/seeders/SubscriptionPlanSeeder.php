@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionPlanSeeder extends Seeder
 {
@@ -117,14 +118,14 @@ class SubscriptionPlanSeeder extends Seeder
                     'Thousands of social media content written by financial services experts',
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
-                    'Ability to create and download 40 posts a day in just a few clicks',
+                    'Ability to create and download 40 posts a Month in just a few clicks',
                     'PFA posts such as Tax, Business Protection, Investments, Will Writing, Pensions',
                     'Gain first access to no extra charge future developments',
                     'Additional Topics such as Commercial Finance, Bridging Finance, Second Charges',
                     'AI Compliance checked social media content',
                     'Built-in scheduling tool for social media accounts',
                     'Content suitable for various platforms (Twitter & WhatsApp)',
-                    '3 day free trial included'
+                    // '3 day free trial included'
                 ]),
                 'sort_order' => 4,
                 'created_at' => Carbon::now(),
@@ -133,8 +134,15 @@ class SubscriptionPlanSeeder extends Seeder
         ];
 
         // DB::table('subscription_plans')->insert($plans);
-        foreach ($plans as $plan) {
-            SubscriptionPlans::updateOrCreate(['slug' => $plan['slug']], $plan);
+        try {
+            DB::beginTransaction();
+            foreach ($plans as $plan) {
+                SubscriptionPlans::updateOrCreate(['slug' => $plan['slug']], $plan);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('SubscriptionPlanSeeder Error: ' . $e->getMessage());
         }
     }
 }
