@@ -204,7 +204,9 @@ class UserSubscriptionNewApiController extends Controller
 
             // store full response from stripe
             $userSubscription->response_meta = json_encode($session, JSON_PRETTY_PRINT);
-            
+            $userSubscription->total_download_limit = 40;
+            $userSubscription->daily_download_limit = 0;
+            $userSubscription->reset_date = now()->addMonths(1)->startOfMonth()->format('Y-m-d');
             $userSubscription->save();
 
             // Reset usage counters for new subscription
@@ -508,35 +510,31 @@ class UserSubscriptionNewApiController extends Controller
         }
         
         $totalDownloadLimit = $subscription->total_download_limit;
-        $dailyDownloadLimit = $subscription->daily_download_limit;
-        $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+        $remainingDownloadLimit = $totalDownloadLimit - $subscription->downloads_used_today;
 
         if ($subscription) {
-            if ($dailyDownloadLimit > 0) {
-                // $subscription->daily_download_limit = $subscription->daily_download_limit - 1;
+            if ($remainingDownloadLimit > 0) {
                 $subscription->downloads_used_today = $subscription->downloads_used_today + 1;
                 $subscription->save();
 
-                $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+                $remainingDownloadLimit = $totalDownloadLimit - $subscription->downloads_used_today;
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Daily download limit exceeded',
+                    'message' => 'Monthly download limit exceeded',
                     'data' => [
                         'total_download_limit' => $totalDownloadLimit,
-                        'daily_download_limit' => $dailyDownloadLimit,
+                        'monthly_download_limit' => $remainingDownloadLimit,
                         'downloads_used_today' => $subscription->downloads_used_today,
                         'remaining_download_limit' => $remainingDownloadLimit,
                     ]
                 ]);
             }
-
-            $dailyDownloadLimit = $subscription->daily_download_limit;
         }
 
         $returnData = [
             'total_download_limit' => $totalDownloadLimit,
-            'daily_download_limit' => $dailyDownloadLimit,
+            'monthly_download_limit' => $remainingDownloadLimit,
             'downloads_used_today' => $subscription->downloads_used_today,
             'remaining_download_limit' => $remainingDownloadLimit,
         ];

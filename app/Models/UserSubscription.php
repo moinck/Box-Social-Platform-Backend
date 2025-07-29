@@ -41,7 +41,7 @@ class UserSubscription extends Model
         'daily_download_limit',
         'downloads_used_today',
         'total_downloads_used',
-        'daily_reset_date',
+        'reset_date',
     ];
 
     public function user()
