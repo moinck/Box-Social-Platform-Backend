@@ -80,6 +80,7 @@ class UserSubscriptionNewApiController extends Controller
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
+            // if FREE-TRIAL plan create free subscription without stripe
             if ($subscriptionPlanDetail->slug == 'free-trial') {
                 $this->createFreeTrialSubscription($userId,$newSubscription->id);
 
@@ -108,6 +109,7 @@ class UserSubscriptionNewApiController extends Controller
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
                 'payment_method_types' => ['card'],
+                'allow_promotion_codes' => true,
                 'line_items' => [
                     [
                         'price' => $subscriptionPlanDetail->stripe_price_id,
@@ -159,7 +161,7 @@ class UserSubscriptionNewApiController extends Controller
 
             // Verify session with Stripe
             $session = $this->stripe->checkout->sessions->retrieve($sessionId, [
-                'expand' => ['subscription', 'customer']
+                'expand' => ['subscription', 'customer','payment_intent']
             ]);
 
             if ($session->payment_status !== 'paid') {
@@ -217,7 +219,7 @@ class UserSubscriptionNewApiController extends Controller
             $newPayment->currency =  $session->currency ?? 'GBP';
             $newPayment->payment_type = 'subscription';
             $newPayment->payment_method = $session->payment_settings->payment_method_types[0] ?? 'card';
-            $newPayment->stripe_payment_intent_id = $session->payment_intent ?? ($userSubscription->stripe_payment_method_id ?? null);
+            $newPayment->stripe_payment_intent_id = $session->payment_intent->id ?? ($userSubscription->stripe_payment_method_id ?? null);
             $newPayment->save();
 
             DB::commit();
@@ -315,7 +317,9 @@ class UserSubscriptionNewApiController extends Controller
             'email' => $user->email,
             'name' => $user->first_name . ' ' . $user->last_name,
             'metadata' => [
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'fca_number' => $user->fca_number ?? null,
+                'company_name' => $user->company_name ?? null,
             ]
         ]);
 
