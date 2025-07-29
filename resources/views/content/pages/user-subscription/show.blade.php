@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Brand Configuration')
+@section('title', 'User Subscription')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
