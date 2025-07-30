@@ -388,7 +388,7 @@ class UserSubscriptionNewApiController extends Controller
 
     public function getCurrentSubscription()
     {
-        $subscription = UserSubscription::with('plan:id,name,price')
+        $subscription = UserSubscription::with('plan:id,name,price','downloadTracker')
             ->where('user_id', Auth::id())
             ->where('status', 'active')
             ->first();
@@ -402,11 +402,14 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         $planDetails = [];
+        $downloadCountDetails = [];
         if($subscription){
             $planDetails = [
                 'id' => Helpers::encrypt($subscription->plan->id),
                 'name' => $subscription->plan->name,
             ];
+
+            $downloadCountDetails = $subscription->downloadTracker->getDownloadStats();
         }
             
         $returnData = [];
@@ -416,13 +419,10 @@ class UserSubscriptionNewApiController extends Controller
                 'status' => $subscription->status,
                 'amount_paid' => $subscription->amount_paid,
                 'currency' => $subscription->currency,
-                'current_period_start' => date("Y-m-d",strtotime($subscription->current_period_start)),
-                'current_period_end' => date("Y-m-d",strtotime($subscription->current_period_end)),
-                'total_download_limit' => $subscription->total_download_limit,
-                'daily_download_limit' => $subscription->daily_download_limit,
-                'download_used_today' => $subscription->downloads_used_today ?? 0,
-                'remaining_download_limit' => abs($subscription->daily_download_limit - ($subscription->downloads_used_today ?? 0)),
+                'current_period_start' => date("d-m-Y",strtotime($subscription->current_period_start)),
+                'current_period_end' => date("d-m-Y",strtotime($subscription->current_period_end)),
                 'plan_details' => $planDetails,
+                'download_count_details' => $downloadCountDetails,
             ];
         }
         // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);

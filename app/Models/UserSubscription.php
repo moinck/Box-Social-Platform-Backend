@@ -70,4 +70,19 @@ class UserSubscription extends Model
         });
     }
 
+    public function downloadTracker()
+    {
+        return $this->hasOne(UserDownloads::class, 'user_subscription_id');
+    }
+
+        /**
+     * Get remaining downloads for current period
+     */
+    public function getRemainingDownloads()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->getRemainingDownloads();
+    }
+
 }

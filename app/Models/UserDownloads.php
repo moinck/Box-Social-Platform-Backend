@@ -186,11 +186,10 @@ class UserDownloads extends Model
      */
     public function getDownloadStats()
     {
-        if ($this->plan_type != 'free-trial') {
+        if ($this->plan_type == 'free-trial') {
             return [
                 'used' => $this->total_downloads_used,
                 'remaining' => $this->getRemainingDownloads(),
-                'limit' => $this->total_limit ?? 3,
                 'expires_at' => $this->expires_at,
                 'expired' => $this->expires_at ? Carbon::now()->gt($this->expires_at) : false,
             ];
