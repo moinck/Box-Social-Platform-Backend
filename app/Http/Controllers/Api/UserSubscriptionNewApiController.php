@@ -512,7 +512,7 @@ class UserSubscriptionNewApiController extends Controller
         $authUser = Auth::user();
         $subscription = UserSubscription::select('id','total_download_limit','daily_download_limit','downloads_used_today')
             ->with('downloadTracker')
-            ->where('user_id', 4)
+            ->where('user_id', $authUser->id)
             ->where('status', 'active')
             ->first();
         
@@ -527,6 +527,7 @@ class UserSubscriptionNewApiController extends Controller
 
         $downloadCountStats = [];
         if ($subscription) {
+            // check if user can download
             if($subscription->canDownload()){
                 $subscription->recordDownload();
                 $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
