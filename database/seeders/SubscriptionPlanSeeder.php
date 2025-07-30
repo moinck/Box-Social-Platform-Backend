@@ -28,8 +28,8 @@ class SubscriptionPlanSeeder extends Seeder
                 'trial_period_days' => 3,
                 'daily_download_limit' => null,
                 'total_download_limit' => 3,
-                'stripe_price_id' => 'price_1RZWqLR0DcXT6U52RNFuFUkY',
-                'stripe_product_id' => 'prod_SUVsWY6A37Y6CS',
+                'stripe_price_id' => null,
+                'stripe_product_id' => null,
                 'is_active' => true,
                 'is_trial' => true,
                 'is_popular' => false,
@@ -44,77 +44,23 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Annual Plan',
-                'slug' => 'annual-plan',
-                'description' => 'Annual subscription with 40 downloads per day',
-                'price' => 99.00, // Adjust your price
+                'name' => 'Box Socials Premium Plan - Before Sept 2025',
+                'slug' => 'box-socials-premium-plan-before-sept-2025',
+                'description' => 'Premium plan for users subscribed before Sept 1, 2025',
+                'price' => 650.00,
                 'currency' => 'GBP',
                 'interval' => 'year',
                 'interval_count' => 1,
-                'trial_period_days' => 0,
-                'daily_download_limit' => 40,
-                'total_download_limit' => null,
-                'stripe_price_id' => 'price_1234567890', // Replace with your actual Stripe price ID
-                'stripe_product_id' => 'prod_1234567890', // Replace with your actual Stripe product ID
-                'is_active' => false,
-                'is_trial' => false,
-                'is_popular' => false,
-                'features' => json_encode([
-                    '40 downloads per day',
-                    'Unlimited access for 1 year',
-                    'Priority support',
-                    'Cancel anytime',
-                    'Admin-managed cancellation'
-                ]),
-                'sort_order' => 2,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            // You can add more plans here for future use
-            [
-                'name' => 'Monthly Plan',
-                'slug' => 'monthly-plan',
-                'description' => 'Monthly subscription with 40 downloads per day',
-                'price' => 9.99,
-                'currency' => 'GBP',
-                'interval' => 'month',
-                'interval_count' => 1,
-                'trial_period_days' => 0,
-                'daily_download_limit' => 40,
-                'total_download_limit' => null,
-                'stripe_price_id' => 'price_monthly_123', // Replace with actual Stripe price ID
-                'stripe_product_id' => 'prod_1234567890',
-                'is_active' => false, // Disabled for now
-                'is_trial' => false,
-                'is_popular' => false,
-                'features' => json_encode([
-                    '40 downloads per day',
-                    'Monthly billing',
-                    'Priority support',
-                    'Cancel anytime'
-                ]),
-                'sort_order' => 3,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'name' => 'Box Socials Premium Plan',
-                'slug' => 'box-socials-premium-plan',
-                'description' => 'Premium annual plan with comprehensive social media features',
-                'price' => 780.00,
-                'currency' => 'GBP', // Based on £65 in the image
-                'interval' => 'year',
-                'interval_count' => 1,
-                'trial_period_days' => 3, // Free 3 day trial mentioned
-                'daily_download_limit' => 40, // Based on "40 posts a day" feature
-                'total_download_limit' => null,
-                'stripe_price_id' => 'price_1Rm6spR0DcXT6U527MVUtt9v', // Replace with actual Stripe price ID
-                'stripe_product_id' => 'prod_ShVuLFcw5okX2y', // Replace with actual Stripe product ID
+                'trial_period_days' => 3,
+                'daily_download_limit' => null,
+                'total_download_limit' => 480,
+                'stripe_price_id' => 'price_1RqCFAR0DcXT6U523bfrSdJJ', // Replace with actual Stripe price ID
+                'stripe_product_id' => 'prod_ShVuLFcw5okX2y',
                 'is_active' => true,
                 'is_trial' => false,
-                'is_popular' => true,
+                'is_popular' => false,
                 'features' => json_encode([
-                    '£65 GBP per month (65*12 = 780 GBP)',
+                    '£650 GBP per year (Before Sept 2025)',
                     'Thousands of social media content written by financial services experts',
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
@@ -125,13 +71,46 @@ class SubscriptionPlanSeeder extends Seeder
                     'AI Compliance checked social media content',
                     'Built-in scheduling tool for social media accounts',
                     'Content suitable for various platforms (Twitter & WhatsApp)',
-                    // '3 day free trial included'
                 ]),
-                'sort_order' => 4,
+                'sort_order' => 2,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
-            ]
+            ],
+            [
+                'name' => 'Box Socials Premium Plan - After Sept 2025',
+                'slug' => 'box-socials-premium-plan-after-sept-2025',
+                'description' => 'Premium plan for users subscribed after Sept 1, 2025',
+                'price' => 780.00,
+                'currency' => 'GBP',
+                'interval' => 'year',
+                'interval_count' => 1,
+                'trial_period_days' => 3,
+                'daily_download_limit' => null,
+                'total_download_limit' => 480,
+                'stripe_price_id' => 'price_1Rm6spR0DcXT6U527MVUtt9v', // Replace with actual Stripe price ID
+                'stripe_product_id' => 'prod_ShVuLFcw5okX2y',
+                'is_active' => true,
+                'is_trial' => false,
+                'is_popular' => true,
+                'features' => json_encode([
+                    '£780 GBP per year (After Sept 2025)',
+                    'Thousands of social media content written by financial services experts',
+                    'Access to an ever-growing library of design templates',
+                    'Access to millions of royalty free stock images updated every week',
+                    'Ability to create and download 40 posts a Month in just a few clicks',
+                    'PFA posts such as Tax, Business Protection, Investments, Will Writing, Pensions',
+                    'Gain first access to no extra charge future developments',
+                    'Additional Topics such as Commercial Finance, Bridging Finance, Second Charges',
+                    'AI Compliance checked social media content',
+                    'Built-in scheduling tool for social media accounts',
+                    'Content suitable for various platforms (Twitter & WhatsApp)',
+                ]),
+                'sort_order' => 3,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ];
+
 
         // DB::table('subscription_plans')->insert($plans);
         try {
