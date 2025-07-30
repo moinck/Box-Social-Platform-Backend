@@ -75,7 +75,7 @@ class UserSubscription extends Model
         return $this->hasOne(UserDownloads::class, 'user_subscription_id');
     }
 
-        /**
+    /**
      * Get remaining downloads for current period
      */
     public function getRemainingDownloads()
@@ -85,4 +85,23 @@ class UserSubscription extends Model
         return $tracker->getRemainingDownloads();
     }
 
+    /**
+     * Record a download (post download or creation - both count as 1)
+     */
+    public function recordDownload()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->incrementDownload();
+    }
+
+    /**
+     * Check if user can download
+     */
+    public function canDownload()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->canDownload();
+    }
 }

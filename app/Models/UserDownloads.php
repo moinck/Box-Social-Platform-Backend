@@ -102,7 +102,7 @@ class UserDownloads extends Model
      */
     public function canDownload()
     {
-        if ($this->plan_type != 'free-trial') {
+        if ($this->plan_type == 'free-trial') {
             // Check if expired
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
                 return false;
@@ -189,9 +189,11 @@ class UserDownloads extends Model
         if ($this->plan_type == 'free-trial') {
             return [
                 'used' => $this->total_downloads_used,
-                'remaining' => $this->getRemainingDownloads(),
-                'expires_at' => $this->expires_at,
-                'expired' => $this->expires_at ? Carbon::now()->gt($this->expires_at) : false,
+                'remaining' => max(0, ($this->total_limit ?? 3) - $this->total_downloads_used),
+                'monthly_limit' => $this->monthly_limit,
+                'total_limit' => $this->total_limit,
+                // 'expires_at' => $this->expires_at,
+                // 'expired' => $this->expires_at ? Carbon::now()->gt($this->expires_at) : false,
             ];
         } else {
             $this->checkAndResetMonthly();
@@ -203,8 +205,8 @@ class UserDownloads extends Model
                 'carried_over' => $this->carried_over_downloads,
                 'effective_limit' => $this->monthly_limit + $this->carried_over_downloads,
                 'current_period' => $this->current_month . '/' . $this->current_year,
-                'last_reset' => $this->last_reset_date,
-                'expires_at' => $this->expires_at,
+                // 'last_reset' => $this->last_reset_date,
+                // 'expires_at' => $this->expires_at,
             ];
         }
     }

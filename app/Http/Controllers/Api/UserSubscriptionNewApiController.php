@@ -511,7 +511,8 @@ class UserSubscriptionNewApiController extends Controller
     {
         $authUser = Auth::user();
         $subscription = UserSubscription::select('id','total_download_limit','daily_download_limit','downloads_used_today')
-            ->where('user_id', $authUser->id)
+            ->with('downloadTracker')
+            ->where('user_id', 4)
             ->where('status', 'active')
             ->first();
         
@@ -522,42 +523,28 @@ class UserSubscriptionNewApiController extends Controller
                 'data' => []
             ]);
         }
-        
-        $totalDownloadLimit = $subscription->total_download_limit;
-        $remainingDownloadLimit = $totalDownloadLimit - $subscription->downloads_used_today;
+    
 
+        $downloadCountStats = [];
         if ($subscription) {
-            if ($remainingDownloadLimit > 0) {
-                $subscription->downloads_used_today = $subscription->downloads_used_today + 1;
-                $subscription->save();
+            if($subscription->canDownload()){
+                $subscription->recordDownload();
+                $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
 
-                $remainingDownloadLimit = $totalDownloadLimit - $subscription->downloads_used_today;
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Subscription download limit updated successfully',
+                    'data' => $downloadCountStats,
+                ]);
             } else {
+                $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
                 return response()->json([
                     'status' => false,
-                    'message' => 'Monthly download limit exceeded',
-                    'data' => [
-                        'total_download_limit' => $totalDownloadLimit,
-                        'monthly_download_limit' => $remainingDownloadLimit,
-                        'downloads_used_today' => $subscription->downloads_used_today,
-                        'remaining_download_limit' => $remainingDownloadLimit,
-                    ]
+                    'message' => 'Subscription download limit exceeded',
+                    'data' => $downloadCountStats,
                 ]);
             }
         }
-
-        $returnData = [
-            'total_download_limit' => $totalDownloadLimit,
-            'monthly_download_limit' => $remainingDownloadLimit,
-            'downloads_used_today' => $subscription->downloads_used_today,
-            'remaining_download_limit' => $remainingDownloadLimit,
-        ];
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Subscription download limit updated successfully',
-            'data' => $returnData,
-        ]);
     }
     
 }
