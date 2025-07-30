@@ -123,7 +123,7 @@
                                         <small class="text-muted d-block">Yearly Downloads</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ $subscriptionData->downloads_used_today }}/{{ $subscriptionData->total_download_limit }}
+                                                {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
                                             </h6>
                                         </div>
                                     </div>

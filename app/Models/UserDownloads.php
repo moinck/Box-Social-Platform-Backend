@@ -46,10 +46,10 @@ class UserDownloads extends Model
     public static function createForSubscription($subscription)
     {
         $currentDate = Carbon::now();
-        $planType = $subscription->plan->type ?? 'basic';
+        $planType = $subscription->plan->slug ?? 'free-trial';
         $monthlyLimit = 0;
         $totalLimit = 0;
-        if($planType === 'premium') {
+        if($planType != 'free-trial') {
             $monthlyLimit = 40;
             $totalLimit = 480;
         } else {
@@ -78,7 +78,7 @@ class UserDownloads extends Model
     public function incrementDownload()
     {
         // Check if we need to reset monthly count for premium plans
-        if ($this->plan_type === 'premium') {
+        if ($this->plan_type != 'free-trial') {
             $this->checkAndResetMonthly();
         }
         
@@ -89,7 +89,7 @@ class UserDownloads extends Model
         
         // Increment counters
         $this->total_downloads_used += 1;
-        if ($this->plan_type === 'premium') {
+        if ($this->plan_type != 'free-trial') {
             $this->monthly_downloads_used += 1;
         }
         
@@ -102,7 +102,7 @@ class UserDownloads extends Model
      */
     public function canDownload()
     {
-        if ($this->plan_type === 'basic') {
+        if ($this->plan_type != 'free-trial') {
             // Check if expired
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
                 return false;
@@ -122,7 +122,7 @@ class UserDownloads extends Model
      */
     public function getRemainingDownloads()
     {
-        if ($this->plan_type === 'basic') {
+        if ($this->plan_type != 'free-trial') {
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
                 return 0;
             }
@@ -167,7 +167,7 @@ class UserDownloads extends Model
      */
     public function resetDownloads()
     {
-        if ($this->plan_type === 'basic') {
+        if ($this->plan_type != 'free-trial') {
             $this->total_downloads_used = 0;
             $this->expires_at = Carbon::now()->addDays(3);
         } else {
@@ -186,7 +186,7 @@ class UserDownloads extends Model
      */
     public function getDownloadStats()
     {
-        if ($this->plan_type === 'basic') {
+        if ($this->plan_type != 'free-trial') {
             return [
                 'used' => $this->total_downloads_used,
                 'remaining' => $this->getRemainingDownloads(),

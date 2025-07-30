@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
+use App\Models\UserDownloads;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -73,7 +74,9 @@ class UserSubscriptionController extends Controller
         $decyptId = Helpers::decrypt($id);
 
         $subscriptionData = UserSubscription::with('user:id,first_name,last_name,email,created_at','plan:id,name,price,features,currency')->findOrFail($decyptId);
+        $userDownloads = UserDownloads::where('user_subscription_id', $decyptId)->first();
+        // dd($userDownloads);
 
-        return view('content.pages.user-subscription.show', compact('subscriptionData'));
+        return view('content.pages.user-subscription.show', compact('subscriptionData', 'userDownloads'));
     }
 }

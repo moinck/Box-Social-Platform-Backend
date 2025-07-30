@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserSubscription;
 use App\Http\Controllers\Controller;
 use App\Models\Payments;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -67,12 +68,25 @@ class UserSubscriptionNewApiController extends Controller
                 ], 400);
             }
 
+            if ($subscriptionPlanDetail->slug != 'free-trial') {
+                $today = now();
+                $currentYear = $today->year;
+                $cutoffDate = Carbon::create($currentYear, 9, 1); // Sept 1, 2025
+
+                // Before Sept 1 → use £650 plan else £780 plan
+                if ($today->lt($cutoffDate)) {
+                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
+                } else {
+                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 3)->first();
+                }
+            }
+
             DB::beginTransaction();
 
             // Create incomplete subscription in DB
             $newSubscription = new UserSubscription();
             $newSubscription->user_id = $userId;
-            $newSubscription->plan_id = $planId;
+            $newSubscription->plan_id = $subscriptionPlanDetail->id;
             $newSubscription->stripe_customer_id = $userStripeCustomerId;
             $newSubscription->stripe_price_id = $subscriptionPlanDetail->stripe_price_id;
             $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit ?? 0;
@@ -93,7 +107,7 @@ class UserSubscriptionNewApiController extends Controller
                     'data' => [
                         'subscription_plan' => 'free-trial',
                         'subscription_id' => Helpers::encrypt($newSubscription->id),
-                        'subscription_status' => $newSubscription->status
+                        'subscription_status' => 'active'
                     ]
                 ]);
             }
