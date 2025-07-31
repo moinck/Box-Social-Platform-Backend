@@ -93,7 +93,7 @@
                             </div>
                         </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="submit" id="createPostContentBtn" class="btn btn-primary">Create</button>
                             <button type="reset" class="btn btn-outline-secondary" id="cancelCreatePostContentBtn">
                                 Cancel
                             </button>
@@ -213,6 +213,15 @@
                 $('.ql-editor').hasClass('ql-blank') ?
                     $('#hiddenPostDescription').val('') :
                     $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
+                if ($('.ql-editor').hasClass('ql-blank')) {
+                    $('.ql-toolbar').css("border","2px solid #ff4d49")
+                    // on container remove top border
+                    $('.ql-container').css("border","2px solid #ff4d49")
+                    $('.ql-container').css("border-top","none")
+                }else{
+                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
+                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                }
                 validator.revalidateField('post_description');
             });
 
@@ -266,6 +275,19 @@
                 $('#create-post-content-form').submit();
             });
             // -----------------------------------------------------
+
+            // for validation on quill editor
+            $(document).on('click','#createPostContentBtn', function () {
+                if ($('.ql-editor').hasClass('ql-blank')) {
+                    $('.ql-toolbar').css("border","2px solid #ff4d49")
+                    // on container remove top border
+                    $('.ql-container').css("border","2px solid #ff4d49")
+                    $('.ql-container').css("border-top","none")
+                }else{
+                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
+                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                }
+            });
 
             // post category change event
             $('#post_category').change(function() {

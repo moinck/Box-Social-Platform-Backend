@@ -84,7 +84,6 @@ class StockImageApiController extends Controller
             $fileExtension = "image/" . explode('?', $fileExtension)[0];
 
             $adminImagesData[] = [
-                'simple_id' => $value->id,
                 'id' => Helpers::encrypt($value->id),
                 'image_url' => $value->image_url ? $value->image_url : '',
                 'tag_name' => $value->tag_name,

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SubscriptionPlans;
 use App\Models\User;
+use App\Models\UserDownloads;
 
 class UserSubscription extends Model
 {
@@ -41,7 +42,7 @@ class UserSubscription extends Model
         'daily_download_limit',
         'downloads_used_today',
         'total_downloads_used',
-        'daily_reset_date',
+        'reset_date',
     ];
 
     public function user()
@@ -59,5 +60,48 @@ class UserSubscription extends Model
     {
         $this->downloads_used_today = $this->downloads_used_today + 1;
         $this->save();
+    }
+
+    protected static function booted()
+    {
+        // Automatically create download tracker when subscription is created
+        static::created(function ($subscription) {
+            UserDownloads::createForSubscription($subscription);
+        });
+    }
+
+    public function downloadTracker()
+    {
+        return $this->hasOne(UserDownloads::class, 'user_subscription_id');
+    }
+
+    /**
+     * Get remaining downloads for current period
+     */
+    public function getRemainingDownloads()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->getRemainingDownloads();
+    }
+
+    /**
+     * Record a download (post download or creation - both count as 1)
+     */
+    public function recordDownload()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->incrementDownload();
+    }
+
+    /**
+     * Check if user can download
+     */
+    public function canDownload()
+    {
+        $tracker = $this->downloadTracker;
+        
+        return $tracker->canDownload();
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Brand Configuration')
+@section('title', 'User Subscription')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -120,10 +120,10 @@
                                         </span>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block">Daily Downloads</small>
+                                        <small class="text-muted d-block">Yearly Downloads</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ $subscriptionData->downloads_used_today }}/{{ $subscriptionData->daily_download_limit }}
+                                                {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
                                             </h6>
                                         </div>
                                     </div>

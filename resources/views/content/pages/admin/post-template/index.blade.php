@@ -109,7 +109,7 @@
                     ajax: {
                         url: "{{ route('post-template.data-table') }}",
                         data: function (d) {
-                            // d.category = $('#category_filter').val();
+                            d.category = $('#category_filter').val();
                             d.status = $('#status_filter').val();
                         },
                         beforeSend: function () {
@@ -132,9 +132,9 @@
 
                         // Append status filter
                         $('#status-filter-container').append(`<select class="form-select input-sm" id="status_filter">
-                            <option value="">Status</option>
+                            <option value="0">Status</option>
                             <option value="1">Active</option>
-                            <option value="0">Inactive</option>
+                            <option value="2">Inactive</option>
                         </select>`);
 
                         // Parse the categories JSON data
@@ -142,17 +142,19 @@
 
                         // Populate the category select with categories
                         $.each(categories, function(index, obj) {
-                            $('#category_filter').append('<option value="' + obj.name + '">' + obj.name + '</option>');
+                            $('#category_filter').append('<option value="' + obj.id + '">' + obj.name + '</option>');
                         });
 
                         // Filter results on category select change
                         $('#category_filter').on('change', function() {
-                            PostTemplateTable.columns(3).search(this.value).draw();
+                            // PostTemplateTable.columns(3).search(this.value).draw();
+                            PostTemplateTable.draw();
                         });
 
                         // Filter results on status select change
                         $('#status_filter').on('change', function() {
-                            PostTemplateTable.columns('raw_status').search(this.value).draw();
+                            // PostTemplateTable.columns('raw_status').search(this.value).draw();
+                            PostTemplateTable.draw();
                         });
                     },
                     columns: [
@@ -231,6 +233,8 @@
             // delete post template
             $(document).on('click', '.delete-post-template-btn', function() {
                 var postTemplateId = $(this).data('post-template-id');
+                var selectedCategory = $('#category_filter').val();
+                var selectedStatus = $('#status_filter').val();
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -259,8 +263,17 @@
                             },
                             success: function(response) {
                                 if (response.success == true) {
+                                    // PostTemplateDataTable();
                                     showSweetAlert('success', 'Deleted!', 'Post Template has been deleted.');
-                                    PostTemplateDataTable();
+
+                                    setTimeout(function() {
+                                        $('#category_filter').val(selectedCategory);
+                                        $('#status_filter').val(selectedStatus);
+                                        // trigger change in category dropdown
+                                        $('#category_filter').trigger('change');
+                                        // trigger change in status dropdown
+                                        $('#status_filter').trigger('change');
+                                    }, 500);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }

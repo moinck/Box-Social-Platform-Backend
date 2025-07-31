@@ -57,7 +57,11 @@ class PostTemplateController extends Controller
                 $query->where('category_id', $request->category);
             })
             ->when($request->has('status') && $request->status != '', function ($query) use ($request) {
-                $query->where('status', $request->status);
+                if ($request->status == 1) {
+                    $query->where('status', true);
+                } elseif ($request->status == 2) {
+                    $query->where('status', "!=", true);
+                }
             })
             ->select([
                 'id',

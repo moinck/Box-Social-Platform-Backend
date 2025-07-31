@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserSubscription;
 use App\Http\Controllers\Controller;
 use App\Models\Payments;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -67,12 +68,25 @@ class UserSubscriptionNewApiController extends Controller
                 ], 400);
             }
 
+            if ($subscriptionPlanDetail->slug != 'free-trial') {
+                $today = now();
+                $currentYear = $today->year;
+                $cutoffDate = Carbon::create($currentYear, 9, 1); // Sept 1, 2025
+
+                // Before Sept 1 → use £650 plan else £780 plan
+                if ($today->lt($cutoffDate)) {
+                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
+                } else {
+                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 3)->first();
+                }
+            }
+
             DB::beginTransaction();
 
             // Create incomplete subscription in DB
             $newSubscription = new UserSubscription();
             $newSubscription->user_id = $userId;
-            $newSubscription->plan_id = $planId;
+            $newSubscription->plan_id = $subscriptionPlanDetail->id;
             $newSubscription->stripe_customer_id = $userStripeCustomerId;
             $newSubscription->stripe_price_id = $subscriptionPlanDetail->stripe_price_id;
             $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit ?? 0;
@@ -80,6 +94,7 @@ class UserSubscriptionNewApiController extends Controller
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
+            // if FREE-TRIAL plan create free subscription without stripe
             if ($subscriptionPlanDetail->slug == 'free-trial') {
                 $this->createFreeTrialSubscription($userId,$newSubscription->id);
 
@@ -92,7 +107,7 @@ class UserSubscriptionNewApiController extends Controller
                     'data' => [
                         'subscription_plan' => 'free-trial',
                         'subscription_id' => Helpers::encrypt($newSubscription->id),
-                        'subscription_status' => $newSubscription->status
+                        'subscription_status' => 'active'
                     ]
                 ]);
             }
@@ -108,6 +123,7 @@ class UserSubscriptionNewApiController extends Controller
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
                 'payment_method_types' => ['card'],
+                'allow_promotion_codes' => true,
                 'line_items' => [
                     [
                         'price' => $subscriptionPlanDetail->stripe_price_id,
@@ -159,7 +175,7 @@ class UserSubscriptionNewApiController extends Controller
 
             // Verify session with Stripe
             $session = $this->stripe->checkout->sessions->retrieve($sessionId, [
-                'expand' => ['subscription', 'customer']
+                'expand' => ['subscription', 'customer','payment_intent']
             ]);
 
             if ($session->payment_status !== 'paid') {
@@ -202,7 +218,9 @@ class UserSubscriptionNewApiController extends Controller
 
             // store full response from stripe
             $userSubscription->response_meta = json_encode($session, JSON_PRETTY_PRINT);
-            
+            $userSubscription->total_download_limit = 40;
+            $userSubscription->daily_download_limit = 0;
+            $userSubscription->reset_date = now()->addMonths(1)->startOfMonth()->format('Y-m-d');
             $userSubscription->save();
 
             // Reset usage counters for new subscription
@@ -217,7 +235,7 @@ class UserSubscriptionNewApiController extends Controller
             $newPayment->currency =  $session->currency ?? 'GBP';
             $newPayment->payment_type = 'subscription';
             $newPayment->payment_method = $session->payment_settings->payment_method_types[0] ?? 'card';
-            $newPayment->stripe_payment_intent_id = $session->payment_intent ?? ($userSubscription->stripe_payment_method_id ?? null);
+            $newPayment->stripe_payment_intent_id = $session->payment_intent->id ?? ($userSubscription->stripe_payment_method_id ?? null);
             $newPayment->save();
 
             DB::commit();
@@ -315,7 +333,9 @@ class UserSubscriptionNewApiController extends Controller
             'email' => $user->email,
             'name' => $user->first_name . ' ' . $user->last_name,
             'metadata' => [
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'fca_number' => $user->fca_number ?? null,
+                'company_name' => $user->company_name ?? null,
             ]
         ]);
 
@@ -368,7 +388,7 @@ class UserSubscriptionNewApiController extends Controller
 
     public function getCurrentSubscription()
     {
-        $subscription = UserSubscription::with('plan:id,name,price')
+        $subscription = UserSubscription::with('plan:id,name,price','downloadTracker')
             ->where('user_id', Auth::id())
             ->where('status', 'active')
             ->first();
@@ -382,11 +402,14 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         $planDetails = [];
+        $downloadCountDetails = [];
         if($subscription){
             $planDetails = [
                 'id' => Helpers::encrypt($subscription->plan->id),
                 'name' => $subscription->plan->name,
             ];
+
+            $downloadCountDetails = $subscription->downloadTracker->getDownloadStats();
         }
             
         $returnData = [];
@@ -396,13 +419,10 @@ class UserSubscriptionNewApiController extends Controller
                 'status' => $subscription->status,
                 'amount_paid' => $subscription->amount_paid,
                 'currency' => $subscription->currency,
-                'current_period_start' => date("Y-m-d",strtotime($subscription->current_period_start)),
-                'current_period_end' => date("Y-m-d",strtotime($subscription->current_period_end)),
-                'total_download_limit' => $subscription->total_download_limit,
-                'daily_download_limit' => $subscription->daily_download_limit,
-                'download_used_today' => $subscription->downloads_used_today ?? 0,
-                'remaining_download_limit' => abs($subscription->daily_download_limit - ($subscription->downloads_used_today ?? 0)),
+                'current_period_start' => date("d-m-Y",strtotime($subscription->current_period_start)),
+                'current_period_end' => date("d-m-Y",strtotime($subscription->current_period_end)),
                 'plan_details' => $planDetails,
+                'download_count_details' => $downloadCountDetails,
             ];
         }
         // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);
@@ -491,6 +511,7 @@ class UserSubscriptionNewApiController extends Controller
     {
         $authUser = Auth::user();
         $subscription = UserSubscription::select('id','total_download_limit','daily_download_limit','downloads_used_today')
+            ->with('downloadTracker')
             ->where('user_id', $authUser->id)
             ->where('status', 'active')
             ->first();
@@ -502,46 +523,29 @@ class UserSubscriptionNewApiController extends Controller
                 'data' => []
             ]);
         }
-        
-        $totalDownloadLimit = $subscription->total_download_limit;
-        $dailyDownloadLimit = $subscription->daily_download_limit;
-        $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+    
 
+        $downloadCountStats = [];
         if ($subscription) {
-            if ($dailyDownloadLimit > 0) {
-                // $subscription->daily_download_limit = $subscription->daily_download_limit - 1;
-                $subscription->downloads_used_today = $subscription->downloads_used_today + 1;
-                $subscription->save();
+            // check if user can download
+            if($subscription->canDownload()){
+                $subscription->recordDownload();
+                $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
 
-                $remainingDownloadLimit = $dailyDownloadLimit - $subscription->downloads_used_today;
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Subscription download limit updated successfully',
+                    'data' => $downloadCountStats,
+                ]);
             } else {
+                $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
                 return response()->json([
                     'status' => false,
-                    'message' => 'Daily download limit exceeded',
-                    'data' => [
-                        'total_download_limit' => $totalDownloadLimit,
-                        'daily_download_limit' => $dailyDownloadLimit,
-                        'downloads_used_today' => $subscription->downloads_used_today,
-                        'remaining_download_limit' => $remainingDownloadLimit,
-                    ]
+                    'message' => 'Subscription download limit exceeded',
+                    'data' => $downloadCountStats,
                 ]);
             }
-
-            $dailyDownloadLimit = $subscription->daily_download_limit;
         }
-
-        $returnData = [
-            'total_download_limit' => $totalDownloadLimit,
-            'daily_download_limit' => $dailyDownloadLimit,
-            'downloads_used_today' => $subscription->downloads_used_today,
-            'remaining_download_limit' => $remainingDownloadLimit,
-        ];
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Subscription download limit updated successfully',
-            'data' => $returnData,
-        ]);
     }
     
 }
