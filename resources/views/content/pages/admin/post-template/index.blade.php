@@ -187,7 +187,7 @@
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You won't to change status!",
+                    text: "You want to change status!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, change it!',
