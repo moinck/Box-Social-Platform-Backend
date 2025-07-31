@@ -201,6 +201,7 @@ class UserDownloads extends Model
                 'used' => $this->monthly_downloads_used,
                 'remaining' => $this->getRemainingDownloads(),
                 'monthly_limit' => $this->monthly_limit,
+                'monthly_remaining_limit' => $this->monthly_limit - $this->monthly_downloads_used,
                 'total_limit' => $this->total_limit,
                 'carried_over' => $this->carried_over_downloads,
                 'effective_limit' => $this->monthly_limit + $this->carried_over_downloads,
