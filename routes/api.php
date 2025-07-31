@@ -78,8 +78,11 @@ Route::group([
         Route::post('/post-content/get/data', [PostContentApiController::class, 'getData']);
         // Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
 
-
+        // stock image api
+        Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+        
         // admin-template API
+        Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
         Route::post('/template/delete', [TemplateApiController::class, 'delete']);
 
@@ -114,25 +117,23 @@ Route::group([
 Route::group([
     'middleware' => 'adminToken'
 ], function () {
+    // admin api
+    Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+
+    // Admin Create & update Template 
+    Route::post('/template/store', [TemplateApiController::class, 'store']);
+    Route::get('/admin-template/get/{id}', [TemplateApiController::class, 'getTemplate']);
+    Route::post('/template/update', [TemplateApiController::class, 'update']);
+    
+    // post content api
+    Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
+
+    // get stock image
+    Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
+    
+    // icon management api
+    Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
 });
-// admin api
-Route::get('/admin/template-data', [AdminApiController::class, 'index']);
-
-// Admin Create Template 
-Route::post('/template/store', [TemplateApiController::class, 'store']);
-Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
-Route::get('/admin-template/get/{id}', [TemplateApiController::class, 'getTemplate']);
-Route::post('/template/update', [TemplateApiController::class, 'update']);
-
-// post content api
-Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
-
-// get stock image
-Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
-Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get'])->middleware('adminToken');
-
-// icon management api
-Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
 // ====================================================================================================== 
 
 // public routes
