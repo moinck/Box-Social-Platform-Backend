@@ -130,10 +130,15 @@ class UserSubscriptionNewApiController extends Controller
                         'quantity' => 1,
                     ],
                 ],
-                'metadata' => [
-                    'user_id' => $userId,
-                    'subscription_id' => $newSubscription->id
-                ]
+                'subscription_data' => [
+                    // 'trial_period_days' => 3, // This adds the 3-day free trial
+                    'metadata' => [
+                        'user_id' => $userId,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'subscription_id' => $newSubscription->id
+                    ]
+                ]   
             ]);
 
             // Store session ID for verification

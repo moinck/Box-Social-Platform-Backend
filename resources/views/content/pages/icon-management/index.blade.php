@@ -254,7 +254,7 @@
                 setTimeout(function() {
                     iconsToRender.forEach(function(icon) {
                         iconsContainer.append(`
-                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;" title="${icon}">
                                 <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/mdi:${icon}.svg?color=%23000000" id="saved-icon-${icon}"/>
                                 <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
                                     <span class="custom-option-body">
@@ -356,7 +356,7 @@
                                 iconsContainer.empty();
                                 searchIcons.forEach(function(icon) {
                                     iconsContainer.append(`
-                                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                            <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;" title="${icon}">
                                                 <input class="form-check-input new-icon-checkbox" type="checkbox" name="selectIcons[]" data-icon-id="${icon}" value="https://api.iconify.design/${icon}.svg?color=%23000000" id="saved-icon-${icon}"/>
                                                 <label class="form-check-label custom-option-content" for="saved-icon-${icon}">
                                                 <span class="custom-option-body">
@@ -472,7 +472,7 @@
                             var savedIconHtml = '';
                             savedIconData.forEach(function(icon) {
                                 savedIconHtml += `
-                                    <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;">
+                                    <div class="form-check custom-option custom-option-image custom-option-image-check" style="height: 100px;width: 100px;" title="${icon.tag_name}">
                                         <input class="form-check-input saved-icon-checkbox" type="checkbox" name="savedSelectedIcons[]" data-icon-id="${icon.id}" value="${icon.icon_url}" id="saved-icon-${icon.id}"/>
                                         <label class="form-check-label custom-option-content" for="saved-icon-${icon.id}">
                                             <span class="custom-option-body">
