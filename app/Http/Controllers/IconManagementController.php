@@ -47,6 +47,7 @@ class IconManagementController extends Controller
             ->when($request->filterTag, function ($query) use ($request) {
                 $query->where('tag_name','LIKE',"%".$request->filterTag."%");
             })
+            ->latest()
             ->get();
 
         $savedTagNames = $icons->pluck('tag_name')->unique()->toArray();
