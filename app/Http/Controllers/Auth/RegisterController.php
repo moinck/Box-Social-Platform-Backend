@@ -283,7 +283,7 @@ class RegisterController extends Controller
         } else {
             $returnResponse = [
                 'status' => '0',
-                'Message' => 'Please Enter Valide FCA Number'
+                'Message' => 'Please Enter Valid FCA Number'
             ];
 
             return response()->json($returnResponse, 422);
