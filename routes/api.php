@@ -120,6 +120,8 @@ Route::group([
 ], function () {
     // admin api
     Route::get('/admin/template-data', [AdminApiController::class, 'index']);
+    
+    Route::get('/admin/brand-kit', [BrnadKitApiController::class, 'adminBrandKit']);
 
     // Admin Create & update Template 
     Route::post('/template/store', [TemplateApiController::class, 'store']);
