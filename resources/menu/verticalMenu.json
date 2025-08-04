@@ -15,13 +15,6 @@
             "role": ["admin","customer"]
         },
         {
-            "url": "/subscription-management",
-            "name": "Subscription Management",
-            "icon": "menu-icon tf-icons ri-money-pound-box-line",
-            "slug": "subscription-management",
-            "role": ["admin"]
-        },
-        {
             "url": "/brand-configuration",
             "name": "Brand Configuration",
             "icon": "menu-icon tf-icons ri-list-settings-fill",
