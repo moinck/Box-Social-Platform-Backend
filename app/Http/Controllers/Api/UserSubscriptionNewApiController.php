@@ -446,6 +446,7 @@ class UserSubscriptionNewApiController extends Controller
     {
         $userSubscription = UserSubscription::find($subscriptionId);
         $userSubscription->status = 'active';
+        $userSubscription->stripe_status = 'active';
         $userSubscription->amount_paid = 0;
         $userSubscription->currency = 'GBP';
         $userSubscription->total_download_limit = 3;

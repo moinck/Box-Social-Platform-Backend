@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\UserDownloads;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ResetMonthlyDownloads extends Command
 {
@@ -13,7 +14,7 @@ class ResetMonthlyDownloads extends Command
      *
      * @var string
      */
-    protected $signature = 'app:reset-monthly-downloads';
+    protected $signature = 'downloads:reset-monthly';
 
     /**
      * The console command description.
@@ -48,22 +49,29 @@ class ResetMonthlyDownloads extends Command
         $resetCount = 0;
         
         foreach ($usersToReset as $userDownload) {
-            // Calculate carry over (unused downloads from previous month)
-            $effectiveLimit = $userDownload->monthly_limit + $userDownload->carried_over_downloads;
-            $unusedDownloads = max(0, $effectiveLimit - $userDownload->monthly_downloads_used);
-            
-            // Reset for new month
-            $userDownload->update([
-                'monthly_downloads_used' => 0,
-                'current_month' => $currentDate->month,
-                'current_year' => $currentDate->year,
-                'last_reset_date' => $currentDate->toDateString(),
-                'carried_over_downloads' => $unusedDownloads,
-            ]);
-            
-            $resetCount++;
-            
-            $this->line("Reset user {$userDownload->user_id}: {$unusedDownloads} downloads carried over");
+            try {
+                DB::beginTransaction();
+                // Calculate carry over (unused downloads from previous month)
+                $effectiveLimit = $userDownload->monthly_limit + $userDownload->carried_over_downloads;
+                $unusedDownloads = max(0, $effectiveLimit - $userDownload->monthly_downloads_used);
+                
+                // Reset for new month
+                $userDownload->update([
+                    'monthly_downloads_used' => 0,
+                    'current_month' => $currentDate->month,
+                    'current_year' => $currentDate->year,
+                    'last_reset_date' => $currentDate->toDateString(),
+                    'carried_over_downloads' => $unusedDownloads,
+                ]);
+
+                $resetCount++;
+                DB::commit();
+                
+                $this->line("Reset user {$userDownload->user_id}: {$unusedDownloads} downloads carried over");
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                //throw $th;
+            }
         }
         
         $this->info("Successfully reset {$resetCount} user download counters.");

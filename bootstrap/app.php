@@ -30,6 +30,19 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         // $schedule->call(CleanExpiredTokens::class)->daily();
+
+        // reset user's monthly downloads
+        $schedule->command('downloads:reset-monthly')
+                ->monthlyOn(1, '00:01')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+        // check user's expired subscriptions
+        $schedule->command('subscriptions:check-expired')
+                ->daily()
+                ->at('02:00')
+                ->withoutOverlapping()
+                ->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
