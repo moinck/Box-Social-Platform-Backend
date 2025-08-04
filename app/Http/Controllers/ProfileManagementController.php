@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
+use App\Models\BrandKit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,9 @@ class ProfileManagementController extends Controller
         } else {
             $profileImage = asset('assets/img/avatars/1.png');
         }
-        return view('content.pages.profile-management.edit', compact('user', 'profileImage'));
+        $brandKitData = BrandKit::where('user_id', $user->id)->first();
+        $method = $brandKitData ? 'edit' : 'create';
+        return view('content.pages.profile-management.edit', compact('user', 'profileImage', 'brandKitData', 'method'));
     }
 
     public function update(Request $request)

@@ -114,6 +114,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/brand-configuration', [BrnadconfigurationController::class, 'index'])->name('brand-configuration');
         Route::get('/brand-configuration/show/{id}', [BrnadconfigurationController::class, 'show'])->name('brand-configuration.show');
         Route::get('/brand-configuration/edit/{id}', [BrnadconfigurationController::class, 'edit'])->name('brand-configuration.edit');
+        Route::post('/brand-configuration/store', [BrnadconfigurationController::class, 'store'])->name('brand-configuration.store');
         Route::post('/brand-configuration/update', [BrnadconfigurationController::class, 'update'])->name('brand-configuration.update');
         Route::get('/brand-configuration/datatable', [BrnadconfigurationController::class, 'dataTable'])->name('brand-configuration.data-table');
         Route::post('/brand-configuration/delete', [BrnadconfigurationController::class, 'destroy'])->name('brand-configuration.delete');

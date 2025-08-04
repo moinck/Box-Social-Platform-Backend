@@ -66,6 +66,43 @@ class BrnadconfigurationController extends Controller
             ->make(true);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required',
+            'brand_company_name' => 'required',
+            'brand_email' => 'required',
+            'brand_phone' => 'required',
+            'brand_address' => 'required',
+            'brand_state' => 'required',
+            'brand_country' => 'required',
+            'brand_postal_code' => 'required',
+            'brand_website' => 'required',
+            'show_email_on_post' => 'required',
+            'show_phone_number_on_post' => 'required',
+            'show_website_on_post' => 'required',
+            'show_address_on_post' => 'required',
+        ]);
+
+        $brandKit = new BrandKit();
+        $brandKit->user_id = $request->user_id;
+        $brandKit->company_name = $request->brand_company_name;
+        $brandKit->email = $request->brand_email;
+        $brandKit->phone = $request->brand_phone;
+        $brandKit->address = $request->brand_address;
+        $brandKit->state = $request->brand_state;
+        $brandKit->country = $request->brand_country;
+        $brandKit->postal_code = $request->brand_postal_code;
+        $brandKit->website = $request->brand_website;
+        $brandKit->show_email_on_post = $request->show_email_on_post ? 1 : 0;
+        $brandKit->show_phone_number_on_post = $request->show_phone_number_on_post ? 1 : 0;
+        $brandKit->show_website_on_post = $request->show_website_on_post ? 1 : 0;
+        $brandKit->show_address_on_post = $request->show_address_on_post ? 1 : 0;
+        $brandKit->save();
+        
+        return redirect()->back()->with('success', 'Brand Kit created successfully');
+    }
+
     public function show($id)
     {
         $id = Helpers::decrypt($id);
@@ -89,21 +126,47 @@ class BrnadconfigurationController extends Controller
         $socialMedia = [];
         if (!empty($socialMediaObj)) {
             $socialMedia = json_decode($socialMediaObj->social_media_icon);
-            // dd($socialMedia);
         }
         return view('content.pages.brand-configuration.edit', compact('brandKit', 'socialMedia'));
     }
 
     public function update(Request $request)
     {
-        $id = Helpers::decrypt($request->id);
-        $data = BrandKit::find($id);
-
-        $data->update($request->except('_token', 'id'));
-        return response()->json([
-            'success' => true,
-            'message' => 'Brand Kit updated successfully'
+        $request->validate([
+            'user_id' => 'required',
+            'brand_company_name' => 'required',
+            'brand_email' => 'required',
+            'brand_phone' => 'required',
+            'brand_address' => 'required',
+            'brand_state' => 'required',
+            'brand_country' => 'required',
+            'brand_postal_code' => 'required',
+            'brand_website' => 'required',
+            'show_email_on_post' => 'nullable|in:on',
+            'show_phone_number_on_post' => 'nullable|in:on',
+            'show_website_on_post' => 'nullable|in:on',
+            'show_address_on_post' => 'nullable|in:on',
         ]);
+        $brandKit = BrandKit::find($request->id);
+        if (!empty($brandKit)) {
+            $brandKit->company_name = $request->brand_company_name;
+            $brandKit->email = $request->brand_email;
+            $brandKit->phone = $request->brand_phone;
+            $brandKit->address = $request->brand_address;
+            $brandKit->state = $request->brand_state;
+            $brandKit->country = $request->brand_country;
+            $brandKit->postal_code = $request->brand_postal_code;
+            $brandKit->website = $request->brand_website;
+            $brandKit->show_email_on_post = $request->show_email_on_post ? 1 : 0;
+            $brandKit->show_phone_number_on_post = $request->show_phone_number_on_post ? 1 : 0;
+            $brandKit->show_website_on_post = $request->show_website_on_post ? 1 : 0;
+            $brandKit->show_address_on_post = $request->show_address_on_post ? 1 : 0;
+            $brandKit->update();
+
+            return redirect()->back()->with('success', 'Brand Kit updated successfully');
+        } else {
+            return redirect()->back()->with('error', 'Brand Kit not found');
+        }
     }
 
     public function destroy(Request $request)
