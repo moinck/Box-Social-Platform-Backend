@@ -262,4 +262,29 @@ class BrnadKitApiController extends Controller
         }
         return $this->success($returnData, 'Design styles fetched successfully');
     }
+
+    public function adminBrandKit(Request $request)
+    {
+        $brandKitObj = BrandKit::where('user_id', 1)->first();
+        if (empty($brandKitObj)) {
+            return $this->error('BrandKit not found', 404);
+        }
+
+        $returnData = [
+            "company_name" => $brandKitObj->company_name,
+            "email" => $brandKitObj->email,
+            "address" => $brandKitObj->address,
+            "state" => $brandKitObj->state,
+            "phone" => $brandKitObj->phone,
+            "country" => $brandKitObj->country,
+            "website" => $brandKitObj->website,
+            "postal_code" => $brandKitObj->postal_code,
+            "show_email_on_post" => $brandKitObj->show_email_on_post,
+            "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
+            "show_website_on_post" => $brandKitObj->show_website_on_post,
+            "show_address_on_post" => $brandKitObj->show_address_on_post,
+        ];
+
+        return $this->success($returnData, 'BrandKit fetched successfully');
+    }
 }

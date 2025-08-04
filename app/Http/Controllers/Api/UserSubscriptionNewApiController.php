@@ -71,9 +71,9 @@ class UserSubscriptionNewApiController extends Controller
             if ($subscriptionPlanDetail->slug != 'free-trial') {
                 $today = now();
                 $currentYear = $today->year;
-                $cutoffDate = Carbon::create($currentYear, 9, 1); // Sept 1, 2025
+                $cutoffDate = Carbon::create($currentYear, 10, 1); // Oct 1, 2025
 
-                // Before Sept 1 → use £650 plan else £780 plan
+                // Before Oct 1 → use £650 plan else £780 plan
                 if ($today->lt($cutoffDate)) {
                     $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
                 } else {
@@ -446,6 +446,7 @@ class UserSubscriptionNewApiController extends Controller
     {
         $userSubscription = UserSubscription::find($subscriptionId);
         $userSubscription->status = 'active';
+        $userSubscription->stripe_status = 'active';
         $userSubscription->amount_paid = 0;
         $userSubscription->currency = 'GBP';
         $userSubscription->total_download_limit = 3;

@@ -135,11 +135,27 @@ class UserDownloads extends Model
     }
 
     /**
+     * Check if this user needs monthly reset (for fallback)
+     * This method can be called during user activity as a safety net
+     */
+    public function checkIfNeedsReset()
+    {
+        if ($this->plan_type == 'free-trial') {
+            return false;
+        }
+
+        $currentDate = Carbon::now();
+        
+        // Check if we're in a new month and it's been more than a day since last reset
+        return ($this->current_month !== $currentDate->month || $this->current_year !== $currentDate->year);
+    }
+
+    /**
      * Check and reset monthly downloads for premium plans
      */
     public function checkAndResetMonthly()
     {
-        if ($this->plan_type !== 'premium') {
+        if ($this->plan_type == 'free-trial') {
             return;
         }
 
@@ -167,7 +183,7 @@ class UserDownloads extends Model
      */
     public function resetDownloads()
     {
-        if ($this->plan_type != 'free-trial') {
+        if ($this->plan_type == 'free-trial') {
             $this->total_downloads_used = 0;
             $this->expires_at = Carbon::now()->addDays(3);
         } else {

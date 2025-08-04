@@ -44,9 +44,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan - Before Sept 2025',
-                'slug' => 'box-socials-premium-plan-before-sept-2025',
-                'description' => 'Premium plan for users subscribed before Sept 1, 2025',
+                'name' => 'Box Socials Premium Plan - Before Oct 2025',
+                'slug' => 'box-socials-premium-plan-before-oct-2025',
+                'description' => 'Premium plan for users subscribed before Oct 1, 2025',
                 'price' => 650.00,
                 'currency' => 'GBP',
                 'interval' => 'year',
@@ -60,7 +60,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'is_trial' => false,
                 'is_popular' => false,
                 'features' => json_encode([
-                    '£650 GBP per year (Before Sept 2025)',
+                    '£650 GBP per year (Before Oct 2025)',
                     'Thousands of social media content written by financial services experts',
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
@@ -77,9 +77,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan - After Sept 2025',
-                'slug' => 'box-socials-premium-plan-after-sept-2025',
-                'description' => 'Premium plan for users subscribed after Sept 1, 2025',
+                'name' => 'Box Socials Premium Plan - After Oct 2025',
+                'slug' => 'box-socials-premium-plan-after-oct-2025',
+                'description' => 'Premium plan for users subscribed after Oct 1, 2025',
                 'price' => 780.00,
                 'currency' => 'GBP',
                 'interval' => 'year',
@@ -93,7 +93,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'is_trial' => false,
                 'is_popular' => true,
                 'features' => json_encode([
-                    '£780 GBP per year (After Sept 2025)',
+                    '£780 GBP per year (After Oct 2025)',
                     'Thousands of social media content written by financial services experts',
                     'Access to an ever-growing library of design templates',
                     'Access to millions of royalty free stock images updated every week',
