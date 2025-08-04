@@ -184,9 +184,9 @@
                             {{-- all input fields --}}
                             <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
                             <div class="form-floating form-floating-outline mb-5">
-                                <input type="text" class="form-control" id="brand_company_name" placeholder="Product title"
+                                <input type="text" class="form-control" id="brand_company_name" placeholder="Enter Company Name"
                                     name="brand_company_name" value="{{ $brandKitData->company_name ?? auth()->user()->company_name }}"
-                                    aria-label="Product title"  />
+                                    aria-label="Company Name"  />
                                 <label for="brand_company_name">Company Name</label>
                             </div>
         
@@ -200,30 +200,30 @@
                                 </div>
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="number" class="form-control" id="brand_phone" placeholder="0123-4567"
-                                            name="brand_phone" value="{{ $brandKitData->phone ?? "123456789" }}" aria-label="Product barcode"  />
+                                        <input type="number" class="form-control" id="brand_phone" placeholder="0123456789"
+                                            name="brand_phone" value="{{ $brandKitData->phone ?? "" }}" aria-label="Product barcode"  />
                                         <label for="brand_phone">Phone</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-floating form-floating-outline mb-5">
-                                <textarea class="form-control h-px-75" id="brand_address" rows="3" placeholder="Product title"
-                                    name="brand_address" aria-label="Product title" >{{ $brandKitData->address ?? "Address" }}</textarea>
+                                <textarea class="form-control h-px-75" id="brand_address" rows="3" placeholder="Enter Address"
+                                    name="brand_address" aria-label="Address" >{{ $brandKitData->address ?? "" }}</textarea>
                                 <label for="brand_address">Address</label>
                             </div>
                             <div class="row mb-5 gx-5">
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" class="form-control" id="brand_state" placeholder="00000"
-                                            name="brand_state" value="{{ $brandKitData->state ?? "State" }}" aria-label="Product SKU"  />
+                                        <input type="text" class="form-control" id="brand_state" placeholder="Enter State Name"
+                                            name="brand_state" value="{{ $brandKitData->state ?? "" }}" aria-label="State Name"  />
                                         <label for="brand_state">State</label>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" class="form-control" id="brand_country" placeholder="0123-4567"
-                                            name="brand_country" value="{{ $brandKitData->country ?? "Country" }}" 
-                                            aria-label="Product barcode" />
+                                        <input type="text" class="form-control" id="brand_country" placeholder="Enter Country Name"
+                                            name="brand_country" value="{{ $brandKitData->country ?? "" }}" 
+                                            aria-label="Country Name" />
                                         <label for="brand_country">Country</label>
                                     </div>
                                 </div>
@@ -232,16 +232,16 @@
                             <div class="row mb-5 gx-5">
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" class="form-control" id="brand_postal_code" placeholder="0123-4567"
-                                            name="brand_postal_code" value="{{ $brandKitData->postal_code ?? "Postalcode" }}" 
-                                            aria-label="Product barcode" />
+                                        <input type="text" class="form-control" id="brand_postal_code" placeholder="Enter Postal Code"
+                                            name="brand_postal_code" value="{{ $brandKitData->postal_code ?? "" }}" 
+                                            aria-label="Postal Code" />
                                         <label for="brand_postal_code">Postalcode</label>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input type="text" class="form-control" id="brand_website" placeholder="00000"
-                                            name="brand_website" value="{{ $brandKitData->website ?? "Website" }}" aria-label="Product SKU" />
+                                        <input type="text" class="form-control" id="brand_website" placeholder="Enter Website URL"
+                                            name="brand_website" value="{{ $brandKitData->website ?? "" }}" aria-label="Website URL" />
                                         <label for="brand_website">Website</label>
                                     </div>
                                 </div>
