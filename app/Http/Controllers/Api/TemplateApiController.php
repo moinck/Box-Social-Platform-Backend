@@ -6,11 +6,14 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
 use App\Models\Categories;
+use App\Models\PostContent;
 use App\ResponseTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\PostTemplate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TemplateApiController extends Controller
 {
@@ -25,7 +28,7 @@ class TemplateApiController extends Controller
             'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required', // or 'array' if JSON
             'design_style_id' => 'nullable|string',
-            'post_content_id' => 'required|string',
+            'post_content_id' => 'nullable|string',
         ],[
             'template_image.regex' => 'Invalid image format',
         ]);
@@ -34,36 +37,88 @@ class TemplateApiController extends Controller
             return $this->validationError('Validation failed', $validator->errors());
         }
 
-        $imagePath = null;
-        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-            $imagePath = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
+        $savedTemplates = [];
+
+        $postContentId = $request->post_content_id ? Helpers::decrypt($request->post_content_id) : null;
+        $categoryId = $request->category_id ? Helpers::decrypt($request->category_id) : null;
+        $subCategoryId = $request->sub_category_id ? Helpers::decrypt($request->sub_category_id) : null;
+        $designStyleId = $request->design_style_id ? Helpers::decrypt($request->design_style_id) : null;
+
+        DB::beginTransaction();
+
+        try {
+            // if single post content then save only 1 template
+            if (!empty($postContentId)) {
+                $imagePath = null;
+                if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+                    $prefix = 'admin_template_'. rand(1000, 9999);
+                    $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
+                }
+                $tempObj = new PostTemplate();
+                $tempObj->category_id = $categoryId;
+                $tempObj->template_image = $imagePath;
+                $tempObj->template_data = json_encode($request->template_data);
+        
+                if ($request->has('sub_category_id') && $subCategoryId !== null) {
+                    $tempObj->sub_category_id = $subCategoryId;
+                }
+        
+                if ($request->has('design_style_id') && $designStyleId) {
+                    $tempObj->design_style_id = $designStyleId;
+                }
+        
+                if ($request->has('post_content_id') && $postContentId) {
+                    $tempObj->post_content_id = $postContentId;
+                }
+                $tempObj->save();
+        
+                $data = [
+                    "id" => Helpers::encrypt($tempObj->id),
+                ];
+                return $this->success($data, 'Template create successfully');
+            }
+            // if null then get all post content from 'category' & 'sub_category' and save template to that all post content
+            else {
+                $postContentData = PostContent::select('id')
+                    ->where('category_id', $categoryId)
+                    ->when($subCategoryId, function ($query) use ($subCategoryId) {
+                        $query->where('sub_category_id', $subCategoryId);
+                    })
+                    ->get();
+    
+                foreach ($postContentData as $postContent) {
+                    $imageNewPath = null;
+                    $prefix = 'admin_template_'. rand(1000, 9999);
+                    if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+                        $imageNewPath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
+                    }
+    
+                    $tempObj = new PostTemplate();
+                    $tempObj->category_id = $categoryId;
+                    $tempObj->template_image = $imageNewPath;
+                    $tempObj->template_data = json_encode($request->template_data);
+    
+                    if ($request->has('sub_category_id') && $subCategoryId !== null) {
+                        $tempObj->sub_category_id = $subCategoryId;
+                    }
+    
+                    if ($request->has('design_style_id') && $designStyleId) {
+                        $tempObj->design_style_id = $designStyleId;
+                    }
+    
+                    $tempObj->post_content_id = $postContent->id;
+                    $tempObj->save();
+    
+                    $savedTemplates[] = Helpers::encrypt($tempObj->id);
+                }
+            }
+    
+            DB::commit();
+            return $this->success($savedTemplates, 'Multiple Templates created successfully');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage(), 500);
         }
-
-        $tempObj = new PostTemplate();
-        $tempObj->category_id = Helpers::decrypt($request->category_id);
-        $tempObj->template_image = $imagePath;
-        $tempObj->template_data = json_encode($request->template_data);
-
-        if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
-            $tempObj->sub_category_id = Helpers::decrypt($request->sub_category_id);
-        }
-
-        if ($request->has('design_style_id') && $request->design_style_id) {
-            $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
-            $tempObj->design_style_id = $decryptedDesignStyleId;
-        }
-
-        if ($request->has('post_content_id') && $request->post_content_id) {
-            $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
-            $tempObj->post_content_id = $decryptedPostContentId;
-        }
-        $tempObj->save();
-
-        $data = [
-            "id" => Helpers::encrypt($tempObj->id),
-        ];
-        return $this->success($data, 'Template create successfully');
-
     }
 
     public function getTemplate(Request $request, $id)
