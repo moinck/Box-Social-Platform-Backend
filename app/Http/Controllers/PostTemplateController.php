@@ -42,6 +42,9 @@ class PostTemplateController extends Controller
             ]);
         }
 
+        // added delay for tokens
+        sleep(1);
+
         $currentAdminToken = $adminToken->token;
         // set token in session
         Session::put('admin_access_token', $currentAdminToken);

@@ -179,13 +179,24 @@ class TemplateApiController extends Controller
     
             $categoryName = $category->name ?? 'Uncategorized';
     
-            $tempData[$categoryName] = $templates->map(function ($t) {
-                return [
-                    'id' => Helpers::encrypt($t->id),
-                    'category_id' => Helpers::encrypt($t->category_id),
-                    'post_content_id' => Helpers::encrypt($t->post_content_id),
-                    'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
-                ];
+            $tempData[$categoryName] = $templates->map(function ($t) use ($decryptedTemplateIds) {
+
+                if (!empty($decryptedTemplateIds)) {
+                    return [
+                        'id' => Helpers::encrypt($t->id),
+                        'category_id' => Helpers::encrypt($t->category_id),
+                        'post_content_id' => Helpers::encrypt($t->post_content_id),
+                        'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
+                        'template_data' => isset($t->template_data) ? $t->template_data : '',
+                    ];
+                } else {
+                    return [
+                        'id' => Helpers::encrypt($t->id),
+                        'category_id' => Helpers::encrypt($t->category_id),
+                        'post_content_id' => Helpers::encrypt($t->post_content_id),
+                        'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
+                    ];
+                }
             })->toArray();
         }
     
