@@ -39,7 +39,7 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         try {
-            $userId = 8;
+            $userId = Auth::user()->id;
             $user = User::find($userId);
 
             // Check for existing active subscription
@@ -103,7 +103,7 @@ class UserSubscriptionNewApiController extends Controller
                 // return success response
                 return response()->json([
                     'status' => true,
-                    'message' => 'Subscription created successfully',
+                    'message' => 'Free trial subscription created successfully',
                     'data' => [
                         'subscription_plan' => 'free-trial',
                         'subscription_id' => Helpers::encrypt($newSubscription->id),
