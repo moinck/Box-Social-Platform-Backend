@@ -274,7 +274,8 @@ class Helpers
             return $imageUrl;
             
         } catch (Exception $e) {
-            Log::error("Error uploading image to {$disk}: " . $e->getMessage());
+            self::sendErrorMailToDeveloper($e);
+            // Log::error("Error uploading image to {$disk}: " . $e->getMessage());
             throw $e;
         }
     }
