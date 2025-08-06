@@ -112,9 +112,9 @@ class TemplateApiController extends Controller
     
                     $savedTemplates[] = Helpers::encrypt($tempObj->id);
                 }
+                DB::commit();
             }
     
-            DB::commit();
             return $this->success($savedTemplates, 'Multiple Templates created successfully');
         } catch (Exception $e) {
             DB::rollBack();
