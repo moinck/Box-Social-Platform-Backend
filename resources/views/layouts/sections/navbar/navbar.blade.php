@@ -8,8 +8,6 @@
         $appType = 'LOCAL';
     } elseif ($appType == 'stage') {
         $appType = 'STAGING';
-    } elseif ($appType == 'production') {
-        $appType = 'PRODUCTION';
     }
 @endphp
 
@@ -49,7 +47,7 @@
 @endif
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-    @if ($appType == "live")
+    @if ($appType != "live")
         <div class="alert alert-solid-danger d-flex align-items-center mb-0" role="alert">
             <span class="alert-icon rounded">
                 <i class="ri-error-warning-line ri-22px"></i>
