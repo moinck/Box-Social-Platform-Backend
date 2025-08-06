@@ -271,18 +271,20 @@ class BrnadKitApiController extends Controller
         }
 
         $returnData = [
-            "company_name" => $brandKitObj->company_name,
-            "email" => $brandKitObj->email,
-            "address" => $brandKitObj->address,
-            "state" => $brandKitObj->state,
-            "phone" => $brandKitObj->phone,
-            "country" => $brandKitObj->country,
-            "website" => $brandKitObj->website,
-            "postal_code" => $brandKitObj->postal_code,
-            "show_email_on_post" => $brandKitObj->show_email_on_post,
-            "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
-            "show_website_on_post" => $brandKitObj->show_website_on_post,
-            "show_address_on_post" => $brandKitObj->show_address_on_post,
+            "company_name" => $brandKitObj->company_name ?? null,
+            "email" => $brandKitObj->email ?? null,
+            "address" => $brandKitObj->address ?? null,
+            "state" => $brandKitObj->state ?? null,
+            "phone" => $brandKitObj->phone ?? null,
+            "country" => $brandKitObj->country ?? null,
+            "website" => $brandKitObj->website ?? null,
+            "postal_code" => $brandKitObj->postal_code ?? null,
+            "warning_title" => $brandKitObj->warning_title ?? null,
+            "warning_message" => $brandKitObj->warning_message ?? null,
+            "show_email_on_post" => $brandKitObj->show_email_on_post ?? 0,
+            "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post ?? 0,
+            "show_website_on_post" => $brandKitObj->show_website_on_post ?? 0,
+            "show_address_on_post" => $brandKitObj->show_address_on_post ?? 0,
         ];
 
         return $this->success($returnData, 'BrandKit fetched successfully');

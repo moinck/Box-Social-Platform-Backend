@@ -240,28 +240,79 @@ class Helpers
     /**
      * function to save images
      */
-    public static function uploadImage($prefix, $image, $path)
+    public static function uploadImage($prefix, $image, $path, $disk = 'digitalocean')
     {
-        // Ensure the directory exists in the storage
-        if (!Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->makeDirectory($path);
+        try {
+            // For local storage, ensure directory exists
+            if ($disk === 'public' && !Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->makeDirectory($path);
+            }
+
+            // add enviroment name
+            $envName = env('APP_ENV');
+            
+            // Generate a unique name for the image
+            $image_name = $prefix . "_" . uniqid() . '.' . $image->getClientOriginalExtension();
+
+            $newPath = $envName . "/" . $path;
+            
+            // Store the image
+            $storedPath = $image->storeAs($newPath, $image_name, $disk);
+            
+            if (!$storedPath) {
+                throw new Exception("Failed to upload image to {$disk} disk");
+            }
+            
+            // Return appropriate URL based on disk
+            if ($disk === 'digitalocean') {
+                $imageUrl = Storage::disk('digitalocean')->url($storedPath);
+            } else {
+                $imageUrl = 'storage/' . $newPath . '/' . $image_name;
+            }
+            
+            Log::info("Image uploaded successfully to {$disk}: " . $imageUrl);
+            return $imageUrl;
+            
+        } catch (Exception $e) {
+            Log::error("Error uploading image to {$disk}: " . $e->getMessage());
+            throw $e;
         }
-        // Generate a unique name for the image
-        $image_name = $prefix . "_" . time() . '.' . $image->getClientOriginalExtension();
-        
-        // Store the image in the storage directory
-        $image->storeAs($path, $image_name, 'public');
-        // Return the relative path to the image
-        $imageUrl = 'storage/' . $path . '/' . $image_name;
-        return $imageUrl;
     }
-    
+
+    /**
+     * Test DigitalOcean connection
+     * @return array
+     */
+    public static function testDigitalOceanConnection()
+    {
+        try {
+            $disk = Storage::disk('digitalocean');
+            
+            // Test basic connection by trying to list files
+            $directory = env('APP_ENV') . '/images/';
+            $files = $disk->allFiles($directory);
+            
+            return [
+                'success' => true,
+                'message' => 'DigitalOcean connection successful',
+                'file_count' => count($files),
+                'files' => $files
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'DigitalOcean connection failed: ' . $e->getMessage(),
+                'error' => $e->getTraceAsString()
+            ];
+        }
+    }
+        
     /**
      * Function to delete image
      * @param mixed $path
      * @return void
      */
-    public static function deleteImage($path)
+    public static function deleteImageOld($path)
     {
         try {
             // Remove 'storage/' prefix if it exists
@@ -272,6 +323,42 @@ class Helpers
                 Log::info("File deleted successfully: " . $path);
             } else {
                 Log::info("File does not exist at: " . $path);
+            }
+        } catch (Exception $e) {
+            Log::error("Error deleting file: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Function to delete image from both local storage and DigitalOcean
+     * @param string $path
+     * @return void
+     */
+    public static function deleteImage($path)
+    {
+        try {
+            // Check if it's a DigitalOcean URL
+            if (str_contains($path, env('DO_SPACES_URL')) || str_contains($path, env('DO_SPACES_ENDPOINT'))) {
+                // Extract the file path from the full URL
+                $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
+                $relativePath = str_replace($doSpacesUrl . '/', '', $path);
+                
+                if (Storage::disk('digitalocean')->exists($relativePath)) {
+                    Storage::disk('digitalocean')->delete($relativePath);
+                    Log::info("File deleted successfully from DigitalOcean: " . $path);
+                } else {
+                    Log::info("File does not exist in DigitalOcean: " . $path);
+                }
+            } else {
+                // Handle local storage files (backward compatibility)
+                $storagePath = str_replace('storage/', '', $path);
+                
+                if (Storage::disk('public')->exists($storagePath)) {
+                    Storage::disk('public')->delete($storagePath);
+                    Log::info("File deleted successfully from local storage: " . $path);
+                } else {
+                    Log::info("File does not exist in local storage: " . $path);
+                }
             }
         } catch (Exception $e) {
             Log::error("Error deleting file: " . $e->getMessage());

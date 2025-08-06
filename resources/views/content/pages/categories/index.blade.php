@@ -481,8 +481,13 @@
                                 $('#edit_category_coming_soon').val('false');
                             }
 
-                            var ImageUrl = "{{ asset('') }}" + response.data.image;
-                            $('#edit_category_image_preview').attr('src', ImageUrl);
+                            // check ig image contain http o https
+                            var ImageUrl = response.data.image;
+                            if (ImageUrl.startsWith('http://')) {
+                                $('#edit_category_image_preview').attr('src', "{{ asset('') }}" + ImageUrl);
+                            } else {
+                                $('#edit_category_image_preview').attr('src', ImageUrl);
+                            }
 
                             var subcategories = response.data.children;
                             var subcategoriesEditHtml = '';

@@ -8,9 +8,9 @@
         $appType = 'LOCAL';
     } elseif ($appType == 'stage') {
         $appType = 'STAGING';
-    } elseif ($appType == 'production') {
-        $appType = 'PRODUCTION';
     }
+
+    $profileUrl = Auth::user()->profile_image ?? asset('assets/img/avatars/5.png');
 @endphp
 
 <!-- Navbar -->
@@ -49,14 +49,16 @@
 @endif
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-    <div class="alert alert-solid-danger d-flex align-items-center mb-0" role="alert">
-        <span class="alert-icon rounded">
-            <i class="ri-error-warning-line ri-22px"></i>
-        </span>
-        You are currently on the {{ $appType }} version of this site. Changes made here will not reflect on the live site.
-        To visit the live version of this site, click <a href="javascript:void(0);" class="alert-link ms-1"
-            style="text-decoration:underline;">here</a>.
-    </div>
+    @if ($appType != "live")
+        <div class="alert alert-solid-danger d-flex align-items-center mb-0" role="alert">
+            <span class="alert-icon rounded">
+                <i class="ri-error-warning-line ri-22px"></i>
+            </span>
+            You are currently on the {{ $appType }} version of this site. Changes made here will not reflect on the live site.
+            To visit the live version of this site, click <a href="javascript:void(0);" class="alert-link ms-1"
+                style="text-decoration:underline;">here</a>.
+        </div>
+    @endif
     <ul class="navbar-nav flex-row align-items-center ms-auto">
         {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-4 me-xl-1">
             <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -117,7 +119,7 @@
             <a class="#04202E" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
                     @if (Auth::check() && Auth::user()->role == 'admin')
-                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                        <img src="{{ $profileUrl }}" alt class="rounded-circle">
                     @else
                         <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
                     @endif
