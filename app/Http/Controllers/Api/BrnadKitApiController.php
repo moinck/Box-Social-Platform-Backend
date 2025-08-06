@@ -279,6 +279,8 @@ class BrnadKitApiController extends Controller
             "country" => $brandKitObj->country,
             "website" => $brandKitObj->website,
             "postal_code" => $brandKitObj->postal_code,
+            "warning_title" => $brandKitObj->warning_title,
+            "warning_message" => $brandKitObj->warning_message,
             "show_email_on_post" => $brandKitObj->show_email_on_post,
             "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
             "show_website_on_post" => $brandKitObj->show_website_on_post,
