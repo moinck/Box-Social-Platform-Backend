@@ -44,9 +44,9 @@ class TemplateApiController extends Controller
         $subCategoryId = $request->sub_category_id ? Helpers::decrypt($request->sub_category_id) : null;
         $designStyleId = $request->design_style_id ? Helpers::decrypt($request->design_style_id) : null;
 
-        DB::beginTransaction();
-
+        
         try {
+            DB::beginTransaction();
             // if single post content then save only 1 template
             if (!empty($postContentId)) {
                 $imagePath = null;
@@ -75,6 +75,7 @@ class TemplateApiController extends Controller
                 $data = [
                     "id" => Helpers::encrypt($tempObj->id),
                 ];
+                DB::commit();
                 return $this->success($data, 'Template create successfully');
             }
             // if null then get all post content from 'category' & 'sub_category' and save template to that all post content

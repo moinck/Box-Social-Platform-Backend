@@ -252,7 +252,7 @@
                                         <input type="text" class="form-control" id="brand_warning_title" placeholder="Enter Warning Title"
                                             name="brand_warning_title" value="{{ $brandKitData->warning_title ?? "" }}" 
                                             aria-label="Warning Title" />
-                                        <label for="brand_warning_title">Warning Title</label>
+                                        <label for="brand_warning_title">Post Title</label>
                                     </div>
                                 </div>
                                 <div class="col">
