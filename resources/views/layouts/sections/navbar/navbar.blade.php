@@ -9,6 +9,8 @@
     } elseif ($appType == 'stage') {
         $appType = 'STAGING';
     }
+
+    $profileUrl = Auth::user()->profile_image ?? asset('assets/img/avatars/5.png');
 @endphp
 
 <!-- Navbar -->
@@ -117,7 +119,7 @@
             <a class="#04202E" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
                     @if (Auth::check() && Auth::user()->role == 'admin')
-                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                        <img src="{{ $profileUrl }}" alt class="rounded-circle">
                     @else
                         <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
                     @endif
