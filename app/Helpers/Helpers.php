@@ -270,12 +270,12 @@ class Helpers
                 $imageUrl = 'storage/' . $newPath . '/' . $image_name;
             }
             
-            Log::info("Image uploaded successfully to {$disk}: " . $imageUrl);
+            // // Log::info("Image uploaded successfully to {$disk}: " . $imageUrl);
             return $imageUrl;
             
         } catch (Exception $e) {
             self::sendErrorMailToDeveloper($e);
-            // Log::error("Error uploading image to {$disk}: " . $e->getMessage());
+            // // Log::error("Error uploading image to {$disk}: " . $e->getMessage());
             throw $e;
         }
     }
@@ -321,12 +321,12 @@ class Helpers
             
             if (Storage::disk('public')->exists($storagePath)) {
                 Storage::disk('public')->delete($storagePath);
-                Log::info("File deleted successfully: " . $path);
+                // Log::info("File deleted successfully: " . $path);
             } else {
-                Log::info("File does not exist at: " . $path);
+                // Log::info("File does not exist at: " . $path);
             }
         } catch (Exception $e) {
-            Log::error("Error deleting file: " . $e->getMessage());
+            // Log::error("Error deleting file: " . $e->getMessage());
         }
     }
 
@@ -346,9 +346,9 @@ class Helpers
                 
                 if (Storage::disk('digitalocean')->exists($relativePath)) {
                     Storage::disk('digitalocean')->delete($relativePath);
-                    Log::info("File deleted successfully from DigitalOcean: " . $path);
+                    // Log::info("File deleted successfully from DigitalOcean: " . $path);
                 } else {
-                    Log::info("File does not exist in DigitalOcean: " . $path);
+                    // Log::info("File does not exist in DigitalOcean: " . $path);
                 }
             } else {
                 // Handle local storage files (backward compatibility)
@@ -356,13 +356,14 @@ class Helpers
                 
                 if (Storage::disk('public')->exists($storagePath)) {
                     Storage::disk('public')->delete($storagePath);
-                    Log::info("File deleted successfully from local storage: " . $path);
+                    // Log::info("File deleted successfully from local storage: " . $path);
                 } else {
-                    Log::info("File does not exist in local storage: " . $path);
+                    // Log::info("File does not exist in local storage: " . $path);
                 }
             }
         } catch (Exception $e) {
-            Log::error("Error deleting file: " . $e->getMessage());
+            self::sendErrorMailToDeveloper($e);
+            // Log::error("Error deleting file: " . $e->getMessage());
         }
     }
     
@@ -483,7 +484,7 @@ class Helpers
 
         } catch (Exception $e) {
             // Log the error
-            Log::error('Image upload from URL failed: ' . $e->getMessage());
+            // Log::error('Image upload from URL failed: ' . $e->getMessage());
             return false;
         }
     }

@@ -39,7 +39,7 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         try {
-            $userId = Auth::user()->id;
+            $userId = 8;
             $user = User::find($userId);
 
             // Check for existing active subscription
@@ -114,8 +114,8 @@ class UserSubscriptionNewApiController extends Controller
 
             $encyptedId = Helpers::encrypt($newSubscription->id);
 
-            $successUrl = url(config('app.frontend_url') . '/user-subscription/success') . '?session_id={CHECKOUT_SESSION_ID}&subscription_id=' . $encyptedId;
-            $cancelUrl = url(config('app.frontend_url') . '/user-subscription/cancel') . '?subscription_id=' . $encyptedId;
+            $successUrl = url(config('app.app_api_url') . '/user-subscription/success') . '?session_id={CHECKOUT_SESSION_ID}&subscription_id=' . $encyptedId;
+            $cancelUrl = url(config('app.app_api_url') . '/user-subscription/cancel') . '?subscription_id=' . $encyptedId;
 
             $checkoutSession = $this->stripe->checkout->sessions->create([
                 'customer' => $userStripeCustomerId,
