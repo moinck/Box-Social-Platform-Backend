@@ -28,13 +28,12 @@ class ProfileManagementApiController extends Controller
         if (!$token) {
             return $this->error('Invalid token');
         }
-        $user = Auth::user();
+        $userId = Auth::user()->id;
 
-        $user_id = $user->id;
-        if (!$user_id) {
+        if (!$userId) {
             return $this->error('Invalid user id', 404);
         }
-        $user = User::find($user_id);
+        $user = User::with('subscription:id,user_id')->find($userId);
         if (!$user) {
             return $this->error('User not found', 404);
         }
@@ -42,7 +41,7 @@ class ProfileManagementApiController extends Controller
         // make data array
         $data = [];
         $data['user'] = [
-            'id' => Helpers::encrypt($user_id),
+            'id' => Helpers::encrypt($user->id),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'company_name' => $user->company_name,
@@ -52,6 +51,7 @@ class ProfileManagementApiController extends Controller
             'phone_number' => $user->phone ?? null,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
             'is_brandkit' => $user->hasBrandKit(),
+            'is_subscribed' => $user->subscription ? true : false,
         ];
 
         return $this->success($data, 'Profile fetched successfully');
@@ -66,9 +66,8 @@ class ProfileManagementApiController extends Controller
     {
         // need to change here
         $token = $request->bearerToken();
-        $user = Auth::user();
-        $user_id = $user->id;
-        if (!$user_id || !$token) {
+        $userId = Auth::user()->id;
+        if (!$userId || !$token) {
             return $this->error('Invalid user id', 404);
         }
         $validator = Validator::make($request->all(), [
@@ -87,11 +86,11 @@ class ProfileManagementApiController extends Controller
             );
         }
 
-        if (!$user) {
+        if (!$userId) {
             return $this->error('User not found', 404);
         }
 
-        $user = User::find($user_id);
+        $user = User::with('subscription:id,user_id')->find($userId);
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->company_name = $request->company_name;
@@ -102,7 +101,7 @@ class ProfileManagementApiController extends Controller
 
         $returnData = [];
         $returnData['user'] = [
-            'id' => Helpers::encrypt($user_id),
+            'id' => Helpers::encrypt($user->id),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'company_name' => $user->company_name,
@@ -111,6 +110,7 @@ class ProfileManagementApiController extends Controller
             'email' => $user->email,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
             'is_brandkit' => $user->hasBrandKit(),
+            'is_subscribed' => $user->subscription ? true : false,
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
@@ -124,8 +124,8 @@ class ProfileManagementApiController extends Controller
     public function profileUpdate(Request $request)
     {
         $token = $request->bearerToken();
-        $user = Auth::user();
-        if (!$user || !$token) {
+        $userId = Auth::user()->id;
+        if (!$userId || !$token) {
             return $this->error('Invalid user id', 404);
         }
 
@@ -142,6 +142,11 @@ class ProfileManagementApiController extends Controller
 
         $uploadLogoUrl = $request->profile_image;
         $logoUrl = null;
+
+        $user = User::find($userId);
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
         $oldLogoUrl = $user->profile_image;
         if ($uploadLogoUrl) {
 
@@ -154,8 +159,6 @@ class ProfileManagementApiController extends Controller
             }
         }
 
-        $user_id = $user->id;
-        $user = User::find($user_id);
         $user->profile_image = $logoUrl;
         $user->save();
 
@@ -165,7 +168,7 @@ class ProfileManagementApiController extends Controller
 
         $returnData = [];
         $returnData['user'] = [
-            'id' => Helpers::encrypt($user_id),
+            'id' => Helpers::encrypt($user->id),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'company_name' => $user->company_name,
@@ -173,7 +176,8 @@ class ProfileManagementApiController extends Controller
             'website' => $user->website,
             'email' => $user->email,
             'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
-            'is_brandkit' => $user->hasBrandKit()
+            'is_brandkit' => $user->hasBrandKit(),
+            'is_subscribed' => $user->subscription ? true : false,
         ];
 
         return $this->success($returnData, 'Profile updated successfully');

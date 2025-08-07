@@ -175,7 +175,8 @@ class UserSubscriptionNewApiController extends Controller
             $subscriptionId = $request->get('subscription_id');
 
             if (!$sessionId || !$subscriptionId) {
-                return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid session');
+                // return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid session');
+                return redirect('http://178.128.45.173:9163/subscription_error?message=Invalid session');
             }
 
             // Verify session with Stripe
@@ -184,7 +185,8 @@ class UserSubscriptionNewApiController extends Controller
             ]);
 
             if ($session->payment_status !== 'paid') {
-                return redirect(config('app.frontend_url') . '/subscription/error?message=Payment not completed');
+                // return redirect(config('app.frontend_url') . '/subscription_error?message=Payment not completed');
+                return redirect('http://178.128.45.173:9163/subscription_error?message=Payment not completed');
             }
 
             $descyptedSubscriptionId = Helpers::decrypt($subscriptionId);
@@ -194,7 +196,8 @@ class UserSubscriptionNewApiController extends Controller
             $userSubscription = UserSubscription::with('plan:id,name,price')->find($descyptedSubscriptionId);
             
             if (!$userSubscription || $userSubscription->stripe_checkout_session_id !== $sessionId) {
-                return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid subscription');
+                // return redirect(config('app.frontend_url') . '/subscription_error?message=Invalid subscription');
+                return redirect('http://178.128.45.173:9163/subscription_error?message=Invalid subscription');
             }
 
             // Get subscription details from Stripe
@@ -245,7 +248,8 @@ class UserSubscriptionNewApiController extends Controller
 
             DB::commit();
 
-            return redirect(config('app.frontend_url') . '/subscription/success?subscription_id=' . $subscriptionId);
+            // return redirect(config('app.frontend_url') . 'subscription_success?subscription_id=' . $subscriptionId);
+            return redirect('http://178.128.45.173:9163/subscription_success?subscription_id=' . $subscriptionId);
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Subscription Created successfully',
@@ -277,7 +281,8 @@ class UserSubscriptionNewApiController extends Controller
                 }
             }
 
-            return redirect(config('app.frontend_url') . '/subscription/cancelled');
+            // return redirect(config('app.frontend_url') . '/subscription_cancel');
+            return redirect('http://178.128.45.173:9163/subscription_cancel');
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Subscription cancelled successfully',
