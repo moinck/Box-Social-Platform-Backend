@@ -122,6 +122,7 @@ class RegisterController extends Controller
                         'fca_number' => $user->fca_number,
                         'created_at' => $user->created_at->format('d-m-Y h:i A'),
                         'is_verified' => $user->is_verified ? true : false,
+                        'is_subscribed' => false,
                     ],
                     'verification_token' => Helpers::encrypt($token),
                 ],
@@ -167,7 +168,7 @@ class RegisterController extends Controller
             ], 400);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('subscription:id,user_id')->where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json([
@@ -236,6 +237,7 @@ class RegisterController extends Controller
                     'created_at' => $user->created_at->format('d-m-Y h:i A'),
                     'is_verified' => $user->is_verified,
                     'is_brandkit' => $isBrandkit,
+                    'is_subscribed' => $user->subscription ? true : false,
                 ],
                 'access_token' => $token,
                 'token_type' => 'Bearer',

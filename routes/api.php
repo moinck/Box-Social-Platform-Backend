@@ -26,8 +26,7 @@ Route::post('/fca-check', [RegisterController::class, 'checkFca']);
 
 // Email verification routes
 Route::post('/email/verify', [AuthApiController::class, 'verify'])
-    ->middleware(['throttle:6,1'])
-    ->name('verification.verify');
+    ->middleware(['throttle:6,1']);
 
 Route::post('/email/resend-verification', [AuthApiController::class, 'resend'])
     ->middleware(['throttle:6,1']);
