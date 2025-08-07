@@ -37,88 +37,45 @@ class TemplateApiController extends Controller
             return $this->validationError('Validation failed', $validator->errors());
         }
 
-        $savedTemplates = [];
-
         $postContentId = $request->post_content_id ? Helpers::decrypt($request->post_content_id) : null;
         $categoryId = $request->category_id ? Helpers::decrypt($request->category_id) : null;
         $subCategoryId = $request->sub_category_id ? Helpers::decrypt($request->sub_category_id) : null;
         $designStyleId = $request->design_style_id ? Helpers::decrypt($request->design_style_id) : null;
 
-        
         try {
             DB::beginTransaction();
-            // if single post content then save only 1 template
-            if (!empty($postContentId)) {
-                $imagePath = null;
-                if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-                    $prefix = 'admin_template_'. rand(1000, 9999);
-                    $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
-                }
-                $tempObj = new PostTemplate();
-                $tempObj->category_id = $categoryId;
-                $tempObj->template_image = $imagePath;
-                $tempObj->template_data = json_encode($request->template_data);
-        
-                if ($request->has('sub_category_id') && $subCategoryId !== null) {
-                    $tempObj->sub_category_id = $subCategoryId;
-                }
-        
-                if ($request->has('design_style_id') && $designStyleId) {
-                    $tempObj->design_style_id = $designStyleId;
-                }
-        
-                if ($request->has('post_content_id') && $postContentId) {
-                    $tempObj->post_content_id = $postContentId;
-                }
-                $tempObj->save();
-        
-                $data = [
-                    "id" => Helpers::encrypt($tempObj->id),
-                ];
-                DB::commit();
-                return $this->success($data, 'Template create successfully');
+            $imagePath = null;
+            if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+                $prefix = 'admin_template_'. rand(1000, 9999);
+                $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
             }
-            // if null then get all post content from 'category' & 'sub_category' and save template to that all post content
-            else {
-                $postContentData = PostContent::select('id')
-                    ->where('category_id', $categoryId)
-                    ->when($subCategoryId, function ($query) use ($subCategoryId) {
-                        $query->where('sub_category_id', $subCategoryId);
-                    })
-                    ->get();
+            $tempObj = new PostTemplate();
+            $tempObj->category_id = $categoryId;
+            $tempObj->template_image = $imagePath;
+            $tempObj->template_data = json_encode($request->template_data);
     
-                foreach ($postContentData as $postContent) {
-                    $imageNewPath = null;
-                    $prefix = 'admin_template_'. rand(1000, 9999);
-                    if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-                        $imageNewPath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
-                    }
-    
-                    $tempObj = new PostTemplate();
-                    $tempObj->category_id = $categoryId;
-                    $tempObj->template_image = $imageNewPath;
-                    $tempObj->template_data = json_encode($request->template_data);
-    
-                    if ($request->has('sub_category_id') && $subCategoryId !== null) {
-                        $tempObj->sub_category_id = $subCategoryId;
-                    }
-    
-                    if ($request->has('design_style_id') && $designStyleId) {
-                        $tempObj->design_style_id = $designStyleId;
-                    }
-    
-                    $tempObj->post_content_id = $postContent->id;
-                    $tempObj->save();
-    
-                    $savedTemplates[] = Helpers::encrypt($tempObj->id);
-                }
-                DB::commit();
+            if ($request->has('sub_category_id') && $subCategoryId !== null) {
+                $tempObj->sub_category_id = $subCategoryId;
             }
     
-            return $this->success($savedTemplates, 'Multiple Templates created successfully');
+            if ($request->has('design_style_id') && $designStyleId) {
+                $tempObj->design_style_id = $designStyleId;
+            }
+    
+            if ($request->has('post_content_id') && $postContentId) {
+                $tempObj->post_content_id = $postContentId;
+            }
+            $tempObj->save();
+    
+            $data = [
+                "id" => Helpers::encrypt($tempObj->id),
+            ];
+            DB::commit();
+            return $this->success($data, 'Template create successfully');
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->error($e->getMessage(), 500);
+            Helpers::sendErrorMailToDeveloper($e);
+            return $this->error('Something went wrong', 500);
         }
     }
 
@@ -207,6 +164,19 @@ class TemplateApiController extends Controller
             ? array_map([Helpers::class, 'decrypt'], $request->template_ids) : [];
     
         $tempData = [];
+        $postContentData = [];
+
+        // get all post content data of post_content_ids
+        if (!empty($decryptedPostContentIds) && !empty($decryptedTemplateIds)) {
+            $postContents = PostContent::select('id','title','warning_message')->whereIn('id', $decryptedPostContentIds)->get();
+            $postContentData['post_content_data'] = $postContents->map(function ($postContent) {
+                return [
+                    'id' => Helpers::encrypt($postContent->id),
+                    'title' => $postContent->title,
+                    'warning_message' => $postContent->warning_message ? $postContent->warning_message : '',
+                ];
+            })->toArray();
+        }
     
         foreach ($categories as $category) {
             $query = PostTemplate::with('category:id,name')
@@ -238,10 +208,11 @@ class TemplateApiController extends Controller
             $tempData[$categoryName] = $templates->map(function ($t) use ($decryptedTemplateIds) {
 
                 if (!empty($decryptedTemplateIds)) {
+                    $postContentId = $t->post_content_id ? Helpers::encrypt($t->post_content_id) : null;
                     return [
                         'id' => Helpers::encrypt($t->id),
                         'category_id' => Helpers::encrypt($t->category_id),
-                        'post_content_id' => Helpers::encrypt($t->post_content_id),
+                        'post_content_id' => $postContentId,
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                         'template_data' => isset($t->template_data) ? $t->template_data : '',
                     ];
@@ -249,14 +220,21 @@ class TemplateApiController extends Controller
                     return [
                         'id' => Helpers::encrypt($t->id),
                         'category_id' => Helpers::encrypt($t->category_id),
-                        'post_content_id' => Helpers::encrypt($t->post_content_id),
+                        'post_content_id' => Helpers::encrypt($t->post_content_id ?? null),
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                     ];
                 }
             })->toArray();
         }
+
+        // $returnData = [
+        //     "template_data" => $tempData,
+        //     "post_content_data" => $postContentData,
+        // ];
+        // dd($postContentData);
+        $returnData = array_merge($tempData, $postContentData);
     
-        return $this->success($tempData, 'Template fetched successfully');
+        return $this->success($returnData, 'Template fetched successfully');
     }
     
 
