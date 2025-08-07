@@ -136,14 +136,14 @@
                             <div class="col-md-6 mb-3">
                                 <div class="form-floating form-floating-outline">
                                     <input type="text" class="form-control"
-                                        value="{{ $subscriptionData->stripe_subscription_id ?? "--" }}" readonly />
+                                        value="{{ $subscriptionData->stripe_subscription_id ?? "N/A" }}" readonly />
                                     <label>Stripe Subscription ID</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-floating form-floating-outline">
                                     <input type="text" class="form-control"
-                                        value="{{ $subscriptionData->stripe_customer_id ?? "--" }}" readonly />
+                                        value="{{ $subscriptionData->stripe_customer_id ?? "N/A" }}" readonly />
                                     <label>Stripe Customer ID</label>
                                 </div>
                             </div>
