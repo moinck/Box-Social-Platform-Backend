@@ -41,9 +41,8 @@ class UserSubscriptionHistoryApiController extends Controller
                 : null;
 
             $returnData[] = [
-                'id' => $val->id,
-                'user_id' => $val->user_id,
-                'plan_id' => $val->plan_id,
+                'id' => Helpers::encrypt($val->id),
+                'user_id' => Helpers::encrypt($val->user_id),
                 'user_name' => $val->user->first_name . ' ' . $val->user->last_name,
                 'plan' => $val->plan->name,
                 'status' => $val->status,
