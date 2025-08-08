@@ -89,7 +89,11 @@
                                         <small class="text-muted d-block">Current Period</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y') }}
+                                                @if ($subscriptionData->current_period_start)
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y') }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>
@@ -106,7 +110,11 @@
                                         <small class="text-muted d-block">End Date</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}
+                                                @if ($subscriptionData->current_period_end)
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>
@@ -123,7 +131,11 @@
                                         <small class="text-muted d-block">Yearly Downloads</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
+                                                @if ($userDownloads && $subscriptionData->status == "active" || $subscriptionData->status == "cancelled")
+                                                    {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>

@@ -110,10 +110,9 @@ class UserDownloads extends Model
             // Check total limit
             return $this->total_downloads_used < ($this->total_limit ?? 3);
         } else {
-            // Premium plan - check monthly limit (including carried over)
+            // Premium plan - check monthly limit only
             $this->checkAndResetMonthly();
-            $effectiveLimit = $this->monthly_limit + $this->carried_over_downloads;
-            return $this->monthly_downloads_used < $effectiveLimit;
+            return $this->monthly_downloads_used < $this->monthly_limit;
         }
     }
 
@@ -122,15 +121,14 @@ class UserDownloads extends Model
      */
     public function getRemainingDownloads()
     {
-        if ($this->plan_type != 'free-trial') {
+        if ($this->plan_type == 'free-trial') {
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
                 return 0;
             }
             return max(0, ($this->total_limit ?? 3) - $this->total_downloads_used);
         } else {
             $this->checkAndResetMonthly();
-            $effectiveLimit = $this->monthly_limit + $this->carried_over_downloads;
-            return max(0, $effectiveLimit - $this->monthly_downloads_used);
+            return max(0, $this->monthly_limit - $this->monthly_downloads_used);
         }
     }
 
@@ -165,14 +163,14 @@ class UserDownloads extends Model
         if ($this->current_month !== $currentDate->month || $this->current_year !== $currentDate->year) {
             
             // Calculate carry over (unused downloads from previous month)
-            $unusedDownloads = max(0, ($this->monthly_limit + $this->carried_over_downloads) - $this->monthly_downloads_used);
+            // $unusedDownloads = max(0, ($this->monthly_limit + $this->carried_over_downloads) - $this->monthly_downloads_used);
             
-            // Reset for new month
+            // Reset for new month - unused downloads are lost
             $this->monthly_downloads_used = 0;
             $this->current_month = $currentDate->month;
             $this->current_year = $currentDate->year;
             $this->last_reset_date = $currentDate->toDateString();
-            $this->carried_over_downloads = $unusedDownloads; // Add unused to next month
+            $this->carried_over_downloads = 0; // Add unused to next month
             
             $this->save();
         }
@@ -219,8 +217,8 @@ class UserDownloads extends Model
                 'monthly_limit' => $this->monthly_limit,
                 'monthly_remaining_limit' => $this->monthly_limit - $this->monthly_downloads_used,
                 'total_limit' => $this->total_limit,
-                'carried_over' => $this->carried_over_downloads,
-                'effective_limit' => $this->monthly_limit + $this->carried_over_downloads,
+                // 'carried_over' => $this->carried_over_downloads,
+                // 'effective_limit' => $this->monthly_limit + $this->carried_over_downloads,
                 'current_period' => $this->current_month . '/' . $this->current_year,
                 // 'last_reset' => $this->last_reset_date,
                 // 'expires_at' => $this->expires_at,

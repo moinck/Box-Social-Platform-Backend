@@ -38,6 +38,14 @@ class ProfileManagementApiController extends Controller
             return $this->error('User not found', 404);
         }
 
+        $profileUrl = $user->profile_image;
+        if (!empty($profileUrl)) {
+            // check if it is digitalocean url or not
+            if (strpos($profileUrl, 'https://') !== 0) {
+                $profileUrl = asset($profileUrl);
+            }
+        }
+
         // make data array
         $data = [];
         $data['user'] = [
@@ -49,7 +57,7 @@ class ProfileManagementApiController extends Controller
             'website' => $user->website,
             'email' => $user->email,
             'phone_number' => $user->phone ?? null,
-            'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'profile_image' => $profileUrl,
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
         ];
@@ -108,7 +116,7 @@ class ProfileManagementApiController extends Controller
             'fca_number' => $user->fca_number,
             'website' => $user->website,
             'email' => $user->email,
-            'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'profile_image' => $user->profile_image ? $user->profile_image : null,
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
         ];
@@ -162,6 +170,15 @@ class ProfileManagementApiController extends Controller
         $user->profile_image = $logoUrl;
         $user->save();
 
+        $profileUrl = $user->profile_image;
+        if (!empty($profileUrl)) {
+            // check if it is digitalocean url or not
+            if (strpos($profileUrl, 'https://') !== 0) {
+                $profileUrl = asset($profileUrl);
+            }
+        }
+        
+        // delete old image
         if ($oldLogoUrl) {
             Helpers::deleteImage($oldLogoUrl);
         }
@@ -175,7 +192,7 @@ class ProfileManagementApiController extends Controller
             'fca_number' => $user->fca_number,
             'website' => $user->website,
             'email' => $user->email,
-            'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+            'profile_image' => $profileUrl ?? null,
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
         ];
