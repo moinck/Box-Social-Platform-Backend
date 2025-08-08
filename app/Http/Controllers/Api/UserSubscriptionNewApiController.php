@@ -39,6 +39,7 @@ class UserSubscriptionNewApiController extends Controller
         }
 
         try {
+            $planId = Helpers::decrypt($request->plan_id);
             $userId = Auth::user()->id;
             $user = User::find($userId);
 
@@ -48,17 +49,44 @@ class UserSubscriptionNewApiController extends Controller
                 ->first();
 
             if ($existingSubscription) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'You already have an active subscription'
-                ], 400);
+                // check if it is free trial subscription
+                if ($existingSubscription->plan_id == 1 && $existingSubscription->status == 'active') {
+                    // if user want to buy premium plan than cancel the free trial subscription
+                    if ($planId != 1) {
+                        $existingSubscription->status = 'cancelled';
+                        $existingSubscription->stripe_status = 'canceled';
+                        $existingSubscription->cancelled_at = now();
+                        $existingSubscription->ends_at = now();
+                        $existingSubscription->save();
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'You already have an active free trial subscription'
+                        ], 400);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'You already have an active premium subscription'
+                    ], 400);
+                }
             }
 
-            // Get or create Stripe customer
-            $userStripeCustomerId = $this->getOrCreateStripeCustomer($user);
+            // check if they have ever had a free trial before
+            if ($planId == 1) {
+                $hasUsedFreeTrial = UserSubscription::where('user_id', $userId)
+                    ->where('plan_id', 1)
+                    ->exists();
+                
+                if ($hasUsedFreeTrial) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'You have already used your free trial. Please choose a premium plan.'
+                    ], 400);
+                }
+            }
 
             // Get plan details
-            $planId = Helpers::decrypt($request->plan_id);
             $subscriptionPlanDetail = SubscriptionPlans::find($planId);
 
             if (!$subscriptionPlanDetail) {
@@ -67,6 +95,9 @@ class UserSubscriptionNewApiController extends Controller
                     'message' => 'Invalid subscription plan'
                 ], 400);
             }
+
+            // Get or create Stripe customer
+            $userStripeCustomerId = $this->getOrCreateStripeCustomer($user);
 
             if ($subscriptionPlanDetail->slug != 'free-trial') {
                 $today = now();
@@ -159,7 +190,7 @@ class UserSubscriptionNewApiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Subscription create error: ' . $e->getMessage(), ['function' => 'subscribe', 'trace' => $e->getTraceAsString()]);
+            // Log::error('Subscription create error: ' . $e->getMessage(), ['function' => 'subscribe', 'trace' => $e->getTraceAsString()]);
             Helpers::sendErrorMailToDeveloper($e);
             return response()->json([
                 'status' => false,
@@ -257,7 +288,7 @@ class UserSubscriptionNewApiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Subscription success error: ' . $e->getMessage(),['function' => 'success', 'data' => $e->getTraceAsString()]);
+            // Log::error('Subscription success error: ' . $e->getMessage(),['function' => 'success', 'data' => $e->getTraceAsString()]);
             Helpers::sendErrorMailToDeveloper($e);
             // return redirect(config('app.frontend_url') . '/subscription/error?message=Processing failed');
             return response()->json([
@@ -275,27 +306,23 @@ class UserSubscriptionNewApiController extends Controller
             if ($subscriptionId) {
                 $userSubscription = UserSubscription::find(Helpers::decrypt($subscriptionId));
                 if ($userSubscription && $userSubscription->status === 'incomplete') {
-                    $userSubscription->status = 'cancelled';
-                    $userSubscription->stripe_status = 'canceled';
+                    $userSubscription->status = 'incomplete';
+                    $userSubscription->stripe_status = 'incomplete';
                     $userSubscription->save();
                 }
             }
 
             // return redirect(config('app.frontend_url') . '/subscription_cancel');
-            return redirect('http://178.128.45.173:9163/subscription_cancel');
+            return redirect('http://178.128.45.173:9163/subscription_cancel?message=Subscription incomplete');
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Subscription cancelled successfully',
             // ]);
 
         } catch (\Exception $e) {
-            Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
-            // return redirect(config('app.frontend_url') . '/subscription/error?message=Cancellation failed');
+            // Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
             Helpers::sendErrorMailToDeveloper($e);
-            return response()->json([
-                'status' => false,
-                'message' => 'Subscription cancellation failed',
-            ]);
+            return redirect('http://178.128.45.173:9163/subscription_cancel?message=Subscription incomplete');
         }
     }
 
@@ -311,7 +338,7 @@ class UserSubscriptionNewApiController extends Controller
                 $payload, $sigHeader, $endpointSecret
             );
         } catch (\Exception $e) {
-            Log::error('Subscription webhook error: ' . $e->getMessage(),['function' => 'webhook', 'data' => $e->getTraceAsString()]);
+            // Log::error('Subscription webhook error: ' . $e->getMessage(),['function' => 'webhook', 'data' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
