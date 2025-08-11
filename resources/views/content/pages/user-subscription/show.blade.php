@@ -131,7 +131,7 @@
                                         <small class="text-muted d-block">Yearly Downloads</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                @if ($userDownloads && $subscriptionData->status == "active" || $subscriptionData->status == "cancelled")
+                                                @if ($userDownloads && $subscriptionData->status == "active" || $subscriptionData->status == "cancelled" || $subscriptionData->status == "ended")
                                                     {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
                                                 @else
                                                     N/A

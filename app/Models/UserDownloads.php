@@ -75,7 +75,7 @@ class UserDownloads extends Model
     /**
      * Increment download count
      */
-    public function incrementDownload()
+    public function incrementDownload($count = 1)
     {
         // Check if we need to reset monthly count for premium plans
         if ($this->plan_type != 'free-trial') {
@@ -88,10 +88,10 @@ class UserDownloads extends Model
         }
         
         // Increment counters
-        $this->total_downloads_used += 1;
-        if ($this->plan_type != 'free-trial') {
-            $this->monthly_downloads_used += 1;
-        }
+        $this->total_downloads_used += $count;
+        $this->monthly_downloads_used += $count;
+        // if ($this->plan_type != 'free-trial') {
+        // }
         
         $this->save();
         return true;
@@ -105,6 +105,18 @@ class UserDownloads extends Model
         if ($this->plan_type == 'free-trial') {
             // Check if expired
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
+                return false;
+            }
+            // Check if total limit is exceeded then end subscription
+            if ($this->total_downloads_used >= ($this->total_limit ?? 3)) {
+                $this->user->subscription()->update([
+                    'status' => 'ended',
+                    'stripe_status' => 'canceled',
+                    'cancelled_at' => Carbon::now(),
+                    'ends_at' => Carbon::now(),
+                ]);
+                $this->expires_at = Carbon::now();
+                $this->save();
                 return false;
             }
             // Check total limit
@@ -205,7 +217,9 @@ class UserDownloads extends Model
                 'used' => $this->total_downloads_used,
                 'remaining' => max(0, ($this->total_limit ?? 3) - $this->total_downloads_used),
                 'monthly_limit' => $this->monthly_limit,
+                'monthly_remaining_limit' => $this->monthly_limit - $this->monthly_downloads_used,
                 'total_limit' => $this->total_limit,
+                'current_period' => $this->current_month . '/' . $this->current_year,
                 // 'expires_at' => $this->expires_at,
                 // 'expired' => $this->expires_at ? Carbon::now()->gt($this->expires_at) : false,
             ];
