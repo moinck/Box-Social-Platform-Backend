@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -440,51 +441,126 @@ class Helpers
     public static function uploadImageFromUrl($prefix, $imageUrl, $path)
     {
         try {
-            // Validate URL
+            // Validate URL format
             if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-                throw new Exception('Invalid URL provided');
+                throw new Exception('Invalid URL format provided');
             }
 
-            // Ensure the directory exists in the storage
-            if (!Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->makeDirectory($path);
+            // Validate URL scheme (only allow HTTP/HTTPS)
+            $scheme = parse_url($imageUrl, PHP_URL_SCHEME);
+            if (!in_array($scheme, ['http', 'https'])) {
+                throw new Exception('Only HTTP/HTTPS URLs are allowed');
             }
 
-            // Get image content from URL
-            $imageContent = @file_get_contents($imageUrl);
-            
-            if ($imageContent === false) {
-                throw new Exception('Failed to fetch image from URL');
+            // Fetch image using HTTP client with timeout and size limits
+            // if image has HTTPs then only fetch, else get from storage
+            // if (str_contains($imageUrl, 'https://')) {
+                $response = Http::timeout(30)
+                    ->withHeaders([
+                        'User-Agent' => 'ImageUploader/1.0',
+                    ])
+                    ->get($imageUrl);
+            // } else {
+            //     $response = file_get_contents($imageUrl);
+            // }
+
+            if (!$response->successful()) {
+                throw new Exception('Failed to fetch image from URL. HTTP Status: ' . $response->status());
             }
 
-            // Get image info to determine extension
+            $imageContent = $response->body();
+
+            // Check file size limit (5MB)
+            $maxSize = 5 * 1024 * 1024;
+            if (strlen($imageContent) > $maxSize) {
+                throw new Exception('Image file too large. Maximum size allowed: 5MB');
+            }
+
+            // Validate image format and get info
             $imageInfo = @getimagesizefromstring($imageContent);
-            
             if ($imageInfo === false) {
-                throw new Exception('Invalid image format');
+                throw new Exception('Invalid image format or corrupted image');
             }
 
-            // Determine file extension from MIME type
+            // Validate image dimensions
+            $maxWidth = 4000;
+            $maxHeight = 4000;
+            if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
+                throw new Exception("Image dimensions too large. Maximum: {$maxWidth}x{$maxHeight}px");
+            }
+
+            // Validate MIME type
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($imageInfo['mime'], $allowedMimeTypes)) {
+                throw new Exception('Unsupported image format. Allowed: JPEG, PNG, GIF, WebP');
+            }
+
+            // Get file extension from MIME type
             $extension = self::getExtensionFromMimeType($imageInfo['mime']);
-            
             if (!$extension) {
-                throw new Exception('Unsupported image format');
+                throw new Exception('Could not determine file extension');
             }
 
-            // Generate a unique name for the image
-            $image_name = $prefix . "_" . time() . '.' . $extension;
-            
-            // Store the image content in the storage directory
-            $fullPath = $path . '/' . $image_name;
-            Storage::disk('public')->put($fullPath, $imageContent);
-            
-            // Return the relative path to the image
-            $savedImageUrl = 'storage/' . $fullPath;
-            return $savedImageUrl;
+            // Generate unique filename
+            $image_name = $prefix . "_" . $extension;
+            $tempPath = storage_path('app/temp/' . $image_name);
+
+            // Create temp directory if it doesn't exist
+            $tempDir = dirname($tempPath);
+            if (!file_exists($tempDir)) {
+                if (!mkdir($tempDir, 0755, true)) {
+                    throw new Exception('Failed to create temporary directory');
+                }
+            }
+
+            // Save image to temporary file
+            if (file_put_contents($tempPath, $imageContent) === false) {
+                throw new Exception('Failed to save temporary file');
+            }
+
+            // Additional validation: re-check the saved file
+            if (Storage::disk('public')->exists($tempPath)) {
+                throw new Exception('Image validation failed after download');
+            }
+
+            // Create UploadedFile instance
+            $uploadedFile = new \Illuminate\Http\UploadedFile(
+                $tempPath,
+                $image_name,
+                $imageInfo['mime'],
+                null,
+                true
+            );
+
+            // Upload using your existing upload method
+            $uploadedImageUrl = self::uploadImage($prefix, $uploadedFile, $path);
+
+            // Clean up temporary file
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+
+            if (!$uploadedImageUrl) {
+                throw new Exception('Failed to upload image to final destination');
+            }
+
+            return $uploadedImageUrl;
 
         } catch (Exception $e) {
-            // Log the error
-            // Log::error('Image upload from URL failed: ' . $e->getMessage());
+            // Clean up temporary file if it exists
+            if (isset($tempPath) && file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+
+            // Log detailed error information
+            Log::error('Image upload from URL failed', [
+                'url' => $imageUrl,
+                'prefix' => $prefix,
+                'path' => $path,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return false;
         }
     }

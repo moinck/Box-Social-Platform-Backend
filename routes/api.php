@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\StockImageApiController;
 use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
+use App\Http\Controllers\Api\UserDownloadsManagementApiController;
 use App\Http\Controllers\Api\UserSubscriptionHistoryApiController;
 use App\Http\Controllers\Api\UserSubscriptionNewApiController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
@@ -100,6 +101,10 @@ Route::group([
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
         Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
+
+        // user downloads Mangement
+        Route::get('/user-downloads/state', [UserDownloadsManagementApiController::class, 'currentState']);
+        Route::get('/user-downloads/increment', [UserDownloadsManagementApiController::class, 'incrementDownload']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);

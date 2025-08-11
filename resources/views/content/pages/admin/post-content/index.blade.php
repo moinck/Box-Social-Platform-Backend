@@ -88,8 +88,16 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col mb-6 mt-2 text-center">
-                                <h4 class="mb-4">Select Import Format</h4>
+                            <div class="col mb-6 mt-2">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h4 class="mb-4">Select Import Format</h4>
+                                    <div class="float-end">
+                                        <a href="{{ asset('sample-post-content-data.xlsx') }}" class="btn btn-icon btn-primary btn-fab demo waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download Sample File" id="download-sample-file">
+                                            <i class="ri-download-line"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <br>
                                 <form id="post-content-import-form" action="{{ route('post-content.import') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="col-12">
