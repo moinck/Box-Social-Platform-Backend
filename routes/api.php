@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\BetaTesterController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\IconManagementAPiController;
@@ -160,3 +161,5 @@ Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class
 
 // Webhook route (no authentication, but signature verification)
 Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
+
+Route::post('/mail/beta-tester', [BetaTesterController::class, 'sendBetaTesterMail']);
