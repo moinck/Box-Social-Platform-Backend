@@ -13,7 +13,9 @@ class BrandKit extends Model
         'social_media_icon',
         'show_address_on_post',
         'design_style_id',
-        'base64_logo'
+        'base64_logo',
+        'warning_title',
+        'warning_message'
     ];
 
     public function designStyle()

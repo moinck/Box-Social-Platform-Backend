@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Helpers;
 use App\Models\UserDownloads;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -52,8 +53,8 @@ class ResetMonthlyDownloads extends Command
             try {
                 DB::beginTransaction();
                 // Calculate carry over (unused downloads from previous month)
-                $effectiveLimit = $userDownload->monthly_limit + $userDownload->carried_over_downloads;
-                $unusedDownloads = max(0, $effectiveLimit - $userDownload->monthly_downloads_used);
+                // $effectiveLimit = $userDownload->monthly_limit + $userDownload->carried_over_downloads;
+                // $unusedDownloads = max(0, $effectiveLimit - $userDownload->monthly_downloads_used);
                 
                 // Reset for new month
                 $userDownload->update([
@@ -61,16 +62,17 @@ class ResetMonthlyDownloads extends Command
                     'current_month' => $currentDate->month,
                     'current_year' => $currentDate->year,
                     'last_reset_date' => $currentDate->toDateString(),
-                    'carried_over_downloads' => $unusedDownloads,
+                    'carried_over_downloads' => 0,
                 ]);
 
                 $resetCount++;
                 DB::commit();
                 
-                $this->line("Reset user {$userDownload->user_id}: {$unusedDownloads} downloads carried over");
-            } catch (\Throwable $th) {
+                $this->line("Reset user {$userDownload->user_id}: downloads carried over");
+            } catch (\Exception $e) {
                 DB::rollBack();
-                //throw $th;
+                Helpers::sendErrorMailToDeveloper($e);
+                $this->error("Failed to reset user {$userDownload->user_id}: " . $e->getMessage());
             }
         }
         

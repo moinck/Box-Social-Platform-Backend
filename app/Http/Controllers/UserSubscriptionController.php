@@ -41,10 +41,18 @@ class UserSubscriptionController extends Controller
                 return $button;
             })
             ->addColumn('start_date', function ($subscription) {
-                return date('d-m-Y', strtotime($subscription->current_period_start));
+                if ($subscription->status == 'active' || $subscription->current_period_start != null) {
+                    return date('d-m-Y', strtotime($subscription->current_period_start));
+                } else {
+                    return 'N/A';
+                }
             })
             ->addColumn('end_date', function ($subscription) {
-                return date('d-m-Y', strtotime($subscription->current_period_end));
+                if ($subscription->status == 'active' || $subscription->current_period_end != null) {
+                    return date('d-m-Y', strtotime($subscription->current_period_end));
+                } else {
+                    return 'N/A';
+                }
             })
             ->addColumn('created_date', function ($subscription) {
                 return Helpers::dateFormate($subscription->created_at);

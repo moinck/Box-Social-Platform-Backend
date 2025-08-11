@@ -78,6 +78,8 @@ class BrnadconfigurationController extends Controller
             'brand_country' => 'nullable',
             'brand_postal_code' => 'nullable',
             'brand_website' => 'nullable',
+            'brand_warning_title' => 'nullable',
+            'brand_warning_message' => 'nullable',
             'show_email_on_post' => 'nullable|in:on',
             'show_phone_number_on_post' => 'nullable|in:on',
             'show_website_on_post' => 'nullable|in:on',
@@ -94,6 +96,8 @@ class BrnadconfigurationController extends Controller
         $brandKit->country = $request->brand_country;
         $brandKit->postal_code = $request->brand_postal_code;
         $brandKit->website = $request->brand_website;
+        $brandKit->warning_title = $request->brand_warning_title;
+        $brandKit->warning_message = $request->brand_warning_message;
         $brandKit->show_email_on_post = $request->show_email_on_post ? 1 : 0;
         $brandKit->show_phone_number_on_post = $request->show_phone_number_on_post ? 1 : 0;
         $brandKit->show_website_on_post = $request->show_website_on_post ? 1 : 0;
@@ -142,6 +146,8 @@ class BrnadconfigurationController extends Controller
             'brand_country' => 'nullable',
             'brand_postal_code' => 'nullable',
             'brand_website' => 'nullable',
+            'brand_warning_title' => 'nullable',
+            'brand_warning_message' => 'nullable',
             'show_email_on_post' => 'nullable|in:on',
             'show_phone_number_on_post' => 'nullable|in:on',
             'show_website_on_post' => 'nullable|in:on',
@@ -157,6 +163,8 @@ class BrnadconfigurationController extends Controller
             $brandKit->country = $request->brand_country;
             $brandKit->postal_code = $request->brand_postal_code;
             $brandKit->website = $request->brand_website;
+            $brandKit->warning_title = $request->brand_warning_title;
+            $brandKit->warning_message = $request->brand_warning_message;
             $brandKit->show_email_on_post = $request->show_email_on_post ? 1 : 0;
             $brandKit->show_phone_number_on_post = $request->show_phone_number_on_post ? 1 : 0;
             $brandKit->show_website_on_post = $request->show_website_on_post ? 1 : 0;

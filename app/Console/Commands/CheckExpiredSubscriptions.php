@@ -72,7 +72,7 @@ class CheckExpiredSubscriptions extends Command
                 if (!$dryRun) {
                     DB::beginTransaction();
                     // Update subscription status
-                    $subscription->status = 'cancelled';
+                    $subscription->status = 'ended';
                     $subscription->stripe_status = 'canceled';
                     $subscription->cancelled_at = $currentDateTime;
                     $subscription->ends_at = $currentDateTime;
@@ -136,8 +136,8 @@ class CheckExpiredSubscriptions extends Command
                 Carbon::now(),
                 Carbon::now()->addDays(3)
             ])
-            ->whereNotIn('status', ['cancelled', 'canceled'])
-            ->whereNotIn('stripe_status', ['cancelled', 'canceled'])
+            ->whereNotIn('status', ['cancelled', 'canceled', 'ended'])
+            ->whereNotIn('stripe_status', ['cancelled', 'canceled', 'ended'])
             ->get();
             
         if ($upcomingExpired->isNotEmpty()) {

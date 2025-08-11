@@ -246,6 +246,23 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row mb-5 gx-5">
+                                <div class="col">
+                                    <div class="form-floating form-floating-outline">
+                                        <input type="text" class="form-control" id="brand_warning_title" placeholder="Enter Warning Title"
+                                            name="brand_warning_title" value="{{ $brandKitData->warning_title ?? "" }}" 
+                                            aria-label="Warning Title" />
+                                        <label for="brand_warning_title">Post Title</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating form-floating-outline">
+                                        <input type="text" class="form-control" id="brand_warning_message" placeholder="Enter Warning Message"
+                                            name="brand_warning_message" value="{{ $brandKitData->warning_message ?? "" }}" aria-label="Warning Message" />
+                                        <label for="brand_warning_message">Warning Message</label>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- all checkbox --}}
                             <div class="row mb-5 gx-5">

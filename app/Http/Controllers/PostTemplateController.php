@@ -83,7 +83,11 @@ class PostTemplateController extends Controller
             ->addIndexColumn()
             ->addColumn('template_image', function ($data) {
                 $categoryName = $data->category->name;
-                return '<img src="' . asset($data->template_image) . '" alt="' . $data->template_name . '" class="br-1 template-image" data-category="' . $categoryName . '" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
+                $templateImage = $data->template_image;
+                if (!str_starts_with($templateImage, 'https://')) {
+                    $templateImage = asset($templateImage);
+                }
+                return '<img src="' . $templateImage . '" alt="' . $data->template_name . '" class="br-1 template-image" data-category="' . $categoryName . '" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click To View Image" width="80" height="100">';
             })
             ->addColumn('post_content', function ($data) {
                 return $data->postContent->title ?? "-";

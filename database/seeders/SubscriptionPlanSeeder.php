@@ -44,7 +44,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan - Before Oct 2025',
+                'name' => 'Box Socials Premium Plan',
                 'slug' => 'box-socials-premium-plan-before-oct-2025',
                 'description' => 'Premium plan for users subscribed before Oct 1, 2025',
                 'price' => 650.00,
@@ -77,7 +77,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan - After Oct 2025',
+                'name' => 'Box Socials Premium Plan',
                 'slug' => 'box-socials-premium-plan-after-oct-2025',
                 'description' => 'Premium plan for users subscribed after Oct 1, 2025',
                 'price' => 780.00,

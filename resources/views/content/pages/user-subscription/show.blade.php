@@ -89,7 +89,11 @@
                                         <small class="text-muted d-block">Current Period</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y') }}
+                                                @if ($subscriptionData->current_period_start)
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y') }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>
@@ -106,7 +110,11 @@
                                         <small class="text-muted d-block">End Date</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}
+                                                @if ($subscriptionData->current_period_end)
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>
@@ -123,7 +131,11 @@
                                         <small class="text-muted d-block">Yearly Downloads</small>
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
-                                                {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
+                                                @if ($userDownloads && $subscriptionData->status == "active" || $subscriptionData->status == "cancelled" || $subscriptionData->status == "ended")
+                                                    {{ $userDownloads->total_downloads_used }}/{{ $userDownloads->total_limit }}
+                                                @else
+                                                    N/A
+                                                @endif
                                             </h6>
                                         </div>
                                     </div>
@@ -136,14 +148,14 @@
                             <div class="col-md-6 mb-3">
                                 <div class="form-floating form-floating-outline">
                                     <input type="text" class="form-control"
-                                        value="{{ $subscriptionData->stripe_subscription_id ?? 'Free-Plan' }}" readonly />
+                                        value="{{ $subscriptionData->stripe_subscription_id ?? "N/A" }}" readonly />
                                     <label>Stripe Subscription ID</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-floating form-floating-outline">
                                     <input type="text" class="form-control"
-                                        value="{{ $subscriptionData->stripe_customer_id }}" readonly />
+                                        value="{{ $subscriptionData->stripe_customer_id ?? "N/A" }}" readonly />
                                     <label>Stripe Customer ID</label>
                                 </div>
                             </div>

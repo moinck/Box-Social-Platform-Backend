@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'status' => 'active',
                 'role' => 'customer',
+                'is_verified' => true,
+                'email_verified_at' => now(),
             ]);
         }
     }

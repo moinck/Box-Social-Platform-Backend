@@ -9,6 +9,9 @@
     } elseif ($appType == 'stage') {
         $appType = 'STAGING';
     }
+
+    $profileUrl = Auth::user()->profile_image ?? asset('assets/img/avatars/5.png');
+    $profileName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
 @endphp
 
 <!-- Navbar -->
@@ -117,9 +120,9 @@
             <a class="#04202E" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
                     @if (Auth::check() && Auth::user()->role == 'admin')
-                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                        <img src="{{ $profileUrl }}" alt="{{ $profileName }}" class="rounded-circle">
                     @else
-                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
+                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="{{ $profileName }}" class="rounded-circle">
                     @endif
                 </div>
             </a>
@@ -130,23 +133,22 @@
                             <div class="flex-shrink-0 me-2">
                                 <div class="avatar avatar-online">
                                     @if (Auth::check() && Auth::user()->role == 'admin')
-                                        <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle">
+                                        <img src="{{ $profileUrl }}" alt="{{ $profileName }}" class="rounded-circle">
                                     @else
-                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle">
+                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="{{ $profileName }}" class="rounded-circle">
                                     @endif
                                 </div>
                             </div>
                             <div class="flex-grow-1">
                                 <span class="fw-medium d-block small">
                                     @if (Auth::check())
-                                        {{ ucfirst(Auth::user()->first_name ?? '') }}
-                                        {{ ucfirst(Auth::user()->last_name ?? '') }}
+                                        {{ ucwords($profileName) }}
                                     @else
                                         John Doe
                                     @endif
                                 </span>
                                 <small
-                                    class="text-muted">{{ Auth::check() ? ucfirst(Auth::user()->role ?? 'User') : 'User' }}</small>
+                                    class="text-muted">{{ Auth::check() ? ucwords(Auth::user()->role ?? 'User') : 'User' }}</small>
                             </div>
                         </div>
                     </a>
