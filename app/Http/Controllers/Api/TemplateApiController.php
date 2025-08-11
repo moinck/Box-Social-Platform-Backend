@@ -249,7 +249,7 @@ class TemplateApiController extends Controller
             'category_id' => 'required|string',
             'sub_category_id' => 'nullable|string',
             'design_style_id' => 'nullable|string',
-            'post_content_id' => 'required|string',
+            'post_content_id' => 'nullable|string',
         ],[
             'template_image.regex' => 'Invalid image format',
         ]);
