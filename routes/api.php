@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
+use App\Http\Controllers\Api\SubscriptionApiController;
 use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
@@ -101,6 +102,9 @@ Route::group([
         Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
 
+        /** New Subscription API */
+        Route::post('/user-subscription/new-subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
+
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
 
@@ -154,4 +158,5 @@ Route::get('/user-subscription/success', [UserSubscriptionNewApiController::clas
 Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancel']);
 
 // Webhook route (no authentication, but signature verification)
-Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
+// Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
+Route::post('/stripe/webhook', [SubscriptionApiController::class, 'webhook']);
