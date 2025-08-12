@@ -96,7 +96,7 @@ Route::group([
         Route::post('/user-template/multiple/store', [UserTemplatesApiController::class, 'MultiStore']);
         Route::post('/user-template/update', [UserTemplatesApiController::class, 'update']);
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
-        Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
+        Route::post('/user-template/download/document', [UserTemplateDownloadController::class, 'downloadDocument']);
 
         // user subscription api
         // Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);

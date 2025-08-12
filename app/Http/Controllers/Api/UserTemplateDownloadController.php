@@ -16,45 +16,34 @@ use App\Models\UserSubscription;
 
 class UserTemplateDownloadController extends Controller
 {
-    public function downloadDocument($id)
+    public function downloadDocument(Request $request)
     {
-        $id = Helpers::decrypt($id);
-        $userTemplate = UserTemplates::select('id','template_id','category_id','template_name','template_image','user_id')
+        $request->validate([
+            'document_ids' => 'required',
+            'is_images' => 'required',
+        ]);
+
+        $isImages = $request->is_images;
+        $decryptIds = [];
+        foreach ($request->document_ids as $id) {
+            $decryptIds[] = Helpers::decrypt($id);
+        }
+        $userTemplates = UserTemplates::select('id','template_id','category_id','template_name','template_image','user_id')
             ->with('template.postContent','category:id,name')
-            ->find($id);
-        
-        // get user brandkit data
-        $brnadKitData = BrandKit::select(['id','company_name','email','phone','website'])
-            ->where('user_id', $userTemplate->user_id)
-            ->first()
-            ->toArray();
-        
-        if (!$userTemplate) {
+            ->whereIn('id', $decryptIds)
+            ->get();
+    
+        if (!$userTemplates) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'User Template not found',
             ]);
         }
-
-        $mainTemplateData = $userTemplate->template ?? null;
-        $postContentData = $mainTemplateData->postContent ?? null;
-
-        $updatedDescription = null;
-        if (!empty($postContentData->description)) {
-            $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'], [$brnadKitData['company_name'] ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''], $postContentData->description);
-        }
-
-        $writtenData = [
-            "title" => $postContentData->title ?? $userTemplate->template_name,
-            "category_name" => $userTemplate->category->name ?? 'Uncategorized',
-            "description" => $updatedDescription ?? "No description provided",
-            "warning_message" => $postContentData->warning_message ?? "No warning message provided",
-        ];
-    
-        // Create a new Word document
+        
+        // Create a new Word document (moved outside the loop)
         $phpWord = new PhpWord();
         
-        // Define custom styles
+        // Define custom styles (moved outside the loop)
         $phpWord->addTitleStyle(1, [
             'name' => 'Arial',
             'size' => 20,
@@ -114,7 +103,7 @@ class UserTemplateDownloadController extends Controller
             'italic' => true
         ];
         
-        // Add a section to the document with margins
+        // Add a section to the document with margins (moved outside the loop)
         $section = $phpWord->addSection([
             'marginLeft' => 720,
             'marginRight' => 720,
@@ -122,46 +111,81 @@ class UserTemplateDownloadController extends Controller
             'marginBottom' => 720
         ]);
         
-        // Add main title
-        $section->addTitle($writtenData['title'], 1);
-        $section->addTextBreak(1);
+        $imagePathsToCleanup = []; // Array to store image paths for cleanup
         
-        // Add a separator line
-        $section->addText(str_repeat('_', 80), ['color' => 'CCCCCC'], 'centeredStyle');
-        $section->addTextBreak(1);
-
-        
-        // Add Category
-        $section->addText('Category: ', $labelFont, 'contentStyle');
-        $section->addText($writtenData['category_name'], $contentFont);
-        $section->addTextBreak(2);
-        
-        // Add Description with HTML parsing
-        $section->addText('Description:', $labelFont, 'contentStyle');
-        
-        // Parse HTML content from Quill editor
-        $this->htmlContentConversation($section, $writtenData['description'], $contentFont);
-        
-        $section->addTextBreak(2);
-        
-        // Add Warning Message
-        $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
-        $section->addText($writtenData['warning_message'], $warningFont, 'contentStyle');
-
-        // Add separator before image
-        $section->addText(str_repeat('_', 80), ['color' => 'CCCCCC'], 'centeredStyle');
-        // Add Template Image
-        if (!empty($userTemplate->template_image)) {
-            $imageContent = file_get_contents($userTemplate->template_image);
-            $imagePath = tempnam(sys_get_temp_dir(), 'img');
-            file_put_contents($imagePath, $imageContent);
+        foreach ($userTemplates as $index => $userTemplate) {            
+            // get user brandkit data
+            $brnadKitData = BrandKit::select(['id','company_name','email','phone','website'])
+                ->where('user_id', $userTemplate->user_id)
+                ->first()
+                ->toArray();
             
-            $section->addImage($imagePath, [
-                'width' => 200,
-                'height' => 250,
-                'alignment' => 'center'
-            ]);
+    
+            $mainTemplateData = $userTemplate->template ?? null;
+            $postContentData = $mainTemplateData->postContent ?? null;
+    
+            $updatedDescription = null;
+            if (!empty($postContentData->description)) {
+                $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'], [$brnadKitData['company_name'] ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''], $postContentData->description);
+            }
+    
+            $writtenData = [
+                "title" => $index + 1 . '. ' . $postContentData->title ?? $userTemplate->template_name,
+                "category_name" => $userTemplate->category->name ?? 'Uncategorized',
+                "description" => $updatedDescription ?? "No description provided",
+                "warning_message" => $postContentData->warning_message ?? "No warning message provided",
+            ];
+        
+            // Add main title
+            $section->addTitle($writtenData['title'], 1);
+            $section->addTextBreak(1);
+            
+            // Add a separator line
+            $section->addText(str_repeat('_', 80), ['color' => 'CCCCCC'], 'centeredStyle');
+            $section->addTextBreak(1);
+    
+            
+            // Add Category
+            $section->addText('Category: ', $labelFont, 'contentStyle');
+            $section->addText($writtenData['category_name'], $contentFont);
+            $section->addTextBreak(2);
+            
+            // Add Description with HTML parsing
+            $section->addText('Description:', $labelFont, 'contentStyle');
+            
+            // Parse HTML content from Quill editor
+            $this->htmlContentConversation($section, $writtenData['description'], $contentFont);
+            
+            $section->addTextBreak(2);
+            
+            // Add Warning Message
+            $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
+            $section->addText($writtenData['warning_message'], $warningFont, 'contentStyle');
+    
+            if ($isImages == 'true') {
+                // Add separator before image
+                $section->addText(str_repeat('_', 80), ['color' => 'CCCCCC'], 'centeredStyle');
+                // Add Template Image
+                if (!empty($userTemplate->template_image)) {
+                    $imageContent = file_get_contents($userTemplate->template_image);
+                    $imagePath = tempnam(sys_get_temp_dir(), 'img');
+                    file_put_contents($imagePath, $imageContent);
+                    $imagePathsToCleanup[] = $imagePath; // Store for cleanup
+                    
+                    $section->addImage($imagePath, [
+                        'width' => 200,
+                        'height' => 250,
+                        'alignment' => 'center'
+                    ]);
+                }
+            }
+    
+            // Add page break only if it's not the last template
+            if ($index < count($userTemplates) - 1) {
+                $section->addPageBreak();
+            }
         }
+    
         
         // Save the document to a temporary file
         $tempFile = tempnam(sys_get_temp_dir(), 'word') . '.docx';
@@ -169,14 +193,13 @@ class UserTemplateDownloadController extends Controller
         $objWriter->save($tempFile);
         
         // Generate filename with title
-        $filename = $userTemplate->template_name . '-document-' . time() . '.docx';
-
-        unlink($imagePath);
-
-        // UPDATE DOWNLOAD LIMIT
-        $userSubscription = UserSubscription::where('user_id', $userTemplate->user_id)->where('status', 'active')->first();
-        if (!empty($userSubscription)) {
-            $userSubscription->updateDailyDownloadLimit();
+        $filename = 'New Document-' . time() . '.docx';
+    
+        // Clean up all image files
+        foreach ($imagePathsToCleanup as $imagePath) {
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
         
         // Return the file as a download response
