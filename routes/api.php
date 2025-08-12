@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\BetaTesterController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\IconManagementAPiController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Api\SubscriptionApiController;
 use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
+use App\Http\Controllers\Api\UserDownloadsManagementApiController;
 use App\Http\Controllers\Api\UserSubscriptionHistoryApiController;
 use App\Http\Controllers\Api\UserSubscriptionNewApiController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
@@ -102,8 +104,9 @@ Route::group([
         Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
 
-        /** New Subscription API */
-        Route::post('/user-subscription/new-subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
+        // user downloads Mangement
+        Route::get('/user-downloads/state', [UserDownloadsManagementApiController::class, 'currentState']);
+        Route::get('/user-downloads/increment', [UserDownloadsManagementApiController::class, 'incrementDownload']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
@@ -160,3 +163,5 @@ Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class
 // Webhook route (no authentication, but signature verification)
 // Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
 Route::post('/stripe/webhook', [SubscriptionApiController::class, 'webhook']);
+
+Route::post('/mail/beta-tester', [BetaTesterController::class, 'sendBetaTesterMail']);

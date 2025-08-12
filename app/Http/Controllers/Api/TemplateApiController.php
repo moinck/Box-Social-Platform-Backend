@@ -90,12 +90,14 @@ class TemplateApiController extends Controller
         }
 
         // post content data
-        $postTemplateData = $tempObj->postContent;
-        $postContentData = [
-            "id" => Helpers::encrypt($postTemplateData->id),
-            "title" => $postTemplateData->title,
-            "warning_message" => $postTemplateData->warning_message ? $postTemplateData->warning_message : '',
-        ];
+        $postTemplateData = $tempObj->postContent ?? null;
+        if (!empty($postTemplateData)) {
+            $postContentData = [
+                "id" => Helpers::encrypt($postTemplateData->id),
+                "title" => $postTemplateData->title,
+                "warning_message" => $postTemplateData->warning_message ? $postTemplateData->warning_message : '',
+            ];
+        }
         // $brandkitData = BrandKit::where('user_id', Auth::user()->id)->first();
 
         // $brandkitData = [
@@ -113,15 +115,15 @@ class TemplateApiController extends Controller
         $adminTemplateData = [
             'category_id' => Helpers::encrypt($tempObj->category_id),
             'sub_category_id' => $tempObj->sub_category_id ? Helpers::encrypt($tempObj->sub_category_id) : null,
-            'post_content_id' => Helpers::encrypt($tempObj->post_content_id),
-            'design_style_id' => Helpers::encrypt($tempObj->design_style_id),
+            'post_content_id' => $tempObj->post_content_id ? Helpers::encrypt($tempObj->post_content_id) : null,
+            'design_style_id' => $tempObj->design_style_id ? Helpers::encrypt($tempObj->design_style_id) : null,
         ];
 
         $data = [
             'id' => Helpers::encrypt($tempObj->id),
             'category_id' => Helpers::encrypt($tempObj->category_id),
             'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
-            'post_content_data' => isset($postContentData) ? $postContentData : [],
+            'post_content_data' => isset($postContentData) ? $postContentData : null,
             'admin_template_data' => isset($adminTemplateData) ? $adminTemplateData : [],
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
         ];
@@ -247,7 +249,7 @@ class TemplateApiController extends Controller
             'category_id' => 'required|string',
             'sub_category_id' => 'nullable|string',
             'design_style_id' => 'nullable|string',
-            'post_content_id' => 'required|string',
+            'post_content_id' => 'nullable|string',
         ],[
             'template_image.regex' => 'Invalid image format',
         ]);

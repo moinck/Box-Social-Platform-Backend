@@ -88,11 +88,11 @@ class UserSubscription extends Model
     /**
      * Record a download (post download or creation - both count as 1)
      */
-    public function recordDownload()
+    public function recordDownload($count = 1)
     {
         $tracker = $this->downloadTracker;
         
-        return $tracker->incrementDownload();
+        return $tracker->incrementDownload($count);
     }
 
     /**
