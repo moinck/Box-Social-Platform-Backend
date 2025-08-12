@@ -25,7 +25,7 @@ class BetaTesterController extends Controller
             ], 422);
         }
         try {
-            $appMode = env('APP_ENV');
+            $appMode = config('app.env');
             $adminMail = User::where('role', 'admin')->first()->email;
             if ($appMode == 'live') {
                 Mail::to('help@boxsocials.com')->send(new BetaJoinNotification($request->name, $request->email));
