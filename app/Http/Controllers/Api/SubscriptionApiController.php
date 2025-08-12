@@ -36,7 +36,8 @@ class SubscriptionApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required',
-            'payment_method' => 'required'
+            'payment_method' => 'required',
+            'user_details' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -52,6 +53,7 @@ class SubscriptionApiController extends Controller
             $planId = Helpers::decrypt($request->plan_id);
             $userId = Auth::user()->id;
             $user = User::find($userId);
+            $user_details = $request->user_details;
 
             // Get plan details
             $subscriptionPlanDetail = SubscriptionPlans::find($planId);
@@ -104,7 +106,7 @@ class SubscriptionApiController extends Controller
             }
 
             // Get or create Stripe customer
-            $userStripeCustomerId = $this->getOrCreateStripeCustomer($user);
+            $userStripeCustomerId = $this->getOrCreateStripeCustomer($user,$user_details);
             if ($subscriptionPlanDetail->slug != 'free-trial') {
                 $today = now();
                 $currentYear = $today->year;
@@ -183,9 +185,10 @@ class SubscriptionApiController extends Controller
                 'subscription_plan' => 'premium-plan',
                 'subscriptionId' => $subscription->id,
                 'clientSecret' => $subscription->latest_invoice->confirmation_secret->client_secret,
+                'user_subscription_id' => $encyptedId
             ];
 
-            return $this->success($returnData, 'Subscription created successfuly.');
+            return $this->success($returnData, 'Subscription created successfuly.', 200);
 
         } catch (Exception $e) {
             Log::error($e);
@@ -193,7 +196,7 @@ class SubscriptionApiController extends Controller
         }
     }
 
-    private function getOrCreateStripeCustomer($user)
+    private function getOrCreateStripeCustomer($user,$user_details=null)
     {
         if (!empty($user->stripe_customer_id)) {
             return $user->stripe_customer_id;
@@ -205,7 +208,15 @@ class SubscriptionApiController extends Controller
             'metadata' => [
                 'user_id' => $user->id,
                 'fca_number' => $user->fca_number ?? null,
-                'company_name' => $user->company_name ?? null,
+                'company_name' => $user_details ? $user_details->company_name : null,
+                'address' => $user_details ? $user_details->address : null,
+                'country' => $user_details ? $user_details->country : null,
+                'email' => $user_details ? $user_details->email : null,
+                'first_name' => $user_details ? $user_details->first_name : null,
+                'last_name' => $user_details ? $user_details->last_name : null,
+                'postal_code' => $user_details ? $user_details->postal_code : null,
+                'state' => $user_details ? $user_details->state : null,
+                'town_city' => $user_details ? $user_details->town_city : null,
             ]
         ]);
 
@@ -321,6 +332,7 @@ class SubscriptionApiController extends Controller
     {
         $subscription = UserSubscription::where('stripe_subscription_id', $invoice['subscription'])->first();
         if ($subscription) {
+            $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
             $subscription->status = 'past_due';
             $subscription->save();
         }
@@ -352,6 +364,73 @@ class SubscriptionApiController extends Controller
             $subscription->stripe_status = 'canceled';
             $subscription->ends_at = now();
             $subscription->save();
+        }
+    }
+
+    /** Subscripiton Plan Verification */
+    public function userSubscriptionVerify(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                // 'payment_intent_id' => 'required',
+                // 'payment_method' => 'required',
+                'user_subscription_id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // $payment_intent_id = $request->payment_intent_id;
+            // $payment_method = $request->payment_method;
+            $user_subscription_id = Helpers::decrypt($request->user_subscription_id);
+
+            // $paymentIntent = $this->stripe->paymentIntents->retrieve($payment_intent_id,[]);
+
+            $user_subscription = UserSubscription::with(['plan'])->where('id',$user_subscription_id)->first();
+
+            if (!$user_subscription) {
+                return $this->error('Subscription data not found.', 404);
+            }
+            
+            $returnData = [
+                'id' => $request->user_subscription_id,
+                'plan_id' => $user_subscription->plan_id,
+                'stripe_subscription_id' => $user_subscription->stripe_subscription_id,
+                'stripe_customer_id' => $user_subscription->stripe_customer_id,
+                'stripe_price_id' => $user_subscription->stripe_price_id,
+                'stripe_payment_method_id' => $user_subscription->stripe_payment_method_id,
+                'plan' => $user_subscription->plan,
+                'response_meta' => $user_subscription->response_meta,
+                'amount_paid' => $user_subscription->amount_paid,
+                'currency' => $user_subscription->currency,
+                'status' => $user_subscription->status,
+                'current_period_start' => $user_subscription->current_period_start,
+                'current_period_end' => $user_subscription->current_period_end,
+                'last_payment_date' => $user_subscription->last_payment_date,
+                'total_download_limit' => $user_subscription->total_download_limit,
+                'daily_download_limit' => $user_subscription->daily_download_limit,
+                'downloads_used_today' => $user_subscription->downloads_used_today,
+                'total_downloads_used' => $user_subscription->total_downloads_used,
+            ];
+
+            if ($user_subscription->response_meta == null) {
+                return $this->success([], 'Webhook call not responsed.', 206);
+            }
+
+            if ($user_subscription->stripe_status == "paid") {
+                return $this->success($returnData, 'Payment has been paid successfully.', 200);
+            } else {
+                return $this->error('Payment failed', 500);
+            }
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error("Somethign went wrong.", 500);
         }
     }
 }
