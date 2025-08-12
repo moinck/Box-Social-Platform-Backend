@@ -36,6 +36,7 @@ class SubscriptionApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required',
+            'payment_method' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -48,8 +49,7 @@ class SubscriptionApiController extends Controller
         DB::beginTransaction();
         try {
 
-            // $planId = Helpers::decrypt($request->plan_id);
-            $planId = $request->plan_id;
+            $planId = Helpers::decrypt($request->plan_id);
             $userId = Auth::user()->id;
             $user = User::find($userId);
 
@@ -149,15 +149,20 @@ class SubscriptionApiController extends Controller
 
             $encyptedId = Helpers::encrypt($newSubscription->id);
 
+            $this->stripe->paymentMethods->attach(
+                $request->payment_method,
+                ['customer' => $userStripeCustomerId]
+            );
+
             /** Create Subscription */
             $subscription = $this->stripe->subscriptions->create([
                 'customer' => $userStripeCustomerId,
                 'items' => [[ 'price' => $subscriptionPlanDetail->stripe_price_id ]],
                 'payment_behavior' => 'default_incomplete',
+                'default_payment_method' => $request->payment_method, // set here
                 'payment_settings' => [
                     'payment_method_types' => ['card'],
                     'save_default_payment_method' => 'on_subscription',
-                    'payment_method' => $request->payment_method, // ← HERE
                 ],
                 'expand' => ['latest_invoice.confirmation_secret', 'pending_setup_intent'],
                 'metadata' => [
@@ -271,7 +276,7 @@ class SubscriptionApiController extends Controller
         $obj_data = !blank($invoice['lines']['data']) ? $invoice['lines']['data'] : null;
 
         if ($obj_data) {
-            $stripe_subscription_id = $obj_data[0]['parent']['subscription'];
+            $stripe_subscription_id = $obj_data[0]['parent']['subscription_item_details']['subscription'];
             $period_start = $obj_data[0]['period']['start'];
             $period_end = $obj_data[0]['period']['end'];
 
