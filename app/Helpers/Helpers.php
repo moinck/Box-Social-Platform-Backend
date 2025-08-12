@@ -873,4 +873,146 @@ class Helpers
 
         return true;
     }
+
+    /**
+     * Convert image URL to base64 format
+     * 
+     * @param string $imagePath
+     * @param int $timeout Timeout in seconds (default: 30)
+     * @return string|null Returns base64 string or null on failure
+     */
+    public static function imageUrlToBase64($imagePath, $timeout = 30)
+    {
+        try {
+            if (empty($imagePath)) {
+                Log::warning('Empty image path provided');
+                return null;
+            }
+
+            // Check if it's a local storage path (doesn't start with http)
+            if (!str_starts_with($imagePath, 'http')) {
+                return self::handleLocalImage($imagePath);
+            }
+
+            // Handle external URL
+            return self::handleExternalImage($imagePath, $timeout);
+
+        } catch (Exception $e) {
+            Log::error('Error converting image to base64', [
+                'path' => $imagePath,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Handle local storage images
+     */
+    public static function handleLocalImage($imagePath)
+    {
+        // Remove leading slash if present
+        $imagePath = ltrim($imagePath, '/');
+        
+        // Get full path from public directory
+        $fullPath = public_path($imagePath);
+        
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            Log::warning('Local image file not found', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Get file content
+        $imageContent = file_get_contents($fullPath);
+        
+        if ($imageContent === false) {
+            Log::warning('Could not read local image file', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Get mime type from file extension
+        $mimeType = self::getMimeTypeFromPath($fullPath);
+        
+        if (!$mimeType) {
+            Log::warning('Could not determine mime type for local image', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Convert to base64
+        $base64 = base64_encode($imageContent);
+        
+        return "data:{$mimeType};base64,{$base64}";
+    }
+
+    /**
+     * Handle external image URLs
+     */
+    public static function handleExternalImage($imageUrl, $timeout)
+    {
+        // Validate URL
+        if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            Log::warning('Invalid external image URL provided', ['url' => $imageUrl]);
+            return null;
+        }
+
+        // Fetch the image using Laravel HTTP client
+        $response = Http::timeout($timeout)->get($imageUrl);
+
+        // Check if request was successful
+        if (!$response->successful()) {
+            Log::warning('Failed to fetch external image', [
+                'url' => $imageUrl,
+                'status' => $response->status()
+            ]);
+            return null;
+        }
+
+        // Get image content
+        $imageContent = $response->body();
+        
+        // Check if content is not empty
+        if (empty($imageContent)) {
+            Log::warning('Empty external image content', ['url' => $imageUrl]);
+            return null;
+        }
+
+        // Get content type from response headers
+        $contentType = $response->header('Content-Type');
+        
+        // Validate that it's an image
+        if (!$contentType || !str_starts_with($contentType, 'image/')) {
+            Log::warning('External URL does not point to an image', [
+                'url' => $imageUrl,
+                'content_type' => $contentType
+            ]);
+            return null;
+        }
+
+        // Convert to base64
+        $base64 = base64_encode($imageContent);
+        
+        return "data:{$contentType};base64,{$base64}";
+    }
+
+    /**
+     * Get MIME type from file path/extension
+     */
+    public static function getMimeTypeFromPath($filePath)
+    {
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        
+        $mimeTypes = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/x-icon',
+        ];
+
+        return $mimeTypes[$extension] ?? null;
+    }
 }

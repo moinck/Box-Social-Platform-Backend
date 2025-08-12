@@ -219,6 +219,7 @@ class TemplateApiController extends Controller
                         'category_id' => Helpers::encrypt($t->category_id),
                         'post_content_id' => $postContentId,
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
+                        'base64_template_image' => isset($t->template_image) ? Helpers::imageUrlToBase64($t->template_image) : '',
                         'template_data' => isset($t->template_data) ? $t->template_data : '',
                     ];
                 } else {
