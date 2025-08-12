@@ -16,7 +16,7 @@ return [
   'name' => env('APP_NAME', 'Laravel'),
   'FCA_Auth_EMAIL' => env('FCA_Auth_EMAIL', ''),
   'FCA_Auth_KEY' => env('FCA_Auth_KEY', ''),
-  'frontend_url' => env('APP_FRONTEND_URL', 'http://178.128.45.173:9163'),
+  'frontend_url' => env('APP_FRONTEND', 'http://178.128.45.173:9163'),
   'app_api_url' => env('APP_API_URL', 'http://178.128.45.173:9162/api'),
 
   /*

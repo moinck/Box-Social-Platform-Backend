@@ -195,7 +195,10 @@ class TemplateApiController extends Controller
     
             // Apply post_content filter if needed
             if (!empty($decryptedPostContentIds) && empty($decryptedTemplateIds)) {
-                $query->whereIn('post_content_id', $decryptedPostContentIds);
+                $query->where(function ($q) use ($decryptedPostContentIds) {
+                    $q->whereIn('post_content_id', $decryptedPostContentIds)
+                        ->orWhereNull('post_content_id');
+                });
             }
     
             // Apply template_ids filter (if provided)
@@ -222,7 +225,7 @@ class TemplateApiController extends Controller
                     return [
                         'id' => Helpers::encrypt($t->id),
                         'category_id' => Helpers::encrypt($t->category_id),
-                        'post_content_id' => Helpers::encrypt($t->post_content_id ?? null),
+                        'post_content_id' => $t->post_content_id ? Helpers::encrypt($t->post_content_id) : null,
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                     ];
                 }
