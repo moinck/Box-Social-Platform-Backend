@@ -3,7 +3,7 @@
     use Illuminate\Support\Facades\Route;
     $containerNav = $configData['contentLayout'] === 'compact' ? 'container-xxl' : 'container-fluid';
     $navbarDetached = $navbarDetached ?? '';
-    $appType = env('APP_ENV');
+    $appType = config('app.env');
     if ($appType == 'local') {
         $appType = 'LOCAL';
     } elseif ($appType == 'stage') {
