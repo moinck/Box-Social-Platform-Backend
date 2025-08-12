@@ -110,6 +110,7 @@ Route::group([
 
         /** New Subscription API */
         Route::post('/user-subscription/subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
+        Route::get('/user-subscription/verify', [SubscriptionApiController::class, 'userSubscriptionVerify']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
