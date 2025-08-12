@@ -208,15 +208,15 @@ class SubscriptionApiController extends Controller
             'metadata' => [
                 'user_id' => $user->id,
                 'fca_number' => $user->fca_number ?? null,
-                'company_name' => $user_details ? $user_details->company_name : null,
-                'address' => $user_details ? $user_details->address : null,
-                'country' => $user_details ? $user_details->country : null,
-                'email' => $user_details ? $user_details->email : null,
-                'first_name' => $user_details ? $user_details->first_name : null,
-                'last_name' => $user_details ? $user_details->last_name : null,
-                'postal_code' => $user_details ? $user_details->postal_code : null,
-                'state' => $user_details ? $user_details->state : null,
-                'town_city' => $user_details ? $user_details->town_city : null,
+                'company_name' => !empty($user_details) ? $user_details['company_name'] : null,
+                'address' => $user_details ? $user_details['address'] : null,
+                'country' => $user_details ? $user_details['country'] : null,
+                'email' => $user_details ? $user_details['email'] : null,
+                'first_name' => $user_details ? $user_details['first_name'] : null,
+                'last_name' => $user_details ? $user_details['last_name'] : null,
+                'postal_code' => $user_details ? $user_details['postal_code'] : null,
+                'state' => $user_details ? $user_details['state'] : null,
+                'town_city' => $user_details ? $user_details['town_city'] : null,
             ]
         ]);
 
@@ -297,13 +297,13 @@ class SubscriptionApiController extends Controller
                 $userSubscription->current_period_end = Carbon::parse($period_end)->format('Y-m-d H:i:s');
                 $userSubscription->stripe_status = $invoice['status'];
                 $userSubscription->status = 'active';
-                $userSubscription->amount_paid = $invoice['amount_total'] / 100;
+                $userSubscription->amount_paid = $invoice['total'] / 100;
                 $userSubscription->currency = $invoice['currency'];
 
                 if (!empty($invoice['default_payment_method'])) {
                     $userSubscription->stripe_payment_method_id = $invoice['default_payment_method'];
                 }
-
+                
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
                 $userSubscription->total_download_limit = 40;
                 $userSubscription->daily_download_limit = 0;
@@ -318,10 +318,10 @@ class SubscriptionApiController extends Controller
                 $newPayment->user_id = $userSubscription->user_id;
                 $newPayment->plan_name = $userSubscription->plan->name ?? "Subscription Plan";
                 $newPayment->status = 'completed';
-                $newPayment->amount = $invoice['amount_total'] / 100;
+                $newPayment->amount = $invoice['total'] / 100;
                 $newPayment->currency =  $invoice['currency'] ?? 'GBP';
                 $newPayment->payment_type = 'subscription';
-                $newPayment->payment_method = $invoice['payment_settings']['payment_method_types'] ?? 'card';
+                $newPayment->payment_method = $invoice['payment_settings']['payment_method_types'][0] ?? 'card';
                 $newPayment->stripe_payment_intent_id = $userSubscription->stripe_payment_method_id ? $invoice['default_payment_method'] : null;
                 $newPayment->save();
             }
