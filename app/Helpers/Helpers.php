@@ -250,7 +250,7 @@ class Helpers
             }
 
             // add enviroment name
-            $envName = env('APP_ENV');
+            $envName = config('app.env') ?? env('APP_ENV','local');
             
             // Generate a unique name for the image
             $image_name = $prefix . "_" . uniqid() . '.' . $image->getClientOriginalExtension();
