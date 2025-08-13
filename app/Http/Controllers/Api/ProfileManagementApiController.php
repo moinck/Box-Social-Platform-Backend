@@ -6,7 +6,9 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
 use App\Models\User;
+use App\Models\UserSubscription;
 use App\ResponseTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -46,6 +48,22 @@ class ProfileManagementApiController extends Controller
             }
         }
 
+        $userSubscription = UserSubscription::where('user_id', $userId)
+            ->latest()
+            ->first();
+
+        $is_plan_expiring = false;
+        $is_plan_canceled = false;
+
+        if ($userSubscription) {
+            $is_plan_expiring = Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24;
+            
+            if ($userSubscription->status === 'canceled') {
+                $is_plan_canceled = true;
+            }
+        }
+
+
         // make data array
         $data = [];
         $data['user'] = [
@@ -60,6 +78,8 @@ class ProfileManagementApiController extends Controller
             'profile_image' => $profileUrl,
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
+            'is_plan_expiring' => $is_plan_expiring,
+            'is_plan_canceled' => $is_plan_canceled
         ];
 
         return $this->success($data, 'Profile fetched successfully');

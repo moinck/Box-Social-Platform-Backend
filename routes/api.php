@@ -101,7 +101,7 @@ Route::group([
         // user subscription api
         // Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
-        Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
+        // Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
 
         // user downloads Mangement
@@ -111,6 +111,7 @@ Route::group([
         /** New Subscription API */
         Route::post('/user-subscription/subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
         Route::get('/user-subscription/verify', [SubscriptionApiController::class, 'userSubscriptionVerify']);
+        Route::post('/user-subscription/cancel', [SubscriptionApiController::class, 'cancelSubscription']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
