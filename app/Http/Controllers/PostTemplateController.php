@@ -195,10 +195,11 @@ class PostTemplateController extends Controller
             // Generate new unique filename
             $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
             $newFilename = 'admin_template_'.time().'.'.$extension;
+            $prefix = 'admin_template_'. rand(1000, 9999);
             
             $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
 
-            $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
+            $newUrl = Helpers::uploadImage($prefix, $uploadNewFile, 'images/admin-post-templates');
 
             // Create the duplicate record
             $newPostTemplate = $postTemplate->replicate();
