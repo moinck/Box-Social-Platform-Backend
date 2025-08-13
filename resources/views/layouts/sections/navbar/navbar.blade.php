@@ -10,7 +10,7 @@
         $appType = 'STAGING';
     }
 
-    $profileUrl = Auth::user()->profile_image ?? asset('assets/img/avatars/5.png');
+    $profileUrl = (Auth::user()->profile_image == null || Auth::user()->profile_image == '') ? asset('assets/img/avatars/5.png') : Auth::user()->profile_image;
     $profileName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
 @endphp
 

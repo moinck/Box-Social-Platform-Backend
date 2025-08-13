@@ -170,10 +170,11 @@ class TemplateApiController extends Controller
 
         // get all post content data of post_content_ids
         if (!empty($decryptedPostContentIds) && !empty($decryptedTemplateIds)) {
-            $postContents = PostContent::select('id','title','warning_message')->whereIn('id', $decryptedPostContentIds)->get();
+            $postContents = PostContent::select('id','title','warning_message','category_id')->whereIn('id', $decryptedPostContentIds)->get();
             $postContentData['post_content_data'] = $postContents->map(function ($postContent) {
                 return [
                     'id' => Helpers::encrypt($postContent->id),
+                    'category_id' => Helpers::encrypt($postContent->category_id),
                     'title' => $postContent->title,
                     'warning_message' => $postContent->warning_message ? $postContent->warning_message : '',
                 ];
@@ -233,11 +234,6 @@ class TemplateApiController extends Controller
             })->toArray();
         }
 
-        // $returnData = [
-        //     "template_data" => $tempData,
-        //     "post_content_data" => $postContentData,
-        // ];
-        // dd($postContentData);
         $returnData = array_merge($tempData, $postContentData);
     
         return $this->success($returnData, 'Template fetched successfully');
