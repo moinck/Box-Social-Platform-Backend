@@ -11,6 +11,9 @@
     }
 
     $profileUrl = (Auth::user()->profile_image == null || Auth::user()->profile_image == '') ? asset('assets/img/avatars/5.png') : Auth::user()->profile_image;
+    if (!str_starts_with('https://', Auth::user()->profile_image)) {
+        $profileUrl = asset(Auth::user()->profile_image);
+    }
     $profileName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
 @endphp
 
