@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class PostTemplateController extends Controller
 {
@@ -189,32 +190,128 @@ class PostTemplateController extends Controller
     {
         $decryptedId = Helpers::decrypt($request->post_template_id);
         $postTemplate = PostTemplate::find($decryptedId);
+        
         if (!empty($postTemplate)) {
             $templateImage = $postTemplate->template_image;
-
-            // Generate new unique filename
-            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
-            $newFilename = 'admin_template_'.time().'.'.$extension;
-            $prefix = 'admin_template_'. rand(1000, 9999);
+            $newUrl = null;
             
-            $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
-
-            $newUrl = Helpers::uploadImage($prefix, $uploadNewFile, 'images/admin-post-templates');
-
-            // Create the duplicate record
-            $newPostTemplate = $postTemplate->replicate();
-            $newPostTemplate->template_image = $newUrl;
-            $newPostTemplate->save();
+            // Check if the image is from Digital Ocean or local storage
+            if ($this->isDigitalOceanUrl($templateImage)) {
+                // Handle Digital Ocean URL - download and re-upload
+                $newUrl = $this->duplicateDigitalOceanImage($templateImage);
+            } else {
+                // Handle local file - existing logic
+                $newUrl = $this->duplicateLocalImage($templateImage);
+            }
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Duplicate Post Template created successfully.'
-            ]);
+            if ($newUrl) {
+                // Create the duplicate record
+                $newPostTemplate = $postTemplate->replicate();
+                $newPostTemplate->template_image = $newUrl;
+                $newPostTemplate->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Duplicate Post Template created successfully.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to duplicate image.'
+                ]);
+            }
         } else {
             return response()->json([
                 'success' => false,
                 'message' => 'Post Template not found.'
             ]);
+        }
+    }
+
+    /**
+     * Check if the URL is from Digital Ocean Spaces
+     */
+    private function isDigitalOceanUrl($url)
+    {
+        // Adjust this condition based on your Digital Ocean URL pattern
+        // Common patterns: contains 'digitaloceanspaces.com' or your specific endpoint
+        return strpos($url, 'digitaloceanspaces.com') !== false || 
+            strpos($url, 'cdn.digitaloceanspaces.com') !== false ||
+            // Add your specific Digital Ocean endpoint here
+            strpos($url, config('filesystems.disks.spaces.endpoint')) !== false;
+    }
+
+    /**
+     * Duplicate image from Digital Ocean by downloading and re-uploading
+     */
+    private function duplicateDigitalOceanImage($imageUrl)
+    {
+        try {
+            // Download the image content
+            $imageContent = file_get_contents($imageUrl);
+            if ($imageContent === false) {
+                return null;
+            }
+            
+            // Get the original filename and extension
+            $originalFilename = basename(parse_url($imageUrl, PHP_URL_PATH));
+            $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+            
+            // Generate new unique filename
+            $newFilename = 'admin_template_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
+            
+            // Create a temporary file
+            $tempPath = sys_get_temp_dir() . '/' . $newFilename;
+            file_put_contents($tempPath, $imageContent);
+            
+            // Create UploadedFile object from the temporary file
+            $uploadedFile = new UploadedFile(
+                $tempPath,
+                $newFilename,
+                mime_content_type($tempPath),
+                null,
+                true // test parameter - set to true for temporary files
+            );
+            
+            $prefix = 'admin_template_' . rand(1000, 9999);
+            $newUrl = Helpers::uploadImage($prefix, $uploadedFile, 'images/admin-post-templates');
+            
+            // Clean up temporary file
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            
+            return $newUrl;
+            
+        } catch (\Exception $e) {
+            Log::error('Error duplicating Digital Ocean image: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Duplicate local image - existing logic
+     */
+    private function duplicateLocalImage($templateImage)
+    {
+        try {
+            // Check if the local file exists
+            $fullPath = public_path($templateImage);
+            if (!file_exists($fullPath)) {
+                return null;
+            }
+            
+            // Generate new unique filename
+            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
+            $newFilename = 'admin_template_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
+            $prefix = 'admin_template_' . rand(1000, 9999);
+            
+            $uploadNewFile = new UploadedFile($fullPath, $newFilename, null, null, true);
+            return Helpers::uploadImage($prefix, $uploadNewFile, 'images/admin-post-templates');
+            
+        } catch (\Exception $e) {
+            Log::error('Error duplicating local image: ' . $e->getMessage());
+            return null;
         }
     }
 }
