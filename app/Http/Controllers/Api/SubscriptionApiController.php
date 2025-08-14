@@ -44,7 +44,14 @@ class SubscriptionApiController extends Controller
                     }
                 }
             ],
-            'user_details' => 'required'
+            'user_details' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    $planId = Helpers::decrypt($request->plan_id);
+                    if ($planId != 1 && empty($value)) {
+                        $fail('The user details is required.');
+                    }
+                }
+            ]
         ]);
 
         if ($validator->fails()) {
