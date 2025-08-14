@@ -375,13 +375,6 @@
                             }
                         }
                     },
-                    edit_company_name: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Please enter company name'
-                            }
-                        }
-                    },
                     edit_user_image: {
                         validators: {
                             file: {
@@ -389,22 +382,6 @@
                                 type: 'image/jpeg,image/png',
                                 maxSize: 1 * 1024 * 1024,
                                 message: 'Please upload a valid image file (max 1MB)'
-                            }
-                        }
-                    },
-                    edit_user_fca_number: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Please enter FCA number'
-                            },
-                            regexp: {
-                                regexp: /^[0-9]*$/,
-                                message: 'FCA Number can only contain digits'
-                            },
-                            stringLength: {
-                                min: 6,
-                                max: 6,
-                                message: 'FCA Number must be 6 digits'
                             }
                         }
                     }

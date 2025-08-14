@@ -40,7 +40,7 @@ class ForgetPasswordMail extends Mailable
      */
     public function content(): Content
     {
-        $reset_password_link = "http://178.128.45.173:9163/email/reset-password?token=".$this->token;
+        $reset_password_link = config('app.frontend_url') ."/email/reset-password?token=".$this->token;
 
         return new Content(
             view: 'content.email.reset-password-email',
