@@ -111,7 +111,7 @@ class ImageStockManagementController extends Controller
                 ];
                 return [
                     'success' => false,
-                    'message' => 'Request failed',
+                    'message' => 'Request failed, Please try different keyword.',
                     'data' => $returndata
                 ];
             }
@@ -138,7 +138,7 @@ class ImageStockManagementController extends Controller
                 ];
                 return [
                     'success' => false,
-                    'message' => 'cURL Error: ' . curl_error($ch),
+                    'message' => 'Request failed, Please try different keyword.',
                     'data' => $returndata
                 ];
             } else {

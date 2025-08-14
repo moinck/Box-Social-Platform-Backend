@@ -29,7 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {
-        // $schedule->call(CleanExpiredTokens::class)->daily();
+        // clean expired auth tokens
+        $schedule->command('app:clean-expired-tokens')
+            ->daily()
+            ->at('01:30')
+            ->withoutOverlapping()
+            ->runInBackground();
 
         // reset user's monthly downloads
         $schedule->command('downloads:reset-monthly')
