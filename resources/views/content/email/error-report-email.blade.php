@@ -353,6 +353,10 @@
                     <h3 class="section-title">🔥 Error Summary</h3>
                     <div class="detail-grid">
                         <div class="detail-row">
+                            <span class="detail-label">Function Name:</span>
+                            <span class="detail-value">{{ $newErrorData['functionName'] ?? 'Not Provided' }}</span>
+                        </div>
+                        <div class="detail-row">
                             <span class="detail-label">Error Message:</span>
                             <span class="detail-value">{{ $newErrorData['message'] ?? 'N/A' }}</span>
                         </div>

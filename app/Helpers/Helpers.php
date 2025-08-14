@@ -834,7 +834,7 @@ class Helpers
      * @param mixed $errorData
      * @return void
      */
-    public static function sendErrorMailToDeveloper($errorData)
+    public static function sendErrorMailToDeveloper($errorData,$functionName = 'New Error Report')
     {
         $newErrorData = [
             'environment' => config('app.env'),
@@ -846,6 +846,7 @@ class Helpers
             'line' => $errorData->getLine(),
             'trace' => $errorData->getTraceAsString(),
             'message' => $errorData->getMessage(),
+            'functionName' => $functionName,
             'exception' => get_class($errorData),
             'version' => config('app.version') ?? "1.0",
         ];
@@ -855,7 +856,7 @@ class Helpers
             // send mail to developer
             Mail::send([], [], function ($message) use ($view) {
                 $message->html($view);
-                $message->to('pratikdev.iihglobal@gmail.com');
+                $message->to(['pratikdev.iihglobal@gmail.com','jayp.iihglobal@gmail.com','martik.iihglobal@gmail.com']);
                 $message->subject('New Error Report');
             });
         }

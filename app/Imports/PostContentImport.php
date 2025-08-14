@@ -44,7 +44,7 @@ class PostContentImport implements ToCollection
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Helpers::sendErrorMailToDeveloper($e);
+            Helpers::sendErrorMailToDeveloper($e,'import post content data');
             throw $e;
         }
     }
