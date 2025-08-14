@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BrandKit;
+use App\Models\SubscriptionPlans;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\ResponseTrait;
@@ -56,11 +57,35 @@ class ProfileManagementApiController extends Controller
         $is_plan_canceled = false;
 
         if ($userSubscription) {
-            $is_plan_expiring = Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24;
+            $is_plan_expiring = $userSubscription->current_period_end ? Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24 : false;
+
+            $hoursLeft = Carbon::now()->diffInHours(
+                Carbon::parse($userSubscription->current_period_end),
+                false
+            );
+
+            $is_plan_expiring = false;
+            if ($userSubscription->plan_id == 2 && $hoursLeft && $hoursLeft >= 0 && $hoursLeft <= 24) {
+                $is_plan_expiring = true;
+            }
             
-            if ($userSubscription->status === 'canceled') {
+            if ($userSubscription->is_subscription_cancel == true) {
                 $is_plan_canceled = true;
             }
+        }
+
+        if ($userSubscription && $userSubscription->plan_id == 1 || !$userSubscription) {
+            $plan_id = Helpers::encrypt(1); // Free plan
+            $plan_flag = 1;
+            $plan_slug = "free-plan";
+        } else if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
+            $plan_id = Helpers::encrypt(2); // £650 plan 
+            $plan_flag = 2;
+            $plan_slug = "premium-plan";
+        } else {
+            $plan_id = Helpers::encrypt(3); // £780 plan
+            $plan_flag = 3;
+            $plan_slug = "premium-plan";
         }
 
 
@@ -79,7 +104,10 @@ class ProfileManagementApiController extends Controller
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
             'is_plan_expiring' => $is_plan_expiring,
-            'is_plan_canceled' => $is_plan_canceled
+            'is_plan_canceled' => $is_plan_canceled,
+            'plan_id' => $plan_id,
+            'plan_flag' => $plan_flag,
+            'plan_slug' => $plan_slug
         ];
 
         return $this->success($data, 'Profile fetched successfully');

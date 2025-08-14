@@ -36,7 +36,14 @@ class SubscriptionApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required',
-            'payment_method' => 'required',
+            'payment_method' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    $planId = Helpers::decrypt($request->plan_id);
+                    if ($planId != 1 && empty($value)) {
+                        $fail('The payment method field is required.');
+                    }
+                }
+            ],
             'user_details' => 'required'
         ]);
 
@@ -109,14 +116,18 @@ class SubscriptionApiController extends Controller
             $userStripeCustomerId = $this->getOrCreateStripeCustomer($user,$user_details);
             if ($subscriptionPlanDetail->slug != 'free-trial') {
                 $today = now();
-                $currentYear = $today->year;
-                $cutoffDate = Carbon::create($currentYear, 10, 1); // Oct 1, 2025
+                // $currentYear = $today->year;
+                $cutoffDate = Carbon::create(2025, 10, 1); // Oct 1, 2025
 
                 // Before Oct 1 → use £650 plan else £780 plan
                 if ($today->lt($cutoffDate)) {
                     $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
                 } else {
+                    $userSubscription = UserSubscription::where('user_id',$userId)->latest()->first();
                     $subscriptionPlanDetail = SubscriptionPlans::where('id', 3)->first();
+                    if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
+                        $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
+                    }
                 }
             }
 
@@ -351,8 +362,7 @@ class SubscriptionApiController extends Controller
 
         if ($stripeSubscription['status'] == "active" && $stripeSubscription['cancel_at_period_end'] == true) {
             $subscription->update([
-                'status' => 'canceled',
-                'stripe_status' => 'canceled',
+                'is_subscription_cancel' => true,
                 'current_period_start'  => $item ? Carbon::parse($item['current_period_start'])->format('Y-m-d H:i:s') : null,
                 'current_period_end'    => $item ? Carbon::parse($item['current_period_end'])->format('Y-m-d H:i:s') : null,
                 'cancelled_at' => now(),
@@ -432,7 +442,7 @@ class SubscriptionApiController extends Controller
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
             }
             
-            if (in_array($user_subscription->stripe_status, ['canceled', 'incomplete_expired'])) {
+            if ($user_subscription->is_subscription_cancel == true) {
                 return $this->error('Payment was canceled.', 410); // resource/payment is no longer available because the user canceled.
             }
 
@@ -444,6 +454,7 @@ class SubscriptionApiController extends Controller
         }
     }
 
+    /** Cancel Subscription */
     public function cancelSubscription(Request $request)
     {
         try {
@@ -468,13 +479,10 @@ class SubscriptionApiController extends Controller
                 // get plan detais
                 $plan = SubscriptionPlans::where('id', $user_subscription->plan_id)->first();
                 if ($plan->slug == 'free-trial') {
-                    
-                    $user_subscription->status = 'canceled';
-                    $user_subscription->stripe_status = 'canceled';
+                    $user_subscription->is_subscription_cancel = true;
                     $user_subscription->cancelled_at = now();
                     $user_subscription->ends_at = now();
                     $user_subscription->save();
-
                 }else{
 
                     $subscription = $this->stripe->subscriptions->update(
@@ -483,8 +491,7 @@ class SubscriptionApiController extends Controller
                     );
 
                     if ($subscription->cancel_at_period_end == true) {
-                        $user_subscription->status = 'canceled';
-                        $user_subscription->stripe_status = 'canceled';
+                        $user_subscription->is_subscription_cancel = true;
                         $user_subscription->cancelled_at = now();
                         $user_subscription->ends_at = now();
                         $user_subscription->save();
@@ -504,5 +511,41 @@ class SubscriptionApiController extends Controller
             return $this->error('Something went wrong.', 500);
         }
 
+    }
+
+    /** Are you want to continue the subscription? */
+    public function continueSubscription(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'is_continue' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $isSubscriptionContinue = $request->is_continue;
+            $userId = Auth::id();
+
+            $subscription = UserSubscription::where('user_id',$userId)->latest()->first();
+
+            if (!$subscription) {
+                return $this->error('Subscription data not found.', 404);
+            }
+
+            $subscription->is_next_sub_continue = $isSubscriptionContinue;
+            $subscription->save();
+
+            return $this->success([],'Status changed', 200);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong.', 500);
+        }
     }
 }
