@@ -64,7 +64,7 @@
 
     <!-- CTA Button -->
     <div style="text-align: center; margin: 30px 0;">
-        <a href="http://178.128.45.173:9163/dashboard" target="_blank" class="dashboard-button"
+        <a href="{{ config('app.frontend_url')  }}/dashboard" target="_blank" class="dashboard-button"
             style="background-color: #F4D106; 
             color: #000;
             padding: 14px 32px; 
