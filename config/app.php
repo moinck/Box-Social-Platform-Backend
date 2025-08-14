@@ -19,6 +19,9 @@ return [
   'frontend_url' => env('APP_FRONTEND', 'http://178.128.45.173:9163'),
   'app_api_url' => env('APP_API_URL', 'http://178.128.45.173:9162/api'),
 
+  'PEXELS_KEY' => env('PEXELS', ''),
+  'PIXABAY_KEY' => env('PIXABAY', ''),
+
   /*
   |--------------------------------------------------------------------------
   | Application Environment
