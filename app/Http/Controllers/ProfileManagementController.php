@@ -29,16 +29,16 @@ class ProfileManagementController extends Controller
         $request->validate([
             'edit_first_name' => 'required',
             'edit_last_name' => 'required',
-            'edit_company_name' => 'required',
-            'edit_user_fca_number' => 'required|min:6|max:30',
+            'edit_company_name' => 'nullable',
+            'edit_user_fca_number' => 'nullable|min:6|max:30',
             'edit_user_image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
         ]);
 
         $user = Auth::user();
         $user->first_name = $request->edit_first_name;
         $user->last_name = $request->edit_last_name;
-        $user->company_name = $request->edit_company_name;
-        $user->fca_number = $request->edit_user_fca_number;
+        $user->company_name = $request->edit_company_name ?? null;
+        $user->fca_number = $request->edit_user_fca_number ?? null;
         if ($request->hasFile('edit_user_image')) {
             $oldImage = $user->profile_image;
             $profileImage = Helpers::uploadImage('profile',$request->file('edit_user_image'), 'images/profile');
