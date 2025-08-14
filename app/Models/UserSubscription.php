@@ -43,6 +43,8 @@ class UserSubscription extends Model
         'downloads_used_today',
         'total_downloads_used',
         'reset_date',
+        'sub_cancel_reason',
+        'child_sub_cancel_reason'
     ];
 
     public function user()

@@ -72,7 +72,7 @@ class SubscriptionApiController extends Controller
                 if ($existingSubscription->plan_id == 1 && $existingSubscription->status == 'active') {
                     // if user want to buy premium plan than cancel the free trial subscription
                     if ($planId != 1) {
-                        $existingSubscription->status = 'cancelled';
+                        $existingSubscription->status = 'canceled';
                         $existingSubscription->stripe_status = 'canceled';
                         $existingSubscription->cancelled_at = now();
                         $existingSubscription->ends_at = now();
@@ -349,18 +349,30 @@ class SubscriptionApiController extends Controller
 
         $item = $stripeSubscription['items']['data'][0] ?? null;
 
-        $subscription->update([
-            'stripe_status'         => $stripeSubscription['status'],
-            'current_period_start'  => $item ? Carbon::parse($item['current_period_start'])->format('Y-m-d H:i:s') : null,
-            'current_period_end'    => $item ? Carbon::parse($item['current_period_end'])->format('Y-m-d H:i:s') : null,
-        ]);
+        if ($stripeSubscription['status'] == "active" && $stripeSubscription['cancel_at_period_end'] == true) {
+            $subscription->update([
+                'status' => 'canceled',
+                'stripe_status' => 'canceled',
+                'current_period_start'  => $item ? Carbon::parse($item['current_period_start'])->format('Y-m-d H:i:s') : null,
+                'current_period_end'    => $item ? Carbon::parse($item['current_period_end'])->format('Y-m-d H:i:s') : null,
+                'cancelled_at' => now(),
+                'ends_at' => now()
+            ]);
+        } else {
+            $subscription->update([
+                'stripe_status'         => $stripeSubscription['status'],
+                'current_period_start'  => $item ? Carbon::parse($item['current_period_start'])->format('Y-m-d H:i:s') : null,
+                'current_period_end'    => $item ? Carbon::parse($item['current_period_end'])->format('Y-m-d H:i:s') : null,
+            ]);
+        }
+
     }
 
     private function handleSubscriptionCancelled($stripeSubscription)
     {
         $subscription = UserSubscription::where('stripe_subscription_id', $stripeSubscription['id'])->first();
         if ($subscription) {
-            $subscription->status = 'cancelled';
+            $subscription->status = 'canceled';
             $subscription->stripe_status = 'canceled';
             $subscription->ends_at = now();
             $subscription->save();
@@ -373,8 +385,6 @@ class SubscriptionApiController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                // 'payment_intent_id' => 'required',
-                // 'payment_method' => 'required',
                 'user_subscription_id' => 'required'
             ]);
 
@@ -385,11 +395,7 @@ class SubscriptionApiController extends Controller
                 ], 422);
             }
 
-            // $payment_intent_id = $request->payment_intent_id;
-            // $payment_method = $request->payment_method;
             $user_subscription_id = Helpers::decrypt($request->user_subscription_id);
-
-            // $paymentIntent = $this->stripe->paymentIntents->retrieve($payment_intent_id,[]);
 
             $user_subscription = UserSubscription::with(['plan'])->where('id',$user_subscription_id)->first();
 
@@ -424,13 +430,79 @@ class SubscriptionApiController extends Controller
 
             if ($user_subscription->stripe_status == "paid") {
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
-            } else {
-                return $this->error('Payment failed', 500);
             }
+            
+            if (in_array($user_subscription->stripe_status, ['canceled', 'incomplete_expired'])) {
+                return $this->error('Payment was canceled.', 410); // resource/payment is no longer available because the user canceled.
+            }
+
+            return $this->error('Payment failed', 500);
 
         } catch (Exception $e) {
             Log::error($e);
             return $this->error("Somethign went wrong.", 500);
         }
+    }
+
+    public function cancelSubscription(Request $request)
+    {
+        try {
+
+            $authUser = Auth::user();
+            $user_subscription = UserSubscription::where('user_id', $authUser->id)
+                ->where('status', 'active')
+                ->latest()
+                ->first();
+
+            if (empty($user_subscription)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No active subscription found',
+                    'data' => []
+                ]);
+            }
+
+            if ($user_subscription) {
+                $user_subscription->sub_cancel_reason = $request->reason;
+                $user_subscription->child_sub_cancel_reason = $request->child_reason;
+                // get plan detais
+                $plan = SubscriptionPlans::where('id', $user_subscription->plan_id)->first();
+                if ($plan->slug == 'free-trial') {
+                    
+                    $user_subscription->status = 'canceled';
+                    $user_subscription->stripe_status = 'canceled';
+                    $user_subscription->cancelled_at = now();
+                    $user_subscription->ends_at = now();
+                    $user_subscription->save();
+
+                }else{
+
+                    $subscription = $this->stripe->subscriptions->update(
+                        $user_subscription->stripe_subscription_id,
+                        ['cancel_at_period_end' => true]
+                    );
+
+                    if ($subscription->cancel_at_period_end == true) {
+                        $user_subscription->status = 'canceled';
+                        $user_subscription->stripe_status = 'canceled';
+                        $user_subscription->cancelled_at = now();
+                        $user_subscription->ends_at = now();
+                        $user_subscription->save();
+                    }
+
+                }
+            }
+
+            if ($user_subscription->status == 'canceled') {
+                return $this->success($user_subscription,'Subscription cancelled successfully.', 200);
+            }
+
+            return $this->error('Subscription not cancelled.', 404);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong.', 500);
+        }
+
     }
 }
