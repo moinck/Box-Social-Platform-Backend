@@ -129,7 +129,7 @@ class PostTemplateController extends Controller
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
                 $adminAccessToken = Session::get('admin_access_token') ?? '';
-                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
+                $editUrl = config('app.frontend_url') . "/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
                 // $downloadUrl = route('download.document', $postTemplateId);
                 // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
                 //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
