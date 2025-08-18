@@ -48,7 +48,7 @@ class CheckExpiredSubscriptions extends Command
             // ->whereNotIn('status', ['cancelled', 'canceled']) // Handle both spellings
             // ->whereNotIn('stripe_status', ['cancelled', 'canceled'])
             ->where('status', 'active')
-            ->where('stripe_status', 'active')
+            ->whereIn('stripe_status', ['active','paid'])
             ->get();
             
         if ($expiredSubscriptions->isEmpty()) {

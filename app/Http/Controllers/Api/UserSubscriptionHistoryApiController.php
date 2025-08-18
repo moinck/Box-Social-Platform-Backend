@@ -48,6 +48,7 @@ class UserSubscriptionHistoryApiController extends Controller
                 'status' => $val->status,
                 'start_date' => $start_date,
                 'end_date' => $end_date,
+                'is_plan_canceled' => $val->is_subscription_cancel == true ? true : false,
                 'created_date' => Helpers::dateFormate($val->created_at),
                 'updated_date' => Helpers::dateFormate($val->updated_at),
             ];
