@@ -28,7 +28,7 @@ class PostContentImport implements ToCollection
                 $subCategoryName = $row[2] ?? null;
                 $subCategory = null;
                 $category = Categories::where('name','like', "%$categoryName%")->first();
-                if ($subCategoryName) {
+                if ($subCategoryName && $category) {
                     $subCategory = Categories::where(function ($query) use ($subCategoryName, $category) {
                         $query->where('name','like', "%$subCategoryName%")
                             ->where('parent_id', $category->id);
@@ -37,7 +37,7 @@ class PostContentImport implements ToCollection
                 if ($category) {
                     PostContent::create([
                         'category_id' => $category->id,
-                        'sub_category_id' => $subCategory->id ?? null,
+                        'sub_category_id' => $subCategory ? $subCategory->id : null,
                         'title' => $row[3] ?? null,
                         'description' => $row[4] ?? null,
                         'warning_message' => $row[5] ?? null,

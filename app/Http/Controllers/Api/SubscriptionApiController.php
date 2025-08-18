@@ -553,7 +553,7 @@ class SubscriptionApiController extends Controller
             }
 
             if ($user_subscription->is_subscription_cancel == true) {
-                return $this->error('Subscription was canceled.', 410); // resource/payment is no longer available because the user canceled.
+                return $this->success([],'Subscription was canceled.', 410); // resource/payment is no longer available because the user canceled.
             }
 
             return $this->error('Subscription was not canceled. Please try again later.', 500);
