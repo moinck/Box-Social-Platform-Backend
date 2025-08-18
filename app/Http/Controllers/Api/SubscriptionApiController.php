@@ -209,7 +209,9 @@ class SubscriptionApiController extends Controller
             return $this->success($returnData, 'Subscription created successfuly.', 200);
 
         } catch (Exception $e) {
+            DB::rollBack();
             Log::error($e);
+            Helpers::sendErrorMailToDeveloper($e);
             return $this->error('Oops!Failed to create subscription', 500);
         }
     }
@@ -445,12 +447,8 @@ class SubscriptionApiController extends Controller
                 return $this->success([], 'Webhook call not responsed.', 206);
             }
 
-            if ($user_subscription->stripe_status == "paid") {
+            if ($user_subscription->stripe_status == "paid" && $user_subscription->is_subscription_cancel != true) {
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
-            }
-            
-            if ($user_subscription->is_subscription_cancel == true) {
-                return $this->error('Payment was canceled.', 410); // resource/payment is no longer available because the user canceled.
             }
 
             return $this->error('Payment failed', 500);
@@ -464,6 +462,7 @@ class SubscriptionApiController extends Controller
     /** Cancel Subscription */
     public function cancelSubscription(Request $request)
     {
+        DB::beginTransaction();
         try {
 
             $authUser = Auth::user();
@@ -473,6 +472,7 @@ class SubscriptionApiController extends Controller
                 ->first();
 
             if (empty($user_subscription)) {
+                DB::rollBack();
                 return response()->json([
                     'status' => false,
                     'message' => 'No active subscription found',
@@ -508,16 +508,60 @@ class SubscriptionApiController extends Controller
             }
 
             if ($user_subscription->is_subscription_cancel) {
+                $user_subscription['user_subscription_id'] = Helpers::encrypt($user_subscription->id);
+                DB::commit();
                 return $this->success($user_subscription,'Subscription cancelled successfully.', 200);
             }
 
-            return $this->error('Subscription not cancelled.', 404);
+            DB::rollBack();
+            return $this->error('Subscription not cancelled. Please try again later.', 404);
 
         } catch (Exception $e) {
+            DB::rollBack();
             Log::error($e);
             return $this->error('Something went wrong.', 500);
         }
 
+    }
+
+    /** Verify User Subscription Canceled */
+    public function verifyUserSubscriptionCanceled(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'user_subscription_id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $user_subscription_id = Helpers::decrypt($request->user_subscription_id);
+
+            $user_subscription = UserSubscription::with(['plan'])->where('id',$user_subscription_id)->first();
+
+            if (!$user_subscription) {
+                return $this->error('Subscription data not found.', 404);
+            }
+
+            if ($user_subscription->is_subscription_cancel == null) {
+                return $this->success([], 'Webhook call not responsed.', 206);
+            }
+
+            if ($user_subscription->is_subscription_cancel == true) {
+                return $this->error('Subscription was canceled.', 410); // resource/payment is no longer available because the user canceled.
+            }
+
+            return $this->error('Subscription was not canceled. Please try again later.', 500);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error("Somethign went wrong.", 500);
+        }
     }
 
     /** Are you want to continue the subscription? */
