@@ -507,7 +507,7 @@ class SubscriptionApiController extends Controller
                 }
             }
 
-            if ($user_subscription->status == 'canceled') {
+            if ($user_subscription->is_subscription_cancel) {
                 return $this->success($user_subscription,'Subscription cancelled successfully.', 200);
             }
 
