@@ -17,6 +17,8 @@ class CheckExpiredSubscriptions extends Command
      * @var string
      */
     // protected $signature = 'app:check-expired-subscriptions';
+    // to check dry run mode use below command
+    // php artisan subscriptions:check-expired --dry-run
     protected $signature = 'subscriptions:check-expired {--dry-run : Show what would be updated without making changes}';
 
 
