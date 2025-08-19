@@ -70,8 +70,8 @@ class UserDownloadsManagementApiController extends Controller
 
             // if plan is free & all limit is used then mark current subscription as ended
             if ($subscription->plan_id == 1 && ($downloadCountStats['total_limit'] == $downloadCountStats['used'])) {
-                $subscription->status = 'ended';
-                $subscription->stripe_status = 'ended';
+                $subscription->status = 'inactive';
+                $subscription->stripe_status = 'inactive';
                 $subscription->cancelled_at = $today;
                 $subscription->ends_at = $today;
                 $subscription->save();

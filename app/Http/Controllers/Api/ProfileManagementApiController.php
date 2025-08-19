@@ -49,6 +49,8 @@ class ProfileManagementApiController extends Controller
             }
         }
 
+        $is_take_free_plan = UserSubscription::where('user_id', $userId)->where('plan_id',1)->exists();
+        
         $userSubscription = UserSubscription::where('user_id', $userId)
             ->latest()
             ->first();
@@ -110,7 +112,8 @@ class ProfileManagementApiController extends Controller
             'is_plan_expiring' => $is_plan_expiring,
             'is_plan_canceled' => $is_plan_canceled,
             'plan_id' => $plan_id,
-            'plan_flag' => $plan_flag
+            'plan_flag' => $plan_flag,
+            'is_take_free_plan' => $is_take_free_plan,
         ];
 
         return $this->success($data, 'Profile fetched successfully');
