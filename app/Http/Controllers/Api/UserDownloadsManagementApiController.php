@@ -68,19 +68,6 @@ class UserDownloadsManagementApiController extends Controller
             $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
             $remainingMonthlyDownloads = $downloadCountStats['monthly_remaining_limit'];
 
-            // if plan is free & all limit is used then mark current subscription as ended
-            if ($subscription->plan_id == 1 && ($downloadCountStats['total_limit'] == $downloadCountStats['used'])) {
-                $subscription->status = 'ended';
-                $subscription->stripe_status = 'ended';
-                $subscription->cancelled_at = $today;
-                $subscription->ends_at = $today;
-                $subscription->save();
-
-                $subscription->downloadTracker->update([
-                    'expires_at' => $today
-                ]);
-            }
-
             if ($remainingMonthlyDownloads < $increaseCount) {
                 return $this->error('No enough remaining downloads',422);
             }
@@ -88,6 +75,19 @@ class UserDownloadsManagementApiController extends Controller
             if($subscription->canDownload()){
                 $subscription->recordDownload($increaseCount);
                 $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
+
+                // if plan is free & all limit is used then mark current subscription as ended
+                if ($subscription->plan_id == 1 && ($downloadCountStats['total_limit'] == $downloadCountStats['used'])) {
+                    $subscription->status = 'inactive';
+                    $subscription->stripe_status = 'inactive';
+                    $subscription->cancelled_at = $today;
+                    $subscription->ends_at = $today;
+                    $subscription->save();
+
+                    $subscription->downloadTracker->update([
+                        'expires_at' => $today
+                    ]);
+                }
 
                 return $this->success($downloadCountStats,'Subscription download limit updated successfully');
             } else {
