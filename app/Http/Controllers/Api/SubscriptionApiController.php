@@ -84,10 +84,10 @@ class SubscriptionApiController extends Controller
             if ($existingSubscription) {
                 // check if it is free trial subscription
                 if ($existingSubscription->plan_id == 1 && $existingSubscription->status == 'active') {
-                    // if user want to buy premium plan than cancel the free trial subscription
+                    // if user want to buy premium plan than inactive the free trial subscription
                     if ($planId != 1) {
-                        $existingSubscription->status = 'canceled';
-                        $existingSubscription->stripe_status = 'canceled';
+                        $existingSubscription->status = 'inactive';
+                        $existingSubscription->stripe_status = 'inactive';
                         $existingSubscription->cancelled_at = now();
                         $existingSubscription->ends_at = now();
                         $existingSubscription->save();
