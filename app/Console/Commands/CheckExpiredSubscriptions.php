@@ -76,7 +76,6 @@ class CheckExpiredSubscriptions extends Command
                     // Update subscription status
                     $subscription->status = 'ended';
                     $subscription->stripe_status = 'canceled';
-                    $subscription->cancelled_at = $currentDateTime;
                     $subscription->ends_at = $currentDateTime;
                     $subscription->save();
                     
