@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersSubscriptionExport;
 use App\Helpers\Helpers;
 use App\Models\UserDownloads;
 use App\Models\UserSubscription;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserSubscriptionController extends Controller
@@ -17,7 +23,16 @@ class UserSubscriptionController extends Controller
 
     public function dataTable(Request $request)
     {
+
+        $subscriptionPlan = isset($request->subscription_plan) ? $request->subscription_plan : null;
+
         $subscriptions = UserSubscription::with('user:id,first_name,last_name,email','plan:id,name')
+            ->when($subscriptionPlan, function($query, $subscriptionPlan){
+                if ($subscriptionPlan == 1) {
+                    return $query->where('plan_id', 1);
+                }
+                return $query->whereIn('plan_id', [2,3]);
+            })
             ->latest()
             ->get();
 
@@ -86,5 +101,50 @@ class UserSubscriptionController extends Controller
         // dd($userDownloads);
 
         return view('content.pages.user-subscription.show', compact('subscriptionData', 'userDownloads'));
+    }
+
+    /** Subscription Details Exports */
+    public function exportSubscriptionDetails(Request $request)
+    {
+        try {
+
+            $subscriptionPlan = isset($request->plan_id) ? $request->plan_id : null;
+
+            $subscriptions = UserSubscription::with('user:id,first_name,last_name,email','plan:id,name')
+                ->when($subscriptionPlan, function($query, $subscriptionPlan){
+                    if ($subscriptionPlan == 1) {
+                        return $query->where('plan_id', 1);
+                    }
+                    return $query->whereIn('plan_id', [2,3]);
+                })
+                ->when($request->subscription_table_search && $request->subscription_table_search != null, function ($query) use ($request) {
+                   $search = $request->subscription_table_search;
+
+                    $query->where(function ($query) use ($search) {
+                        $query->whereHas('user', function ($q) use ($search) {
+                            $q->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+                        })
+                        ->orWhereHas('plan', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                    });
+                })
+                ->latest()
+                ->get();
+
+            $format = $request->format;
+            $name = 'subscription_' . date('Y-m-d_g-s');
+            if ($format == 'csv') {
+                return Excel::download(new UsersSubscriptionExport($subscriptions), $name . '.csv');
+            } else {
+                return Excel::download(new UsersSubscriptionExport($subscriptions), $name . '.xlsx');
+            }
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json(['success' => false, 'message' => 'Something went wrong.']);
+        }
     }
 }

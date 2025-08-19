@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/subscription-management/datatable', [UserSubscriptionController::class, 'dataTable'])->name('subscription-management.data-table');
         Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
+        Route::post('/subscription-management/export', [UserSubscriptionController::class, 'exportSubscriptionDetails'])->name('subscription-management.export');
         
         // icon management controller
         Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');
