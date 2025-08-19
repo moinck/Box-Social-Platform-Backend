@@ -23,16 +23,19 @@ class UserSubscriptionHistoryApiController extends Controller
 
         $subscriptions = UserSubscription::with(['user:id,first_name,last_name,email', 'plan:id,name'])
             ->where('user_id', $user->id)
-            ->when($searchQuery, function ($query) use ($searchQuery) {
-                $query->whereHas('plan', function ($query) use ($searchQuery) {
-                    $query->where('name', 'like', "%$searchQuery%");
-                })
-                ->orWhereHas('user', function ($query) use ($searchQuery) {
-                    $query->where('first_name', 'like', "%$searchQuery%")
-                        ->orWhere('last_name', 'like', "%$searchQuery%")
-                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $searchQuery . '%']);
-                })
-                ->orWhere('status', 'like', "%$searchQuery%");
+            ->when($searchQuery, function ($query) use ($user, $searchQuery) {
+                $query->where('user_id', $user->id)
+                    ->where(function ($query) use ($searchQuery) {
+                        $query->whereHas('plan', function ($query) use ($searchQuery) {
+                            $query->where('name', 'like', "%$searchQuery%");
+                        })
+                        ->orWhereHas('user', function ($query) use ($searchQuery) {
+                            $query->where('first_name', 'like', "%$searchQuery%")
+                                ->orWhere('last_name', 'like', "%$searchQuery%")
+                                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $searchQuery . '%']);
+                        })
+                        ->orWhere('status', 'like', "%$searchQuery%");
+                    });
             })
             ->latest()
             ->get();
