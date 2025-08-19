@@ -280,6 +280,7 @@ class SubscriptionApiController extends Controller
                 $payload, $sigHeader, $endpointSecret
             );
         } catch (\Exception $e) {
+            Helpers::sendErrorMailToDeveloper($e);
             // Log::error('Subscription webhook error: ' . $e->getMessage(),['function' => 'webhook', 'data' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Invalid signature'], 400);
         }
@@ -374,8 +375,7 @@ class SubscriptionApiController extends Controller
                 'is_subscription_cancel' => true,
                 'current_period_start'  => $item ? Carbon::parse($item['current_period_start'])->format('Y-m-d H:i:s') : null,
                 'current_period_end'    => $item ? Carbon::parse($item['current_period_end'])->format('Y-m-d H:i:s') : null,
-                'cancelled_at' => now(),
-                'ends_at' => now()
+                'cancelled_at' => now()
             ]);
         } else {
             $subscription->update([
@@ -500,7 +500,6 @@ class SubscriptionApiController extends Controller
                     if ($subscription->cancel_at_period_end == true) {
                         $user_subscription->is_subscription_cancel = true;
                         $user_subscription->cancelled_at = now();
-                        $user_subscription->ends_at = now();
                         $user_subscription->save();
                     }
 
