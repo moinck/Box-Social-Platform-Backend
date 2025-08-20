@@ -277,6 +277,10 @@
             $(document).on('click', '#generateInvoice', function(){
 
                 var id = $(this).data('id');
+
+                if (id == undefined || id == '') {
+                    return false;
+                }
                 
                 $.ajax({
                     url: "{{ route('subscription-management.generate-invoice') }}",
