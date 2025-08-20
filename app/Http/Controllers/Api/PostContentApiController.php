@@ -120,6 +120,7 @@ class PostContentApiController extends Controller
                 return [
                     'id' => Helpers::encrypt($post->id),
                     'category_id' => Helpers::encrypt($post->category_id),
+                    'sub_category_id' => $post->sub_category_id ? Helpers::encrypt($post->sub_category_id) : null,
                     'title' => $post->title,
                     'description' => $post->description,
                     'warning_message' => $post->warning_message,
