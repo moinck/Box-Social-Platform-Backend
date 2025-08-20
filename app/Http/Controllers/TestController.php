@@ -32,10 +32,11 @@ class TestController extends Controller
 
                 $extension = $map[$mime];
                 $fileName  = $image->id.'.'.$extension;
+                $path = "live/stock_images/".$fileName;
 
-                $path = Storage::disk('digitalocean')->put("local/stock_images/".$fileName, $response->body(), 'public');
+                $path = Storage::disk('digitalocean')->put($path, $response->body(), 'public');
                 if($path){
-                    $image->image_url = Storage::disk('digitalocean')->url("local/stock_images/".$fileName);
+                    $image->image_url = Storage::disk('digitalocean')->url($path);
                     $image->is_expired = 1;
                     $image->save();
                 }else{
