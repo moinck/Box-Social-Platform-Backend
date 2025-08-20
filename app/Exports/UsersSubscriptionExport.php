@@ -39,9 +39,9 @@ class UsersSubscriptionExport extends DefaultValueBinder implements FromCollecti
             'No',
             'User',
             'Subscription Plan',
+            'Status',
             'Start Date',
             'End Date',
-            'Status',
             'Created Date',
             'Updated Date',
         ];
