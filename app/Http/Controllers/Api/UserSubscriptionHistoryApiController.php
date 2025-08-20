@@ -60,6 +60,7 @@ class UserSubscriptionHistoryApiController extends Controller
                 'id' => Helpers::encrypt($val->id),
                 'user_id' => Helpers::encrypt($val->user_id),
                 'user_name' => $val->user->first_name . ' ' . $val->user->last_name,
+                'plan_id' => $val->plan_id,
                 'plan' => $val->plan->name,
                 'status' => $val->status,
                 'start_date' => $start_date,
