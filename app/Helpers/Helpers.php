@@ -1052,7 +1052,10 @@ class Helpers
 
         $pdf = Pdf::loadView('content.pages.user-subscription.invoice',compact('subscription'))->setPaper('a4', 'portrait');
 
-        $fileName = 'Invoice-' . $invoice_number . '.pdf';
+        $fileName = 'Invoice' . rand(0,999999999) . '.pdf';
+        if ($invoice_number) {
+            $fileName = 'Invoice' . $invoice_number . '.pdf';
+        }
 
         return response($pdf->output(), 200, [
             'Content-Type'        => 'application/pdf',
