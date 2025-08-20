@@ -160,7 +160,7 @@ $(function () {
                         `;
                     }
                     newImage += `
-                            <div class="col-md mb-md-0 mb-5">
+                            <div class="col-md mb-md-0 mb-5" style="padding-bottom: 24px">
                                 <div class="form-check custom-option custom-option-image custom-option-image-check">
                                     <input class="form-check-input search-image-checkbox" type="checkbox" name="selectImages[]" id="search-image-${id}" value="${image_url}"/>
                                     <label class="form-check-label custom-option-content" for="search-image-${id}">
