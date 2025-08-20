@@ -168,11 +168,11 @@
                                             </div>
                                             <div class="row mt-5" id="saved_images">
                                             </div>
-
+                                            
                                             <!-- No more images indicator -->
-                                            <div id="no-more-images" class="text-center mt-3" style="display: none;">
+                                            {{-- <div id="no-more-images" class="text-center mt-3" style="display: none;">
                                                 <p class="text-muted">No more images to load</p>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
