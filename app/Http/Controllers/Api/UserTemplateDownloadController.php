@@ -30,7 +30,7 @@ class UserTemplateDownloadController extends Controller
         }
         $userTemplates = UserTemplates::select('id','template_id','category_id','template_name','template_image','user_id')
             ->with('template.postContent','category:id,name')
-            ->whereIn('id', [118])
+            ->whereIn('id', $decryptIds)
             ->get();
     
         if (!$userTemplates) {
