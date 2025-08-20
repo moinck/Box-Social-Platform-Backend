@@ -273,6 +273,63 @@
                 showBSPLoader();
                 xhr.send(exportFormData);
             }
+
+            $(document).on('click', '#generateInvoice', function(){
+
+                var id = $(this).data('id');
+                
+                $.ajax({
+                    url: "{{ route('subscription-management.generate-invoice') }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id
+                    },
+                    xhrFields: { responseType: 'blob' }, // always request as Blob
+                    beforeSend: function () {
+                        showBSPLoader();
+                    },
+                    complete: function () {
+                        hideBSPLoader();
+                    },
+                    success: function (blob, status, xhr) {
+                        // Check content type
+                        const contentType = xhr.getResponseHeader('Content-Type');
+
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            // JSON error instead of PDF
+                            const reader = new FileReader();
+                            reader.onload = function () {
+                                const json = JSON.parse(reader.result);
+                                showSweetAlert('error', 'Error!', json.message || 'Something went wrong.');
+                            };
+                            reader.readAsText(blob); // Convert Blob -> JSON text
+                        } else {
+                            // ✅ It's a PDF
+                            let filename = "export.pdf";
+                            const dispo = xhr.getResponseHeader('Content-Disposition');
+                            if (dispo && dispo.indexOf('filename=') !== -1) {
+                                filename = dispo.split('filename=')[1].replace(/"/g, '').trim();
+                            }
+
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(url);
+                        }
+                    },
+                    error: function (xhr) {
+                        hideBSPLoader();
+                        showSweetAlert('error', 'Error!', 'Something went wrong.');
+                    }
+                });
+
+                
+            });
         });
     </script>
 @endsection

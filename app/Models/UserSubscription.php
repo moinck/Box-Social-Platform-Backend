@@ -46,7 +46,8 @@ class UserSubscription extends Model
         'is_next_sub_continue',
         'is_subscription_cancel',
         'sub_cancel_reason',
-        'child_sub_cancel_reason'
+        'child_sub_cancel_reason',
+        'invoice_number'
     ];
 
     public function user()

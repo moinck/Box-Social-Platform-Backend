@@ -77,16 +77,17 @@ class UserSubscriptionController extends Controller
             })
             ->addColumn('action', function ($subscription) {
                 $id = Helpers::encrypt($subscription->id);
-                $showRoute = route('subscription-management.show',$id);
-                $deleteBtn = '<a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
-                        <i class="ri-delete-bin-line"></i>
+                $btn = '<a href="' . route('subscription-management.show',$id) . '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Show">
+                        <i class="ri-eye-line"></i>
+                    </a>';
+                // $deleteBtn = '<a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+                //         <i class="ri-delete-bin-line"></i>
+                //     </a>';
+                $btn .= '<a href="javascript:void" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-id="'.Helpers::encrypt($subscription->id).'" id="generateInvoice" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Invoice">
+                        <i class="ri-file-pdf-2-fill"></i>
                     </a>';
 
-                return '
-                    <a href="' . $showRoute . '" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Show">
-                        <i class="ri-eye-line"></i>
-                    </a>
-                ';
+                return $btn;
             })
             ->rawColumns(['user', 'plan', 'status', 'start_date', 'end_date', 'created_date', 'updated_date', 'action'])
             ->make(true);
@@ -145,6 +146,29 @@ class UserSubscriptionController extends Controller
         } catch (Exception $e) {
             Log::error($e);
             return response()->json(['success' => false, 'message' => 'Something went wrong.']);
+        }
+    }
+
+    /** Generate Invoice */
+    public function generateSubscriptionInvoice(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'id' => 'required',
+            ]);
+
+            $subscriptionId = Helpers::decrypt($request->id);
+
+            return Helpers::generateSubscriptionInvoice($subscriptionId);
+            
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.'
+            ]);
         }
     }
 }

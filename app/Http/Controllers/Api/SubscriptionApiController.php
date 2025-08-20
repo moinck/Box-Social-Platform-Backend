@@ -320,6 +320,7 @@ class SubscriptionApiController extends Controller
                 $userSubscription->status = 'active';
                 $userSubscription->amount_paid = $invoice['total'] / 100;
                 $userSubscription->currency = $invoice['currency'];
+                $userSubscription->invoice_number = $invoice['number'];
 
                 if (!empty($invoice['default_payment_method'])) {
                     $userSubscription->stripe_payment_method_id = $invoice['default_payment_method'];
@@ -596,6 +597,25 @@ class SubscriptionApiController extends Controller
         } catch (Exception $e) {
             Log::error($e);
             return $this->error('Something went wrong.', 500);
+        }
+    }
+
+    /** Generate Subscription Invoice */
+    public function generateSubscriptionInvoice(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'id' => 'required',
+            ]);
+
+            $subscriptionId = Helpers::decrypt($request->id);
+
+            return Helpers::generateSubscriptionInvoice($subscriptionId);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error("Something went wrong.", 500);
         }
     }
 }
