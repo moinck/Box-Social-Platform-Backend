@@ -30,7 +30,7 @@ class UserTemplateDownloadController extends Controller
         }
         $userTemplates = UserTemplates::select('id','template_id','category_id','template_name','template_image','user_id')
             ->with('template.postContent','category:id,name')
-            ->whereIn('id', $decryptIds)
+            ->whereIn('id', [118])
             ->get();
     
         if (!$userTemplates) {
@@ -129,12 +129,21 @@ class UserTemplateDownloadController extends Controller
                 $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'], [$brnadKitData['company_name'] ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''], $postContentData->description);
             }
     
-            $writtenData = [
-                "title" => $index + 1 . '. ' . $postContentData->title ?? $userTemplate->template_name,
-                "category_name" => $userTemplate->category->name ?? 'Uncategorized',
-                "description" => $updatedDescription ?? "No description provided",
-                "warning_message" => $postContentData->warning_message ?? "No warning message provided",
-            ];
+            if (!empty($postContentData)) {
+                $writtenData = [
+                    "title" => $index + 1 . '. ' . $postContentData->title ?? $userTemplate->template_name,
+                    "category_name" => $userTemplate->category->name ?? 'Uncategorized',
+                    "description" => $updatedDescription ?? "No description provided",
+                    "warning_message" => $postContentData->warning_message ?? "No warning message provided",
+                ];
+            } else {
+                $writtenData = [
+                    "title" => $index + 1 . '. ' . ($userTemplate->template_name ?? 'No Template Name'),
+                    "category_name" => $userTemplate->category->name ?? 'Uncategorized',
+                    "description" => "No description provided",
+                    "warning_message" => "No warning message provided",
+                ];
+            }
         
             // Add main title
             $section->addTitle($writtenData['title'], 1);
