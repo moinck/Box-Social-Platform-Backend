@@ -83,7 +83,20 @@ class UserSubscriptionController extends Controller
                 // $deleteBtn = '<a href="javascript:void(0);" data-user-subscription-id="' . $id . '" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-subscription-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                 //         <i class="ri-delete-bin-line"></i>
                 //     </a>';
-                $btn .= '<a href="javascript:void" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-id="'.Helpers::encrypt($subscription->id).'" id="generateInvoice" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Invoice">
+
+                $id = "";
+                if ($subscription->status != "incomplete" && $subscription->plan_id != 1) {
+                    $id = Helpers::encrypt($subscription->id);
+                }
+
+                $style = "";
+                $title = "Invoice";
+                if ($subscription->plan_id == 1 || $id == '') {
+                    $style = "style='opacity:0.5;'";
+                    $title = "No Invoice";
+                }
+
+                $btn .= '<a href="javascript:void" class="btn btn-sm btn-text-secondary rounded-pill btn-icon" data-id="'.$id.'" id="generateInvoice" data-bs-toggle="tooltip" data-bs-placement="bottom" title="'.$title.'" '.$style.'>
                         <i class="ri-file-pdf-2-fill"></i>
                     </a>';
 
