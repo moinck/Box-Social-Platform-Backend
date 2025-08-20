@@ -85,7 +85,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
         Route::post('/subscription-management/export', [UserSubscriptionController::class, 'exportSubscriptionDetails'])->name('subscription-management.export');
-        
+        Route::post('/subscription-management/generate-invoice', [UserSubscriptionController::class, 'generateSubscriptionInvoice'])->name('subscription-management.generate-invoice');
+
         // icon management controller
         Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');
         Route::post('/icon-management/store', [IconManagementController::class, 'store'])->name('icon-management.store');
@@ -163,8 +164,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/terms-and-condition/datatable', [TermsAndConditionController::class, 'dataTable'])->name('terms-and-condition.data-table');
         Route::post('/terms-and-condition/delete', [TermsAndConditionController::class, 'destroy'])->name('terms-and-condition.delete');
     });
-
+    
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
+    
     Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
+    Route::get('invoice', function() {
+        return view('content.pages.user-subscription.invoice');
+    });
 });

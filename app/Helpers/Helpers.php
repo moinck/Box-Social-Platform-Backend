@@ -5,8 +5,10 @@ namespace App\Helpers;
 use App\Events\NewNotificationEvent;
 use App\Mail\RegisterVerificationMail;
 use App\Models\Notification;
+use App\Models\UserSubscription;
 use App\Models\UserTokens;
 use App\Notifications\CustomVerifyEmail;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,6 +19,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pusher\Pusher;
+use Stripe\StripeClient;
 
 class Helpers
 {
@@ -1015,5 +1018,50 @@ class Helpers
         ];
 
         return $mimeTypes[$extension] ?? null;
+    }
+
+    /** 
+     * Generate Subscription Invoice
+     */
+    public static function generateSubscriptionInvoice($subscriptionId)
+    {
+        $subscription = UserSubscription::with('user:id,first_name,last_name,email','plan:id,name,interval,interval_count')
+                ->where('id',$subscriptionId)
+                ->first();
+
+        if (!$subscription) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data not found.'
+            ]);
+        }
+
+        $stripe = new StripeClient(config('services.stripe.secret_key'));
+
+        $invoice_number = $subscription->invoice_number;
+        if (!$subscription->invoice_number && $subscription->plan_id != 1) {
+            $invoices = $stripe->invoices->all([
+                'subscription' => $subscription->stripe_subscription_id,
+            ]);
+
+            $invoice_number = $invoices && isset($invoices['data'][0]['number']) && $invoices['data'][0]['number'] ? $invoices['data'][0]['number'] : null;
+
+            $subscription->invoice_number = $invoice_number;
+            $subscription->save();
+        }
+
+        $pdf = Pdf::loadView('content.pages.user-subscription.invoice',compact('subscription'))->setPaper('a4', 'portrait');
+
+        $fileName = 'Invoice' . rand(0,999999999) . '.pdf';
+        if ($invoice_number) {
+            $fileName = 'Invoice' . $invoice_number . '.pdf';
+        }
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+            'Cache-Control'       => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'              => 'no-cache',
+        ]);
     }
 }

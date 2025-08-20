@@ -114,6 +114,7 @@ Route::group([
         Route::post('/user-subscription/cancel', [SubscriptionApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/canceled-verification', [SubscriptionApiController::class, 'verifyUserSubscriptionCanceled']);
         Route::post('/user-subscription/continue', [SubscriptionApiController::class, 'continueSubscription']);
+        Route::get('/user-subscription/generate-invoice', [SubscriptionApiController::class, 'generateSubscriptionInvoice']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
