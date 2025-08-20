@@ -24,6 +24,7 @@ use App\Http\Controllers\ProjectTestController;
 use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
+use App\Http\Controllers\TestController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -36,6 +37,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
     Route::get('/dashboard', [HomePage::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
     // notification controller
     Route::get('/notification/datatable', [NotificationController::class, 'dataTable'])->name('notification.data-table');
