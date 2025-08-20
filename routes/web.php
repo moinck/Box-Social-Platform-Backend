@@ -171,7 +171,5 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     
     Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
-    Route::get('invoice', function() {
-        return view('content.pages.user-subscription.invoice');
-    });
+
 });
