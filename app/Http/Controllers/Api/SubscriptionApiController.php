@@ -571,7 +571,7 @@ class SubscriptionApiController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'is_continue' => 'required',
-                'type' => 'required',
+                // 'type' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -582,7 +582,7 @@ class SubscriptionApiController extends Controller
             }
 
             $isSubscriptionContinue = $request->is_continue;
-            $type = $request->type;
+            // $type = $request->type;
             $userId = Auth::id();
 
             $subscription = UserSubscription::where('user_id',$userId)->latest()->first();
@@ -591,12 +591,12 @@ class SubscriptionApiController extends Controller
                 return $this->error('Subscription data not found.', 404);
             }
 
-            if ($subscription->is_subscription_cancel == true && $type == 2) {
-                $subscription->is_subscription_cancel = false;
+            // if ($subscription->is_subscription_cancel == true && $type == 2) {
+            //     $subscription->is_subscription_cancel = false;
+            //     $subscription->is_next_sub_continue = $isSubscriptionContinue;
+            // } else {
                 $subscription->is_next_sub_continue = $isSubscriptionContinue;
-            } else {
-                $subscription->is_next_sub_continue = $isSubscriptionContinue;
-            }
+            // }
 
             $subscription->save();
 
