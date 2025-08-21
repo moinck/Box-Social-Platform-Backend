@@ -1042,10 +1042,10 @@ class Helpers
         if (!$subscription->invoice_number && $subscription->plan_id != 1) {
             $invoices = $stripe->invoices->all([
                 'subscription' => $subscription->stripe_subscription_id,
-            ]);
-
-            $invoice_number = $invoices && isset($invoices['data'][0]['number']) && $invoices['data'][0]['number'] ? $invoices['data'][0]['number'] : null;
-
+                'limit' => 1,
+            ])->data[0] ?? null;
+            
+            $invoice_number = $invoices && isset($invoices['number']) && $invoices['number'] ? $invoices['number'] : null;
             $subscription->invoice_number = $invoice_number;
             $subscription->save();
         }
