@@ -90,7 +90,7 @@ class UserSubscriptionController extends Controller
                 }
 
                 $style = "";
-                $title = "Invoice";
+                $title = "Download Invoice";
                 if ($subscription->plan_id == 1 || $id == '') {
                     $style = "style='opacity:0.5;'";
                     $title = "No Invoice";
