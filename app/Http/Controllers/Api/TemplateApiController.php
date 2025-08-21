@@ -368,7 +368,7 @@ class TemplateApiController extends Controller
 
             // Fetch the categories from DB
             $categories = Categories::select('id','name')->whereIn('id', $decryptedCategoryIds)->get();
-            $postContents = PostContent::select('id','title','category_id','warning_message')->whereIn('id',$decryptedPostContentIds)->orWhereIn('sub_category_id',$decryptedSubCategoryIds)->get();
+            $postContents = PostContent::select('id','title','category_id','warning_message')->whereIn('id',$decryptedPostContentIds)->get();
             $tempData = [];
 
             foreach ($categories as $category) {
@@ -398,29 +398,19 @@ class TemplateApiController extends Controller
                 $categoryName = $category->name ?? 'Uncategorized';
                 $tempContentData = [];
 
-                $filteredPostContents = $postContents->where('category_id',$category->id)->toArray();
-                
-                if (!empty($filteredPostContents)) {
-                    foreach ($filteredPostContents as $key => $postContent) {
-    
-                        $templateData = $templates->where('category_id',$category->id)
-                            ->where('id', $postContent['id'])
-                            ->map(function ($t) {
-                                return [
-                                    'id' => Helpers::encrypt($t->id),
-                                    'category_id' => Helpers::encrypt($t->category_id),
-                                    'post_content_id' => $t->post_content_id ? Helpers::encrypt($t->post_content_id) : null,
-                                    'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
-                                ];
-                            })->toArray();
+                foreach ($templates as $template) {
 
-                        $tempContentData[] = [
-                            'id' => Helpers::encrypt($postContent['id']),
-                            'title' => $postContent['title'],
-                            'warning_message' => $postContent['warning_message'] ? $postContent['warning_message'] : '',
-                            'templates_data' => $templateData
-                        ];
-                    }
+                    $postContent = $postContents->where('id',$template->post_content_id)->where('category_id',$category->id)->first();
+                    
+                    $tempContentData[] = [
+                        'id' => Helpers::encrypt($template->id),
+                        'category_id' => Helpers::encrypt($template->category_id),
+                        'post_content_id' => $template->post_content_id ? Helpers::encrypt($template->post_content_id) : null,
+                        'template_image' => isset($template->template_image) ? asset($template->template_image) : '',
+                        'title' => $postContent && $postContent['title'] ? $postContent['title'] : null,
+                        'warning_message' => $postContent && $postContent['warning_message'] ? $postContent['warning_message'] : '',
+                    ];
+
                 }
 
                 $tempData[] = [
