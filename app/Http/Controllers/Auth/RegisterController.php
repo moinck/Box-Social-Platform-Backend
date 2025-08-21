@@ -258,6 +258,17 @@ class RegisterController extends Controller
             ]);
         }
 
+        $fca_number_exists = User::where('fca_number',$fcaNumber)->exists();
+
+        if ($fca_number_exists) {
+            $returnResponse = [
+                'status' => '0',
+                'Message' => 'FCA number already exists.'
+            ];
+
+            return response()->json($returnResponse, 422);
+        }
+
         $returnResponse = [];
         $headers = [
             'x-auth-email' => config('app.FCA_Auth_EMAIL'),

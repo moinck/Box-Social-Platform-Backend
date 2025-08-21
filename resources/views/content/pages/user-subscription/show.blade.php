@@ -205,15 +205,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <ul class="list-group ps-6 my-5 pt-4">
-                                    @foreach (json_decode($subscriptionData->plan->features) as $feature)
-                                        <li class="mb-4">{{ $feature }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
