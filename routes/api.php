@@ -87,6 +87,7 @@ Route::group([
         // admin-template API
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
+        Route::post('/text-content/template/list', [TemplateApiController::class, 'getTextContentTemplateList']);
         Route::post('/template/delete', [TemplateApiController::class, 'delete']);
 
         // User templates APIS
