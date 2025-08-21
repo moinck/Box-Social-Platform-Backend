@@ -298,6 +298,8 @@ class TemplateApiController extends Controller
         if ($request->has('post_content_id') && $request->post_content_id) {
             $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
             $adminTemplate->post_content_id = $decryptedPostContentId;
+        } else {
+            $adminTemplate->post_content_id = null;
         }
 
         $adminTemplate->template_image = $updateImageUrl ?? null;
