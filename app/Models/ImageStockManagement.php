@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class ImageStockManagement extends Model
 {
@@ -48,4 +50,23 @@ class ImageStockManagement extends Model
     {
         return $this->checkImageExists($this->image_url);
     }
+
+    /**
+     * The "booted" method of the model.
+     */
+    // protected static function booted()
+    // {
+    //     // This runs BEFORE the record is deleted from database
+    //     static::deleting(function ($image) {
+    //         // Delete from cloud storage if cloud URL exists
+    //         if (!empty($image->image_url)) {
+    //             try {
+    //                 Helpers::deleteImage($image->image_url);
+    //             } catch (\Exception $e) {
+    //                 Log::error("Failed to delete cloud image for ID {$image->id}: " . $e->getMessage());
+    //                 return false;
+    //             }
+    //         }
+    //     });
+    // }
 }   
