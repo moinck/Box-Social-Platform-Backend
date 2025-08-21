@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessStockImageUpload;
 use App\Models\ImageStockManagement;
 use Illuminate\Http\Request;
 
@@ -58,9 +59,13 @@ class ImageStockManagementController extends Controller
                     ], 
                     [
                         'tag_name' => $request->custom_tag_name,
-                        'user_id' => auth()->user()->id
+                        'user_id' => auth()->user()->id,
+                        'is_expired' => 0,
                     ]
                 );
+
+                // dispatch job to upload image to cloud
+                ProcessStockImageUpload::dispatch($imge->id);
             }
 
             // update saved images count

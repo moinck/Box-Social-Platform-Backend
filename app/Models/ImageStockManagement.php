@@ -12,6 +12,8 @@ class ImageStockManagement extends Model
         'image_url',
         'tag_name',
         'user_id',
+        'is_expired',
+        'old_url'
     ];
 
     public function user()
