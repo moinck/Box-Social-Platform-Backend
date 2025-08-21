@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helpers;
+use App\Jobs\ProcessStockImageUpload;
 use App\Models\ImageStockManagement;
 use Illuminate\Http\Request;
 
@@ -58,9 +60,13 @@ class ImageStockManagementController extends Controller
                     ], 
                     [
                         'tag_name' => $request->custom_tag_name,
-                        'user_id' => auth()->user()->id
+                        'user_id' => auth()->user()->id,
+                        'is_expired' => 0,
                     ]
                 );
+
+                // dispatch job to upload image to cloud
+                ProcessStockImageUpload::dispatch($imge->id);
             }
 
             // update saved images count
@@ -223,7 +229,18 @@ class ImageStockManagementController extends Controller
         $imageIds = $request->image_ids;
 
         if (!empty($imageIds)) {
-            ImageStockManagement::whereIn('id', $imageIds)->delete();
+            $allDeleteImageData = ImageStockManagement::whereIn('id', $imageIds)->get();
+
+            foreach ($allDeleteImageData as $key => $value) {
+                // check if url has 'digitaloceanspaces'
+                if (strpos($value->image_url, 'digitaloceanspaces') !== false) {
+                    Helpers::deleteImage($value->image_url);
+                    $value->delete();
+                } else {
+                    $value->delete();
+                }
+            }
+            
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
             return response()->json([
                 'success' => true,
