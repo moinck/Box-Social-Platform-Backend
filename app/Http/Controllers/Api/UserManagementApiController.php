@@ -38,6 +38,9 @@ class UserManagementApiController extends Controller
         if (!$user) {
             return $this->error('User not found', 404);
         }
+        if ($user->role == 'admin') {
+            return $this->error('You are not allowed to delete admin account', 403);
+        }
 
         $deleteUser = Helpers::deleteUserData($userId);
         if ($deleteUser === true) {
