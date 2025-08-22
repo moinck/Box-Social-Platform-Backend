@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Edit Terms and Condition</h4>
+                    <h4 class="card-title mb-0">Edit Terms & Conditions</h4>
                 </div>
                 <div class="card-body mt-2">
                     <form id="edit-terms-condition-form" action="{{ route('terms-and-condition.update') }}" class="row g-5"

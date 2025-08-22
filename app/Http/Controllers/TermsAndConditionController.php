@@ -64,7 +64,7 @@ class TermsAndConditionController extends Controller
 
         $firstDataId = TermsAndCondition::first()->id;
 
-        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($firstDataId))->with('success', 'Terms and Condition created successfully');
+        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($firstDataId))->with('success', 'Terms and Conditions created successfully');
     }
 
     public function edit($id)
@@ -93,7 +93,7 @@ class TermsAndConditionController extends Controller
             'description' => $request->terms_condition_edit_description,
         ]);
 
-        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($id))->with('success', 'Terms and Condition updated successfully');
+        return redirect()->route('terms-and-condition.edit', Helpers::encrypt($id))->with('success', 'Terms and Conditions updated successfully');
     }
 
     public function destroy(Request $request)
@@ -104,7 +104,7 @@ class TermsAndConditionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Terms and Condition deleted successfully',
+            'message' => 'Terms and Conditions deleted successfully',
         ]);
     }
 }
