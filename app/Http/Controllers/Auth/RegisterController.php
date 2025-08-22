@@ -60,7 +60,7 @@ class RegisterController extends Controller
                     ->symbols(),
             ],
             'company_name' => 'required|string',
-            'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
+            'fca_number' => 'required|numeric|min:6|unique:users,fca_number|unique:fca_numbers,fca_number',
             'website' => 'nullable|string|url',
         ], [
             // General password messages

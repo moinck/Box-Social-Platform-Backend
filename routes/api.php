@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
 use App\Http\Controllers\Api\UserDownloadsManagementApiController;
+use App\Http\Controllers\Api\UserManagementApiController;
 use App\Http\Controllers\Api\UserSubscriptionHistoryApiController;
 use App\Http\Controllers\Api\UserSubscriptionNewApiController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
@@ -126,6 +127,9 @@ Route::group([
         // user images routes
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
         Route::post('/user-image/delete', [StockImageApiController::class, 'delete']);
+
+        // user management api
+        Route::post('/user-account/delete', [UserManagementApiController::class, 'deleteUserAccount']);
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
