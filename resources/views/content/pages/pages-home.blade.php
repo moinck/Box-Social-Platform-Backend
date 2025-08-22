@@ -498,7 +498,7 @@
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
                     customClass: {
-                        confirmButton: 'btn btn-primary me-3',
+                        confirmButton: 'btn btn-danger me-3',
                         cancelButton: 'btn btn-outline-secondary'
                     },
                     buttonsStyling: false
