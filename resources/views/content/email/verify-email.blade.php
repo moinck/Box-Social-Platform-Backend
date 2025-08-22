@@ -18,7 +18,7 @@
     <!-- Description -->
     <div class="email-description"
         style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
-        Just one more step — tap the button below to confirm your email and unlock your full experience.
+        Just one more step…Please confirm your email address by tapping the button below
     </div>
 
     <!-- CTA Button -->
