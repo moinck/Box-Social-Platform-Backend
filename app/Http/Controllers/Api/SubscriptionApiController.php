@@ -149,6 +149,9 @@ class SubscriptionApiController extends Controller
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
+            // send notification to admin
+            Helpers::sendNotification($user, 'new-subscription');
+
             // if FREE-TRIAL plan create free subscription without stripe
             if ($subscriptionPlanDetail->slug == 'free-trial') {
                 $this->createFreeTrialSubscription($userId,$newSubscription->id);

@@ -676,15 +676,19 @@ class Helpers
     {
         $title = "";
         $body = "";
+        $fullName = ($data->first_name ?? '')." ".($data->last_name ?? '');
         switch ($type) {
             case 'new-registration':
-                $fullName = $data->first_name." ".$data->last_name;
                 $title = "New Registration";
                 $body = "New user ".$fullName." registered";
                 break;
             case 'new-contact-us':
                 $title = "New Feedback";
                 $body = "New feedback is given by ".$data->name;
+                break;
+            case 'new-subscription':
+                $title = "New Subscription";
+                $body = "User " .$fullName." taken subscription";
                 break;
             default:
                 $title = "New Notification";
