@@ -27,7 +27,10 @@ class CopyExistFcaNumbers extends Command
      */
     public function handle()
     {
-        $users = User::all();
+        $users = User::select('fca_number', 'company_name')->where('role','!=','admin')->get();
+        $this->info('Total users: ' . $users->count());
+        
+        // copy all exist fca numbers
         foreach ($users as $user) {
             FcaNumbers::updateOrCreate([
                 'fca_number' => $user->fca_number,
@@ -35,5 +38,7 @@ class CopyExistFcaNumbers extends Command
                 'fca_name' => $user->company_name,
             ]);
         }
+
+        $this->info('FCA numbers copied successfully.');
     }
 }
