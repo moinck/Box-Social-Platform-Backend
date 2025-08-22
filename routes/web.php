@@ -13,6 +13,7 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\CookiePolicyController;
 use App\Http\Controllers\IconManagementController;
 use App\Http\Controllers\IconMangementsController;
 use App\Http\Controllers\ImageStockManagementController;
@@ -166,6 +167,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/terms-and-condition/update', [TermsAndConditionController::class, 'update'])->name('terms-and-condition.update');
         Route::get('/terms-and-condition/datatable', [TermsAndConditionController::class, 'dataTable'])->name('terms-and-condition.data-table');
         Route::post('/terms-and-condition/delete', [TermsAndConditionController::class, 'destroy'])->name('terms-and-condition.delete');
+
+        // cookie policy controller
+        Route::get('/cookie-policy', [CookiePolicyController::class, 'cookiePolicy'])->name('cookie-policy');
+        Route::post('cookie-policy/save', [CookiePolicyController::class, 'saveCookiePolicy'])->name('cookie-policy.save');
+        
     });
     
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');

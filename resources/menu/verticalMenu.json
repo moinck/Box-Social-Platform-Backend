@@ -83,6 +83,13 @@
             "icon": "menu-icon tf-icons ri-newspaper-line",
             "slug": "terms-and-condition",
             "role": ["admin"]
+        },
+        {
+            "url": "/cookie-policy",
+            "name": "Cookie Policy",
+            "icon": "menu-icon tf-icons ri-shield-line",
+            "slug": "cookie-policy",
+            "role": ["admin"]
         }
     ]
 }

@@ -163,6 +163,7 @@ Route::group([
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
 Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
+Route::get('/cookie-policy', [TermsAndConditionApiController::class, 'cookiePolicy']);
 
 
 
