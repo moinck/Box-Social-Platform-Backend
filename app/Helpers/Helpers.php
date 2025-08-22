@@ -4,8 +4,14 @@ namespace App\Helpers;
 
 use App\Events\NewNotificationEvent;
 use App\Mail\RegisterVerificationMail;
+use App\Models\BrandKit;
+use App\Models\FcaNumbers;
+use App\Models\ImageStockManagement;
 use App\Models\Notification;
+use App\Models\User;
+use App\Models\UserDownloads;
 use App\Models\UserSubscription;
+use App\Models\UserTemplates;
 use App\Models\UserTokens;
 use App\Notifications\CustomVerifyEmail;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,6 +19,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -676,15 +683,19 @@ class Helpers
     {
         $title = "";
         $body = "";
+        $fullName = ($data->first_name ?? '')." ".($data->last_name ?? '');
         switch ($type) {
             case 'new-registration':
-                $fullName = $data->first_name." ".$data->last_name;
                 $title = "New Registration";
                 $body = "New user ".$fullName." registered";
                 break;
             case 'new-contact-us':
                 $title = "New Feedback";
                 $body = "New feedback is given by ".$data->name;
+                break;
+            case 'new-subscription':
+                $title = "New Subscription";
+                $body = "User " .$fullName." taken subscription";
                 break;
             default:
                 $title = "New Notification";
@@ -1063,5 +1074,101 @@ class Helpers
             'Cache-Control'       => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma'              => 'no-cache',
         ]);
+    }
+
+    /**
+     * Delete User's all Data
+     * @param mixed $userId
+     * @return bool
+     */
+    public static function deleteUserData($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) {
+            return false;
+        }
+        try {
+            DB::beginTransaction();
+
+            // add fca number
+            FcaNumbers::updateOrCreate([
+                'fca_number' => $user->fca_number,
+            ], [
+                'fca_name' => $user->company_name,
+            ]);
+    
+            // stock image delete
+            // $user->imageStockManagement()->delete();
+            $allDeleteImageData = ImageStockManagement::where('user_id', $userId)->get();
+    
+            foreach ($allDeleteImageData as $value) {
+                Helpers::deleteImage($value->image_url);
+                $value->delete();
+            }
+    
+            // brand kit delete
+            // $user->brandKit()->delete();
+            $userBrandKit = BrandKit::where('user_id', $userId)->first();
+            if (!empty($userBrandKit)) {
+                Helpers::deleteImage($userBrandKit->logo);
+                $userBrandKit->delete();
+            }
+    
+            // subscription (all) delete
+            // $user->subscription()->delete();
+            $userSubscription = UserSubscription::where('user_id', $userId)->get();
+            if (!empty($userSubscription)) {
+                foreach ($userSubscription as $value) {
+                    if ($value->plan_id != 1) {
+                        $stripe = new StripeClient(config('services.stripe.secret_key'));
+                        // first cancel subscription from stripe
+                        $stripe->subscriptions->cancel($value->stripe_subscription_id, [
+                            'cancellation_details' => [
+                                'comment' => 'user deleted their account',
+                                'reason' => 'account_deleted',
+                            ],
+                        ]);
+    
+                        $value->delete();
+                    } else {
+                        $value->delete();
+                    }
+                }
+            }
+    
+            // user downloads
+            $userDownloads = UserDownloads::where('user_id', $userId)->get();
+            if (!empty($userDownloads)) {
+                foreach ($userDownloads as $value) {
+                    $value->delete();
+                }
+            }
+    
+            // user template delete
+            $userTemplate = UserTemplates::where('user_id', $userId)->get();
+            if (!empty($userTemplate)) {
+                foreach ($userTemplate as $value) {
+                    Helpers::deleteImage($value->template_image);
+                    $value->delete();
+                }
+            }
+    
+            // delete usertokens
+            $userTokens = UserTokens::where('user_id', $userId)->get();
+            if (!empty($userTokens)) {
+                foreach ($userTokens as $value) {
+                    $value->delete();
+                }
+            }
+    
+            $user->delete();
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            // dd($e);
+            Helpers::sendErrorMailToDeveloper($e,'User account delete API.');
+            return false;
+        }   
     }
 }

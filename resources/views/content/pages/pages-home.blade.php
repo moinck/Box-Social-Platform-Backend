@@ -493,11 +493,12 @@
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You want to delete " + userName + " account!",
+                    footer: '<p class="text-danger mb-0">Note: All data associated with this account will be deleted.</p>',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
                     customClass: {
-                        confirmButton: 'btn btn-primary me-3',
+                        confirmButton: 'btn btn-danger me-3',
                         cancelButton: 'btn btn-outline-secondary'
                     },
                     buttonsStyling: false

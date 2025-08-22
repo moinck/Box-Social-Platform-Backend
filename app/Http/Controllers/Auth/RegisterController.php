@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Models\BrandKit;
+use App\Models\FcaNumbers;
 use App\ResponseTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -59,7 +60,7 @@ class RegisterController extends Controller
                     ->symbols(),
             ],
             'company_name' => 'required|string',
-            'fca_number' => 'required|numeric|min:6|unique:users,fca_number',
+            'fca_number' => 'required|numeric|min:6|unique:users,fca_number|unique:fca_numbers,fca_number',
             'website' => 'nullable|string|url',
         ], [
             // General password messages
@@ -98,6 +99,12 @@ class RegisterController extends Controller
                 'website' => $request->website,
                 'fca_number' => $request->fca_number,
                 'is_verified' => false,
+            ]);
+
+            // save fca number
+            FcaNumbers::create([
+                'fca_number' => $request->fca_number,
+                'fca_name' => $request->company_name,
             ]);
 
             // send notification of new registration

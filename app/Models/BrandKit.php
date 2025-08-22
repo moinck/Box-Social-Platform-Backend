@@ -15,7 +15,8 @@ class BrandKit extends Model
         'design_style_id',
         'base64_logo',
         'warning_title',
-        'warning_message'
+        'warning_message',
+        'logo',
     ];
 
     public function designStyle()

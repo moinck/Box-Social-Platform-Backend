@@ -162,33 +162,6 @@ class UserManagementController extends Controller
     }
 
     /**
-     * delete User
-     * @param \Illuminate\Http\Request $request
-     * @return mixed|\Illuminate\Http\JsonResponse
-     */
-    public function destroy(Request $request)
-    {
-        $userId = Helpers::decrypt($request->user_id);
-        $user = User::find($userId);
-        if ($user) {
-            if ($user->profile_image != null) {
-                Helpers::deleteImage($user->profile_image);
-            }
-            $user->hasBrandKit() ? $user->brandKit()->delete() : null;
-            $user->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted successfully.'
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found.'
-            ]);
-        }
-    }
-
-    /**
      * change User account status
      * @param \Illuminate\Http\Request $request
      * @return mixed|\Illuminate\Http\JsonResponse
@@ -262,6 +235,36 @@ class UserManagementController extends Controller
             return Excel::download(new UsersExport($users), $name . '.csv');
         } else {
             return Excel::download(new UsersExport($users), $name . '.xlsx');
+        }
+    }
+
+    /**
+     * delete User
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request)
+    {
+        $userId = Helpers::decrypt($request->user_id);
+        $user = User::find($userId);
+        if ($user) {
+            $deleteUser = Helpers::deleteUserData($userId);
+            if ($deleteUser === true) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User deleted successfully.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not deleted.'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.'
+            ]);
         }
     }
 }
