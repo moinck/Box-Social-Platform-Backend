@@ -93,11 +93,11 @@ class UserSubscription extends Model
     /**
      * Record a download (post download or creation - both count as 1)
      */
-    public function recordDownload($count = 1)
+    public function recordDownload($count = 1, $type=null) // $type = 1 => For Saved, 2 => For Download
     {
         $tracker = $this->downloadTracker;
         
-        return $tracker->incrementDownload($count);
+        return $tracker->incrementDownload($count,$type);
     }
 
     /**
@@ -108,5 +108,15 @@ class UserSubscription extends Model
         $tracker = $this->downloadTracker;
         
         return $tracker->canDownload();
+    }
+
+    /**
+     * Check if user can saved
+     */
+    public function canSaved()
+    {
+        $tracker = $this->downloadTracker;
+
+        return $tracker->canSaved();
     }
 }

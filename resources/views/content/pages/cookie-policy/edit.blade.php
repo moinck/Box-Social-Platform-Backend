@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Edit Terms and Condition')
+@section('title', 'Edit Cookie Policy')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -34,32 +34,31 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Edit Terms & Conditions</h4>
+                    <h4 class="card-title mb-0">@if($cookiePolicy) Edit @else Add @endif Cookie Policy</h4>
                 </div>
                 <div class="card-body mt-2">
-                    <form id="edit-terms-condition-form" action="{{ route('terms-and-condition.update') }}" class="row g-5"
+                    <form id="edit-privacy-policy-form" action="{{ route('cookie-policy.save') }}" class="row g-5"
                         method="POST" enctype="multipart/form-data">
                         @csrf
-
-                        <input type="hidden" name="terms_condition_id" value="{{ $encryptedEditId }}" />
+                        <input type="hidden" name="cookie_policy_id" value="{{ $cookiePolicy ? $cookiePolicy->id : '' }}" />
 
                         {{-- title --}}
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="title" name="title" class="form-control"
-                                    placeholder="Title" value="{{ $termsAndCondition->title }}" />
+                                    placeholder="Title" value="{{ $cookiePolicy ? $cookiePolicy->title : '' }}" />
                                 <label for="title">Title</label>
                             </div>
                         </div>
 
                         {{-- quill text description --}}
                         <div class="col-12">
-                            <div id="terms_condition_edit_description">{!! $termsAndCondition->description !!}</div>
-                            <input type="hidden" name="terms_condition_edit_description" id="hiddenTermsConditionDescription"
-                                value="{{ $termsAndCondition->description }}" />
+                            <div id="cookie_policy_description">{!! $cookiePolicy ? $cookiePolicy->description : '' !!}</div>
+                            <input type="hidden" name="cookie_policy_description" id="hiddenCookiePolicyDescription"
+                                value="{{ $cookiePolicy ? $cookiePolicy->description : '' }}" />
                         </div>
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary">{{ $cookiePolicy ? 'Update' : 'Create' }}</button>
                             <button type="reset" class="btn btn-outline-secondary" id="cancelEditTermsConditionBtn">
                                 Cancel
                             </button>
@@ -137,8 +136,8 @@
                 ['clean']
             ];
 
-            const createTermsConditionDescription = new Quill('#terms_condition_edit_description', {
-                bounds: '#terms_condition_edit_description',
+            const createCookiePpolicyDescription = new Quill('#cookie_policy_description', {
+                bounds: '#cookie_policy_description',
                 placeholder: 'Type Something...',
                 modules: {
                     formula: true,
@@ -147,12 +146,12 @@
                 theme: 'snow'
             });
             // update hidden post description
-            createTermsConditionDescription.on('text-change', function() {
+            createCookiePpolicyDescription.on('text-change', function() {
                 // $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 $('.ql-editor').hasClass('ql-blank') ?
-                    $('#hiddenTermsConditionDescription').val('') :
-                    $('#hiddenTermsConditionDescription').val(createTermsConditionDescription.root.innerHTML);
-                validator.revalidateField('terms_condition_edit_description');
+                    $('#hiddenCookiePolicyDescription').val('') :
+                    $('#hiddenCookiePolicyDescription').val(createCookiePpolicyDescription.root.innerHTML);
+                validator.revalidateField('cookie_policy_description');
             });
 
             // cancel create post content
@@ -160,7 +159,7 @@
             });
 
             // profile form validation
-            const formValidationExamples = document.getElementById('edit-terms-condition-form');
+            const formValidationExamples = document.getElementById('edit-privacy-policy-form');
             const validator = FormValidation.formValidation(formValidationExamples, {
                 fields: {
                     title: {
@@ -170,7 +169,7 @@
                             }
                         }
                     },
-                    terms_condition_edit_description: {
+                    cookie_policy_description: {
                         validators: {
                             notEmpty: {
                                 message: 'Please enter description'
@@ -183,7 +182,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
-                            if (['title', 'terms_condition_edit_description'].includes(
+                            if (['title', 'cookie_policy_description'].includes(
                                     field)) {
                                 return '.col-12';
                             }
@@ -194,7 +193,7 @@
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 }
             }).on('core.form.valid', function() {
-                $('#edit-terms-condition-form').submit();
+                $('#edit-privacy-policy-form').submit();
             });
             // -----------------------------------------------------
         });

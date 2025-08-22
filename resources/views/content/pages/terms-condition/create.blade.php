@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Create Terms and Condition</h4>
+                    <h4 class="card-title mb-0">Create Terms & Conditions</h4>
                 </div>
                 <div class="card-body mt-2">
                     <form id="create-terms-condition-form" action="{{ route('terms-and-condition.store') }}" class="row g-5"

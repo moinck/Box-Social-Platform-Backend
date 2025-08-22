@@ -109,6 +109,7 @@ Route::group([
         // user downloads Mangement
         Route::get('/user-downloads/state', [UserDownloadsManagementApiController::class, 'currentState']);
         Route::get('/user-downloads/increment', [UserDownloadsManagementApiController::class, 'incrementDownload']);
+        Route::get('/saved-template-count/increment', [UserDownloadsManagementApiController::class, 'incrementSavedTemplateCount']);
 
         /** New Subscription API */
         Route::post('/user-subscription/subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
@@ -166,6 +167,7 @@ Route::group([
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
 Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
+Route::get('/cookie-policy', [TermsAndConditionApiController::class, 'cookiePolicy']);
 
 
 

@@ -281,6 +281,9 @@ class ProfileManagementApiController extends Controller
         $user->password = Hash::make($request->new_password);
         $user->save();
 
+         // 🔹 Logout from current device only
+        $user->tokens()->delete();
+
         return $this->success([], 'Password updated successfully');
     }
 }
