@@ -87,7 +87,7 @@
         {
             "url": "/cookie-policy",
             "name": "Cookie Policy",
-            "icon": "menu-icon tf-icons ri-shield-line",
+            "icon": "menu-icon tf-icons ri-shield-check-line",
             "slug": "cookie-policy",
             "role": ["admin"]
         }
