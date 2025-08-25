@@ -25,7 +25,6 @@
         }
         table th, table td {
             border: 1px solid #ddd;
-            padding: 8px;
         }
         table th {
             background: #f8f8f8;
@@ -51,8 +50,9 @@
         <!-- Header -->
         <table style="width:100%; margin-bottom:20px; border:none;">
             <tr style="border:none;">
-                <td style="border:none; font-size:20px; font-weight:bold; display:flex; align-items:center;">
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/box-logo-horizontal.png'))) }}" style="height:45px;">
+                <td style="border:none; display:flex; align-items:center;">
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/box-logo-horizontal.png'))) }}" style="height:45px;"></br>
+                    
                 </td>
                 <td style="border:none; text-align:right; vertical-align:middle;">
                     @if ($subscription->invoice_number)
@@ -62,7 +62,18 @@
                 </td>
             </tr>
         </table>
-
+        <table style="width:100%; margin-bottom:20px; border:none;">
+            <tr style="border:none;">
+                <td style="border:none; display:flex; align-items:center;">
+                    <p><strong>IsocialCircle Ltd trading as Box Socials</strong><br><strong>Company number: </strong>10916328</p>
+                    
+                </td>
+                <td style="border:none; text-align:right; vertical-align:middle;">
+                    <p><strong>Registered address:</strong><br>Basildon Essex SS14 3JJ United Kingdom</p>
+                </td>
+            </tr>
+        </table>
+        <hr>
         <!-- Billed To -->
         <div class="heading">Billed To</div>
         <p>
@@ -95,7 +106,7 @@
 
         <!-- Payment Summary -->
         <div class="heading">Payment Summary</div>
-        <table>
+        <table style="width:100%; margin-bottom:35px;">
             <tbody>
                 <tr>
                     <td>Subtotal</td>
@@ -108,10 +119,23 @@
                 @if ($subscription->plan_id != 1)
                 <tr>
                     <td>Status</td>
-                    <td class="text-right">{{ ucwords($subscription->stripe_status) }}</td>
+                    <td class="text-right" style="color:green;"><strong>{{ ucwords($subscription->stripe_status) }}</strong></td>
                 </tr>
                 @endif
             </tbody>
+        </table>
+
+        <hr>
+
+        <table style="width:100%; margin-bottom:20px; border:none;">
+            <tr style="border:none;">
+                <td style="border:none; display:flex; align-items:center;">
+                    <p><strong>Need help?</strong><br> Reach out to us at <a href="mailto:help@boxsocials.com">help@boxsocials.com   </a></p>
+                </td>
+                <td style="border:none; text-align:right; vertical-align:middle;">
+                    <p><strong>Website: </strong><br><a href="www.boxsocials.com">www.boxsocials.com</a></p>
+                </td>
+            </tr>
         </table>
 
         <!-- Footer -->

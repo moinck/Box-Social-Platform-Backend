@@ -89,11 +89,13 @@ class UserDownloadsManagementApiController extends Controller
                         'expires_at' => $today
                     ]);
                 }
+                $response = ["download_count_details" => $downloadCountStats];
 
-                return $this->success($downloadCountStats,'Subscription download limit updated successfully');
+                return $this->success($response,'Subscription download limit updated successfully');
             } else {
                 $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
-                return $this->success($downloadCountStats,'Subscription download limit exceeded');
+                $response = ["download_count_details" => $downloadCountStats];
+                return $this->success($response,'Subscription download limit exceeded');
             }
         }
     }
@@ -127,7 +129,7 @@ class UserDownloadsManagementApiController extends Controller
         $savedCountStats = [];
 
         if ($subscription) {
-            $increaseCount = $request->has('increase_count') && $request->increse_count > 0 ? $request->increse_count : 1;
+            $increaseCount = $request->has('increase_count') && $request->increase_count > 0 ? $request->increase_count : 1;
             $savedCountStats = $subscription->downloadTracker->getDownloadStats();
             $remainingMonthlySaved = $savedCountStats['saved_monthly_remaining_limit'];
 
