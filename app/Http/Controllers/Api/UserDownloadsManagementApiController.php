@@ -89,13 +89,12 @@ class UserDownloadsManagementApiController extends Controller
                         'expires_at' => $today
                     ]);
                 }
-                $response = ["download_count_details" => $downloadCountStats];
 
-                return $this->success($response,'Subscription download limit updated successfully');
+                return $this->success($downloadCountStats,'Subscription download limit updated successfully');
             } else {
+                
                 $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
-                $response = ["download_count_details" => $downloadCountStats];
-                return $this->success($response,'Subscription download limit exceeded');
+                return $this->success($downloadCountStats,'Subscription download limit exceeded');
             }
         }
     }
