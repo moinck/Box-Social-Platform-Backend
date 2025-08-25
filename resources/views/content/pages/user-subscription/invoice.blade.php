@@ -69,7 +69,7 @@
                     
                 </td>
                 <td style="border:none; text-align:right; vertical-align:middle;">
-                    <p><strong>Registered address:</strong><br>Basildon Essex SS14 3JJ United Kingdom</p>
+                    <p><strong>Registered address:</strong><br>4 Capricorn Centre, Cranes Farm Road, <br> Basildon Essex SS14 3JJ United Kingdom</p>
                 </td>
             </tr>
         </table>
