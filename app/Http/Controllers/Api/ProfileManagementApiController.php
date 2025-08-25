@@ -155,10 +155,7 @@ class ProfileManagementApiController extends Controller
         $user = User::with('subscription:id,user_id')->find($userId);
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        $user->company_name = $request->company_name;
-        $user->fca_number = $request->fca_number;
         $user->website = $request->website;
-        $user->email = $request->email;
         $user->save();
 
         $returnData = [];
@@ -284,6 +281,7 @@ class ProfileManagementApiController extends Controller
          // 🔹 Logout from current device only
         $user->tokens()->delete();
 
-        return $this->success([], 'Password updated successfully');
+        return response()->json(['status' => 'error','message' => 'Password changed.',], 401);
+
     }
 }
