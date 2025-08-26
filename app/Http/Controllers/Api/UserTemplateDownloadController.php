@@ -12,6 +12,7 @@ use PhpOffice\PhpWord\IOFactory;
 use App\Models\PostTemplate;
 use App\Helpers\Helpers;
 use App\Models\BrandKit;
+use App\Models\User;
 use App\Models\UserSubscription;
 
 class UserTemplateDownloadController extends Controller
@@ -38,6 +39,17 @@ class UserTemplateDownloadController extends Controller
                 'status' => 'error',
                 'message' => 'User Template not found',
             ]);
+        }
+
+        // get users Detail
+        $userDetail = User::select('id','first_name','last_name','email')
+            ->where('id', $userTemplates->first()->user_id)
+            ->first();
+        
+        if (!empty($userDetail)) {
+            $fullName = $userDetail->first_name . ' ' . $userDetail->last_name;
+        } else {
+            $fullName = 'Template Name';
         }
         
         // Create a new Word document (moved outside the loop)
@@ -126,7 +138,9 @@ class UserTemplateDownloadController extends Controller
     
             $updatedDescription = null;
             if (!empty($postContentData->description)) {
-                $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'], [$brnadKitData['company_name'] ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''], $postContentData->description);
+                $updatedDescription = str_replace(['|name|', '|email|', '|phone|', '|website|'],
+                    [$fullName ?? '', $brnadKitData['email'] ?? '', $brnadKitData['phone'] ?? '', $brnadKitData['website'] ?? ''],
+                    $postContentData->description);
             }
     
             if (!empty($postContentData)) {
