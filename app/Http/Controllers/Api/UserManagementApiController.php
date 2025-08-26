@@ -44,7 +44,7 @@ class UserManagementApiController extends Controller
 
         $deleteUser = Helpers::deleteUserData($userId);
         if ($deleteUser === true) {
-            return $this->success([], 'Your Account deleted successfully');
+            return $this->success([], 'Your Account deleted successfully', 401);
         } else {
             return $this->error('Something went wrong', 500);
         }

@@ -50,8 +50,8 @@
     </div> --}}
 
     <!-- Description -->
-    <div class="email-description"
+    {{-- <div class="email-description"
         style="text-align: left; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
         If you find any issue or have any questions, please contact support at <a href="mailto:help@boxsocials.com" style="color: #F4D106;">help@boxsocials.com</a>.
-    </div>
+    </div> --}}
 @endsection
