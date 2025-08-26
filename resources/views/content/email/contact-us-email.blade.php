@@ -7,7 +7,7 @@
     {{-- this email send to admin , to inform that new contact form is submitted --}}
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="Box Social Logo" class="logo-img"
+        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="Box Socials Logo" class="logo-img"
             style="width: 100; height: 100px; display: block; margin: 0 auto;">
     </div>
 

@@ -479,7 +479,7 @@
                                                                                         <td class="t46">
                                                                                             <p class="t45"
                                                                                                 style="margin:0;Margin:0;font-family:Roboto,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">
-                                                                                                The Box Social Team</p>
+                                                                                                The Box Socials Team</p>
                                                                                         </td>
                                                                                     </tr>
                                                                                 </table>
