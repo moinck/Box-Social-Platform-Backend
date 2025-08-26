@@ -27,13 +27,13 @@ class PaymentsController extends Controller
                 $name = $payment->user->first_name . ' ' . $payment->user->last_name;
                 return $name;
             })
-            ->addColumn('payment_id', function ($payment) {
-                if ($payment->stripe_payment_intent_id) {
-                    $subscription = UserSubscription::select('id','stripe_subscription_id')->where('stripe_payment_method_id', $payment->stripe_payment_intent_id)->first();
-                    return $subscription ? $subscription->stripe_subscription_id : 'N/A';
-                }
-                return 'N/A';
-            })
+            // ->addColumn('payment_id', function ($payment) {
+            //     if ($payment->stripe_payment_intent_id) {
+            //         $subscription = UserSubscription::select('id','stripe_subscription_id')->where('stripe_payment_method_id', $payment->stripe_payment_intent_id)->first();
+            //         return $subscription ? $subscription->stripe_subscription_id : 'N/A';
+            //     }
+            //     return 'N/A';
+            // })
             ->addColumn('plan', function ($payment) {
                 return $payment->plan_name;
             })

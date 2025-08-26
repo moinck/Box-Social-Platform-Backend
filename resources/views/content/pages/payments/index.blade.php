@@ -44,7 +44,7 @@
                     <tr>
                         <th>No</th>
                         <th>User</th>
-                        <th>Payment Method ID</th>
+                        {{-- <th>Payment Method ID</th> --}}
                         <th>Subscription Plan</th>
                         <th>Amount</th>
                         <th>Payment Method</th>
@@ -114,7 +114,7 @@
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'user', name: 'user'},
-                        { data: 'payment_id', name: 'payment_id'},
+                        // { data: 'payment_id', name: 'payment_id'},
                         { data: 'plan_name', name: 'plan_name'},
                         { data: 'amount', name: 'amount'},
                         { data: 'payment_method', name: 'payment_method'},
