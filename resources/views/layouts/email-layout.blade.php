@@ -70,7 +70,7 @@
                     <div class="footer-text" style="text-align: center; font-size: 13px; color: #999; margin-top: 40px; line-height: 1.6;">
                         {{-- Didn't request this email?<br>
                         You can safely ignore it, and no changes will be made.<br><br> --}}
-                        <strong>— The Box Social Team</strong>
+                        <strong>— The Box Socials Team</strong>
                     </div>
                     
                 </div>
