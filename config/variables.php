@@ -1,10 +1,10 @@
 <?php
 // Variables
 return [
-  "creatorName" => "Box Social Platform",
+  "creatorName" => "Box Socials Platform",
   "creatorUrl" => "http://178.128.45.173:9162/",
-  "templateName" => "Box Social Platform",
-  "templateSuffix" => "Box Social Platform",
+  "templateName" => "Box Socials Platform",
+  "templateSuffix" => "Box Socials Platform",
   "templateVersion" => "2.0.0",
   "templateFree" => false,
   "templateDescription" => "",
