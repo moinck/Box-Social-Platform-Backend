@@ -341,6 +341,7 @@ class SubscriptionApiController extends Controller
                 // create new payments record
                 $newPayment = new Payments();
                 $newPayment->user_id = $userSubscription->user_id;
+                $newPayment->user_subscription_id = $userSubscription->id;
                 $newPayment->plan_name = $userSubscription->plan->name ?? "Subscription Plan";
                 $newPayment->status = 'completed';
                 $newPayment->amount = $invoice['total'] / 100;
