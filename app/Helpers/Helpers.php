@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pusher\Pusher;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
 
 class Helpers
@@ -1120,14 +1122,37 @@ class Helpers
             if (!empty($userSubscription)) {
                 foreach ($userSubscription as $value) {
                     if ($value->plan_id != 1) {
-                        $stripe = new StripeClient(config('services.stripe.secret_key'));
-                        // first cancel subscription from stripe
-                        $stripe->subscriptions->cancel($value->stripe_subscription_id, [
-                            'cancellation_details' => [
-                                'comment' => 'user deleted their account',
-                                // 'reason' => 'account_deleted',
-                            ],
-                        ]);
+
+                        if (!empty($value->stripe_subscription_id)) {
+                            try {
+
+                                $stripe = new StripeClient(config('services.stripe.secret_key'));
+
+                                // Always fetch the subscription from Stripe
+                                $stripeSub = $stripe->subscriptions->retrieve($value->stripe_subscription_id, []);
+
+                                // Cancel if it's not already canceled
+                                if ($stripeSub->status !== 'canceled') {
+                                    // first cancel subscription from stripe
+                                    $stripe->subscriptions->cancel($value->stripe_subscription_id, [
+                                        'cancellation_details' => [
+                                            'comment' => 'user deleted their account',
+                                            // 'reason' => 'account_deleted',
+                                        ],
+                                    ]);
+                                }
+
+                            } catch (InvalidRequestException $e) {
+                                // Most common: "No such subscription" (already deleted or never existed)
+                                Log::warning("Stripe invalid request for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            } catch (ApiErrorException $e) {
+                                // Any other Stripe API error (network, auth, etc.)
+                                Log::error("Stripe API error for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            } catch (\Exception $e) {
+                                // Catch-all for unexpected issues
+                                Log::error("Unexpected error for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            }
+                        }
     
                         $value->delete();
                     } else {
