@@ -1125,7 +1125,7 @@ class Helpers
                         $stripe->subscriptions->cancel($value->stripe_subscription_id, [
                             'cancellation_details' => [
                                 'comment' => 'user deleted their account',
-                                'reason' => 'account_deleted',
+                                // 'reason' => 'account_deleted',
                             ],
                         ]);
     
@@ -1167,6 +1167,7 @@ class Helpers
         } catch (Exception $e) {
             DB::rollBack();
             // dd($e);
+            Log::error($e);
             Helpers::sendErrorMailToDeveloper($e,'User account delete API.');
             return false;
         }   

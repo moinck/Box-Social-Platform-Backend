@@ -234,7 +234,7 @@ class SubscriptionApiController extends Controller
                 'company_name' => !empty($user_details) ? $user_details['company_name'] : null,
                 'address' => $user_details ? $user_details['address'] : null,
                 'country' => $user_details ? $user_details['country'] : null,
-                'email' => $user_details ? $user_details['email'] : null,
+                'email' => $user->email,
                 'first_name' => $user_details ? $user_details['first_name'] : null,
                 'last_name' => $user_details ? $user_details['last_name'] : null,
                 'postal_code' => $user_details ? $user_details['postal_code'] : null,
