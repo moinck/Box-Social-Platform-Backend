@@ -170,7 +170,7 @@
                 ['link', 'image', 'video', 'formula'],
                 [
                     {'insert-name': 'Name'},
-                    {'insert-email': 'Email'},
+                    // {'insert-email': 'Email'},
                     {'insert-phone': 'Phone'},
                     {'insert-website': 'Website'},
                 ],
