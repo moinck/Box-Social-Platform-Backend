@@ -147,6 +147,7 @@ class SubscriptionApiController extends Controller
             $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit ?? 0;
             $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit ?? 0;
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
+            $newSubscription->stripe_status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->save();
 
             // send notification to admin
@@ -198,7 +199,20 @@ class SubscriptionApiController extends Controller
 
             // Store session ID for verification
             $newSubscription->stripe_subscription_id = $subscription->id;
-            $newSubscription->save();   
+            $newSubscription->stripe_payment_method_id = $request->payment_method;
+            $newSubscription->client_secret = $subscription->latest_invoice->confirmation_secret->client_secret;
+            $newSubscription->save(); 
+            
+            $newPayment = new Payments();
+            $newPayment->user_id = $newSubscription->user_id;
+            $newPayment->user_subscription_id = $newSubscription->id;
+            $newPayment->plan_name = $subscriptionPlanDetail->name;
+            $newPayment->status = 'pending';
+            $newPayment->amount = 0.00;
+            $newPayment->currency = 'GBP';
+            $newPayment->payment_type = 'subscription';
+            $newPayment->payment_method = 'card';
+            $newPayment->save();
 
             DB::commit();
 
@@ -324,10 +338,6 @@ class SubscriptionApiController extends Controller
                 $userSubscription->amount_paid = $invoice['total'] / 100;
                 $userSubscription->currency = $invoice['currency'];
                 $userSubscription->invoice_number = $invoice['number'];
-
-                if (!empty($invoice['default_payment_method'])) {
-                    $userSubscription->stripe_payment_method_id = $invoice['default_payment_method'];
-                }
                 
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
                 $userSubscription->total_download_limit = 40;
@@ -338,16 +348,13 @@ class SubscriptionApiController extends Controller
                 $userSubscription->last_payment_date = now();
                 $userSubscription->save();
 
-                // create new payments record
-                $newPayment = new Payments();
-                $newPayment->user_id = $userSubscription->user_id;
-                $newPayment->plan_name = $userSubscription->plan->name ?? "Subscription Plan";
+                // Update payments record
+                $newPayment = Payments::where('user_subscription_id',$userSubscription->id)->latest()->first();
                 $newPayment->status = 'completed';
                 $newPayment->amount = $invoice['total'] / 100;
                 $newPayment->currency =  $invoice['currency'] ?? 'GBP';
-                $newPayment->payment_type = 'subscription';
                 $newPayment->payment_method = $invoice['payment_settings']['payment_method_types'][0] ?? 'card';
-                $newPayment->stripe_payment_intent_id = $userSubscription->stripe_payment_method_id ? $invoice['default_payment_method'] : null;
+                $newPayment->stripe_payment_intent_id = $userSubscription->stripe_payment_intent_id;
                 $newPayment->save();
             }
         }
@@ -360,6 +367,10 @@ class SubscriptionApiController extends Controller
             $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
             $subscription->status = 'past_due';
             $subscription->save();
+
+            $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
+            $newPayment->status = 'failed';
+            $newPayment->save();
         }
     }
 
@@ -408,7 +419,8 @@ class SubscriptionApiController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'user_subscription_id' => 'required'
+                'user_subscription_id' => 'required',
+                'payment_intent_data' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -425,6 +437,15 @@ class SubscriptionApiController extends Controller
             if (!$user_subscription) {
                 return $this->error('Subscription data not found.', 404);
             }
+
+            $user_subscription->stripe_payment_intent_id = $request->payment_intent_data['id'];
+            $user_subscription->stripe_payment_method_id = $request->payment_intent_data['payment_method'];
+            $user_subscription->client_secret = $request->payment_intent_data['client_secret'];
+            $user_subscription->save();
+
+            $payments = Payments::where('user_subscription_id',$user_subscription_id)->latest()->first();
+            $payments->stripe_payment_intent_id = $request->payment_intent_data['id'];
+            $payments->save();
             
             $returnData = [
                 'id' => $request->user_subscription_id,

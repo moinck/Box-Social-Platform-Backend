@@ -125,6 +125,34 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="direct_authorised" checked="" onclick="return false;">
+                                <label class="form-check-label" for="direct_authorised">
+                                    <span>Directly Authorised</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="2" id="appointed_representative" checked="" onclick="return false;">
+                                <label class="form-check-label" for="appointed_representative">
+                                    <span>Appointed Representative</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-none" id="networkDiv">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="appointed_network" name="appointed_network" class="form-control" readonly onclick="return false;"/>
+                                <label for="appointed_network">Which network are you an Appointed Representative of?</label>
+                            </div>
+                        </div>
+                         <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="company_type" name="company_type" class="form-control" readonly onclick="return false;"/>
+                                <label for="company_type">Are you a sole trader or limited company?</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="user_fca_number" name="user_fca_number" class="form-control"
                                     placeholder="123456789" />
@@ -330,6 +358,33 @@
 
                             $('#user_has_brandkit').prop('checked', response.data.has_brandkit);
                             $('#user_is_verified').prop('checked', response.data.is_verified);
+
+                            
+                            let authType = response.data.authorisation_type;
+
+                            // Set checkboxes
+                            $('#direct_authorised').prop('checked', authType == 1);
+                            $('#appointed_representative').prop('checked', authType == 2);
+                            
+                            // Company Type mapping
+                            let companyType = response.data.company_type == 2 ? "Limited Company" : (response.data.company_type == 1 ? "Sole Trader" : "");
+                            
+                            $("#company_type").val(companyType).prop('readonly', true);
+
+                            if (authType == 2) {
+                                // Show extra fields
+                                $("#networkDiv").removeClass('d-none');
+
+                                // Fill values
+                                $("#appointed_network").val(response.data.appointed_network).prop('readonly', true);
+                            } else {
+                                // Hide extra fields
+                                $("#networkDiv").addClass('d-none');
+
+                                // Clear values (optional)
+                                $("#appointed_network").val('');
+                            }
+
                             $('#edit_user_id').val(userId);
                         } else {
                             // toastr.error(response.message);

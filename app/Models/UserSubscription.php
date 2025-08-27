@@ -20,6 +20,8 @@ class UserSubscription extends Model
         'stripe_price_id',
         'stripe_status',
         'stripe_payment_method_id',
+        'client_secret',
+        'stripe_payment_intent_id',
         'response_meta',
         'amount_paid',
         'currency',

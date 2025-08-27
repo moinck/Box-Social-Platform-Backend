@@ -30,6 +30,9 @@ class User extends Authenticatable
         'password',
         'status',
         'role',
+        'authorisation_type',
+        'appointed_network',
+        'company_type',
         'profile_image',
     ];
 
