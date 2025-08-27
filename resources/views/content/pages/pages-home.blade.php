@@ -146,7 +146,7 @@
                                 <label for="appointed_network">Which network are you an Appointed Representative of?</label>
                             </div>
                         </div>
-                         <div class="col-12 d-none" id="companyTypeDiv">
+                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="company_type" name="company_type" class="form-control" readonly onclick="return false;"/>
                                 <label for="company_type">Are you a sole trader or limited company?</label>
@@ -365,23 +365,24 @@
                             // Set checkboxes
                             $('#direct_authorised').prop('checked', authType == 1);
                             $('#appointed_representative').prop('checked', authType == 2);
+                            
+                            // Company Type mapping
+                            let companyType = response.data.company_type == 2 ? "Limited Company" : (response.data.company_type == 1 ? "Sole Trader" : "");
+                            
+                            $("#company_type").val(companyType).prop('readonly', true);
 
                             if (authType == 2) {
                                 // Show extra fields
-                                $("#networkDiv, #companyTypeDiv").removeClass('d-none');
-
-                                // Company Type mapping
-                                let companyType = response.data.company_type == 2 ? "Limited Company" : "Sole Trader";
+                                $("#networkDiv").removeClass('d-none');
 
                                 // Fill values
                                 $("#appointed_network").val(response.data.appointed_network).prop('readonly', true);
-                                $("#company_type").val(companyType).prop('readonly', true);
                             } else {
                                 // Hide extra fields
-                                $("#networkDiv, #companyTypeDiv").addClass('d-none');
+                                $("#networkDiv").addClass('d-none');
 
                                 // Clear values (optional)
-                                $("#appointed_network, #company_type").val('');
+                                $("#appointed_network").val('');
                             }
 
                             $('#edit_user_id').val(userId);

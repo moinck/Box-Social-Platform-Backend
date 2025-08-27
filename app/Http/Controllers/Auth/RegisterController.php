@@ -64,7 +64,7 @@ class RegisterController extends Controller
             'website' => 'nullable|string|url',
             'authorisation_type' => 'required|numeric',
             'appointed_network'  => 'sometimes|required_if:authorisation_type,2|string|nullable',
-            'company_type'       => 'sometimes|required_if:authorisation_type,2|numeric|nullable',
+            'company_type' => 'required|numeric',
         ], [
             // General password messages
             'password.required' => 'Password is required.',
@@ -74,8 +74,7 @@ class RegisterController extends Controller
             'password.numbers' => 'Password must contain at least one number.',
             'password.symbols' => 'Password must contain at least one symbol.',
             'authorisation_type.required' => 'Please select any one Directly Authorised or an Appointed Representative.',
-            'appointed_network.required_if' => 'Appointed network is required when authorisation type is Appointed Representative.',
-            'company_type.required_if'      => 'Company type is required when authorisation type is Appointed Representative.',
+            'appointed_network.required_if' => 'Appointed network is required when authorisation type is Appointed Representative.'
         ]);
 
         $messages = [
@@ -107,7 +106,7 @@ class RegisterController extends Controller
                 'is_verified' => false,
                 'authorisation_type' => $request->authorisation_type,
                 'appointed_network' => isset($request->appointed_network) ? $request->appointed_network : null,
-                'company_type' => isset($request->company_type) ? $request->company_type : 0,
+                'company_type' => $request->company_type,
             ]);
 
             // save fca number
