@@ -70,7 +70,7 @@
                 <tr>
                     <td>
                         <p style="font-weight: bold;margin:0;">Best regards,</p>
-                        <p style="font-weight: bold;margin-top:0;">Box Social</p>
+                        <p style="font-weight: bold;margin-top:0;">Box Socials</p>
                     </td>
                 </tr>
             </tbody>

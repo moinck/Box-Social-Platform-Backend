@@ -5,7 +5,7 @@
 @section('main-content')
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="Box Social Logo" class="logo-img"
+        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="Box Socials Logo" class="logo-img"
             style="width: 200px; height: auto; display: block; margin: 0 auto;">
     </div>
 
