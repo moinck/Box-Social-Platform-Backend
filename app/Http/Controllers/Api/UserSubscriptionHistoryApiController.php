@@ -71,6 +71,10 @@ class UserSubscriptionHistoryApiController extends Controller
                 'is_plan_canceled' => $val->is_subscription_cancel == true ? true : false,
                 'created_date' => Helpers::dateFormate($val->created_at),
                 'updated_date' => Helpers::dateFormate($val->updated_at),
+                'coupon_name' => $val->coupon_name,
+                'coupon_code' => $val->coupon_code,
+                'coupon_discount' => $val->coupon_discount,
+                'coupon_currency' => $val->coupon_currency
             ];
         }
 

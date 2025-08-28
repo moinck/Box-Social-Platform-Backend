@@ -59,6 +59,9 @@
                         <th>Company Name</th>
                         <th>Email Address</th>
                         <th>FCA number</th>
+                        <th>Authorisation Type</th>
+                        <th>Network Name</th>
+                        <th>Company Type</th>
                         <th>Created Date</th>
                         <th>Account Status</th>
                         <th class="table-action-col">Action</th>
@@ -290,6 +293,9 @@
                         { data: 'company_name', name: 'company_name'},
                         { data: 'email', name: 'email'},
                         { data: 'fca_number', name: 'fca_number'},
+                        { data: 'authorisation_type', name: 'authorisation_type', orderable: false},
+                        { data: 'appointed_network', name: 'appointed_network', orderable: false},
+                        { data: 'company_type', name: 'company_type', orderable: false},
                         { data: 'created_date', name: 'created_date'},
                         { data: 'account_status', name: 'account_status', orderable: false, searchable: false},
                         { data: 'action', name: 'action', orderable: false, searchable: false}
