@@ -99,7 +99,7 @@
                     <td>{{ \Carbon\Carbon::parse($subscription->current_period_start)->format('d-m-Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($subscription->current_period_end)->format('d-m-Y') }}</td>
                     <td>{{ $subscription->plan->interval_count }} {{ ucwords($subscription->plan->interval) }}</td>
-                    <td class="text-right">£{{ $subscription->amount_paid ? $subscription->amount_paid : 0 }}</td>
+                    <td class="text-right">£{{ $subscription->amount_paid ? number_format($subscription->amount_paid + $subscription->coupon_discount,2,'.', '') : 0 }}</td>
                 </tr>
             </tbody>
         </table>
@@ -110,10 +110,16 @@
             <tbody>
                 <tr>
                     <td>Subtotal</td>
-                    <td class="text-right">£{{ $subscription->amount_paid ? $subscription->amount_paid : 0 }}</td>
+                    <td class="text-right">£{{ $subscription->amount_paid ? number_format($subscription->amount_paid + $subscription->coupon_discount,2,'.', '') : 0 }}</td>
                 </tr>
-                <tr class="total">
-                    <td>Total</td>
+                @if($subscription->coupon_code)
+                <tr>
+                    <td>{{ $subscription->coupon_code }} (£{{ $subscription->coupon_discount }} Off)</td>
+                    <td class="text-right" style="color: red;">- £{{ $subscription->coupon_discount ? $subscription->coupon_discount : 0 }}</td>
+                </tr>
+                @endif
+                <tr class="total" style="font-size: 15px;">
+                    <td>Total Amount</td>
                     <td class="text-right">£{{ $subscription->amount_paid ? $subscription->amount_paid : 0 }}</td>
                 </tr>
                 @if ($subscription->plan_id != 1)
