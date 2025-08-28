@@ -68,6 +68,7 @@ class SubscriptionApiController extends Controller
             $userId = Auth::user()->id;
             $user = User::find($userId);
             $user_details = $request->user_details;
+            $coupon_details = isset($request->coupon_details) ? $request->coupon_details : null;
 
             // Get plan details
             $subscriptionPlanDetail = SubscriptionPlans::find($planId);
@@ -173,6 +174,11 @@ class SubscriptionApiController extends Controller
 
             $encyptedId = Helpers::encrypt($newSubscription->id);
 
+            // $paymentMethod = $this->stripe->paymentMethods->create([
+            //     'type' => 'card',
+            //     'card' => ['token' => 'tok_visa'], // predefined test token
+            // ]);
+
             $this->stripe->paymentMethods->attach(
                 $request->payment_method,
                 ['customer' => $userStripeCustomerId]
@@ -188,6 +194,9 @@ class SubscriptionApiController extends Controller
                     'payment_method_types' => ['card'],
                     'save_default_payment_method' => 'on_subscription',
                 ],
+                'discounts' => [
+                    ['coupon' => !empty($coupon_details) ? $coupon_details['coupon'] : null] // correct format
+                ],
                 'expand' => ['latest_invoice.confirmation_secret', 'pending_setup_intent'],
                 'metadata' => [
                     'user_id' => $userId,
@@ -201,7 +210,20 @@ class SubscriptionApiController extends Controller
             $newSubscription->stripe_subscription_id = $subscription->id;
             $newSubscription->stripe_payment_method_id = $request->payment_method;
             $newSubscription->client_secret = $subscription->latest_invoice->confirmation_secret->client_secret;
+            if (!empty($coupon_details)) {
+                $newSubscription->coupon_id = $coupon_details['coupon'];
+                $newSubscription->coupon_code = $coupon_details['coupon_code'];
+                $newSubscription->coupon_name = $coupon_details['coupon_name'];
+                $newSubscription->coupon_type = $coupon_details['discount_type']; // discount_type == amount, percent
+                $newSubscription->coupon_discount = $coupon_details['discount'];
+                $newSubscription->coupon_currency = $coupon_details['currency'];
+            }
             $newSubscription->save(); 
+
+            // $confirmedPayment = $this->stripe->paymentIntents->confirm(
+            //     explode('_secret', $subscription->latest_invoice->confirmation_secret->client_secret)[0],
+            //     ['client_secret' => $subscription->latest_invoice->confirmation_secret->client_secret]
+            // );
             
             $newPayment = new Payments();
             $newPayment->user_id = $newSubscription->user_id;
@@ -209,6 +231,7 @@ class SubscriptionApiController extends Controller
             $newPayment->plan_name = $subscriptionPlanDetail->name;
             $newPayment->status = 'pending';
             $newPayment->amount = 0.00;
+            $newPayment->coupon_discounted_amt = 0.00;
             $newPayment->currency = 'GBP';
             $newPayment->payment_type = 'subscription';
             $newPayment->payment_method = 'card';
@@ -338,6 +361,8 @@ class SubscriptionApiController extends Controller
                 $userSubscription->amount_paid = $invoice['total'] / 100;
                 $userSubscription->currency = $invoice['currency'];
                 $userSubscription->invoice_number = $invoice['number'];
+                $userSubscription->coupon_discounted_amt = isset($invoice['total_discount_amounts'][0]['amount']) ? $invoice['total_discount_amounts'][0]['amount'] / 100 : null;
+                $userSubscription->coupon_discount_id = isset($invoice['total_discount_amounts'][0]['discount']) ? $invoice['total_discount_amounts'][0]['discount'] : null;
                 
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
                 $userSubscription->total_download_limit = 40;
@@ -352,6 +377,7 @@ class SubscriptionApiController extends Controller
                 $newPayment = Payments::where('user_subscription_id',$userSubscription->id)->latest()->first();
                 $newPayment->status = 'completed';
                 $newPayment->amount = $invoice['total'] / 100;
+                $newPayment->coupon_discounted_amt = isset($invoice['total_discount_amounts'][0]['amount']) ? $invoice['total_discount_amounts'][0]['amount'] / 100 : null;
                 $newPayment->currency =  $invoice['currency'] ?? 'GBP';
                 $newPayment->payment_method = $invoice['payment_settings']['payment_method_types'][0] ?? 'card';
                 $newPayment->stripe_payment_intent_id = $userSubscription->stripe_payment_intent_id;
@@ -644,6 +670,61 @@ class SubscriptionApiController extends Controller
             $subscriptionId = Helpers::decrypt($request->id);
 
             return Helpers::generateSubscriptionInvoice($subscriptionId);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error("Something went wrong.", 500);
+        }
+    }
+
+    /** Get Subscriptions Coupons */
+    public function couponVerify(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'code' => 'required',
+            ]);
+
+            $promotionCodes = $this->stripe->promotionCodes->all([
+                'code' => $request->code,
+                'limit' => 1,
+                'expand' => ['data.coupon'],
+            ]);
+
+            if (empty($promotionCodes->data)) {
+                return $this->success([], "Invalid coupon code.",422);
+            }
+
+            $promotionCode = $promotionCodes->data[0];
+            $coupon = $promotionCode->coupon;
+
+            $discount = null;
+            $discount_type = null;
+
+            if ($coupon->percent_off) {
+                $discount = $coupon->percent_off;
+                $discount_type = 'percent';
+            } elseif ($coupon->amount_off) {
+                $discount = number_format($coupon->amount_off / 100, 2);
+                $discount_type = 'amount';
+            }
+
+            $response = [];
+            if ($promotionCode->active == true) {
+                $response[] = [
+                    'coupon' => $coupon->id,
+                    'coupon_code' => $promotionCode->code,
+                    'coupon_name' => $coupon->name ?? 'No Name',
+                    'discount' => $discount,
+                    'discount_type'=> $discount_type,
+                    'valid' => $promotionCode->active,
+                    'currency' => $coupon->currency
+                ];
+                return $this->success($response, "Coupons fetched successfully.",200);
+            }
+
+            return $this->success([], "Invalid coupon code.",422);
 
         } catch (Exception $e) {
             Log::error($e);
