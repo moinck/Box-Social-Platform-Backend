@@ -79,6 +79,15 @@ class UserManagementController extends Controller
                             </span>
                         </label>';
             })
+            ->addColumn('authorisation_type', function ($user) {
+                return $user->authorisation_type == 1 ? "Directly Authorised" : ($user->authorisation_type == 2 ? "Appointed Representative" : '');
+            })
+            ->addColumn('appointed_network', function ($user) {
+                return $user->appointed_network;
+            })
+            ->addColumn('company_type', function ($user) {
+                return $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '');
+            })
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);
                 $name = $user->first_name . ' ' . $user->last_name;
