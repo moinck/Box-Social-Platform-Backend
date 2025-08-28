@@ -185,7 +185,7 @@ class SubscriptionApiController extends Controller
             );
 
             /** Create Subscription */
-            $subscription = $this->stripe->subscriptions->create([
+            $data = [
                 'customer' => $userStripeCustomerId,
                 'items' => [[ 'price' => $subscriptionPlanDetail->stripe_price_id ]],
                 'payment_behavior' => 'default_incomplete',
@@ -194,9 +194,6 @@ class SubscriptionApiController extends Controller
                     'payment_method_types' => ['card'],
                     'save_default_payment_method' => 'on_subscription',
                 ],
-                'discounts' => [
-                    ['coupon' => !empty($coupon_details) ? $coupon_details['coupon'] : null] // correct format
-                ],
                 'expand' => ['latest_invoice.confirmation_secret', 'pending_setup_intent'],
                 'metadata' => [
                     'user_id' => $userId,
@@ -204,7 +201,16 @@ class SubscriptionApiController extends Controller
                     'email' => $user->email,
                     'subscription_id' => $encyptedId
                 ]
-            ]);
+            ];
+
+            // conditionally add coupon
+            if (!empty($coupon_details) && !empty($coupon_details['coupon'])) {
+                $data['discounts'] = [
+                    ['coupon' => $coupon_details['coupon']]
+                ];
+            }
+
+            $subscription = $this->stripe->subscriptions->create($data);
 
             // Store session ID for verification
             $newSubscription->stripe_subscription_id = $subscription->id;
