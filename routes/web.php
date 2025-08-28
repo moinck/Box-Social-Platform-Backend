@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PostTemplateController;
 use App\Http\Controllers\SubscriptionPlansController;
 use App\Http\Controllers\UserManagementController;
@@ -90,6 +91,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
         Route::post('/subscription-management/export', [UserSubscriptionController::class, 'exportSubscriptionDetails'])->name('subscription-management.export');
         Route::post('/subscription-management/generate-invoice', [UserSubscriptionController::class, 'generateSubscriptionInvoice'])->name('subscription-management.generate-invoice');
+
+        // payments controller
+        Route::get('/payment-history', [PaymentsController::class, 'index'])->name('payment-history');
+        Route::get('/payment-history/datatable', [PaymentsController::class, 'dataTable'])->name('payment-history.data-table');
 
         // icon management controller
         Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');

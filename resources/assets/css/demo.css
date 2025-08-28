@@ -272,6 +272,9 @@ div.font-icon-btns {
 .ql-insert-name {
     width: max-content !important;
 }
+.ql-insert-email {
+    width: max-content !important;
+}
 .ql-insert-phone {
     width: max-content !important;
 }
@@ -280,6 +283,18 @@ div.font-icon-btns {
 }
 .ql-insert-name::before {
     content: "Name";
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
+}
+.ql-insert-email::before {
+    content: "Email";
     padding: 5px;
     line-height: 1.375;
     height: 1.5rem;

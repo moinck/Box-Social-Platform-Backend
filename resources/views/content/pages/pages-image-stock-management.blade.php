@@ -380,12 +380,12 @@
                             }
                             
                             newImage += `
-                                <div class="col-md mb-md-0 mb-5">
+                                <div class="col-md mb-md-0 mb-5 pb-5">
                                     <div class="form-check custom-option custom-option-image custom-option-image-check">
                                         <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
                                         <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
                                         <span class="custom-option-body">
-                                            <img src="${image_url}" alt="${tagName}"/>
+                                            <img src="${image_url}" alt="${tagName}" style="width: 100%; height:250px; object-fit: cover;"/>
                                         </span>
                                         </label>
                                     </div>
