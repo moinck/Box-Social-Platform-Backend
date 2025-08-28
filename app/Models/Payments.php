@@ -10,6 +10,7 @@ class Payments extends Model
 
     protected $fillable = [
         'user_id',
+        'user_subscription_id',
         'plan_name',
         'status',
         'amount',
