@@ -195,6 +195,8 @@
 
                         // Filter results on category select change
                         $('#category_filter').on('change', function() {
+                            // if category change, then make sub category value empty
+                            $('#sub_category_filter').val('');
                             PostContentTable.draw();
                         });
 

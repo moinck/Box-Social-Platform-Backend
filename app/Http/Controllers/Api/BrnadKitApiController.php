@@ -203,11 +203,14 @@ class BrnadKitApiController extends Controller
         }
 
         $path = $brandKitObj->logo;
-        $mime = pathinfo($path, PATHINFO_EXTENSION);
-        if ($mime == 'svg') {
-            $mime = 'svg+xml';
+        $base64Image = null;
+        if (!empty($path)) {
+            $mime = pathinfo($path, PATHINFO_EXTENSION);
+            if ($mime == 'svg') {
+                $mime = 'svg+xml';
+            }
+            $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
         }
-        $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
 
         // if ($brandKitObj->base64_logo == null) {
         //     $brandKitObj->base64_logo = $base64Image;
@@ -221,7 +224,7 @@ class BrnadKitApiController extends Controller
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $base64Image,
-                "logo_url" => asset($brandKitObj->logo),
+                "logo_url" => $brandKitObj->logo ? asset($brandKitObj->logo) : null,
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,
