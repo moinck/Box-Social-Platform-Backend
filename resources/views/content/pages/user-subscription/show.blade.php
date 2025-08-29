@@ -141,6 +141,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-3 col-sm-6 mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <span class="avatar-initial rounded bg-label-danger">
+                                            <i class="ri-coupon-2-line ri-24px"></i>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Coupon</small>
+                                        <div class="d-flex align-items-center">
+                                            <h6 class="mb-0 me-1">
+                                                @if ($subscriptionData->coupon_code)
+                                                {{ $subscriptionData->coupon_code }} ({{ $subscriptionData->coupon_name }}) - GBP {{ number_format($subscriptionData->coupon_discounted_amt, 2) }}
+                                                @else
+                                                N/A
+                                                @endif
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Additional subscription info --}}

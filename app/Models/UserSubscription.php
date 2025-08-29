@@ -49,7 +49,15 @@ class UserSubscription extends Model
         'is_subscription_cancel',
         'sub_cancel_reason',
         'child_sub_cancel_reason',
-        'invoice_number'
+        'invoice_number',
+        'coupon_id',
+        'coupon_code',
+        'coupon_name',
+        'coupon_type',
+        'coupon_discount',
+        'coupon_currency',
+        'coupon_discount_id',
+        'coupon_discounted_amt'
     ];
 
     public function user()

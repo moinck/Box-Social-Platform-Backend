@@ -14,6 +14,7 @@ class Payments extends Model
         'plan_name',
         'status',
         'amount',
+        'coupon_discounted_amt',
         'currency',
         'payment_type',
         'payment_method',
