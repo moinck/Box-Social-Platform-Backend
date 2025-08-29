@@ -44,9 +44,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan',
+                'name' => 'Box Socials Pro Plan',
                 'slug' => 'box-socials-premium-plan-before-oct-2025',
-                'description' => 'Premium plan for users subscribed before Oct 1, 2025',
+                'description' => 'Pro plan for users subscribed before Oct 1, 2025',
                 'price' => 650.00,
                 'currency' => 'GBP',
                 'interval' => 'year',
@@ -56,7 +56,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'total_download_limit' => 480,
                 'stripe_price_id' => 'price_1RqCFAR0DcXT6U523bfrSdJJ', // Replace with actual Stripe price ID
                 'stripe_product_id' => 'prod_ShVuLFcw5okX2y',
-                'is_active' => true,
+                'is_active' => false,
                 'is_trial' => false,
                 'is_popular' => false,
                 'features' => json_encode([
@@ -77,9 +77,9 @@ class SubscriptionPlanSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'name' => 'Box Socials Premium Plan',
+                'name' => 'Box Socials Pro Plan',
                 'slug' => 'box-socials-premium-plan-after-oct-2025',
-                'description' => 'Premium plan for users subscribed after Oct 1, 2025',
+                'description' => 'Pro plan for users subscribed after Oct 1, 2025',
                 'price' => 780.00,
                 'currency' => 'GBP',
                 'interval' => 'year',
