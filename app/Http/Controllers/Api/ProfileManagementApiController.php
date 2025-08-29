@@ -78,19 +78,22 @@ class ProfileManagementApiController extends Controller
 
         $today = now();
         $cutoffDate = Carbon::create(2025, 10, 1); // Oct 1, 2025
+        $plan_id = Helpers::encrypt(3); // £780 plan
         if ($userSubscription && $userSubscription->plan_id == 1 || !$userSubscription) {
             $plan_flag = 1;
 
             // Before Oct 1 → use £650 plan else £780 plan
-            $plan_id = $today->lt($cutoffDate)
-                ? Helpers::encrypt(2) // £650 plan
-                : Helpers::encrypt(3); // £780 plan
+            // $plan_id = $today->lt($cutoffDate)
+            //     ? Helpers::encrypt(2) // £650 plan
+            //     : Helpers::encrypt(3); // £780 plan
 
-        } else if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
-            $plan_id = Helpers::encrypt(2); // £650 plan 
-            $plan_flag = 2;
-        } else {
-            $plan_id = Helpers::encrypt(3); // £780 plan
+        } 
+        // else if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
+        //     $plan_id = Helpers::encrypt(2); // £650 plan 
+        //     $plan_flag = 2;
+        // } 
+        else {
+            // $plan_id = Helpers::encrypt(3); // £780 plan
             $plan_flag = 3;
         }
 
