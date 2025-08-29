@@ -128,15 +128,15 @@ class SubscriptionApiController extends Controller
                 $cutoffDate = Carbon::create(2025, 10, 1); // Oct 1, 2025
 
                 // Before Oct 1 → use £650 plan else £780 plan
-                if ($today->lt($cutoffDate)) {
-                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
-                } else {
-                    $userSubscription = UserSubscription::where('user_id',$userId)->latest()->first();
-                    $subscriptionPlanDetail = SubscriptionPlans::where('id', 3)->first();
-                    if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
-                        $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
-                    }
-                }
+                // if ($today->lt($cutoffDate)) {
+                //     $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
+                // } else {
+                //     $userSubscription = UserSubscription::where('user_id',$userId)->latest()->first();
+                //     if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
+                //         $subscriptionPlanDetail = SubscriptionPlans::where('id', 2)->first();
+                //     }
+                // }
+                $subscriptionPlanDetail = SubscriptionPlans::where('id', 3)->first();
             }
 
             // Create incomplete subscription in DB
