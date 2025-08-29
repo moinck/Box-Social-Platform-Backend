@@ -97,6 +97,13 @@
             "icon": "menu-icon tf-icons ri-shield-check-line",
             "slug": "cookie-policy",
             "role": ["admin"]
+        },
+        {
+            "url": "/email-settings",
+            "name": "Email Settings",
+            "icon": "menu-icon tf-icons ri-mail-line",
+            "slug": "email-settings",
+            "role": ["admin"]
         }
     ]
 }
