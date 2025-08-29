@@ -28,7 +28,7 @@ class PaymentsController extends Controller
                 return $name;
             })
             ->addColumn('subscription_id', function ($payment) {
-                return $payment->subscription_id ?? "N/A";
+                return $payment->user_subscription_id ?? "N/A";
             })
             ->addColumn('payment_id', function ($payment) {
                 return $payment->stripe_payment_intent_id ?? "N/A";
