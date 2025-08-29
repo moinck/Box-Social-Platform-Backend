@@ -179,6 +179,8 @@ class BrnadKitApiController extends Controller
 
     public function get(Request $request)
     {
+        sleep(1);
+
         // check barer token
         $user = $request->user();
         if (!$user) {
