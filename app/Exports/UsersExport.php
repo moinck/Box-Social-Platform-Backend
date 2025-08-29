@@ -42,9 +42,12 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             'Email',
             'FCA Number',
             'Company Name',
-            'Account Status',
+            'Authorisation Type',
+            'Network Name',
+            'Company Type',
             'User BrandConfiguration',
             'User Verified',
+            'Account Status',
             'Created Date'
         ];
     }
@@ -67,9 +70,12 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             $user->email,
             $user->fca_number,
             $user->company_name,
-            $user->status == 'active' ? 'Active' : 'Inactive',
+            $user->authorisation_type == 1 ? "Directly Authorised" : ($user->authorisation_type == 2 ? "Appointed Representative" : '-'),
+            $user->appointed_network ? $user->appointed_network : "-",
+            $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '-'),
             $user->hasBrandKit() ? 'Yes' : 'No',
             $user->is_verified ? 'Yes' : 'No',
+            $user->status == 'active' ? 'Active' : 'Inactive',
             \Carbon\Carbon::parse($user->created_at)->format('d-m-Y')
         ];
     }

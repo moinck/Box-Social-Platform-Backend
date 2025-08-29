@@ -129,7 +129,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" value="1" id="direct_authorised" checked="" onclick="return false;">
+                                <input class="form-check-input" type="checkbox" value="1" id="direct_authorised" name="direct_authorised" checked="" >
                                 <label class="form-check-label" for="direct_authorised">
                                     <span>Directly Authorised</span>
                                 </label>
@@ -137,7 +137,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" value="2" id="appointed_representative" checked="" onclick="return false;">
+                                <input class="form-check-input" type="checkbox" value="2" id="appointed_representative" name="appointed_representative" checked="" >
                                 <label class="form-check-label" for="appointed_representative">
                                     <span>Appointed Representative</span>
                                 </label>
@@ -145,13 +145,18 @@
                         </div>
                         <div class="col-12 d-none" id="networkDiv">
                             <div class="form-floating form-floating-outline">
-                                <input type="text" id="appointed_network" name="appointed_network" class="form-control" readonly onclick="return false;"/>
+                                <input type="text" id="appointed_network" name="appointed_network" class="form-control" />
                                 <label for="appointed_network">Which network are you an Appointed Representative of?</label>
                             </div>
                         </div>
-                         <div class="col-12">
+                        <div class="col-12">
                             <div class="form-floating form-floating-outline">
-                                <input type="text" id="company_type" name="company_type" class="form-control" readonly onclick="return false;"/>
+                                <select id="company_type" name="company_type" class="form-select"
+                                    aria-label="Default select example">
+                                    <option value="">Select Type</option>
+                                    <option value="1">Sole Trader</option>
+                                    <option value="2">Limited Company</option>
+                                </select>
                                 <label for="company_type">Are you a sole trader or limited company?</label>
                             </div>
                         </div>
@@ -373,16 +378,15 @@
                             $('#appointed_representative').prop('checked', authType == 2);
                             
                             // Company Type mapping
-                            let companyType = response.data.company_type == 2 ? "Limited Company" : (response.data.company_type == 1 ? "Sole Trader" : "");
                             
-                            $("#company_type").val(companyType).prop('readonly', true);
+                            $("#company_type").val(response.data.company_type ? response.data.company_type : '');
 
                             if (authType == 2) {
                                 // Show extra fields
                                 $("#networkDiv").removeClass('d-none');
 
                                 // Fill values
-                                $("#appointed_network").val(response.data.appointed_network).prop('readonly', true);
+                                $("#appointed_network").val(response.data.appointed_network);
                             } else {
                                 // Hide extra fields
                                 $("#networkDiv").addClass('d-none');
@@ -405,6 +409,23 @@
                 $('#edit-user-modal').modal('show');
             });
             // -------------------------------------------
+
+            // Change Authorisation
+            $("#direct_authorised, #appointed_representative").on("change", function () {
+                if ($(this).attr("id") === "appointed_representative") {
+                    // If Appointed Representative is checked
+                    $("#appointed_representative").prop("checked", true);
+                    $("#direct_authorised").prop("checked", false);
+                    $("#networkDiv").removeClass("d-none"); // Show the input
+                } else {
+                    // If Directly Authorised is checked
+                    $("#direct_authorised").prop("checked", true);
+                    $("#appointed_representative").prop("checked", false);
+                    $("#networkDiv").addClass("d-none"); // Hide the input
+                    $("#appointed_network").val(""); // Clear input
+                }
+            });
+            //---------------------------------------------------------------
 
             // var editUserForm = $('#edit-user-form');
             const formValidationExamples = document.getElementById('edit-user-form');
@@ -493,6 +514,54 @@
                                 message: 'Please select account status'
                             }
                         }
+                    },
+                    company_type: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please select company type'
+                            }
+                        }
+                    },
+                    appointed_network: {
+                        validators: {
+                            callback: {
+                                message: 'Please enter your appointed network',
+                                callback: function(input) {
+                                    const isRep = document.getElementById('appointed_representative').checked;
+                                    if (isRep && input.value.trim() === '') {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    },
+                    // At least one checkbox required
+                    direct_authorised: {
+                        validators: {
+                            callback: {
+                                message: 'Please select either Directly Authorised or Appointed Representative',
+                                callback: function() {
+                                    return (
+                                        document.getElementById('direct_authorised').checked ||
+                                        document.getElementById('appointed_representative').checked
+                                    );
+                                }
+                            }
+                        }
+                    },
+                    appointed_representative: {
+                        validators: {
+                            callback: {
+                                message: 'Please select either Directly Authorised or Appointed Representative',
+                                callback: function() {
+                                    return (
+                                        document.getElementById('direct_authorised').checked ||
+                                        document.getElementById('appointed_representative').checked
+                                    );
+                                }
+                            }
+                        }
                     }
                 },
                 plugins: {
@@ -502,7 +571,7 @@
                         rowSelector: function(field, ele) {
                             // Customize row selector based on your form layout
                             if (['edit_first_name', 'edit_last_name', 'user_fca_number',
-                                    'user_account_status'
+                                    'user_account_status', 'direct_authorised', 'appointed_representative'
                                 ].includes(field)) {
                                 return '.col-md-6';
                             }
