@@ -80,13 +80,13 @@ class UserManagementController extends Controller
                         </label>';
             })
             ->addColumn('authorisation_type', function ($user) {
-                return $user->authorisation_type == 1 ? "Directly Authorised" : ($user->authorisation_type == 2 ? "Appointed Representative" : '');
+                return $user->authorisation_type == 1 ? "Directly Authorised" : ($user->authorisation_type == 2 ? "Appointed Representative" : '-');
             })
             ->addColumn('appointed_network', function ($user) {
-                return $user->appointed_network;
+                return $user->appointed_network ? $user->appointed_network : "-";
             })
             ->addColumn('company_type', function ($user) {
-                return $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '');
+                return $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '-');
             })
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);
@@ -140,16 +140,26 @@ class UserManagementController extends Controller
             'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
             'user_fca_number' => 'required|string|max:255',
             'user_account_status' => 'string|in:active,inactive',
+            'company_type' => 'required',
+            'appointed_network' => 'required_if:appointed_representative,1|required_if:appointed_representative,2',
+            'appointed_representative' => 'required_without:direct_authorised',
+            'direct_authorised' => 'required_without:appointed_representative',
         ]);
 
         $user = User::find($userId);
         if ($user) {
+
+            $authorisation_type = isset($request->direct_authorised) ? $request->direct_authorised : (isset($request->appointed_representative) ? $request->appointed_representative : 0);
+
             $user->first_name = $request->edit_first_name;
             $user->last_name = $request->edit_last_name;
             $user->company_name = $request->edit_company_name;
             $user->email = $request->edit_user_email;
             $user->fca_number = $request->user_fca_number;
             $user->status = $request->user_account_status;
+            $user->authorisation_type = $authorisation_type;
+            $user->appointed_network = isset($request->appointed_network) ? $request->appointed_network : null;
+            $user->company_type = $request->company_type;
 
             if ($user->save()) {
                 return response()->json([

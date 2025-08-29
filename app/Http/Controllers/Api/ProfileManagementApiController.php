@@ -142,6 +142,9 @@ class ProfileManagementApiController extends Controller
             'fca_number' => 'required',
             'website' => 'nullable|url',
             'email' => 'required|email',
+            'authorisation_type' => 'required|numeric',
+            'appointed_network'  => 'sometimes|required_if:authorisation_type,2|string|nullable',
+            'company_type' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -159,6 +162,9 @@ class ProfileManagementApiController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->website = $request->website;
+        $user->authorisation_type = $request->authorisation_type;
+        $user->appointed_network = isset($request->appointed_network) ? $request->appointed_network : null;
+        $user->company_type = $request->company_type;
         $user->save();
 
         $returnData = [];
