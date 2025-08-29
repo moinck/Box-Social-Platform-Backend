@@ -28,7 +28,6 @@ class Payments extends Model
 
     public function subscription()
     {
-        $subscription = UserSubscription::where('stripe_payment_method_id', $this->stripe_payment_intent_id)->latest()->first();
-        return $subscription;
+        return $this->belongsTo(UserSubscription::class, 'user_subscription_id', 'id');
     }
 }
