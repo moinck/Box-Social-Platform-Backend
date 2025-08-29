@@ -17,7 +17,7 @@ class PaymentsController extends Controller
 
     public function dataTable(Request $request)
     {
-        $payments = Payments::with('user:id,first_name,last_name,email')
+        $payments = Payments::with('user:id,first_name,last_name,email','subscription:id,stripe_subscription_id')
             ->latest()
             ->get();
 
@@ -28,7 +28,7 @@ class PaymentsController extends Controller
                 return $name;
             })
             ->addColumn('subscription_id', function ($payment) {
-                return $payment->user_subscription_id ?? "N/A";
+                return $payment->subscription->stripe_subscription_id ?? "N/A";
             })
             ->addColumn('payment_id', function ($payment) {
                 return $payment->stripe_payment_intent_id ?? "N/A";
