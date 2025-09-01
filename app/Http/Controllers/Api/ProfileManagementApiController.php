@@ -182,6 +182,9 @@ class ProfileManagementApiController extends Controller
             'profile_image' => $user->profile_image ? $user->profile_image : null,
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
+            'authorisation_type' => $user->authorisation_type,
+            'appointed_network' => $user->appointed_network,
+            'company_type' => $user->company_type,
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
