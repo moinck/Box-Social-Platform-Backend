@@ -120,7 +120,7 @@ class RegisterController extends Controller
 
             // Send verification email
             $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
-            Helpers::sendVerificationMail($user, $token);
+            Helpers::sendVerificationMail($user,  Helpers::encrypt($token));
             DB::commit();
 
             return response()->json([
