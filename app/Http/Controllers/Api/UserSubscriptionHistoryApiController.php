@@ -74,7 +74,8 @@ class UserSubscriptionHistoryApiController extends Controller
                 'coupon_name' => $val->coupon_name,
                 'coupon_code' => $val->coupon_code,
                 'coupon_discount' => $val->coupon_discount,
-                'coupon_currency' => $val->coupon_currency
+                'coupon_currency' => $val->coupon_currency,
+                'price' => $val->amount_paid
             ];
         }
 

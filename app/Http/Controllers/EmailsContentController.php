@@ -29,6 +29,9 @@ class EmailsContentController extends Controller
                     ->editColumn('subject', function ($emailContents) {
                         return $emailContents->subject;
                     })
+                    ->editColumn('slug', function ($emailContents) {
+                        return $emailContents->slug ? Helpers::emailType()[$emailContents->slug] : '-';
+                    })
                     ->addColumn('action', function ($emailContents) {
                         $emailContentId = Helpers::encrypt($emailContents->id);
                         return '
@@ -56,10 +59,11 @@ class EmailsContentController extends Controller
         try {
 
             $emailId = Helpers::decrypt($id);
+            $emailType = Helpers::emailType();
 
             $emailContent = EmailContent::where('id',$emailId)->first();
 
-            return view('content.pages.email-content.edit',compact('emailContent','id'));
+            return view('content.pages.email-content.edit',compact('emailContent','id','emailType'));
 
         } catch (Exception $e) {
             Log::error($e);
@@ -76,6 +80,7 @@ class EmailsContentController extends Controller
             $request->validate([
                 'title' => 'required',
                 'subject' => 'required',
+                'slug' => 'required',
                 'content' => 'required'
             ]);
 
@@ -86,6 +91,7 @@ class EmailsContentController extends Controller
             ],[
                 'title' => $request->title,
                 'subject' => $request->subject,
+                'slug' => $request->slug,
                 'content' => $request->content  
             ]);
 
