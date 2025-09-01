@@ -11,6 +11,7 @@ class EmailContent extends Model
     protected $fillable = [
         'title',
         'subject',
+        'slug',
         'content'
     ];
 }

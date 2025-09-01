@@ -42,7 +42,7 @@
                         @csrf
 
                         {{-- post title --}}
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="title" name="title" class="form-control"
                                     placeholder="Title" value="{{ old('title') ? old('title') : ($emailContent ? $emailContent->title : '') }}"/>
@@ -51,11 +51,23 @@
                         </div>
 
                         {{-- category select --}}
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
                             <div class="form-floating form-floating-outline">
                                 <input type="text" id="subject" name="subject" class="form-control"
                                     placeholder="Subject" value="{{ old('subject') ? old('subject') : ($emailContent ? $emailContent->subject : '') }}"/>
                                 <label for="subject">Subject</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-4">
+                            <div class="form-floating form-floating-outline">
+                                <select id="slug" name="slug" class="form-select">
+                                    <option value="">Select Email For</option>
+                                    @foreach ($emailType as $key => $val)
+                                        <option value="{{ $key }}" {{ old('slug') == $key ? 'selected' : ($emailContent && $emailContent->slug == $key ? 'selected' : '') }}>{{ $val }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="slug">Email For</label>
                             </div>
                         </div>
 
@@ -201,6 +213,13 @@
                             }
                         }
                     },
+                    slug: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please select email for'
+                            }
+                        }
+                    },
                     content: {
                         validators: {
                             notEmpty: {
@@ -214,7 +233,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
-                            if (['title', 'subject', 'content', ].includes(
+                            if (['title', 'subject', 'slug', 'content', ].includes(
                                     field)) {
                                 return '.col-12';
                             }

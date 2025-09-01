@@ -55,6 +55,7 @@
                         <th>No</th>
                         <th>Title</th>
                         <th>Subject</th>
+                        <th>Email For</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -103,6 +104,7 @@
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'title', name: 'title'},
                         { data: 'subject', name: 'subject'},
+                        { data: 'slug', name: 'slug'},
                         { data: 'action', name: 'action', searchable: false, orderable: false},
                     ],
                     language: {
