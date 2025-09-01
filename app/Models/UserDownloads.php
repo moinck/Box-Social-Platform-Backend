@@ -22,6 +22,8 @@ class UserDownloads extends Model
         'plan_type',
         'monthly_limit',
         'total_limit',
+        'monthly_saved_limit',
+        'total_saved_limit',
         'carried_over_downloads',
         'expires_at',
     ];
@@ -49,14 +51,20 @@ class UserDownloads extends Model
     {
         $currentDate = Carbon::now();
         $planType = $subscription->plan->slug ?? 'free-trial';
-        $monthlyLimit = 0;
-        $totalLimit = 0;
+        // $monthlyLimit = 0;
+        // $totalLimit = 0;
+        // $monthlySavedLimit = 0;
+        // $totalSavedLimit = 0;
         if($planType != 'free-trial') {
-            $monthlyLimit = 40;
-            $totalLimit = 480;
+            $monthlyLimit = $subscription->plan->monthly_download_limit;
+            $totalLimit = $subscription->plan->total_download_limit;
+            $monthlySavedLimit = $subscription->plan->monthly_saved_limit;
+            $totalSavedLimit = $subscription->plan->total_saved_limit;
         } else {
-            $monthlyLimit = 3;
-            $totalLimit = 3;
+            $monthlyLimit = $subscription->plan->monthly_download_limit;
+            $totalLimit = $subscription->plan->total_download_limit;
+            $monthlySavedLimit = $subscription->plan->monthly_saved_limit;
+            $totalSavedLimit = $subscription->plan->total_saved_limit;
         }
         
         return self::create([
@@ -71,6 +79,8 @@ class UserDownloads extends Model
             'total_limit' => $totalLimit,
             'carried_over_downloads' => 0,
             'expires_at' => $subscription->current_period_end,
+            'monthly_saved_limit' => $monthlySavedLimit,
+            'total_saved_limit' => $totalSavedLimit,
         ]);
     }
 
@@ -154,7 +164,7 @@ class UserDownloads extends Model
                 return false;
             }
             //Check if total limit is exceeded then end subscription
-            if ($this->saved_template_count >= ($this->total_limit ?? 3)) {
+            if ($this->saved_template_count >= ($this->total_saved_limit ?? 3)) {
                 $this->user->subscription()->update([
                     'status' => 'ended',
                     'stripe_status' => 'canceled',
@@ -166,11 +176,11 @@ class UserDownloads extends Model
                 return false;
             }
             //Check total limit
-            return $this->saved_template_count < ($this->total_limit ?? 3);
+            return $this->saved_template_count < ($this->total_saved_limit ?? 3);
         } else {
             //Premium plan - check monthly limit only
             $this->checkAndResetMonthly();
-            return $this->monthly_saved_template_count < $this->monthly_limit;
+            return $this->monthly_saved_template_count < $this->monthly_saved_limit;
         }
     }
 
@@ -199,10 +209,10 @@ class UserDownloads extends Model
             if ($this->expires_at && Carbon::now()->gt($this->expires_at)) {
                 return 0;
             }
-            return max(0, ($this->total_limit ?? 3) - $this->saved_template_count);
+            return max(0, ($this->total_saved_limit ?? 3) - $this->saved_template_count);
         } else {
             $this->checkAndResetMonthly();
-            return max(0, $this->monthly_limit - $this->monthly_saved_template_count);
+            return max(0, $this->monthly_saved_limit - $this->monthly_saved_template_count);
         }
     }
 
@@ -277,14 +287,18 @@ class UserDownloads extends Model
     {
         if ($this->plan_type == 'free-trial') {
             return [
+                //Start Downloads Limit
                 'used' => $this->total_downloads_used,
-                'saved_used' => $this->saved_template_count,
                 'remaining' => max(0, ($this->total_limit ?? 3) - $this->total_downloads_used),
-                'saved_remaining' => max(0, ($this->total_limit ?? 3) - $this->saved_template_count),
                 'monthly_limit' => $this->monthly_limit,
                 'monthly_remaining_limit' => $this->monthly_limit - $this->monthly_downloads_used,
-                'saved_monthly_remaining_limit' => $this->monthly_limit - $this->monthly_saved_template_count,
                 'total_limit' => $this->total_limit,
+                //Start Saved Limit
+                'saved_used' => $this->saved_template_count,
+                'saved_remaining' => max(0, ($this->total_saved_limit ?? 3) - $this->saved_template_count),
+                'monthly_saved_limit' => $this->monthly_saved_limit,
+                'saved_monthly_remaining_limit' => $this->monthly_saved_limit - $this->monthly_saved_template_count,
+                'total_saved_limit' => $this->total_saved_limit,
                 'current_period' => $this->current_month . '/' . $this->current_year,
                 // 'expires_at' => $this->expires_at,
                 // 'expired' => $this->expires_at ? Carbon::now()->gt($this->expires_at) : false,
@@ -292,14 +306,18 @@ class UserDownloads extends Model
         } else {
             $this->checkAndResetMonthly();
             return [
+                //Start Download Limit
                 'used' => $this->monthly_downloads_used,
-                'saved_used' => $this->saved_template_count,
                 'remaining' => $this->getRemainingDownloads(),
-                'saved_remaining' => $this->getRemainingSaved(),
                 'monthly_limit' => $this->monthly_limit,
                 'monthly_remaining_limit' => $this->monthly_limit - $this->monthly_downloads_used,
-                'saved_monthly_remaining_limit' => $this->monthly_limit - $this->monthly_saved_template_count,
                 'total_limit' => $this->total_limit,
+                //Start Saved Limit
+                'saved_used' => $this->saved_template_count,
+                'saved_remaining' => $this->getRemainingSaved(),
+                'monthly_saved_limit' => $this->monthly_saved_limit,
+                'saved_monthly_remaining_limit' => $this->monthly_saved_limit - $this->monthly_saved_template_count,
+                'total_saved_limit' => $this->total_saved_limit,
                 // 'carried_over' => $this->carried_over_downloads,
                 // 'effective_limit' => $this->monthly_limit + $this->carried_over_downloads,
                 'current_period' => $this->current_month . '/' . $this->current_year,

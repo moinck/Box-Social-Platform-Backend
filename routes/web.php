@@ -15,6 +15,7 @@ use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\CookiePolicyController;
+use App\Http\Controllers\EmailsContentController;
 use App\Http\Controllers\IconManagementController;
 use App\Http\Controllers\IconMangementsController;
 use App\Http\Controllers\ImageStockManagementController;
@@ -176,6 +177,12 @@ Route::middleware('auth')->group(function () {
         // cookie policy controller
         Route::get('/cookie-policy', [CookiePolicyController::class, 'cookiePolicy'])->name('cookie-policy');
         Route::post('cookie-policy/save', [CookiePolicyController::class, 'saveCookiePolicy'])->name('cookie-policy.save');
+
+        /** Email content controller */
+        Route::match(['GET','POST'],'/email-settings', [EmailsContentController::class, 'index'])->name('email-settings');
+        Route::get('/email-settings/edit/{id?}', [EmailsContentController::class, 'createOrEdit'])->name('email-settings.create');
+        Route::post('/email-settings/save', [EmailsContentController::class, 'saveEmailContent'])->name('email-settings.save');
+        Route::post('/email-settings/delete', [EmailsContentController::class, 'deleteEmailContent'])->name('email-settings.delete');
         
     });
     
