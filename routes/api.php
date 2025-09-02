@@ -84,6 +84,7 @@ Route::group([
 
         // stock image api
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+        Route::get('/stock-image/uploaded', [StockImageApiController::class, 'getUploadedStockImage']);
         
         // admin-template API
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
@@ -158,6 +159,7 @@ Route::group([
 
     // get stock image
     Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
+    Route::get('/admin/stock-image/uploaded', [StockImageApiController::class, 'getUploadedStockImage']);
     
     // icon management api
     Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);

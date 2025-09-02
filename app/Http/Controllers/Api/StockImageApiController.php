@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\ImageStockManagement;
 use App\Models\User;
 use App\ResponseTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class StockImageApiController extends Controller
@@ -186,5 +188,59 @@ class StockImageApiController extends Controller
         $imageData->delete();
 
         return $this->success([], 'Image deleted successfully');
+    }
+
+    /** Get Uploaded Stock Image */
+    public function getUploadedStockImage(Request $request)
+    {
+        try {
+
+            $limit = $request->limit ?? 25; // default to 25 if not provided
+            $page = $request->offset ?? 1; // treat 'offset' as page number
+            $page = $page == 0 ? 1 : $page;
+            $realOffset = ($page - 1) * $limit;
+
+            $authUserImages = [];
+            if ($request->bearerToken()) {
+                $token = $request->bearerToken();
+                $tokenId = explode('|', $token)[0];
+                $authUser = DB::table('personal_access_tokens')
+                    ->where('id', $tokenId)
+                    ->first();
+                
+                $authUserImages = ImageStockManagement::select('id','image_url')
+                        ->where('user_id', $authUser->tokenable_id)
+                        ->latest()
+                        ->offset($realOffset)
+                        ->limit($limit)
+                        ->get();
+
+            }
+
+            $returnData = [];
+            $userImagesData = [];
+
+            // auth user images
+            foreach ($authUserImages as $key => $value) {
+                $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
+                $fileExtension = "image/" . explode('?', $fileExtension)[0];
+                $userImagesData[] = [
+                    'id' => Helpers::encrypt($value->id),
+                    'image_url' => $value->image_url ? asset($value->image_url) : '',
+                    'fileType' => $fileExtension,
+                ];
+            }
+
+            $returnData['limit'] = $limit;
+            $returnData['total_images'] = count($authUserImages);
+            $returnData['page'] = $page;
+            $returnData['user'] = $userImagesData;
+
+            return $this->success($returnData, 'Stock Image Fetch successfully');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something wentwrong.', 500);
+        }
     }
 }
