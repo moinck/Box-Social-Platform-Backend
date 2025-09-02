@@ -201,21 +201,21 @@ class StockImageApiController extends Controller
             $realOffset = ($page - 1) * $limit;
 
             $authUserImages = [];
-            if ($request->bearerToken()) {
-                $token = $request->bearerToken();
-                $tokenId = explode('|', $token)[0];
-                $authUser = DB::table('personal_access_tokens')
-                    ->where('id', $tokenId)
-                    ->first();
-                
-                $authUserImages = ImageStockManagement::select('id','image_url')
-                        ->where('user_id', $authUser->tokenable_id)
-                        ->latest()
-                        ->offset($realOffset)
-                        ->limit($limit)
-                        ->get();
-
-            }
+            $authUserId = Auth::user()->id;
+            // if ($request->bearerToken()) {
+            //     $token = $request->bearerToken();
+            //     $tokenId = explode('|', $token)[0];
+            //     $authUser = DB::table('personal_access_tokens')
+            //         ->where('id', $tokenId)
+            //         ->first();
+            // }
+            $totalUserImageCount = ImageStockManagement::where('user_id', $authUserId)->count() ?? 0;
+            $authUserImages = ImageStockManagement::select('id','image_url')
+                    ->where('user_id', $authUserId)
+                    ->latest()
+                    ->offset($realOffset)
+                    ->limit($limit)
+                    ->get();
 
             $returnData = [];
             $userImagesData = [];
@@ -232,7 +232,7 @@ class StockImageApiController extends Controller
             }
 
             $returnData['limit'] = $limit;
-            $returnData['total_images'] = count($authUserImages);
+            $returnData['total_images'] = $totalUserImageCount;
             $returnData['page'] = $page;
             $returnData['user'] = $userImagesData;
 
