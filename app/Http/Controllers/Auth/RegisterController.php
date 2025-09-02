@@ -124,24 +124,6 @@ class RegisterController extends Controller
             $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
             Helpers::sendVerificationMail($user, $token);
 
-            /** Send Mail to Users. Only User Register Between 16-Sep-2025 to 28-Sep-2025  */
-            $currentDate = Carbon::now();
-            $startDate = Carbon::parse('2025-09-16')->startOfDay();
-            $endDate = Carbon::parse('2025-09-28')->endOfDay();
-            if ($startDate <= $currentDate && $endDate >= $currentDate) {
-
-                $email_content = EmailContent::where('slug','welcome_beta_trial')->first();
-                
-                if ($email_content) {
-                    $data = [
-                        'email' => $user->email,
-                        'subject' => $email_content->subject,
-                        'content' => $email_content->content
-                    ];
-                    Helpers::sendDynamicContentEmail($data);
-                }
-            }
-
             DB::commit();
 
             return response()->json([

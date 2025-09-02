@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\EmailContent;
 use App\Models\Payments;
 use App\Models\SubscriptionPlans;
 use App\Models\User;
@@ -157,7 +158,7 @@ class SubscriptionApiController extends Controller
 
             // if FREE-TRIAL plan create free subscription without stripe
             if ($subscriptionPlanDetail->slug == 'free-trial') {
-                $this->createFreeTrialSubscription($userId,$newSubscription->id);
+                $this->createFreeTrialSubscription($user,$newSubscription->id);
 
                 DB::commit();
 
@@ -296,7 +297,7 @@ class SubscriptionApiController extends Controller
     /**
      * Create free trial subscription
      */
-    private function createFreeTrialSubscription($userId,$subscriptionId)
+    private function createFreeTrialSubscription($user,$subscriptionId)
     {
 
         $freePlan = SubscriptionPlans::where('id',1)->first();
@@ -315,6 +316,25 @@ class SubscriptionApiController extends Controller
         $userSubscription->trial_start = now();
         $userSubscription->trial_end = now()->addDays(3);
         $userSubscription->save();
+
+        /** Send Mail to Users. Only User Register Between 16-Sep-2025 to 28-Sep-2025  */
+        $currentDate = Carbon::now();
+        $startDate = Carbon::parse('2025-09-16')->startOfDay();
+        $endDate = Carbon::parse('2025-09-28')->endOfDay();
+        // if ($startDate <= $currentDate && $endDate >= $currentDate) {
+        if ($endDate >= $currentDate) {
+
+            $email_content = EmailContent::where('slug','welcome_beta_trial')->first();
+            
+            if ($email_content) {
+                $data = [
+                    'email' => $user->email,
+                    'subject' => $email_content->subject,
+                    'content' => $email_content->content
+                ];
+                Helpers::sendDynamicContentEmail($data);
+            }
+        }
 
         return true;
     }
