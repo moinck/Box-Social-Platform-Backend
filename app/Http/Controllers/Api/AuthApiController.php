@@ -39,6 +39,7 @@ class AuthApiController extends Controller
             return $this->validationError('Invalid verification token', $validator->errors());
         }
 
+        // do not decrypt token
         $verificationToken = $request->verification_token;
 
         $userToken = UserTokens::where(function ($query) use ($verificationToken) {
