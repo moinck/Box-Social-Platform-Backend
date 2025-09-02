@@ -1197,4 +1197,13 @@ class Helpers
             return false;
         }   
     }
+
+    /** Email type list */
+    public static function emailType()
+    {
+        return [
+            'before_first_oct_mail' => "BEFORE 1st OCT",
+            'after_first_oct_mail' => "FROM 1st OCT",
+        ];
+    }
 }

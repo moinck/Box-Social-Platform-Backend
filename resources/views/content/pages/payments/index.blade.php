@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Payment history')
+@section('title', 'Payment History')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -35,7 +35,7 @@
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row border-bottom subscription-management-header" style="justify-content: space-between;">
             <div class="head-label">
-                <h5 class="card-title mb-0">Payment history</h5>
+                <h5 class="card-title mb-0">Payment History</h5>
             </div>
         </div>
         <div class="card-datatable table-responsive">

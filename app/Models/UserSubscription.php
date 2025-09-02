@@ -41,6 +41,7 @@ class UserSubscription extends Model
         'cancellation_bonus_granted_at',
         'cancellation_bonus_days',
         'total_download_limit',
+        'total_saved_limit',
         'daily_download_limit',
         'downloads_used_today',
         'total_downloads_used',

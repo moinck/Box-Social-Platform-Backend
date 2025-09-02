@@ -146,6 +146,7 @@ class SubscriptionApiController extends Controller
             $newSubscription->stripe_customer_id = $userStripeCustomerId;
             $newSubscription->stripe_price_id = $subscriptionPlanDetail->stripe_price_id;
             $newSubscription->total_download_limit = $subscriptionPlanDetail->total_download_limit ?? 0;
+            $newSubscription->total_saved_limit = $subscriptionPlanDetail->total_saved_limit ?? 0;
             $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit ?? 0;
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->stripe_status = 'incomplete'; // Important: Set as incomplete
@@ -297,13 +298,17 @@ class SubscriptionApiController extends Controller
      */
     private function createFreeTrialSubscription($userId,$subscriptionId)
     {
+
+        $freePlan = SubscriptionPlans::where('id',1)->first();
+
         $userSubscription = UserSubscription::find($subscriptionId);
         $userSubscription->status = 'active';
         $userSubscription->stripe_status = 'active';
         $userSubscription->amount_paid = 0;
         $userSubscription->currency = 'GBP';
-        $userSubscription->total_download_limit = 3;
-        $userSubscription->daily_download_limit = 3;
+        $userSubscription->total_download_limit = $freePlan->total_download_limit;
+        $userSubscription->total_saved_limit = $freePlan->total_saved_limit;
+        $userSubscription->daily_download_limit = $freePlan->total_download_limit;
         $userSubscription->downloads_used_today = 0;
         $userSubscription->current_period_start = now();
         $userSubscription->current_period_end = now()->addDays(3);
@@ -371,10 +376,7 @@ class SubscriptionApiController extends Controller
                 $userSubscription->coupon_discount_id = isset($invoice['total_discount_amounts'][0]['discount']) ? $invoice['total_discount_amounts'][0]['discount'] : null;
                 
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
-                $userSubscription->total_download_limit = 40;
-                $userSubscription->daily_download_limit = 0;
                 $userSubscription->reset_date = now()->addMonths(1)->startOfMonth()->format('Y-m-d');
-
 
                 $userSubscription->last_payment_date = now();
                 $userSubscription->save();
