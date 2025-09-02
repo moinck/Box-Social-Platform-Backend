@@ -6,11 +6,13 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Models\BrandKit;
+use App\Models\EmailContent;
 use App\Models\FcaNumbers;
 use App\ResponseTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -121,6 +123,25 @@ class RegisterController extends Controller
             // Send verification email
             $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
             Helpers::sendVerificationMail($user, $token);
+
+            /** Send Mail to Users. Only User Register Between 16-Sep-2025 to 28-Sep-2025  */
+            $currentDate = Carbon::now();
+            $startDate = Carbon::parse('2025-09-16')->startOfDay();
+            $endDate = Carbon::parse('2025-09-28')->endOfDay();
+            if ($startDate <= $currentDate && $endDate >= $currentDate) {
+
+                $email_content = EmailContent::where('slug','welcome_beta_trial')->first();
+                
+                if ($email_content) {
+                    $data = [
+                        'email' => $user->email,
+                        'subject' => $email_content->subject,
+                        'content' => $email_content->content
+                    ];
+                    Helpers::sendDynamicContentEmail($data);
+                }
+            }
+
             DB::commit();
 
             return response()->json([
