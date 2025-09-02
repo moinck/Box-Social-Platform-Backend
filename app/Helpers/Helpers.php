@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Events\NewNotificationEvent;
+use App\Mail\DynamicContentMail;
 use App\Mail\RegisterVerificationMail;
 use App\Models\BrandKit;
 use App\Models\FcaNumbers;
@@ -1204,6 +1205,13 @@ class Helpers
         return [
             'before_first_oct_mail' => "BEFORE 1st OCT",
             'after_first_oct_mail' => "FROM 1st OCT",
+            'welcome_beta_trial' => "Welcome to Your Box Socials Beta Trial 🎉",
         ];
+    }
+
+    /** Send Dynamic Email Content */
+    public static function sendDynamicContentEmail($data)
+    {
+        Mail::to($data['email'])->send(new DynamicContentMail($data));
     }
 }
