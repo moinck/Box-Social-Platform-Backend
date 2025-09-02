@@ -209,7 +209,7 @@ class StockImageApiController extends Controller
             //         ->where('id', $tokenId)
             //         ->first();
             // }
-            $totalUserImageCount = ImageStockManagement::where('user_id', $authUserId)->count();
+            $totalUserImageCount = ImageStockManagement::where('user_id', $authUserId)->count() ?? 0;
             $authUserImages = ImageStockManagement::select('id','image_url')
                     ->where('user_id', $authUserId)
                     ->latest()
