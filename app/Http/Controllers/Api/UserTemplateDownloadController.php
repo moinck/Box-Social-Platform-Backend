@@ -182,8 +182,10 @@ class UserTemplateDownloadController extends Controller
             $section->addTextBreak(2);
             
             // Add Warning Message
-            $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
-            $section->addText($writtenData['warning_message'], $warningFont, 'contentStyle');
+            if (isset($writtenData['warning_message'])) {
+                $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
+                $section->addText($writtenData['warning_message'], $warningFont, 'contentStyle');
+            }
     
             if ($isImages == 'true') {
                 // Add separator before image
