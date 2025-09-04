@@ -700,6 +700,14 @@ class Helpers
                 $title = "New Subscription";
                 $body = "User " .$fullName." taken subscription";
                 break;
+            case 'subscription-expiring-soon':
+                $title = "Subscription Expiration";
+                $body = "The subscription for user " .$fullName." will expire on ".Carbon::parse($data->expiring_at)->format('d-m-Y');
+                break;
+            case 'subscription-failed':
+                $title = "Payment Failed";
+                $body = "The subscription payment of user ".$fullName." is failed.";
+                break;
             default:
                 $title = "New Notification";
                 $body = "New notification is submitted";
@@ -708,6 +716,7 @@ class Helpers
 
         if($title && $body){
             $newnotification = Notification::create([
+                'user_id' => $data->id,
                 'tital' => $title,
                 'body' => $body,
                 'type' => $type,

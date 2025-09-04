@@ -36,7 +36,7 @@ class NotificationController extends Controller
             ->addColumn('action', function ($notification) {
                 $encyptedId = Helpers::encrypt($notification->id);
                 return '
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon notification-mark-as-read-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read" data-notification-id="'.$encyptedId.'"><i class="ri-mail-check-fill"></i></a>
+                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon notification-mark-as-read-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Mark as Read" data-notification-id="'.$encyptedId.'"><i class="ri-notification-3-fill"></i></a>
                 ';
             })
             ->rawColumns(['title','message','type','action','created_date'])
