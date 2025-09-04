@@ -177,7 +177,7 @@ class UserTemplateDownloadController extends Controller
             $section->addText('Description:', $labelFont, 'contentStyle');
             
             // Parse HTML content from Quill editor
-            $this->htmlContentConversation($section, $writtenData['description'], $contentFont);
+            $this->htmlContentConversation($section, htmlspecialchars_decode($writtenData['description']), $contentFont);
             
             $section->addTextBreak(2);
             
@@ -220,15 +220,16 @@ class UserTemplateDownloadController extends Controller
         // Generate filename with title
         $filename = 'New Document-' . time() . '.docx';
     
+        
+        // Return the file as a download response
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+
         // Clean up all image files
         foreach ($imagePathsToCleanup as $imagePath) {
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
         }
-        
-        // Return the file as a download response
-        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
     
     /**
