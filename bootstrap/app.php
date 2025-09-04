@@ -48,6 +48,21 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->at('02:00')
                 ->withoutOverlapping()
                 ->runInBackground();
+                
+        // check user's expired subscriptions
+        $schedule->command('subscriptions:check-expired')
+                ->daily()
+                ->at('02:00')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+        //Free Trial Subscription Last Day mail
+        $schedule->command('SendLastDaySubMail')
+                ->daily()
+                ->at('10:00')
+                ->withoutOverlapping()
+                ->runInBackground();
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
