@@ -160,7 +160,7 @@ class UserTemplateDownloadController extends Controller
             }
         
             // Add main title
-            $section->addTitle($writtenData['title'], 1);
+            $section->addTitle(htmlspecialchars_decode(str_replace("&", "And ", $writtenData['title'])), 1);
             $section->addTextBreak(1);
             
             // Add a separator line
@@ -170,21 +170,23 @@ class UserTemplateDownloadController extends Controller
             
             // Add Category
             $section->addText('Category: ', $labelFont, 'contentStyle');
-            $section->addText($writtenData['category_name'], $contentFont);
+            $section->addText(htmlspecialchars_decode(str_replace("&", "And ", $writtenData['category_name'])), $contentFont);
             $section->addTextBreak(2);
             
             // Add Description with HTML parsing
             $section->addText('Description:', $labelFont, 'contentStyle');
+
+            $cleanHtml = str_replace("&", "And ", $writtenData['description']);
             
             // Parse HTML content from Quill editor
-            $this->htmlContentConversation($section, htmlspecialchars_decode($writtenData['description']), $contentFont);
+            $this->htmlContentConversation($section, htmlspecialchars_decode($cleanHtml), $contentFont);
             
             $section->addTextBreak(2);
             
             // Add Warning Message
             if (isset($writtenData['warning_message'])) {
                 $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
-                $section->addText($writtenData['warning_message'], $warningFont, 'contentStyle');
+                $section->addText(htmlspecialchars_decode(str_replace("&", "And ", $writtenData['warning_message'])), $warningFont, 'contentStyle');
             }
     
             if ($isImages == 'true') {
