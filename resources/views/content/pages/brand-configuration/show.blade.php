@@ -60,44 +60,44 @@
                     </div>
                     <div class="card-body">
                         <div class="form-floating form-floating-outline mb-5">
-                            <input type="text" class="form-control" id="brand_company_name" placeholder="Product title"
+                            <input type="text" class="form-control" id="brand_company_name" placeholder="Company Name"
                                 name="brand_company_name" value="{{ $brandKit->user->company_name }}"
-                                aria-label="Product title" readonly />
+                                aria-label="Company Name" readonly />
                             <label for="brand_company_name">Company Name</label>
                         </div>
 
                         <div class="row mb-5 gx-5">
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="email" class="form-control" id="brand_email" placeholder="00000"
-                                        name="brand_email" value="{{ $brandKit->user->email }}" aria-label="Product SKU" readonly />
+                                    <input type="email" class="form-control" id="brand_email" placeholder="Email"
+                                        name="brand_email" value="{{ $brandKit->user->email }}" aria-label="Email" readonly />
                                     <label for="brand_email">Email</label>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="number" class="form-control" id="brand_phone" placeholder="0123-4567"
-                                        name="brand_phone" value="{{ $brandKit->phone }}" aria-label="Product barcode" readonly />
+                                    <input type="number" class="form-control" id="brand_phone" placeholder="Phone"
+                                        name="brand_phone" value="{{ $brandKit->phone }}" aria-label="Phone" readonly />
                                     <label for="brand_phone">Phone</label>
                                 </div>
                             </div>
                         </div>
                         <div class="form-floating form-floating-outline mb-5">
-                            <textarea class="form-control h-px-75" id="brand_address" rows="3" placeholder="Product title"
-                                name="brand_address" aria-label="Product title" readonly>{{ $brandKit->address }}</textarea>
+                            <textarea class="form-control h-px-75" id="brand_address" rows="3" placeholder="Address"
+                                name="brand_address" aria-label="Address" readonly>{{ $brandKit->address }}</textarea>
                             <label for="brand_address">Address</label>
                         </div>
                         <div class="row mb-5 gx-5">
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" class="form-control" id="brand_state" placeholder="00000"
+                                    <input type="text" class="form-control" id="brand_state" placeholder="County"
                                         name="brand_state" value="{{ $brandKit->state }}" aria-label="Product SKU" readonly />
-                                    <label for="brand_state">State</label>
+                                    <label for="brand_state">County</label>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" class="form-control" id="brand_country" placeholder="0123-4567"
+                                    <input type="text" class="form-control" id="brand_country" placeholder="Country"
                                         name="brand_country" value="{{ $brandKit->country }}" readonly
                                         aria-label="Product barcode" />
                                     <label for="brand_country">Country</label>
@@ -108,7 +108,7 @@
                         <div class="row mb-5 gx-5">
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" class="form-control" id="brand_country" placeholder="0123-4567"
+                                    <input type="text" class="form-control" id="brand_country" placeholder="ABCD 1234"
                                         name="brand_country" value="{{ $brandKit->postal_code }}" readonly
                                         aria-label="Product barcode" />
                                     <label for="brand_country">Postalcode</label>
