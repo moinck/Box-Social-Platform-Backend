@@ -82,6 +82,9 @@ class PostTemplateController extends Controller
 
         return DataTables::of($postTemplates)
             ->addIndexColumn()
+            ->addColumn('checkbox', function ($data) {
+                return '<input type="checkbox" class="form-check-input template-checkbox" name="template_id[]" value="' . Helpers::encrypt($data->id) . '">';
+            })
             ->addColumn('template_image', function ($data) {
                 $categoryName = $data->category->name;
                 $templateImage = $data->template_image;
@@ -143,18 +146,23 @@ class PostTemplateController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_content', 'template_image', 'status', 'created_at'])
+            ->rawColumns(['checkbox','action', 'post_content', 'template_image', 'status', 'created_at'])
             ->make(true);
     }
 
     public function destroy(Request $request)
     {
-        $decryptedId = Helpers::decrypt($request->post_template_id);
-        $postTemplate = PostTemplate::find($decryptedId);
-        if ($postTemplate) {
-            // delete post-template image
-            Helpers::deleteImage($postTemplate->template_image);
-            $postTemplate->delete();
+        $decryptedIds = collect($request->post_template_id)->map(function ($encryptedId) {
+            return Helpers::decrypt($encryptedId);
+        })->toArray();
+
+        $postTemplates = PostTemplate::whereIn('id',$decryptedIds)->get();
+        if ($postTemplates->isNotEmpty()) {
+            foreach ($postTemplates as $key => $value) {
+                // delete post-template image
+                Helpers::deleteImage($value->template_image);
+                $value->delete();
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Post Template deleted successfully.'
@@ -169,14 +177,34 @@ class PostTemplateController extends Controller
 
     public function changeStatus(Request $request)
     {
-        $decryptedId = Helpers::decrypt($request->id);
-        $postTemplate = PostTemplate::find($decryptedId);
-        if ($postTemplate) {
-            $postTemplate->status = !$postTemplate->status;
-            $postTemplate->save();
+
+        $type = $request->type;
+        $decryptedIds = collect($request->post_template_id)->map(function ($encryptedId) {
+            return Helpers::decrypt($encryptedId);
+        })->toArray();
+
+        $postTemplates = PostTemplate::whereIn('id',$decryptedIds)->get();
+        
+        if ($postTemplates->isNotEmpty()) {
+
+            foreach ($postTemplates as $key => $value) {
+                if ($type == "single") {
+                    $value->status = !$value->status;
+                } else if ($type == "bulk" && $value->status == 1) {
+                    $value->status = !$value->status;
+                }
+
+                $value->save();
+            }
+
+            $message = "Post Template status has been updated successfully.";
+            if ($type == "bulk") {
+                $message = "Post Template has been disabled successfully.";
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Post Template status changed successfully.'
+                'message' => $message
             ]);
         } else {
             return response()->json([

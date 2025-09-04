@@ -5,8 +5,9 @@
 @section('main-content')
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="https://admin.boxsocials.com/assets/img/box-logo-horizontal.png" alt="Box Socials Logo" class="logo-img"
-            style="width: 100; height: 100px; display: block; margin: 0 auto;">
+        <img src="{{ asset('assets/img/box-logo-horizontal.png') }}" 
+            alt="Box Socials Logo"
+            style="display:block; margin:0 auto; width:300px; max-width:100%; height:auto;">
     </div>
     <hr>
 

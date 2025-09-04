@@ -108,7 +108,7 @@
                         <div class="row mb-5 gx-5">
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" class="form-control" id="brand_country" placeholder="ABCD 1234"
+                                    <input type="text" class="form-control" id="brand_country" placeholder="Postalcode"
                                         name="brand_country" value="{{ $brandKit->postal_code }}" readonly
                                         aria-label="Product barcode" />
                                     <label for="brand_country">Postalcode</label>
@@ -116,7 +116,7 @@
                             </div>
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" class="form-control" id="brand_state" placeholder="00000"
+                                    <input type="text" class="form-control" id="brand_state" placeholder="Website"
                                         name="brand_state" value="{{ $brandKit->website }}" aria-label="Product SKU" readonly/>
                                     <label for="brand_state">Website</label>
                                 </div>
