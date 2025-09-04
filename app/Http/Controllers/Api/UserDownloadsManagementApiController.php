@@ -78,7 +78,7 @@ class UserDownloadsManagementApiController extends Controller
                 $downloadCountStats = $subscription->downloadTracker->getDownloadStats();
 
                 // if plan is free & all limit is used then mark current subscription as ended
-                if ($subscription->plan_id == 1 && ($downloadCountStats['total_limit'] == $downloadCountStats['used']) && ($downloadCountStats['total_limit'] == $downloadCountStats['saved_used'])) {
+                if ($subscription->plan_id == 1 && ($downloadCountStats['total_limit'] == $downloadCountStats['used']) && ($downloadCountStats['total_saved_limit'] == $downloadCountStats['saved_used'])) {
                     $subscription->status = 'inactive';
                     $subscription->stripe_status = 'inactive';
                     $subscription->cancelled_at = $today;
@@ -140,7 +140,7 @@ class UserDownloadsManagementApiController extends Controller
                 $subscription->recordDownload($increaseCount, 1); // 1 => For Saved, 2 => For Download
                 $savedCountStats = $subscription->downloadTracker->getDownloadStats();
 
-                if ($subscription->plan_id == 1 && ($savedCountStats['total_limit'] == $savedCountStats['used']) && ($savedCountStats['total_limit'] == $savedCountStats['saved_used'])) {
+                if ($subscription->plan_id == 1 && ($savedCountStats['total_limit'] == $savedCountStats['used']) && ($savedCountStats['total_saved_limit'] == $savedCountStats['saved_used'])) {
                     $subscription->status = 'inactive';
                     $subscription->stripe_status = 'inactive';
                     $subscription->cancelled_at = $today;
