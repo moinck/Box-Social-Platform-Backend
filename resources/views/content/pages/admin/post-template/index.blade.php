@@ -37,15 +37,37 @@
             <div class="head-label">
                 <h5 class="card-title mb-0">Post Template</h5>
             </div>
-            <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                <div class="dt-buttons btn-group flex-wrap"> 
-                    <a href="{{ env('APP_FRONTEND', 'http://178.128.45.173:9163') }}/admin/create-templates?token={{ $currentAdminToken ?? '' }}" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Template">
-                        <span>
-                            <i class="ri-add-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">Create Post Template</span>
-                        </span>
-                    </a>
+            <div class="d-flex gap-2">
+                <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                    <div class="dt-buttons btn-group flex-wrap"> 
+                        <a href="{{ env('APP_FRONTEND', 'http://178.128.45.173:9163') }}/admin/create-templates?token={{ $currentAdminToken ?? '' }}" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Template">
+                            <span>
+                                <i class="ri-add-line ri-16px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">Create Post Template</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="dt-action-buttons text-end pt-3 pt-md-0 d-none" id="template-delete-btn-div" >
+                    <div class="dt-buttons btn-group flex-wrap"> 
+                        <button class="btn btn-danger waves-effect waves-light" type="button" id="template-delete-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Delete Templates">
+                            <span>
+                                <i class="ri-delete-bin-line ri-16px me-sm-2" style="vertical-align: baseline;"></i>
+                                <span class="d-none d-sm-inline-block">Delete</span>
+                            </span>
+                        </button> 
+                    </div>
+                </div>
+                <div class="dt-action-buttons text-end pt-3 pt-md-0 d-none" id="template-disabled-btn-div" >
+                    <div class="dt-buttons btn-group flex-wrap"> 
+                        <button class="btn waves-effect waves-light" style="background-color: #141313;color:#ffffff;" type="button" id="template-disabled-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Disable Templates">
+                            <span>
+                                <i class="ri-lock-line ri-16px me-sm-2" style="vertical-align: baseline;"></i>
+                                <span class="d-none d-sm-inline-block">Disable</span>
+                            </span>
+                        </button> 
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,7 +75,9 @@
             <table class="dt-fixedheader table table-bordered" id="post-template-data-table">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th class="col-1 checkbox-th">
+                            <input type="checkbox" class="form-check-input" id="select-all" title="Select All" style="width: 1.1rem;">
+                        </th>
                         <th>Template</th>
                         <th>Post Content</th>
                         <th>Category</th>
@@ -158,7 +182,7 @@
                         });
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
                         { data: 'template_image', name: 'template_image'},
                         { data: 'post_content', name: 'post_content'},
                         { data: 'category', name: 'category'},
@@ -185,9 +209,30 @@
                 e.preventDefault();
                 var id = $(this).data('id');
 
+                changeTemplateStatus(id.split(","),'single');
+            });
+
+            //Bulk Template change status
+            $(document).on('click', '#template-disabled-btn', function (e) {
+                e.preventDefault();
+                var selectedIds = $('.template-checkbox:checked').map(function () {
+                            return $(this).val();
+                        }).get();
+
+                changeTemplateStatus(selectedIds,'bulk');
+            });
+
+
+            function changeTemplateStatus(id,type) {
+
+                var titleLabel = "You want to change status!"
+                if (type=='bulk') {
+                    titleLabel = "You want to disable template!";
+                }
+
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You want to change status!",
+                    text: titleLabel,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, change it!',
@@ -202,7 +247,8 @@
                             url: "{{ route('post-template.change-status') }}",
                             type: "POST",
                             data: {
-                                id: id,
+                                post_template_id: id,
+                                type: type,
                                 _token: "{{ csrf_token() }}"
                             },
                             beforeSend: function () {
@@ -213,7 +259,7 @@
                             },
                             success: function (response) {
                                 if (response.success == true) {
-                                    showSweetAlert('success', 'Updated !','Post Template status has been updated successfully.');
+                                    showSweetAlert('success', 'Updated !',response.message);
                                     PostTemplateDataTable();
                                 }
                             },
@@ -223,16 +269,37 @@
                                 showSweetAlert('error', 'Error !', 'Something went wrong.');
                             }
                         });
+
+                        $('#template-delete-btn-div').addClass('d-none');
+                        $('#template-disabled-btn-div').addClass('d-none');
+                        $('.template-checkbox').prop('checked', false);
                     } else {
                         $(this).prop('checked', !$(this).prop('checked'));
                     }
                 });
-            });
+
+            }
+
             // ----------------------------------------------------------
 
             // delete post template
             $(document).on('click', '.delete-post-template-btn', function() {
                 var postTemplateId = $(this).data('post-template-id');
+                
+                deleteTemplates(postTemplateId.split(","));
+            });
+
+            // Bulk delete post template
+            $(document).on('click', '#template-delete-btn', function() {
+                var selectedIds = $('.template-checkbox:checked').map(function () {
+                            return $(this).val();
+                        }).get();
+                
+                deleteTemplates(selectedIds);
+            });
+
+            function deleteTemplates(postTemplateId) {
+
                 var selectedCategory = $('#category_filter').val();
                 var selectedStatus = $('#status_filter').val();
                 Swal.fire({
@@ -277,6 +344,10 @@
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
+
+                                $('#template-delete-btn-div').addClass('d-none');
+                                $('#template-disabled-btn-div').addClass('d-none');
+                                $('.template-checkbox').prop('checked', false);
                             },
                             error: function(xhr, status, error) {
                                 hideBSPLoader();
@@ -286,7 +357,8 @@
                         });
                     }
                 });
-            });
+            }
+
             // ----------------------------------------------------------
 
             // show image modal
@@ -346,6 +418,30 @@
                 });
             });
             // ----------------------------------------------------------
+
+            // show hide btn
+            $(document).on('change', '.template-checkbox', function () {
+                if ($('.template-checkbox:checked').length > 0) {
+                    $('#template-delete-btn-div').removeClass('d-none');
+                    $('#template-disabled-btn-div').removeClass('d-none');
+                } else {
+                    $('#template-delete-btn-div').addClass('d-none');
+                    $('#template-disabled-btn-div').addClass('d-none');
+                }
+            });
+
+            // select all
+            $(document).on('click', '#select-all', function () {
+                $('.template-checkbox').prop('checked', this.checked);
+                if ($('.template-checkbox:checked').length > 0) {
+                    $('#template-delete-btn-div').removeClass('d-none');
+                    $('#template-disabled-btn-div').removeClass('d-none');
+                } else {
+                    $('#template-delete-btn-div').addClass('d-none');
+                    $('#template-disabled-btn-div').addClass('d-none');
+                }
+            });
+            // -------------------------------------------
 
         });
     </script>
