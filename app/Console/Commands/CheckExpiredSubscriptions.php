@@ -147,6 +147,8 @@ class CheckExpiredSubscriptions extends Command
             foreach ($upcomingExpired as $subscription) {
                 $user = $subscription->user;
                 $userName = $user ? $user->name : 'Unknown User';
+                $user['expiring_at'] = $subscription->current_period_end;
+                Helpers::sendNotification($user, "subscription-expiring-soon");
                 $this->line("  - {$userName} (ID: {$subscription->id}) expires on {$subscription->current_period_end}");
             }
         } else {

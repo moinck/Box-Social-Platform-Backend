@@ -425,6 +425,8 @@ class SubscriptionApiController extends Controller
             $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
             $newPayment->status = 'failed';
             $newPayment->save();
+
+            Helpers::sendNotification($subscription->user, "subscription-failed");
         }
     }
 

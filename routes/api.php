@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BetaTesterController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\IconManagementAPiController;
+use App\Http\Controllers\Api\NotificationApiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
@@ -136,6 +137,10 @@ Route::group([
 
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
+
+        //User Notification
+        Route::get('/notifications', [NotificationApiController::class, 'list']);
+
     });
 });
 // ======================================================================================================

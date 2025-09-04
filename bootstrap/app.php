@@ -60,6 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('SendLastDaySubMail')
                 ->daily()
                 ->at('10:00')
+                ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
 
