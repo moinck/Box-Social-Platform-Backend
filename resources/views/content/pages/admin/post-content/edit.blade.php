@@ -100,6 +100,7 @@
                                 Cancel
                             </button>
                         </div>
+                        <input type="hidden" id="isValidate" value="0" readonly>
                     </form>
                 </div>
             </div>
@@ -322,6 +323,9 @@
 
             // get sub category
             function GetSubCategory(category_id) {
+
+                var isValidate = $("#isValidate").val();
+
                 $.ajax({
                     url: '{{ route('post-content.sub-category.get.data') }}',
                     type: 'GET',
@@ -348,6 +352,7 @@
                             });
                             $('#post_content_edit_sub_category').html(option);
                             $('#selectSubCategory-edit-div').removeClass('d-none');
+                            $("#isValidate").val(1);
 
                             validator.revalidateField('post_content_edit_sub_category');
                             validator.addField(`post_content_edit_sub_category`, {
@@ -362,10 +367,13 @@
                             var subCategoryField = $('#post_content_edit_sub_category');
                             if (editSubCategoryId != 0) {
                                 validator.revalidateField('post_content_edit_sub_category');
+                            }
+                            if (isValidate == 1) {
                                 validator.removeField(`post_content_edit_sub_category`);
                             }
                             subCategoryField.html('<option value="">Select Subcategory</option>');
                             $('#selectSubCategory-edit-div').addClass('d-none');
+                            $("#isValidate").val(0);
                         }
                     }
                 });

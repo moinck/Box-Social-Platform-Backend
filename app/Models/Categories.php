@@ -14,6 +14,7 @@ class Categories extends Model
         'description',
         'status',
         'is_comming_soon',
+        'custom_label',
     ];
 
     public function parent()
@@ -32,10 +33,10 @@ class Categories extends Model
      */
     public static function getActiveCategoeyList()
     {
-        return Categories::select(['id', 'name'])->where(function ($query) {
+        return Categories::select(['id', 'name', 'is_comming_soon'])->where(function ($query) {
             $query->where('status', true)
-                ->where('parent_id', null)
-                ->where('is_comming_soon', false);
+                ->where('parent_id', null);
+                // ->where('is_comming_soon', false);
         })->orderBy('name', 'asc')->get();
     }
 }

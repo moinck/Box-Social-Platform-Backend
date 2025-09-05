@@ -75,7 +75,8 @@ class CategoriesController extends Controller
             'category_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_description' => 'required|string',
             'category_status' => 'required|string|in:active,inactive',
-            'category_coming_soon' => 'required|string|in:true,false',
+            'category_coming_soon' => 'required|string',
+            'custom_label' => 'required_if:category_coming_soon,2',
             'subcategory_name' => 'nullable|array',
             'subcategory_name.*' => 'required|string|max:255',
         ]);
@@ -88,7 +89,8 @@ class CategoriesController extends Controller
         $category->image = $image_url;
         $category->description = $request->category_description;
         $category->status = $request->category_status == 'active' ? true : false;
-        $category->is_comming_soon = $request->category_coming_soon == 'true' ? true : false;
+        $category->is_comming_soon = $request->category_coming_soon;
+        $category->custom_label = isset($request->custom_label) ? $request->custom_label : null;
         $category->save();
 
         // add subcategories
@@ -138,7 +140,8 @@ class CategoriesController extends Controller
             'edit_category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'edit_category_description' => 'required|string',
             'edit_category_status' => 'required|string|in:active,inactive',
-            'edit_category_coming_soon' => 'required|string|in:true,false',
+            'edit_category_coming_soon' => 'required|string',
+            'edit_custom_label' => 'required_if:edit_category_coming_soon,2',
             'edit_subcategory_ids' => 'nullable|json',
         ]);
 
@@ -148,7 +151,8 @@ class CategoriesController extends Controller
             $category->name = $request->edit_category_name;
             $category->description = $request->edit_category_description;
             $category->status = $request->edit_category_status == 'active' ? true : false;
-            $category->is_comming_soon = $request->edit_category_coming_soon == 'true' ? true : false;
+            $category->is_comming_soon = $request->edit_category_coming_soon;
+            $category->custom_label = isset($request->edit_custom_label) ? $request->edit_custom_label : null;
 
             if ($request->hasFile('edit_category_image')) {
                 // delete old image

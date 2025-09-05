@@ -16,7 +16,7 @@ class PostContentController extends Controller
     {
         $categories = Categories::getActiveCategoeyList();
         $subCategories = Categories::whereNotNull(columns: 'parent_id')
-            ->where('is_comming_soon', false)
+            // ->where('is_comming_soon', false)
             ->select('id', 'name')
             ->get();
         
@@ -28,8 +28,8 @@ class PostContentController extends Controller
         $categories = Categories::with('children:id,name,parent_id')
             ->where(function ($query) {
                 $query->where('status', true)
-                    ->where('parent_id', null)
-                    ->where('is_comming_soon', false);
+                    ->where('parent_id', null);
+                    // ->where('is_comming_soon', false);
             })
             ->orderBy('name', 'asc')
             ->get();
@@ -41,8 +41,8 @@ class PostContentController extends Controller
     {
         $categories = Categories::whereNotNull(columns: 'parent_id')
             ->where(function ($query) use ($request) {
-                $query->where('parent_id', $request->category_id)
-                    ->where('is_comming_soon', false);
+                $query->where('parent_id', $request->category_id);
+                    // ->where('is_comming_soon', false);
             })
             ->orderBy('name', 'asc')
             ->get();

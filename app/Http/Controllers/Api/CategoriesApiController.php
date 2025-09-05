@@ -20,49 +20,48 @@ class CategoriesApiController extends Controller
                 ->where('parent_id', null);
         })->with('children:id,name,parent_id,is_comming_soon')->latest()->get();
 
-        // send data to resource
-        // $categoryCollection = CategoryResource::collection($categories);
-        $categoryCollection = [];
         $commingSoonCategories = [];
         $notCommingSoonCategories = [];
+        $customCategories = [];
+
+        $formatCategory = function ($category) {
+            return [
+                'id' => Helpers::encrypt($category->id),
+                'name' => $category->name,
+                'image' => asset($category->image),
+                'is_comming_soon' => $category->is_comming_soon,
+                'custom_label' => $category->is_comming_soon == 1 ? "Coming Soon!" : $category->custom_label,
+                'sub_categories' => $category->children->map(function ($child) {
+                    return [
+                        'id' => Helpers::encrypt($child->id),
+                        'name' => $child->name,
+                        'is_comming_soon' => $child->is_comming_soon,
+                    ];
+                }),
+            ];
+        };
+
+
         foreach ($categories as $category) {
 
-            $isCommingSoon = $category->is_comming_soon;
+            $formatted = $formatCategory($category);
 
-            if ($isCommingSoon) {
-                $commingSoonCategories[] = [
-                    'id' => Helpers::encrypt($category->id),
-                    'name' => $category->name,
-                    'image' => asset($category->image),
-                    'is_comming_soon' => $isCommingSoon,
-                    'sub_categories' => $category->children->map(function ($child) {
-                        return [
-                            'id' => Helpers::encrypt($child->id),
-                            'name' => $child->name,
-                            'is_comming_soon' => $child->is_comming_soon,
-                        ];
-                    }),
-                ];
-            } else {
-                $notCommingSoonCategories[] = [
-                    'id' => Helpers::encrypt($category->id),
-                    'name' => $category->name,
-                    'image' => asset($category->image),
-                    'is_comming_soon' => $isCommingSoon,
-                    'sub_categories' => $category->children->map(function ($child) {
-                        return [
-                            'id' => Helpers::encrypt($child->id),
-                            'name' => $child->name,
-                            'is_comming_soon' => $child->is_comming_soon,
-                        ];
-                    }),
-                ];
+            switch ($category->is_comming_soon) {
+                case 1:
+                    $commingSoonCategories[] = $formatted;
+                    break;
+                case 2:
+                    $customCategories[] = $formatted;
+                    break;
+                default:
+                    $notCommingSoonCategories[] = $formatted;
             }
         }
 
         $returnData = [
             'active' => $notCommingSoonCategories,
             'coming_soon' => $commingSoonCategories,
+            'custom' => $customCategories
         ];
 
         return $this->success($returnData, 'Categories list.');
