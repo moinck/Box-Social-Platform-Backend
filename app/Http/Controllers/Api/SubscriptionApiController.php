@@ -190,6 +190,7 @@ class SubscriptionApiController extends Controller
             $data = [
                 'customer' => $userStripeCustomerId,
                 'items' => [[ 'price' => $subscriptionPlanDetail->stripe_price_id ]],
+                'cancel_at_period_end' => true,
                 'payment_behavior' => 'default_incomplete',
                 'default_payment_method' => $request->payment_method, // set here
                 'payment_settings' => [
@@ -218,6 +219,11 @@ class SubscriptionApiController extends Controller
             $newSubscription->stripe_subscription_id = $subscription->id;
             $newSubscription->stripe_payment_method_id = $request->payment_method;
             $newSubscription->client_secret = $subscription->latest_invoice->confirmation_secret->client_secret;
+            if ($subscription->cancel_at_period_end == true) {
+                $newSubscription->is_subscription_cancel = true;
+                $newSubscription->cancelled_at = now();
+                $newSubscription->save();
+            }
             if (!empty($coupon_details)) {
                 $newSubscription->coupon_id = $coupon_details['coupon'];
                 $newSubscription->coupon_code = $coupon_details['coupon_code'];
