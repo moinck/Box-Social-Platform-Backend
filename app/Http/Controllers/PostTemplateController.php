@@ -156,7 +156,7 @@ class PostTemplateController extends Controller
             return Helpers::decrypt($encryptedId);
         })->toArray();
 
-        $postTemplates = PostTemplate::whereIn('id',$decryptedIds)->get();
+        $postTemplates = PostTemplate::select('id','template_image')->whereIn('id',$decryptedIds)->get();
         if ($postTemplates->isNotEmpty()) {
             foreach ($postTemplates as $key => $value) {
                 // delete post-template image
@@ -183,7 +183,7 @@ class PostTemplateController extends Controller
             return Helpers::decrypt($encryptedId);
         })->toArray();
 
-        $postTemplates = PostTemplate::whereIn('id',$decryptedIds)->get();
+        $postTemplates = PostTemplate::select('id','status')->whereIn('id',$decryptedIds)->get();
         
         if ($postTemplates->isNotEmpty()) {
 

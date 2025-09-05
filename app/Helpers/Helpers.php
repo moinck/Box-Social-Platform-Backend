@@ -687,6 +687,7 @@ class Helpers
         $title = "";
         $body = "";
         $fullName = ($data->first_name ?? '')." ".($data->last_name ?? '');
+        $dataId = $data->id ?? null;
         switch ($type) {
             case 'new-registration':
                 $title = "New Registration";
@@ -695,6 +696,7 @@ class Helpers
             case 'new-contact-us':
                 $title = "New Feedback";
                 $body = "New feedback is given by ".$data->name;
+                $dataId = null;
                 break;
             case 'new-subscription':
                 $title = "New Subscription";
@@ -711,12 +713,13 @@ class Helpers
             default:
                 $title = "New Notification";
                 $body = "New notification is submitted";
+                $dataId = null;
                 break;
         }
 
         if($title && $body){
             $newnotification = Notification::create([
-                'user_id' => $data->id,
+                'user_id' => $dataId,
                 'tital' => $title,
                 'body' => $body,
                 'type' => $type,
