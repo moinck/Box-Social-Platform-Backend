@@ -534,7 +534,7 @@ class SubscriptionApiController extends Controller
                 return $this->success([], 'Webhook call not responsed.', 206);
             }
 
-            if ($user_subscription->stripe_status == "paid" && $user_subscription->is_subscription_cancel != true) {
+            if ($user_subscription->stripe_status == "paid") {
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
             }
 
