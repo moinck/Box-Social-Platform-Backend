@@ -115,10 +115,18 @@
                                 <select id="category_coming_soon" name="category_coming_soon" class="form-select"
                                     aria-label="Default select example">
                                     <option value="">Select Coming Soon</option>
-                                    <option value="true">Yes</option>
-                                    <option value="false" selected>No</option>
+                                    <option value="1">Yes</option>
+                                    <option value="2">Yes Custom</option>
+                                    <option value="0" selected>No</option>
                                 </select>
                                 <label for="category_coming_soon">Coming Soon</label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-none" id="custom_label_div">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="custom_label" name="custom_label" class="form-control"
+                                    placeholder="Custom Label" required />
+                                <label for="custom_label">Custom Label</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -200,10 +208,18 @@
                                 <select id="edit_category_coming_soon" name="edit_category_coming_soon" class="form-select"
                                     aria-label="Default select example">
                                     <option value="">Select Coming Soon</option>
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
+                                    <option value="1">Yes</option>
+                                    <option value="2">Yes Custom</option>
+                                    <option value="0">No</option>
                                 </select>
                                 <label for="edit_category_coming_soon">Coming Soon</label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-none" id="edit_custom_label_div">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="edit_custom_label" name="edit_custom_label" class="form-control"
+                                    placeholder="Custom Label" required />
+                                <label for="edit_custom_label">Custom Label</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -292,6 +308,9 @@
                 subcategoryCount = 0;
                 // reset the form validation
                 addCategoryFV.resetForm();
+
+                $("#custom_label_div").addClass('d-none');
+
                 $('#add-category-modal').modal('show');
             });
             // -------------------------------------------
@@ -349,6 +368,21 @@
                                 message: 'Please select Category Coming Soon'
                             }
                         }
+                    },
+                    custom_label: {
+                        validators: {
+                            callback: {
+                                message: 'Please enter your custom label',
+                                callback: function(data, validator, $field) {
+                                    const comingSoonVal = $('#add-category-form [name="category_coming_soon"]').val();
+                                    
+                                    if (comingSoonVal == 2) {
+                                        return (data.value !== null && data.value.trim() !== '');
+                                    }
+                                    return true; // Not required if not "2"
+                                }
+                            }
+                        }
                     }
                 },
                 plugins: {
@@ -357,7 +391,7 @@
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
                             // Customize row selector based on your form layout
-                            if (['category_name', 'category_image', 'category_description'].includes(field)) {
+                            if (['category_name', 'category_image', 'category_description', 'custom_label'].includes(field)) {
                                 return '.col-12';
                             }
                             if (['category_status', 'category_coming_soon'].includes(field)) {
@@ -474,11 +508,13 @@
                             }
 
                             $('#edit_category_coming_soon').val(response.data.is_comming_soon);
-                            var accountStatus = response.data.is_comming_soon;
-                            if (accountStatus == true) {
-                                $('#edit_category_coming_soon').val('true');
+                           
+                            if (response.data.is_comming_soon == 2) {
+                                $("#edit_custom_label_div").removeClass('d-none');
+                                $('#edit_custom_label').val(response.data.custom_label);
                             } else {
-                                $('#edit_category_coming_soon').val('false');
+                                $("#edit_custom_label_div").addClass('d-none');
+                                $('#edit_custom_label').val(response.data.custom_label);
                             }
 
                             // check ig image contain http o https
@@ -604,6 +640,20 @@
                                     message: 'Please select coming soon status'
                                 }
                             }
+                        },
+                        edit_custom_label: {
+                            validators: {
+                                callback: {
+                                    message: 'Please enter your custom label',
+                                    callback: function(data, validator, $field) {
+                                        const comingSoonVal = $('#edit-category-form [name="edit_category_coming_soon"]').val();
+                                        if (comingSoonVal == 2) {
+                                            return (data.value !== null && data.value.trim() !== '');
+                                        }
+                                        return true; // Not required if not "2"
+                                    }
+                                }
+                            }
                         }
                     },
                     plugins: {
@@ -612,7 +662,7 @@
                             eleValidClass: '',
                             rowSelector: function(field, ele) {
                                 // Customize row selector based on your form layout
-                                if (['edit_category_name', 'edit_category_description'].includes(field)) {
+                                if (['edit_category_name', 'edit_category_description','edit_custom_label'].includes(field)) {
                                     return '.col-12';
                                 }
                                 if (['edit_category_image'].includes(field)) {
@@ -833,6 +883,31 @@
                 subcategoryEditCount--;
             });
             // ----------------------------------------------------------
+
+            //Comming Soon type change 
+            //Create : When type is Yes Custom show Input Box
+            $(document).on('click', '#category_coming_soon', function() {
+                var type = $(this).val();
+
+                if (type == 2) {
+                    $("#custom_label_div").removeClass('d-none');
+                } else {
+                    $("#custom_label_div").addClass('d-none');
+                    $("#custom_label").val('');
+                }
+            });
+            
+            //Edit: When type is Yes Custom show Input Box
+            $(document).on('click', '#edit_category_coming_soon', function() {
+                var type = $(this).val();
+
+                if (type == 2) {
+                    $("#edit_custom_label_div").removeClass('d-none');
+                } else {
+                    $("#edit_custom_label_div").addClass('d-none');
+                    $("#edit_custom_label").val('');
+                }
+            });
         });
     </script>
 @endsection

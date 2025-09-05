@@ -98,6 +98,7 @@
                                 Cancel
                             </button>
                         </div>
+                        <input type="hidden" id="isValidate" value="0" readonly>
                     </form>
                 </div>
             </div>
@@ -299,6 +300,7 @@
             // post category change event
             $('#post_category').change(function() {
                 var category_id = $(this).val();
+                var isValidate = $("#isValidate").val();
                 if (category_id.length == 0) {
                     $('#post_sub_category').html('<option value="">Select Subcategory</option>');
                     $('#selectSubCategory-div').addClass('d-none');
@@ -329,6 +331,7 @@
                             });
                             $('#post_sub_category').html(option);
                             $('#selectSubCategory-div').removeClass('d-none');
+                            $("#isValidate").val(1);
 
                             validator.revalidateField('post_sub_category');
                             validator.addField(`post_sub_category`, {
@@ -340,11 +343,14 @@
                             });
 
                         } else {
-                            $('#post_sub_category').html(
-                                '<option value="">Select Subcategory</option>');
+                            
+                            $('#post_sub_category').html('<option value="">Select Subcategory</option>');
                             $('#selectSubCategory-div').addClass('d-none');
                             validator.revalidateField('post_sub_category');
-                            // validator.removeField(`post_sub_category`);
+                            if (isValidate == 1) {
+                                validator.removeField(`post_sub_category`);
+                            }
+                            $("#isValidate").val(0);
                         }
                     }
                 });

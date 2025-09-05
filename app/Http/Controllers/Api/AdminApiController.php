@@ -31,7 +31,7 @@ class AdminApiController extends Controller
             ->where(function ($query) use ($categoryIds) {
                 $query->where('status', true)
                     ->where('parent_id', null)
-                    ->where('is_comming_soon', false)
+                    // ->where('is_comming_soon', false)
                     ->whereIn('id', $categoryIds);
             })
             ->get()
@@ -45,8 +45,8 @@ class AdminApiController extends Controller
         $subCategories = Categories::select('id', 'name','parent_id')
             ->where(function ($query) {
                 $query->whereNotNull('parent_id')
-                    ->where('status', true)
-                    ->where('is_comming_soon', false);
+                    ->where('status', true);
+                    // ->where('is_comming_soon', false);
             })
             ->get()
             ->map(function ($subCategory) {
