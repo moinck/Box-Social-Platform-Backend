@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\ResponseTrait;
@@ -21,13 +22,28 @@ class NotificationApiController extends Controller
 
             $userId = Auth::user()->id;
 
-            $notifications = Notification::where("user_id", $userId)->orderBy('id','DESC')->get();
+            $notifications = Notification::where("user_id", $userId)
+                ->where('type','!=','new-registration')
+                ->orderBy('id','DESC')
+                ->get();
 
-            return $this->success($notifications,"Notification fetched.",200);
+            $returnData = [];
+            foreach ($notifications as $notification) {
+                $returnData[] = [
+                    'id' => Helpers::encrypt($notification->id),
+                    'type' => $notification->type,
+                    'title' => $notification->tital,
+                    'message' => $notification->body,
+                    'is_read' => $notification->is_read,
+                    'created_at' => $notification->created_at->format('d-m-Y H:i A'),
+                ];
+            }
+
+            return $this->success($returnData,"Notification fetched.",200);
 
         } catch (Exception $e) {
             Log::error($e);
-            return $this->error("SOmething went wrong.",500);
+            return $this->error("Something went wrong.",500);
         }
     }
 }
