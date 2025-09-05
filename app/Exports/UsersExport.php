@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Helpers\Helpers;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -76,7 +77,7 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
             $user->hasBrandKit() ? 'Yes' : 'No',
             $user->is_verified ? 'Yes' : 'No',
             $user->status == 'active' ? 'Active' : 'Inactive',
-            \Carbon\Carbon::parse($user->created_at)->format('d-m-Y')
+            Helpers::dateFormate($user->created_at),
         ];
     }
 
@@ -87,7 +88,7 @@ class UsersExport extends DefaultValueBinder implements FromCollection, WithHead
      */
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:J1')->applyFromArray([
+        $sheet->getStyle('A1:M1')->applyFromArray([
             'font' => [
                 'bold' => true,
             ],
