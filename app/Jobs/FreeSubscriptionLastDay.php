@@ -37,8 +37,8 @@ class FreeSubscriptionLastDay implements ShouldQueue
 
             if ($this->type == 1) {
                 $slug = 'before_first_oct_mail';
-                $placeholder = '|Click here|';
-                $link = "<b><a href='" . env('APP_FRONTEND_URL') . "dashboard'>Click here</a></b>";
+                $placeholder = '|Box Socials Beta Tester Feedback|';
+                $link = "<b><a href='https://www.surveymonkey.com/r/CT32D7F'><u>Box Socials Beta Tester Feedback</u></a></b>";
             } else {
                 $slug = 'after_first_oct_mail';
                 $placeholder = '|Link to Upgrade to Pro Plan|';

@@ -143,7 +143,7 @@ class ProfileManagementApiController extends Controller
             'last_name' => 'required',
             'company_name' => 'required',
             'fca_number' => 'required',
-            'website' => 'nullable|url',
+            'website' => ['nullable','string','regex:/^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/.*)?$/i'],
             'email' => 'required|email',
             'authorisation_type' => 'required|numeric',
             'appointed_network'  => 'sometimes|required_if:authorisation_type,2|string|nullable',

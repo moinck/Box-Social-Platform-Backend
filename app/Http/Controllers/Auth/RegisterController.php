@@ -63,7 +63,7 @@ class RegisterController extends Controller
             ],
             'company_name' => 'required|string',
             'fca_number' => 'required|numeric|min:6|unique:users,fca_number|unique:fca_numbers,fca_number',
-            'website' => 'nullable|string|url',
+            'website' => ['nullable','string','regex:/^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/.*)?$/i'],
             'authorisation_type' => 'required|numeric',
             'appointed_network'  => 'sometimes|required_if:authorisation_type,2|string|nullable',
             'company_type' => 'required|numeric',
