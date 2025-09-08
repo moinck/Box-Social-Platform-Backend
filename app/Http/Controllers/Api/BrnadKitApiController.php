@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\BrandKit;
 use App\Models\SocialMedia;
 use Faker\Extension\Helper;
+use Illuminate\Support\Facades\Cache;
 
 class BrnadKitApiController extends Controller
 {
@@ -187,42 +188,44 @@ class BrnadKitApiController extends Controller
             return $this->error('Unauthorized', 401);
         }
 
-        $brandKitObj = BrandKit::where('user_id', $user->id)->first();
-        if (empty($brandKitObj)) {
-            return $this->error('BrandKit not found', 404);
-        }
+        $cacheKey = 'brandkit_' . $user->id;
 
-        $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
-        $SocialMediaIcon = [];
-        if (!empty($SocialMediaObj)) {
-            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
-        }
-
-        // design style
-        $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
-        if (empty($designStyle)) {
-            $designStyle = null;
-        }
-
-        $path = $brandKitObj->logo;
-        $base64Image = null;
-        if (!empty($path)) {
-            $mime = pathinfo($path, PATHINFO_EXTENSION);
-            if ($mime == 'svg') {
-                $mime = 'svg+xml';
+        $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
+            
+            $brandKitObj = BrandKit::where('user_id', $user->id)->first();
+            if (empty($brandKitObj)) {
+                return null; // Handle later outside cache
+                // return $this->error('BrandKit not found', 404);
             }
-            $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
-        }
 
-        // if ($brandKitObj->base64_logo == null) {
-        //     $brandKitObj->base64_logo = $base64Image;
-        //     $brandKitObj->save();
-        // }
+            $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
+            $SocialMediaIcon = [];
+            if (!empty($SocialMediaObj)) {
+                $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data Fetched Successfully.',
-            'data' => [
+            // design style
+            $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
+            if (empty($designStyle)) {
+                $designStyle = null;
+            }
+
+            $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
+            if (empty($designStyle)) {
+                $designStyle = null;
+            }
+
+            $path = $brandKitObj->logo;
+            $base64Image = null;
+            if (!empty($path)) {
+                $mime = pathinfo($path, PATHINFO_EXTENSION);
+                if ($mime == 'svg') {
+                    $mime = 'svg+xml';
+                }
+                $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            }
+
+            return [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $base64Image,
@@ -243,7 +246,23 @@ class BrnadKitApiController extends Controller
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
                 "social_media_icon_show" => $SocialMediaIcon,
                 // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
-            ],
+            ];
+
+        });
+
+        // if ($brandKitObj->base64_logo == null) {
+        //     $brandKitObj->base64_logo = $base64Image;
+        //     $brandKitObj->save();
+        // }
+
+        if (!$data) {
+            return $this->error('BrandKit not found', 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Fetched Successfully.',
+            'data' => $data,
         ], 200);
     }
 

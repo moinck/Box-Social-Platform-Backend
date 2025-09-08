@@ -230,6 +230,8 @@
                     titleLabel = "You want to disable template!";
                 }
 
+                var table = $('#post-template-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: titleLabel,
@@ -260,7 +262,8 @@
                             success: function (response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Updated !',response.message);
-                                    PostTemplateDataTable();
+                                    // PostTemplateDataTable();
+                                    reloadDataTablePreservingPage(table); 
                                 }
                             },
                             error: function (xhr) {
@@ -302,6 +305,8 @@
 
                 var selectedCategory = $('#category_filter').val();
                 var selectedStatus = $('#status_filter').val();
+                var table = $('#post-template-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -332,6 +337,7 @@
                                 if (response.success == true) {
                                     // PostTemplateDataTable();
                                     showSweetAlert('success', 'Deleted!', 'Post Template has been deleted.');
+                                    reloadDataTablePreservingPage(table); 
 
                                     setTimeout(function() {
                                         $('#category_filter').val(selectedCategory);
@@ -443,6 +449,13 @@
             });
             // -------------------------------------------
 
+            //Datatable Reload with same page
+            function reloadDataTablePreservingPage(dataTable) {
+                var currentPage = dataTable.page();
+                dataTable.ajax.reload(function() {
+                    dataTable.page(currentPage).draw(false);
+                }, false);
+            }
         });
     </script>
 @endsection

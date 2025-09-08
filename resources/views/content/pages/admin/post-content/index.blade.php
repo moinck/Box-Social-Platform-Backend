@@ -256,6 +256,8 @@
             // delete post content
             $(document).on('click', '.delete-post-content-btn', function() {
                 var postId = $(this).data('post-id');
+                var table = $('#post-content-data-table').DataTable();
+                
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -285,7 +287,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'Post Content has been deleted.');
-                                    PostContentDataTable();
+                                    // PostContentDataTable();
+                                    reloadDataTablePreservingPage(table); 
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
@@ -341,6 +344,14 @@
                 });
             });
             // -------------------------------------------
+
+            //Datatable Reload with same page
+            function reloadDataTablePreservingPage(dataTable) {
+                var currentPage = dataTable.page();
+                dataTable.ajax.reload(function() {
+                    dataTable.page(currentPage).draw(false);
+                }, false);
+            }
         });
     </script>
 @endsection

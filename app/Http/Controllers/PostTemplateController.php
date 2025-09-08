@@ -127,7 +127,7 @@ class PostTemplateController extends Controller
                 return $data->status;
             })
             ->addColumn('created_at', function ($data) {
-                return Helpers::dateFormate($data->created_at);
+                return '<span data-order="' . $data->created_at . '">' . Helpers::dateFormate($data->created_at) . '</span>';
             })
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);

@@ -441,7 +441,8 @@
             $(document).on('click', '#category-status', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
-
+                var table = $('#categories-data-table').DataTable();
+                
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You want to change status!",
@@ -471,7 +472,7 @@
                             success: function (response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Updated !','Category status has been updated successfully.');
-                                    CategoriesDataTable();
+                                    reloadDataTablePreservingPage(table); 
                                 }
                             },
                             error: function (xhr) {
@@ -699,6 +700,8 @@
                 });
                 formData.append('edit_subcategory_ids', JSON.stringify(subcategoryIds));
 
+                var table = $('#categories-data-table').DataTable();
+
                 $.ajax({
                     url: "{{ route('categories.update') }}",
                     type: "POST",
@@ -715,7 +718,8 @@
                         if (response.success == true) {
                             showSweetAlert('success', 'Updated !','Category has been updated successfully.');
                             $('#edit-category-modal').modal('hide');
-                            CategoriesDataTable();
+                            // CategoriesDataTable();
+                            reloadDataTablePreservingPage(table);
                         }
                     },
                     error: function(xhr) {
@@ -730,6 +734,8 @@
             // delete category 
             $(document).on('click', '.delete-category-btn', function() {
                 var categoryId = $(this).data('category-id');
+                var table = $('#categories-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -759,7 +765,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'Category has been deleted.');
-                                    CategoriesDataTable();
+                                    // CategoriesDataTable();
+                                    reloadDataTablePreservingPage(table);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
@@ -908,6 +915,15 @@
                     $("#edit_custom_label").val('');
                 }
             });
+
+            //Datatable Reload with same page
+            function reloadDataTablePreservingPage(dataTable) {
+                var currentPage = dataTable.page();
+                dataTable.ajax.reload(function() {
+                    dataTable.page(currentPage).draw(false);
+                }, false);
+            }
+
         });
     </script>
 @endsection
