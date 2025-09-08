@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\CustomVerifyEmail;
 use App\Models\UserSubscription;
-
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -57,6 +57,24 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            Cache::forget('user_profile_' . $user->id);
+        });
+
+        static::updated(function ($user) {
+            Cache::forget('user_profile_' . $user->id);
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('user_profile_' . $user->id);
+        });
     }
 
     // Custom method to mark email as verified

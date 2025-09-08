@@ -31,7 +31,7 @@ class NotificationController extends Controller
                 return $retrunData;
             })
             ->addColumn('created_date', function ($notification) {
-                return Helpers::dateFormate($notification->created_at);
+                return '<span data-order="' . $notification->created_at . '">' . Helpers::dateFormate($notification->created_at) . '</span>';
             })
             ->addColumn('action', function ($notification) {
                 $encyptedId = Helpers::encrypt($notification->id);

@@ -70,10 +70,10 @@ class UserSubscriptionController extends Controller
                 }
             })
             ->addColumn('created_date', function ($subscription) {
-                return Helpers::dateFormate($subscription->created_at);
+                return '<span data-order="' . $subscription->created_at . '">' . Helpers::dateFormate($subscription->created_at) . '</span>';
             })
             ->addColumn('updated_date', function ($subscription) {
-                return Helpers::dateFormate($subscription->updated_at);
+                return '<span data-order="' . $subscription->updated_at . '">' . Helpers::dateFormate($subscription->updated_at) . '</span>';
             })
             ->addColumn('action', function ($subscription) {
                 $id = Helpers::encrypt($subscription->id);

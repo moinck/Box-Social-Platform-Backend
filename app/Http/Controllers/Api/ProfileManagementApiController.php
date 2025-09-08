@@ -12,6 +12,7 @@ use App\ResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,91 +37,104 @@ class ProfileManagementApiController extends Controller
         if (!$userId) {
             return $this->error('Invalid user id', 404);
         }
-        $user = User::with('subscription:id,user_id')->find($userId);
-        if (!$user) {
-            return $this->error('User not found', 404);
-        }
 
-        $profileUrl = $user->profile_image;
-        if (!empty($profileUrl)) {
-            // check if it is digitalocean url or not
-            if (strpos($profileUrl, 'https://') !== 0) {
-                $profileUrl = asset($profileUrl);
+        $cacheKey = 'user_profile_' . $userId;
+
+        $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($userId) {
+
+            $user = User::with('subscription:id,user_id')->find($userId);
+            if (!$user) {
+                return null;
+                // return $this->error('User not found', 404);
             }
-        }
 
-        $is_take_free_plan = UserSubscription::where('user_id', $userId)->where('plan_id',1)->exists();
+            $profileUrl = $user->profile_image;
+            if (!empty($profileUrl)) {
+                // check if it is digitalocean url or not
+                if (strpos($profileUrl, 'https://') !== 0) {
+                    $profileUrl = asset($profileUrl);
+                }
+            }
+
+            $is_take_free_plan = UserSubscription::where('user_id', $userId)->where('plan_id',1)->exists();
         
-        $userSubscription = UserSubscription::where('user_id', $userId)
-            ->latest()
-            ->first();
-
-        $is_plan_expiring = false;
-        $is_plan_canceled = false;
-
-        if ($userSubscription) {
-            $is_plan_expiring = $userSubscription->current_period_end ? Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24 : false;
-
-            $hoursLeft = Carbon::now()->diffInHours(
-                Carbon::parse($userSubscription->current_period_end),
-                false
-            );
+            $userSubscription = UserSubscription::where('user_id', $userId)
+                ->latest()
+                ->first();
 
             $is_plan_expiring = false;
-            if ($userSubscription->plan_id == 2 && $hoursLeft && $hoursLeft >= 0 && $hoursLeft <= 24) {
-                $is_plan_expiring = true;
+            $is_plan_canceled = false;
+
+            if ($userSubscription) {
+                $is_plan_expiring = $userSubscription->current_period_end ? Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24 : false;
+
+                $hoursLeft = Carbon::now()->diffInHours(
+                    Carbon::parse($userSubscription->current_period_end),
+                    false
+                );
+
+                $is_plan_expiring = false;
+                if ($userSubscription->plan_id == 2 && $hoursLeft && $hoursLeft >= 0 && $hoursLeft <= 24) {
+                    $is_plan_expiring = true;
+                }
+                
+                if ($userSubscription->is_subscription_cancel == true) {
+                    $is_plan_canceled = true;
+                }
             }
-            
-            if ($userSubscription->is_subscription_cancel == true) {
-                $is_plan_canceled = true;
+
+            $today = now();
+            $cutoffDate = Carbon::create(2025, 10, 1); // Oct 1, 2025
+            $plan_id = Helpers::encrypt(3); // £780 plan
+            if ($userSubscription && $userSubscription->plan_id == 1 || !$userSubscription) {
+                $plan_flag = 1;
+
+                // Before Oct 1 → use £650 plan else £780 plan
+                // $plan_id = $today->lt($cutoffDate)
+                //     ? Helpers::encrypt(2) // £650 plan
+                //     : Helpers::encrypt(3); // £780 plan
+
+            } 
+            // else if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
+            //     $plan_id = Helpers::encrypt(2); // £650 plan 
+            //     $plan_flag = 2;
+            // } 
+            else {
+                // $plan_id = Helpers::encrypt(3); // £780 plan
+                $plan_flag = 3;
             }
+
+            // make data array
+            $response_data = [];
+            $response_data['user'] = [
+                'id' => Helpers::encrypt($user->id),
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'company_name' => $user->company_name,
+                'fca_number' => $user->fca_number,
+                'website' => $user->website,
+                'email' => $user->email,
+                'phone_number' => $user->phone ?? null,
+                'authorisation_type' => $user->authorisation_type,
+                'appointed_network' => $user->appointed_network,
+                'company_type' => $user->company_type,
+                'profile_image' => $profileUrl,
+                'is_brandkit' => $user->hasBrandKit(),
+                'is_subscribed' => $user->subscription ? true : false,
+                'is_plan_expiring' => $is_plan_expiring,
+                'is_plan_canceled' => $is_plan_canceled,
+                'plan_id' => $plan_id,
+                'plan_flag' => $plan_flag,
+                'is_take_free_plan' => $is_take_free_plan,
+            ];
+
+            return $response_data;
+
+        });
+
+        if (!$data) {
+            return $this->error('User not found', 404);
         }
-
-        $today = now();
-        $cutoffDate = Carbon::create(2025, 10, 1); // Oct 1, 2025
-        $plan_id = Helpers::encrypt(3); // £780 plan
-        if ($userSubscription && $userSubscription->plan_id == 1 || !$userSubscription) {
-            $plan_flag = 1;
-
-            // Before Oct 1 → use £650 plan else £780 plan
-            // $plan_id = $today->lt($cutoffDate)
-            //     ? Helpers::encrypt(2) // £650 plan
-            //     : Helpers::encrypt(3); // £780 plan
-
-        } 
-        // else if ($userSubscription && $userSubscription->plan_id == 2 && $userSubscription->is_subscription_cancel == true && $userSubscription->is_next_sub_continue == true) {
-        //     $plan_id = Helpers::encrypt(2); // £650 plan 
-        //     $plan_flag = 2;
-        // } 
-        else {
-            // $plan_id = Helpers::encrypt(3); // £780 plan
-            $plan_flag = 3;
-        }
-
-
-        // make data array
-        $data = [];
-        $data['user'] = [
-            'id' => Helpers::encrypt($user->id),
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'company_name' => $user->company_name,
-            'fca_number' => $user->fca_number,
-            'website' => $user->website,
-            'email' => $user->email,
-            'phone_number' => $user->phone ?? null,
-            'authorisation_type' => $user->authorisation_type,
-            'appointed_network' => $user->appointed_network,
-            'company_type' => $user->company_type,
-            'profile_image' => $profileUrl,
-            'is_brandkit' => $user->hasBrandKit(),
-            'is_subscribed' => $user->subscription ? true : false,
-            'is_plan_expiring' => $is_plan_expiring,
-            'is_plan_canceled' => $is_plan_canceled,
-            'plan_id' => $plan_id,
-            'plan_flag' => $plan_flag,
-            'is_take_free_plan' => $is_take_free_plan,
-        ];
 
         return $this->success($data, 'Profile fetched successfully');
     }

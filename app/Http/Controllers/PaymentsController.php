@@ -50,7 +50,7 @@ class PaymentsController extends Controller
                 return $payment->payment_method ? strtoupper($payment->payment_method) : 'N/A';
             })
             ->addColumn('created_date', function ($payment) {
-                return Helpers::dateFormate($payment->created_at);
+                return '<span data-order="' . $payment->created_at . '">' . Helpers::dateFormate($payment->created_at) . '</span>';
             })
             ->rawColumns(['user', 'plan', 'amount', 'payment_method', 'created_date', 'subscription_id', 'payment_id', 'coupon_discounted_amt'])
             ->make(true);

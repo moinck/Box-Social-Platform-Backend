@@ -48,7 +48,7 @@ class CategoriesController extends Controller
                         </label>';
             })
             ->addColumn('created_at', function ($category) {
-                return Helpers::dateFormate($category->created_at);
+                return '<span data-order="' . $category->created_at . '">' . Helpers::dateFormate($category->created_at) . '</span>';
             })
             ->addColumn('action', function ($category) {
                 $categoryId = Helpers::encrypt($category->id);
@@ -59,7 +59,7 @@ class CategoriesController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="' . $categoryId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['image', 'status', 'action'])
+            ->rawColumns(['image', 'status', 'created_at', 'action'])
             ->make(true);
     }
 

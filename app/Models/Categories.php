@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Categories extends Model
 {
@@ -16,6 +17,24 @@ class Categories extends Model
         'is_comming_soon',
         'custom_label',
     ];
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            Cache::forget('categories_list');
+        });
+
+        static::updated(function ($user) {
+            Cache::forget('categories_list');
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('categories_list');
+        });
+    }
 
     public function parent()
     {

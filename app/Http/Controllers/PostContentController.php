@@ -144,10 +144,10 @@ class PostContentController extends Controller
                 return $description;
             })
             ->addColumn('created_date', function ($postContent) {
-                return Helpers::dateFormate($postContent->created_at);
+                return '<span data-order="' . $postContent->created_at . '">' . Helpers::dateFormate($postContent->created_at) . '</span>';
             })
             ->addColumn('updated_date', function ($postContent) {
-                return Helpers::dateFormate($postContent->updated_at);
+                return '<span data-order="' . $postContent->updated_at . '">' . Helpers::dateFormate($postContent->updated_at) . '</span>';
             })
             ->addColumn('action', function ($postContent) {
                 $postId = Helpers::encrypt($postContent->id);
