@@ -149,6 +149,8 @@
 
             // delete selected feedback
             $(document).on('click', '#contact-us-delete-btn', function () {
+                var table = $('#contact-us-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -186,7 +188,9 @@
                             },
                             success: function (response) {
                                 showSweetAlert('success', 'Deleted!', response.message);
-                                ContactUsDataTable();
+                                // ContactUsDataTable();
+                                reloadDataTablePreservingPage(table);
+
                             },
                             error: function (xhr, status, error) {
                                 toastr.error(error);

@@ -322,6 +322,8 @@
             $(document).on('change', '#user-account-status', function() {
                 var status = $(this).is(':checked') ? 1 : 0;
                 var userId = $(this).data('id');
+                var table = $('#user-data-table').DataTable();
+
                 $.ajax({
                     url: "{{ route('user.account-status') }}",
                     type: "POST",
@@ -333,7 +335,8 @@
                     success: function(response) {
                         if (response.success == true) {
                             showSweetAlert('success', 'Updated!', 'User account status has been updated successfully.');
-                            UserDataTable();
+                            // UserDataTable();
+                            reloadDataTablePreservingPage(table); 
                         } else {
                             showSweetAlert('error', 'Error!', 'Something went wrong.');
                         }
@@ -586,6 +589,7 @@
                 // Form is valid, proceed with form submission
                 var form = $('#edit-user-form');
                 var formData = new FormData(form[0]); // Creates FormData object
+                var table = $('#user-data-table').DataTable();
 
                 $.ajax({
                     url: "{{ route('user.update') }}",
@@ -604,7 +608,8 @@
                             showSweetAlert('success', 'Updated !',
                                 'User has been updated successfully.');
                             $('#edit-user-modal').modal('hide');
-                            UserDataTable();
+                            // UserDataTable();
+                            reloadDataTablePreservingPage(table);
                         }
                     },
                     error: function(xhr) {
@@ -620,6 +625,8 @@
             $(document).on('click', '.delete-user-btn', function() {
                 var userId = $(this).data('user-id');
                 var userName = $(this).data('user-name');
+                var table = $('#user-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You want to delete " + userName + " account!",
@@ -650,7 +657,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'User has been deleted.');
-                                    UserDataTable();
+                                    // UserDataTable();
+                                    reloadDataTablePreservingPage(table);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }

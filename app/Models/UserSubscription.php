@@ -62,24 +62,6 @@ class UserSubscription extends Model
         'coupon_discounted_amt'
     ];
 
-    /** Boot method on clear cache */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($user) {
-            Cache::forget('user_subscription_' . $user->id);
-        });
-
-        static::updated(function ($user) {
-            Cache::forget('user_subscription_' . $user->id);
-        });
-
-        static::deleted(function ($user) {
-            Cache::forget('user_subscription_' . $user->id);
-        });
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);

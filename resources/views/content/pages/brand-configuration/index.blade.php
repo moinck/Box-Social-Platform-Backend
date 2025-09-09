@@ -115,6 +115,8 @@
             // delete brand configuration
             $(document).on('click', '.delete-brand-kit-btn', function() {
                 var brandKitId = $(this).data('brand-kit-id');
+                var table = $('#brand-configuration-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -144,7 +146,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'Brand Configuration has been deleted.');
-                                    BrandConfigurationDataTable();
+                                    // BrandConfigurationDataTable();
+                                    reloadDataTablePreservingPage(table);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
