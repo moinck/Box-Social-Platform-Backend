@@ -19,7 +19,7 @@ class CategoriesApiController extends Controller
 
         $cacheKey = 'categories_list';
 
-        $returnData = Cache::remember($cacheKey, env('CACHE_TIME'), function () {
+        // $returnData = Cache::remember($cacheKey, env('CACHE_TIME'), function () {
 
             $categories = Categories::where(function ($query) {
                 $query->where('status', true)
@@ -62,12 +62,12 @@ class CategoriesApiController extends Controller
                 }
             }
 
-            return [
+            $returnData = [
                 'active' => $notCommingSoonCategories,
                 'coming_soon' => $commingSoonCategories,
                 'custom' => $customCategories
             ];
-        });
+        // });
 
         return $this->success($returnData, 'Categories list.');
     }
