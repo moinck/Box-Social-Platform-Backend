@@ -180,8 +180,6 @@ class BrnadKitApiController extends Controller
 
     public function get(Request $request)
     {
-        sleep(1);
-
         // check barer token
         $user = $request->user();
         if (!$user) {
@@ -192,28 +190,19 @@ class BrnadKitApiController extends Controller
 
         $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
             
-            $brandKitObj = BrandKit::where('user_id', $user->id)->first();
-            if (empty($brandKitObj)) {
+            $brandKitObj = BrandKit::with(['socialMedia', 'designStyle'])->where('user_id', $user->id)->first();
+            if (!$brandKitObj) {
                 return null; // Handle later outside cache
                 // return $this->error('BrandKit not found', 404);
             }
 
-            $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
-            $SocialMediaIcon = [];
-            if (!empty($SocialMediaObj)) {
-                $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
-            }
+            // Social Media Icons
+            $socialMediaIcon = optional($brandKitObj->socialMedia)->social_media_icon
+                ? json_decode($brandKitObj->socialMedia->social_media_icon, true)
+                : [];
 
-            // design style
-            $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
-            if (empty($designStyle)) {
-                $designStyle = null;
-            }
-
-            $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
-            if (empty($designStyle)) {
-                $designStyle = null;
-            }
+            // Design Style Name
+            // $designStyle = optional($brandKitObj->designStyle)->name;
 
             $path = $brandKitObj->logo;
             $base64Image = null;
@@ -244,7 +233,7 @@ class BrnadKitApiController extends Controller
                 "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
-                "social_media_icon_show" => $SocialMediaIcon,
+                "social_media_icon_show" => $socialMediaIcon,
                 // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
             ];
 

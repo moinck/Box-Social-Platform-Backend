@@ -1226,4 +1226,57 @@ class Helpers
     {
         Mail::to($data['email'])->send(new DynamicContentMail($data));
     }
+
+    /** Special Characters Replacements */
+    public static function specialCharactersReplacments()
+    {
+        return [
+            '!' => '',        // Remove or you can replace with '(exclamation)'
+            '@' => 'at',      // Replace @ with 'at'
+            '#' => '',        // Remove or replace with '(hash)'
+            '$' => 'USD',    // Replace $ with 'USD'
+            '%' => ' percent ',
+            '^' => ' caret ',        // Remove or replace with '(caret)'
+            '&' => 'And',
+            '*' => '',        // Remove or replace with '(asterisk)'
+            '(' => '',        // Remove or replace with ''
+            ')' => '',
+            '_' => ' ',
+            '+' => ' plus ',
+            '-' => ' - ',
+            '=' => ' equals ',
+            '{' => '',
+            '}' => '',
+            '[' => '',
+            ']' => '',
+            '|' => '',
+            '\\' => '',
+            ':' => '',
+            ';' => '',
+            '"' => '',
+            "'" => '',
+            '<' => ' less than ',
+            '>' => ' greater than ',
+            ',' => '',
+            '.' => '',
+            '?' => '',
+            '/' => '',
+            '~' => '',
+            '`' => '',
+            '©' => '(c)',
+            '®' => '(R)',
+            '™' => '(TM)',
+            '°' => ' degrees ',
+            '±' => '+/-',
+            '§' => 'Section ',
+            '¶' => '',
+            '÷' => '/',
+            '×' => 'x',
+            'µ' => 'u',
+            '€' => 'EUR',
+            '£' => 'GBP',
+            '¥' => 'YEN',
+            '₹' => 'INR'
+        ];
+    }
 }

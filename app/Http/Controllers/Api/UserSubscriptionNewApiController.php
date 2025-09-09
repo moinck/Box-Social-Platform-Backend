@@ -12,6 +12,7 @@ use App\Models\UserSubscription;
 use App\Http\Controllers\Controller;
 use App\Models\Payments;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -425,33 +426,29 @@ class UserSubscriptionNewApiController extends Controller
 
     public function getCurrentSubscription()
     {
-        $subscription = UserSubscription::with('plan:id,name,price','downloadTracker')
-            ->where('user_id', Auth::id())
-            ->where('status', 'active')
-            ->first();
-        if (empty($subscription)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No active subscription found',
-                'data' => [],
-                'stripe_subscription' => []
-            ]);
-        }
 
-        $planDetails = [];
-        $downloadCountDetails = [];
-        if($subscription){
+        $userId = Auth::id();
+        $cacheKey = 'user_subscription_' . $userId;
+
+        $subscriptionData = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($userId) {
+
+            $subscription = UserSubscription::with('plan:id,name,price','downloadTracker')
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->first();
+
+            if (empty($subscription)) {
+                return null; // Handle outside cache block
+            }
+
             $planDetails = [
                 'id' => Helpers::encrypt($subscription->plan->id),
                 'name' => $subscription->plan->name,
             ];
 
-            $downloadCountDetails = $subscription->downloadTracker->getDownloadStats();
-        }
-            
-        $returnData = [];
-        if($subscription){
-            $returnData = [
+            $downloadCountDetails = $subscription->downloadTracker ? $subscription->downloadTracker->getDownloadStats() : [];
+
+            return [
                 'id' => Helpers::encrypt($subscription->id),
                 'status' => $subscription->status,
                 'amount_paid' => $subscription->amount_paid,
@@ -461,12 +458,23 @@ class UserSubscriptionNewApiController extends Controller
                 'plan_details' => $planDetails,
                 'download_count_details' => $downloadCountDetails,
             ];
+
+        });
+
+        if (empty($subscriptionData)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No active subscription found',
+                'data' => [],
+                'stripe_subscription' => []
+            ]);
         }
+
         // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);
         return response()->json([
             'status' => true,
             'message' => 'Subscription fetched successfully',
-            'data' => $returnData,
+            'data' => $subscriptionData,
             'stripe_subscription' => []
         ]);
     }

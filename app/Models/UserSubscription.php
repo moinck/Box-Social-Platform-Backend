@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\SubscriptionPlans;
 use App\Models\User;
 use App\Models\UserDownloads;
+use Illuminate\Support\Facades\Cache;
 
 class UserSubscription extends Model
 {
@@ -60,6 +61,24 @@ class UserSubscription extends Model
         'coupon_discount_id',
         'coupon_discounted_amt'
     ];
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            Cache::forget('user_subscription_' . $user->id);
+        });
+
+        static::updated(function ($user) {
+            Cache::forget('user_subscription_' . $user->id);
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('user_subscription_' . $user->id);
+        });
+    }
 
     public function user()
     {

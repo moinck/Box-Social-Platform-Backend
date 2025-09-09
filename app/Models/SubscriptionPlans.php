@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionPlans extends Model
 {
@@ -46,4 +47,22 @@ class SubscriptionPlans extends Model
         'interval_count' => 'integer',
         'sort_order' => 'integer'
     ];
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            Cache::forget('subscription_plans_list');
+        });
+
+        static::updated(function ($user) {
+            Cache::forget('subscription_plans_list');
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('subscription_plans_list');
+        });
+    }
 }

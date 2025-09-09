@@ -166,27 +166,32 @@ class UserTemplateDownloadController extends Controller
             // Add a separator line
             $section->addText(str_repeat('_', 80), ['color' => 'CCCCCC'], 'centeredStyle');
             $section->addTextBreak(1);
-    
-            
+
             // Add Category
+            $replacements = Helpers::specialCharactersReplacments();
+            $categoryName = $writtenData['category_name'];
+            $categoryName = str_replace(array_keys($replacements), array_values($replacements), $categoryName);
+
             $section->addText('Category: ', $labelFont, 'contentStyle');
-            $section->addText(htmlspecialchars_decode(str_replace("&", "And ", $writtenData['category_name'])), $contentFont);
+            $section->addText($categoryName, $contentFont);
             $section->addTextBreak(2);
             
             // Add Description with HTML parsing
             $section->addText('Description:', $labelFont, 'contentStyle');
-
-            $cleanHtml = str_replace("&", "And ", $writtenData['description']);
+            $description = $writtenData['description'];
+            $description = str_replace(array_keys($replacements), array_values($replacements), $description);
             
             // Parse HTML content from Quill editor
-            $this->htmlContentConversation($section, htmlspecialchars_decode($cleanHtml), $contentFont);
+            $this->htmlContentConversation($section, htmlspecialchars_decode($description), $contentFont);
             
             $section->addTextBreak(2);
             
             // Add Warning Message
             if (isset($writtenData['warning_message'])) {
                 $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
-                $section->addText(htmlspecialchars_decode(str_replace("&", "And ", $writtenData['warning_message'])), $warningFont, 'contentStyle');
+                $warning_message = $writtenData['warning_message'];
+                $warning_message = str_replace(array_keys($replacements), array_values($replacements), $warning_message);
+                $section->addText(htmlspecialchars_decode($warning_message), $warningFont, 'contentStyle');
             }
     
             if ($isImages == 'true') {
