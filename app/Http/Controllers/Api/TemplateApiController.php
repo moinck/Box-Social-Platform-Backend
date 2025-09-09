@@ -53,7 +53,7 @@ class TemplateApiController extends Controller
             $tempObj = new PostTemplate();
             $tempObj->category_id = $categoryId;
             $tempObj->template_image = $imagePath;
-            $tempObj->template_data = json_encode($request->template_data);
+            $tempObj->template_data = $request->template_data;
     
             if ($request->has('sub_category_id') && $subCategoryId !== null) {
                 $tempObj->sub_category_id = $subCategoryId;
@@ -303,7 +303,7 @@ class TemplateApiController extends Controller
         }
 
         $adminTemplate->template_image = $updateImageUrl ?? null;
-        $adminTemplate->template_data = json_encode($request->template_data);
+        $adminTemplate->template_data = $request->template_data;
         $adminTemplate->save();
 
 
