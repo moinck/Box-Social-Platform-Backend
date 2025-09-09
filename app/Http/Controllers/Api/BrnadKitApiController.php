@@ -188,12 +188,12 @@ class BrnadKitApiController extends Controller
 
         $cacheKey = 'brandkit_' . $user->id;
 
-        $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
+        // $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
             
             $brandKitObj = BrandKit::with(['socialMedia', 'designStyle'])->where('user_id', $user->id)->first();
             if (!$brandKitObj) {
-                return null; // Handle later outside cache
-                // return $this->error('BrandKit not found', 404);
+                // return null; // Handle later outside cache
+                return $this->error('BrandKit not found', 404);
             }
 
             // Social Media Icons
@@ -214,7 +214,7 @@ class BrnadKitApiController extends Controller
                 $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
             }
 
-            return [
+            $data = [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $base64Image,
@@ -237,16 +237,12 @@ class BrnadKitApiController extends Controller
                 // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
             ];
 
-        });
+        // });
 
         // if ($brandKitObj->base64_logo == null) {
         //     $brandKitObj->base64_logo = $base64Image;
         //     $brandKitObj->save();
         // }
-
-        if (!$data) {
-            return $this->error('BrandKit not found', 404);
-        }
 
         return response()->json([
             'success' => true,

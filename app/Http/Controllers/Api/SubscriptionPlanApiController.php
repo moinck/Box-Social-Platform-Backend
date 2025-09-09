@@ -17,7 +17,7 @@ class SubscriptionPlanApiController extends Controller
     {
         $cacheKey = 'subscription_plans_list';
 
-        $returnData = Cache::remember($cacheKey, env('CACHE_TIME'), function () {
+        // $returnData = Cache::remember($cacheKey, env('CACHE_TIME'), function () {
             $subscritionPlans = SubscriptionPlans::where('is_active', true)->get();
 
             $data = [];
@@ -30,9 +30,9 @@ class SubscriptionPlanApiController extends Controller
                 ];
             }
 
-            return $data;
-        });
+            // return $data;
+        // });
 
-        return $this->success($returnData, 'Subscription Plans List');
+        return $this->success($data, 'Subscription Plans List');
     }
 }
