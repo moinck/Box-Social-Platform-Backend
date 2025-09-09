@@ -137,7 +137,7 @@ class UserTemplatesApiController extends Controller
             'category_id' => $categoryId ?? null,
             'template_name' => $request->template_name,
             'template_image' => $imageUrl ?? null,
-            'template_data' => json_encode($request->template_data),
+            'template_data' => $request->template_data,
         ]);
 
         // send mail
@@ -216,7 +216,7 @@ class UserTemplatesApiController extends Controller
                     'category_id' => $categoryId,
                     'template_name' => $templateData['template_name'],
                     'template_image' => $imageUrl ?? null,
-                    'template_data' => json_encode($templateData['template_data']),
+                    'template_data' => $templateData['template_data'],
                 ]);
 
                 // Send mail
@@ -310,7 +310,7 @@ class UserTemplatesApiController extends Controller
 
         $userTemplate->template_name = $request->template_name;
         $userTemplate->template_image = $imageUrl ?? null;
-        $userTemplate->template_data = json_encode($request->template_data);
+        $userTemplate->template_data = $request->template_data;
         $userTemplate->save();
 
 

@@ -54,7 +54,7 @@ return [
 
     'stack' => [
       'driver' => 'stack',
-      'channels' => explode(',', env('LOG_STACK', 'single')),
+      'channels' => ['single', 'slack'], // ✅ added slack here
       'ignore_exceptions' => false,
     ],
 
@@ -76,10 +76,24 @@ return [
     'slack' => [
       'driver' => 'slack',
       'url' => env('LOG_SLACK_WEBHOOK_URL'),
-      'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+      'username' => 'Laravel [' . env('APP_ENV') . ']', // 👈 add environment here
       'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
       'level' => env('LOG_LEVEL', 'critical'),
       'replace_placeholders' => true,
+      'handler' => Monolog\Handler\SlackWebhookHandler::class,
+      'with' => [
+          'webhookUrl' => env('LOG_SLACK_WEBHOOK_URL'),
+          'channel' => '#error-log',
+          'username' => 'Laravel Bot',
+          'useShortAttachment' => true,
+          'includeContextAndExtra' => true,
+      ],
+      'formatter' => Monolog\Formatter\LineFormatter::class,
+      'formatter_with' => [
+          // Customize message format
+          'format' => "🔥 Error: %message% \n🕒 %datetime% \n📂 %context% \n",
+          'dateFormat' => 'Y-m-d H:i:s',
+      ],
     ],
 
     'papertrail' => [
