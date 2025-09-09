@@ -229,6 +229,14 @@
                                 });
                             });
                         }
+                        var css = `.select2-container--default .select2-results > .select2-results__options {
+                            max-height: 11.5rem;
+                            overflow-y: auto;
+                        }`;
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.appendChild(document.createTextNode(css));
+                        document.head.appendChild(style);
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
