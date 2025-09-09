@@ -59,24 +59,6 @@ class User extends Authenticatable
         ];
     }
 
-    /** Boot method on clear cache */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($user) {
-            Cache::forget('user_profile_' . $user->id);
-        });
-
-        static::updated(function ($user) {
-            Cache::forget('user_profile_' . $user->id);
-        });
-
-        static::deleted(function ($user) {
-            Cache::forget('user_profile_' . $user->id);
-        });
-    }
-
     // Custom method to mark email as verified
     public function markEmailAsVerified()
     {

@@ -916,14 +916,6 @@
                 }
             });
 
-            //Datatable Reload with same page
-            function reloadDataTablePreservingPage(dataTable) {
-                var currentPage = dataTable.page();
-                dataTable.ajax.reload(function() {
-                    dataTable.page(currentPage).draw(false);
-                }, false);
-            }
-
         });
     </script>
 @endsection

@@ -33,12 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('app:clean-expired-tokens')
             ->daily()
             ->at('01:30')
+            ->timezone('Europe/London')
             ->withoutOverlapping()
             ->runInBackground();
 
         // reset user's monthly downloads
         $schedule->command('downloads:reset-monthly')
                 ->monthlyOn(1, '00:01')
+                ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
 
@@ -46,13 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('subscriptions:check-expired')
                 ->daily()
                 ->at('02:00')
-                ->withoutOverlapping()
-                ->runInBackground();
-                
-        // check user's expired subscriptions
-        $schedule->command('subscriptions:check-expired')
-                ->daily()
-                ->at('02:00')
+                ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
 

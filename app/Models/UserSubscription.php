@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\SubscriptionPlans;
 use App\Models\User;
 use App\Models\UserDownloads;
+use Illuminate\Support\Facades\Cache;
 
 class UserSubscription extends Model
 {

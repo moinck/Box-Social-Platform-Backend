@@ -339,14 +339,14 @@
                                     showSweetAlert('success', 'Deleted!', 'Post Template has been deleted.');
                                     reloadDataTablePreservingPage(table); 
 
-                                    setTimeout(function() {
-                                        $('#category_filter').val(selectedCategory);
-                                        $('#status_filter').val(selectedStatus);
-                                        // trigger change in category dropdown
-                                        $('#category_filter').trigger('change');
-                                        // trigger change in status dropdown
-                                        $('#status_filter').trigger('change');
-                                    }, 500);
+                                    // setTimeout(function() {
+                                    //     $('#category_filter').val(selectedCategory);
+                                    //     $('#status_filter').val(selectedStatus);
+                                    //     // trigger change in category dropdown
+                                    //     $('#category_filter').trigger('change');
+                                    //     // trigger change in status dropdown
+                                    //     $('#status_filter').trigger('change');
+                                    // }, 500);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
@@ -449,13 +449,6 @@
             });
             // -------------------------------------------
 
-            //Datatable Reload with same page
-            function reloadDataTablePreservingPage(dataTable) {
-                var currentPage = dataTable.page();
-                dataTable.ajax.reload(function() {
-                    dataTable.page(currentPage).draw(false);
-                }, false);
-            }
         });
     </script>
 @endsection

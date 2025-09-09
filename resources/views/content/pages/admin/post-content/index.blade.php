@@ -229,6 +229,14 @@
                                 });
                             });
                         }
+                        var css = `.select2-container--default .select2-results > .select2-results__options {
+                            max-height: 11.5rem;
+                            overflow-y: auto;
+                        }`;
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.appendChild(document.createTextNode(css));
+                        document.head.appendChild(style);
                     },
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -344,14 +352,6 @@
                 });
             });
             // -------------------------------------------
-
-            //Datatable Reload with same page
-            function reloadDataTablePreservingPage(dataTable) {
-                var currentPage = dataTable.page();
-                dataTable.ajax.reload(function() {
-                    dataTable.page(currentPage).draw(false);
-                }, false);
-            }
         });
     </script>
 @endsection
