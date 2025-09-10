@@ -1218,6 +1218,8 @@ class Helpers
             'before_first_oct_mail' => "BEFORE 1st OCT",
             'after_first_oct_mail' => "FROM 1st OCT",
             'welcome_beta_trial' => "Welcome to Your Box Socials Beta Trial 🎉",
+            'user_register_acount_in_review' => "Welcome Email -  ACCOUNT IN REVIEW",
+            'user_register_acount_reviewed' => "Welcome Email -  ACCOUNT REVIEWED",
         ];
     }
 
@@ -1231,52 +1233,9 @@ class Helpers
     public static function specialCharactersReplacments()
     {
         return [
-            '!' => '',        // Remove or you can replace with '(exclamation)'
-            '@' => 'at',      // Replace @ with 'at'
-            '#' => '',        // Remove or replace with '(hash)'
-            '$' => 'USD',    // Replace $ with 'USD'
-            '%' => ' percent ',
-            '^' => ' caret ',        // Remove or replace with '(caret)'
             '&' => 'And',
-            '*' => '',        // Remove or replace with '(asterisk)'
-            '(' => '',        // Remove or replace with ''
-            ')' => '',
-            '_' => ' ',
-            '+' => ' plus ',
-            '-' => ' - ',
-            '=' => ' equals ',
-            '{' => '',
-            '}' => '',
-            '[' => '',
-            ']' => '',
-            '|' => '',
-            '\\' => '',
-            ':' => '',
-            ';' => '',
-            '"' => '',
-            "'" => '',
-            '<' => ' less than ',
-            '>' => ' greater than ',
-            ',' => '',
-            '.' => '',
-            '?' => '',
-            '/' => '',
-            '~' => '',
-            '`' => '',
-            '©' => '(c)',
-            '®' => '(R)',
-            '™' => '(TM)',
-            '°' => ' degrees ',
-            '±' => '+/-',
-            '§' => 'Section ',
-            '¶' => '',
-            '÷' => '/',
-            '×' => 'x',
-            'µ' => 'u',
-            '€' => 'EUR',
-            '£' => 'GBP',
-            '¥' => 'YEN',
-            '₹' => 'INR'
+            '<' => '',
+            '>' => ''
         ];
     }
 }
