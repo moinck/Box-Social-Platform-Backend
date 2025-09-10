@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -210,13 +211,21 @@ class UserTemplatesApiController extends Controller
                     $categoryId = PostTemplate::find($decyptedId)->category_id;
                 }
 
+                // Log::info('Template data type: ' . gettype($templateData['template_data']));
+
+                $templateDataString = is_array($templateData['template_data']) 
+                    ? json_encode($templateData['template_data']) 
+                    : $templateData['template_data'];
+                
+                // Log::info('Template data type: ' . gettype($templateDataString));
+
                 $userTemplate = UserTemplates::create([
                     'user_id' => $user->id,
                     'template_id' => $decyptedId,
                     'category_id' => $categoryId,
                     'template_name' => $templateData['template_name'],
                     'template_image' => $imageUrl ?? null,
-                    'template_data' => $templateData['template_data'],
+                    'template_data' => $templateDataString,
                 ]);
 
                 // Send mail
