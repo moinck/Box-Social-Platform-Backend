@@ -239,7 +239,7 @@
                         document.head.appendChild(style);
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex',orderable: false, searchable: false},
                         { data: 'post_title', name: 'post_title'},
                         { data: 'post_category', name: 'post_category'},
                         { data: 'post_sub_category', name: 'post_sub_category'},

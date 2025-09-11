@@ -90,7 +90,7 @@
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
                                                 @if ($subscriptionData->current_period_start)
-                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y') }}
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_start)->format('d M Y | G:i A') }}
                                                 @else
                                                     N/A
                                                 @endif
@@ -111,7 +111,7 @@
                                         <div class="d-flex align-items-center">
                                             <h6 class="mb-0 me-1">
                                                 @if ($subscriptionData->current_period_end)
-                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y') }}
+                                                    {{ \Carbon\Carbon::parse($subscriptionData->current_period_end)->format('d M Y | G:i A') }}
                                                 @else
                                                     N/A
                                                 @endif

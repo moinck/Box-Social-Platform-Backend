@@ -24,7 +24,7 @@ class ContactUsController extends Controller
     // data table function
     public function contactUsDataTable(Request $request)
     {
-        $contactUs = ContactUs::latest()->get();
+        $contactUs = ContactUs::latest();
 
         return DataTables::of($contactUs)
             ->addIndexColumn()

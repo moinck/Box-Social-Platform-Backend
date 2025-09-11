@@ -152,7 +152,7 @@ class CheckExpiredSubscriptions extends Command
 
                 $useNotificationExists = Notification::where('user_id', $user->id)
                     ->where('type','subscription-expiring-soon')
-                    ->whereBetween('created_at',[Carbon::now()->startOfDay,Carbon::now()->endOfDay])
+                    ->whereBetween('created_at',[Carbon::now()->startOfDay(),Carbon::now()->endOfDay()])
                     ->exists();
 
                 if (!$useNotificationExists) {

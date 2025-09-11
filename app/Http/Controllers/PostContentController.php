@@ -125,7 +125,7 @@ class PostContentController extends Controller
             ->when($request->sub_category_id && $request->sub_category_id != 0, function ($query) use ($request) {
                 $query->where('sub_category_id', $request->sub_category_id);
             })
-            ->latest()->get();
+            ->latest();
 
         return DataTables::of($postContents)
             ->addIndexColumn()
