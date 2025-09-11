@@ -57,14 +57,14 @@ class UserSubscriptionController extends Controller
             })
             ->addColumn('start_date', function ($subscription) {
                 if ($subscription->status == 'active' || $subscription->current_period_start != null) {
-                    return date('d-m-Y', strtotime($subscription->current_period_start));
+                    return'<span data-order="' . $subscription->current_period_start . '">' . Helpers::dateFormate($subscription->current_period_start) . '</span>';
                 } else {
                     return 'N/A';
                 }
             })
             ->addColumn('end_date', function ($subscription) {
                 if ($subscription->status == 'active' || $subscription->current_period_end != null) {
-                    return date('d-m-Y', strtotime($subscription->current_period_end));
+                    return '<span data-order="' . $subscription->current_period_end . '">' . Helpers::dateFormate($subscription->current_period_end) . '</span>';
                 } else {
                     return 'N/A';
                 }
