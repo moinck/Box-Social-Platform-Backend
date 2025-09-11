@@ -37,11 +37,11 @@ Route::middleware('guest')->group(function () {
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
 
+Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
+
 Route::middleware('auth')->group(function () {
     // Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
     Route::get('/dashboard', [HomePage::class, 'dashboard'])->name('dashboard');
-
-    Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
     // notification controller
     Route::get('/notification/datatable', [NotificationController::class, 'dataTable'])->name('notification.data-table');
