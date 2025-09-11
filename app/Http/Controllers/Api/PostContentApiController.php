@@ -63,7 +63,7 @@ class PostContentApiController extends Controller
         return $this->success($resturnData, 'Post content fetched successfully');
     }
 
-    public function getData(Request $request)
+    public function getDataOld(Request $request)
     {
         // Token check
         $token = $request->bearerToken();
@@ -130,6 +130,71 @@ class PostContentApiController extends Controller
     
         return $this->success($returnData, 'Post content fetched successfully');
     }    
+
+    /** Get Post Content New API */
+    public function getData(Request $request)
+    {
+
+        // Token check
+        $token = $request->bearerToken();
+        if (!$token) {
+            return $this->error('Invalid token', 401);
+        }
+    
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'category_ids' => 'nullable|array',
+            'sub_category_ids' => 'nullable|array',
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->validationError('Validation Error', $validator->errors());
+        }
+
+        // Decrypt category IDs if provided
+        $decryptedCategoryIds = $request->has('category_ids') && !empty($request->category_ids)
+            ? array_map(fn($id) => Helpers::decrypt($id), $request->category_ids)
+            : [];
+
+        // Decrypt subcategory IDs if provided
+        $decryptedSubCategoryIds = !empty($request->sub_category_ids)
+            ? array_map(fn($id) => Helpers::decrypt($id), $request->sub_category_ids)
+            : [];
+
+        // Get categories
+        $categories = Categories::whereIn('id', $decryptedCategoryIds)->get();
+
+        // Fetch all PostContents in a single query, filtering by category and subcategory
+        $postContents = PostContent::whereIn('category_id', $categories->pluck('id'))
+            ->when(!empty($decryptedSubCategoryIds), function ($query) use ($decryptedSubCategoryIds) {
+                $query->where(function ($q) use ($decryptedSubCategoryIds) {
+                    $q->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                    ->orWhereNull('sub_category_id');
+                });
+            })
+            ->get();
+
+        // Group post contents by category_id
+        $grouped = $postContents->groupBy('category_id');
+
+        $returnData = $categories->mapWithKeys(function ($category) use ($grouped) {
+            $posts = $grouped->get($category->id, collect())->map(function ($post) {
+                return [
+                    'id' => Helpers::encrypt($post->id),
+                    'category_id' => Helpers::encrypt($post->category_id),
+                    'sub_category_id' => $post->sub_category_id ? Helpers::encrypt($post->sub_category_id) : null,
+                    'title' => $post->title,
+                    'description' => $post->description,
+                    'warning_message' => $post->warning_message,
+                ];
+            })->toArray();
+
+            return [$category->name => $posts];
+        })->toArray();
+
+        return $this->success($returnData, 'Post content fetched successfully');
+
+    }
 
     /**
      * Get post content by category

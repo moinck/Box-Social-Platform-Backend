@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\Helpers;
+use App\Models\Notification;
 use App\Models\UserSubscription;
 use App\Models\UserDownloads;
 use Illuminate\Console\Command;
@@ -148,7 +149,15 @@ class CheckExpiredSubscriptions extends Command
                 $user = $subscription->user;
                 $userName = $user ? $user->name : 'Unknown User';
                 $user['expiring_at'] = $subscription->current_period_end;
-                Helpers::sendNotification($user, "subscription-expiring-soon");
+
+                $useNotificationExists = Notification::where('user_id', $user->id)
+                    ->where('type','subscription-expiring-soon')
+                    ->whereBetween('created_at',[Carbon::now()->startOfDay,Carbon::now()->endOfDay])
+                    ->exists();
+
+                if (!$useNotificationExists) {
+                    Helpers::sendNotification($user, "subscription-expiring-soon");
+                }
                 $this->line("  - {$userName} (ID: {$subscription->id}) expires on {$subscription->current_period_end}");
             }
         } else {

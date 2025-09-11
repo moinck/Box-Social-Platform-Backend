@@ -46,8 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // check user's expired subscriptions
         $schedule->command('subscriptions:check-expired')
-                ->daily()
-                ->at('02:00')
+                ->everyFiveMinutes()
                 ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
@@ -56,6 +55,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('SendLastDaySubMail')
                 ->daily()
                 ->at('10:00')
+                ->timezone('Europe/London')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+        //Telescope Data Delete every hour
+        $schedule->command('telescope:prune --hours=6')
+                ->everyThreeHours()
                 ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
