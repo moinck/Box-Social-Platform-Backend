@@ -76,6 +76,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/account-status', [UserManagementController::class, 'accountStatus'])->name('user.account-status');
     Route::post('/user/export', [UserManagementController::class, 'export'])->name('user.export');
 
+    //Deleted FCA Number
+    Route::match(['GET','POST'],'/user/fca-numbers', [UserManagementController::class, 'fcaNumberList'])->name('user.fca-number.list');
+
     // Profile Management Controller
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management');
     Route::post('/profile-management/update', [ProfileManagementController::class, 'update'])->name('profile-management.update');

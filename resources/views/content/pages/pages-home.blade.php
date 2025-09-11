@@ -38,6 +38,18 @@
                 <h5 class="card-title mb-0">User Management</h5>
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons btn-group flex-wrap">
+                    <a href="{{ route('user.fca-number.list') }}">
+                        <button class="btn btn-danger waves-effect waves-light mr-4" type="button" id="deleted-fca-number"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom"
+                            title="Deleted FCA Numbers">
+                            <span>
+                                <i class="ri-arrow-right-fill ri-20px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">Deleted FCA Numbers</span>
+                            </span>
+                        </button> 
+                    </a>
+                </div>
                 <div class="dt-buttons btn-group flex-wrap"> 
                     <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="user-export-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom"

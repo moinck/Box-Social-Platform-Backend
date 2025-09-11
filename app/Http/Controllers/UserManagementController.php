@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Exports\UsersExport;
 use App\Helpers\Helpers;
+use App\Models\FcaNumbers;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -284,6 +287,42 @@ class UserManagementController extends Controller
                 'success' => false,
                 'message' => 'User not found.'
             ]);
+        }
+    }
+
+    /** Deleted FCA Number List */
+    public function fcaNumberList(Request $request)
+    {
+        try {
+
+            $fcaNumbers = FcaNumbers::whereNotNull('account_deleted_at')->latest()->get();
+
+            if ($request->ajax()) {
+
+                return DataTables::of($fcaNumbers)
+                    ->addIndexColumn()
+                    ->addColumn('fca_number', function ($fcaNumbers) {
+                        return $fcaNumbers->fca_number;
+                    })
+                    ->addColumn('fca_name', function ($fcaNumbers) {
+                        return $fcaNumbers->fca_name ?? '-';
+                    })
+                    ->addColumn('created_date', function ($fcaNumbers) {
+                        return '<span data-order="' . $fcaNumbers->created_at . '">' . Helpers::dateFormate($fcaNumbers->created_at) . '</span>';
+                    }
+                    )->addColumn('account_deleted_at', function ($fcaNumbers) {
+                        return $fcaNumbers->account_deleted_at != null ? '<span data-order="' . $fcaNumbers->account_deleted_at . '">' . Helpers::dateFormate($fcaNumbers->account_deleted_at) . '</span>' : '-';
+                    })
+                    ->rawColumns(['fca_number', 'fca_name','created_date','account_deleted_at'])
+                    ->make(true);
+
+            }
+
+            return view('content.pages.fca-numbers');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return redirect()->back()->with('error', 'Something went wrong.');
         }
     }
 }
