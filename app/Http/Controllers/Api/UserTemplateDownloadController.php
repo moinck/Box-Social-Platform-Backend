@@ -179,7 +179,6 @@ class UserTemplateDownloadController extends Controller
             // Add Description with HTML parsing
             $section->addText('Description:', $labelFont, 'contentStyle');
             $description = $writtenData['description'];
-            $description = str_replace(array_keys($replacements), array_values($replacements), $description);
             
             // Parse HTML content from Quill editor
             $this->htmlContentConversation($section, htmlspecialchars_decode($description), $contentFont);
@@ -290,6 +289,8 @@ class UserTemplateDownloadController extends Controller
             // Remove any remaining HTML tags
             $line = strip_tags($line);
             $line = html_entity_decode($line, ENT_QUOTES, 'UTF-8');
+
+            $line = str_replace(array_keys(Helpers::specialCharactersReplacments()), array_values(Helpers::specialCharactersReplacments()), $line);
             
             if (!empty($line)) {
                 $section->addText($line, $font, 'contentStyle');
