@@ -38,7 +38,7 @@ class UserManagementController extends Controller
                     $query->where('status', '=', 'inactive');
                 }
             })
-            ->latest()->get();
+            ->latest();
 
         return DataTables::of($users)
             ->addIndexColumn()

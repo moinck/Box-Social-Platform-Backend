@@ -33,8 +33,7 @@ class UserSubscriptionController extends Controller
                 }
                 return $query->whereIn('plan_id', [2,3]);
             })
-            ->latest()
-            ->get();
+            ->latest();
 
         return DataTables::of($subscriptions)
             ->addIndexColumn()
