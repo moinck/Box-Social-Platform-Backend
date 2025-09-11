@@ -334,7 +334,7 @@ class Helpers
             $storagePath = str_replace('storage/', '', $path);
             
             if (Storage::disk('public')->exists($storagePath)) {
-                Storage::disk('public')->delete($storagePath);
+                // Storage::disk('public')->delete($storagePath);
                 // Log::info("File deleted successfully: " . $path);
             } else {
                 // Log::info("File does not exist at: " . $path);
@@ -359,7 +359,7 @@ class Helpers
                 $relativePath = str_replace($doSpacesUrl . '/', '', $path);
                 
                 if (Storage::disk('digitalocean')->exists($relativePath)) {
-                    Storage::disk('digitalocean')->delete($relativePath);
+                    // Storage::disk('digitalocean')->delete($relativePath);
                     // Log::info("File deleted successfully from DigitalOcean: " . $path);
                 } else {
                     // Log::info("File does not exist in DigitalOcean: " . $path);
@@ -369,7 +369,7 @@ class Helpers
                 $storagePath = str_replace('storage/', '', $path);
                 
                 if (Storage::disk('public')->exists($storagePath)) {
-                    Storage::disk('public')->delete($storagePath);
+                    // Storage::disk('public')->delete($storagePath);
                     // Log::info("File deleted successfully from local storage: " . $path);
                 } else {
                     // Log::info("File does not exist in local storage: " . $path);
