@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Exports\UsersExport;
 use App\Helpers\Helpers;
+use App\Models\EmailContent;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -24,19 +27,22 @@ class UserManagementController extends Controller
     public function userDataTable(Request $request)
     {
         $users = User::where('role', 'customer')
-            ->when($request->is_brandkit, function ($query) use ($request) {
+            ->when($request->filled('is_brandkit'), function ($query) use ($request) {
                 if ($request->is_brandkit == 1) {
                     $query->whereHas('brandKit');
                 } else if($request->is_brandkit == 2) {
                     $query->whereDoesntHave('brandKit');
                 }
             })
-            ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
+            ->when($request->filled('account_status'), function ($query) use ($request) {
                 if ($request->account_status == 1) {
                     $query->where('status', '=', 'active');
                 } elseif ($request->account_status == 2) {
                     $query->where('status', '=', 'inactive');
                 }
+            })
+            ->when($request->filled('is_admin_verified'), function ($query) use ($request) {
+                $query->where('is_admin_verified','=', $request->is_admin_verified);
             })
             ->latest();
 
@@ -91,7 +97,13 @@ class UserManagementController extends Controller
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);
                 $name = $user->first_name . ' ' . $user->last_name;
-                return '
+
+                $button = "";
+                if ($user->is_admin_verified == false) {
+                    $button = '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon admin-verify-btn" title="Need to Verify" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-verified-badge-fill"></i></a>';
+                }
+
+                return $button.'
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="' . $userId . '"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
@@ -283,6 +295,60 @@ class UserManagementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User not found.'
+            ]);
+        }
+    }
+
+    /** User Account Verify By Admin */
+    public function userAccountVerify(Request $request)
+    {
+        try {
+
+            $userId = $request->user_id;
+
+            $user = User::find(Helpers::decrypt($userId));
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data not found.'
+                ]);
+            }
+
+            $user->is_admin_verified = true;
+            $user->save();
+
+            if ($user->is_admin_verified == true) {
+                $email_setting = EmailContent::where('slug','user_register_acount_reviewed')->first();
+                if ($email_setting) {
+                    $websiteLink = "<b><a href='https://www.boxsocials.com'>www.boxsocials.com</a></b>";
+                    $youtubeLink = "<b><a href='https://www.youtube.com/@BoxSocialsUK'><i>@‌BoxSocialsUK</i></a></b>";
+                    $plateFormLink = "<b><a href='https://boxsocials.com/faqs'><i>Box Social platform</i></a></b>";
+    
+                    $format_content = $email_setting->content;
+                    $format_content = str_replace('|first_name|', "<b>".$user->first_name."</b>", $format_content);
+                    $format_content = str_replace('|website_link|', $websiteLink, $format_content);
+                    $format_content = str_replace('|youtube_link|', $youtubeLink, $format_content);
+                    $format_content = str_replace('|platform_link|', $plateFormLink, $format_content);
+    
+                    $data = [
+                        'email' => $user->email,
+                        'subject' => $email_setting->subject,
+                        'content' => $format_content
+                    ];
+                    Helpers::sendDynamicContentEmail($data);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verified successfully.'
+            ]);
+
+        } catch (Exception $e){
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Somthing went wrong.'
             ]);
         }
     }

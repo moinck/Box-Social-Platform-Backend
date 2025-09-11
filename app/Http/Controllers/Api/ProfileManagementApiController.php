@@ -165,6 +165,7 @@ class ProfileManagementApiController extends Controller
         $user = User::with('subscription:id,user_id')->find($userId);
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
+        $user->company_name = $request->company_name;
         $user->website = $request->website;
         $user->authorisation_type = $request->authorisation_type;
         $user->appointed_network = isset($request->appointed_network) ? $request->appointed_network : null;
