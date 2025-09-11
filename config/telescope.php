@@ -170,10 +170,10 @@ return [
 
         Watchers\JobWatcher::class => env('TELESCOPE_JOB_WATCHER', true),
 
-        Watchers\LogWatcher::class => [
-            'enabled' => env('TELESCOPE_LOG_WATCHER', true),
-            'level' => 'error',
-        ],
+        // Watchers\LogWatcher::class => [
+        //     'enabled' => env('TELESCOPE_LOG_WATCHER', true),
+        //     'level' => 'error',
+        // ],
 
         Watchers\MailWatcher::class => env('TELESCOPE_MAIL_WATCHER', true),
 
@@ -183,14 +183,14 @@ return [
         //     'hydrations' => true,
         // ],
 
-        Watchers\NotificationWatcher::class => env('TELESCOPE_NOTIFICATION_WATCHER', true),
+        // Watchers\NotificationWatcher::class => env('TELESCOPE_NOTIFICATION_WATCHER', true),
 
-        // Watchers\QueryWatcher::class => [
-        //     'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
-        //     'ignore_packages' => true,
-        //     'ignore_paths' => [],
-        //     'slow' => 100,
-        // ],
+        Watchers\QueryWatcher::class => [
+            'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
+            'ignore_packages' => true,
+            'ignore_paths' => [],
+            'slow' => 100,
+        ],
 
         Watchers\RedisWatcher::class => env('TELESCOPE_REDIS_WATCHER', true),
 

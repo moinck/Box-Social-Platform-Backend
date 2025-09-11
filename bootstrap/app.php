@@ -46,8 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // check user's expired subscriptions
         $schedule->command('subscriptions:check-expired')
-                ->daily()
-                ->at('02:00')
+                ->everyFiveMinutes()
                 ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
