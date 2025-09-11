@@ -293,7 +293,7 @@
                         });
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex',orderable: false, searchable: false},
                         { data: 'name', name: 'name'},
                         { data: 'company_name', name: 'company_name'},
                         { data: 'email', name: 'email'},

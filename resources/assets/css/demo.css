@@ -249,6 +249,11 @@ div.font-icon-btns {
     text-align: center !important;
 }
 
+/* make first child content null, so that ascending and descending icon not show */
+.table-bordered.dataTable thead tr th:first-child::before {
+    content: '' !important;
+}
+
 .table-bordered.dataTable tbody {
     text-align: center !important;
 }
