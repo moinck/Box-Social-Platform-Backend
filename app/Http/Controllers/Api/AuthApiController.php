@@ -65,14 +65,19 @@ class AuthApiController extends Controller
             return $this->error('Email is already verified', 400);
         }
 
-        // gernerte token
-        $LoginToken = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
-        // check does user have brandkit
-        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
-
         // Mark email as verified
         $user->markEmailAsVerified();
         event(new Verified($user));
+        
+        if ($user->is_admin_verified == false) {
+            return $this->error('Your account is currently under admin review.', 400);
+        }
+
+        // check does user have brandkit
+        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
+
+        // gernerte token
+        $LoginToken = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
 
         $userToken->update([
             'is_used' => true
