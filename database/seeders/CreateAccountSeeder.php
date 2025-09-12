@@ -31,10 +31,10 @@ class CreateAccountSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => "kausha@iihglobal.com"],
+            ['email' => "eyup@northernwebexperts.co.uk"],
             [
-                'first_name' => "IIH",
-                'last_name' => "Global Test",
+                'first_name' => "Mat",
+                'last_name' => "Khan",
                 'fca_number' => 000000,
                 'company_name' => "Test",
                 'password' => Hash::make('Test@123'),   
@@ -47,13 +47,13 @@ class CreateAccountSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => "qa.iihtest@yopmail.com"],
+            ['email' => "kausha@iihglobal.com"],
             [
-                'first_name' => "QA",
-                'last_name' => "IIH Global",
+                'first_name' => "IIH",
+                'last_name' => "Global Test",
                 'fca_number' => 000000,
                 'company_name' => "Test",
-                'password' => Hash::make('Test@123'),   
+                'password' => Hash::make('Test@123'),
                 'status' => 'active',
                 'role' => 'customer',
                 'is_verified' => true,
