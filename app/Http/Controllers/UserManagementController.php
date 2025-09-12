@@ -322,7 +322,7 @@ class UserManagementController extends Controller
                 if ($email_setting) {
                     $websiteLink = "<b><a href='https://www.boxsocials.com'>www.boxsocials.com</a></b>";
                     $youtubeLink = "<b><a href='https://www.youtube.com/@BoxSocialsUK'><i>@‌BoxSocialsUK</i></a></b>";
-                    $plateFormLink = "<b><a href='https://boxsocials.com/faqs'><i>Box Social platform</i></a></b>";
+                    $plateFormLink = "<b><a href='https://boxsocials.com/faqs'><i>Box Socials platform</i></a></b>";
     
                     $format_content = $email_setting->content;
                     $format_content = str_replace('|first_name|', "<b>".$user->first_name."</b>", $format_content);
