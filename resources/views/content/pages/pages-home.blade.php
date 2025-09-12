@@ -244,6 +244,7 @@
                         data: function (d) {
                             d.is_brandkit = $('#brandkit_filter').val();
                             d.account_status = $('#account_status_filter').val();
+                            d.is_admin_verified = $('#admin_verified_filter').val();
                         },
                         beforeSend: function () {
                             showBSPLoader();
@@ -260,8 +261,9 @@
                         // Create a row to hold the two select filters
                         targetDiv.append(`
                             <div class="row">
-                                <div class="col-md-6" id="brandkit-filter-container"></div>
-                                <div class="col-md-6" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="brandkit-filter-container"></div>
+                                <div class="col-md-4" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="admin-verified-filter-container"></div>
                             </div>`);
 
                         // Append brandkit filter
@@ -289,6 +291,20 @@
 
                         // Filter results on account status select change
                         $('#account_status_filter').on('change', function() {
+                            UserTable.draw();
+                        });
+
+                        // Append admin verified user filter
+                        $('#admin-verified-filter-container').append(`
+                            <select class="form-select input-sm" id="admin_verified_filter">
+                                <option value="">Verification Status</option>
+                                <option value="1">Verified</option>
+                                <option value="0">Not Verified</option>
+                            </select>
+                        `);
+
+                        // Filter results on account status select change
+                        $('#admin_verified_filter').on('change', function() {
                             UserTable.draw();
                         });
                     },
@@ -726,6 +742,60 @@
                 xhr.send(exportFormData);
             }
             // ----------------------------------------------------------
+
+            // Admin Verified User
+            $(document).on('click','.admin-verify-btn', function () {
+                
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+                var table = $('#user-data-table').DataTable();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want verify " + userName + " account!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, verify!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('user.account-verify') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                user_id: userId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Verified!', 'User has been verified.');
+                                    // UserDataTable();
+                                    reloadDataTablePreservingPage(table);
+                                } else {
+                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+                
+
+            });
         });
     </script>
 @endsection

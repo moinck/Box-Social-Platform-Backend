@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class, 'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class, 'accountStatus'])->name('user.account-status');
     Route::post('/user/export', [UserManagementController::class, 'export'])->name('user.export');
+    Route::post('/user/account-verify', [UserManagementController::class, 'userAccountVerify'])->name('user.account-verify');
 
     // Profile Management Controller
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management');

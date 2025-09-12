@@ -34,6 +34,7 @@ class User extends Authenticatable
         'appointed_network',
         'company_type',
         'profile_image',
+        'is_admin_verified',
     ];
 
     /**

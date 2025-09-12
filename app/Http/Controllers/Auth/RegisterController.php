@@ -13,6 +13,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 
@@ -67,6 +69,7 @@ class RegisterController extends Controller
             'authorisation_type' => 'required|numeric',
             'appointed_network'  => 'sometimes|required_if:authorisation_type,2|string|nullable',
             'company_type' => 'required|numeric',
+            'is_domain_verified' => 'required',
         ], [
             // General password messages
             'password.required' => 'Password is required.',
@@ -109,6 +112,7 @@ class RegisterController extends Controller
                 'authorisation_type' => $request->authorisation_type,
                 'appointed_network' => isset($request->appointed_network) ? $request->appointed_network : null,
                 'company_type' => $request->company_type,
+                'is_admin_verified' => $request->is_domain_verified
             ]);
 
             // save fca number
@@ -123,6 +127,24 @@ class RegisterController extends Controller
             // Send verification email
             $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
             Helpers::sendVerificationMail($user, $token);
+
+            if ($request->is_domain_verified == false) {
+                $email_setting = EmailContent::where('slug','user_register_acount_in_review')->first();
+                if ($email_setting) {
+                    $link = "<b><a href='mailto:support@boxsocials.com'>support@boxsocials.com</a></b>";
+    
+                    $format_content = $email_setting->content;
+                    $format_content = str_replace('|first_name|', "<b>".$user->first_name."</b>", $format_content);
+                    $format_content = str_replace('|support_email|', $link, $format_content);
+    
+                    $data = [
+                        'email' => $user->email,
+                        'subject' => $email_setting->subject,
+                        'content' => $format_content
+                    ];
+                    Helpers::sendDynamicContentEmail($data);
+                }
+            }
 
             DB::commit();
 
@@ -219,21 +241,30 @@ class RegisterController extends Controller
         // $user = User::where('email', $request->email)->first();
 
         // Check if email is verified
-        // if (!$user->hasVerifiedEmail()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Email not verified. Please verify your email first.',
-        //         'data' => [
-        //             'user' => [
-        //                 'id' => Helpers::encrypt($user->id),
-        //                 'first_name' => $user->first_name,
-        //                 'last_name' => $user->last_name,
-        //                 'email' => $user->email,
-        //                 'is_verified' => $user->is_verified,
-        //             ]
-        //         ]
-        //     ], 403);
-        // }
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not verified. Please verify your email first.',
+                'data' => [
+                    'user' => [
+                        'id' => Helpers::encrypt($user->id),
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'is_verified' => $user->is_verified,
+                    ]
+                ]
+            ], 403);
+        }
+
+        if ($user->is_admin_verified == false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is currently under admin review.',
+                'data' => []
+            ], 403);
+        }
+
         // For example, generate a token if using Laravel Sanctum or Passport
         $token = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
 
@@ -365,5 +396,77 @@ class RegisterController extends Controller
             'message' => 'Account status checked successfully.',
             'data' => $returnData,
         ], 200);
+    }
+
+    /** Check Email Domain */
+    public function checkEmailDomain(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users,email',
+                'company_name' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $email = $request->email;
+            $companyName = $request->company_name;
+
+            // Step 1: Extract domain from email
+            $domain = substr(strrchr($email, "@"), 1);
+            $domainName = explode('.', $domain)[0];
+
+            // Step 2: Normalize domain
+            $normalizedDomain = strtolower($domainName);
+            $normalizedDomain = preg_replace('/[^a-z0-9]/', '', $normalizedDomain);
+
+            // Step 3: Normalize company name and split into words
+            $normalizedCompany = strtolower($companyName);
+            $normalizedCompany = preg_replace('/[^a-z0-9 ]/', '', $normalizedCompany);
+            $words = explode(' ', $normalizedCompany);
+
+            // Step 4: Exact Match
+            $exactMatch = in_array($normalizedDomain, $words);
+
+            // Step 5: Partial Match
+            $partialMatch = false;
+            foreach ($words as $word) {
+                if (!empty($word) && strpos($normalizedDomain, $word) !== false) {
+                    $partialMatch = true;
+                    break;
+                }
+            }
+
+            // Step 6: Fuzzy Match using Levenshtein distance
+            // $fuzzyMatch = false;
+            // foreach ($words as $word) {
+            //     if (!empty($word)) {
+            //         $distance = levenshtein($normalizedDomain, $word);
+            //         if ($distance <= 1) { // You can adjust the threshold here
+            //             $fuzzyMatch = true;
+            //             break;
+            //         }
+            //     }
+            // }
+
+            // Step 7: Decide overall verification
+            $verified = $exactMatch || $partialMatch;
+
+            if ($verified) {
+                return $this->success(true,"Domain verified",200);
+            } else {
+                return $this->success(false,"Domain not verified",200);
+            }
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong.', 500);
+        }
     }
 }
