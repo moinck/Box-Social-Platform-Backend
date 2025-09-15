@@ -70,7 +70,7 @@ class AuthApiController extends Controller
         event(new Verified($user));
         
         if ($user->is_admin_verified == false) {
-            return $this->error('Your account is currently under admin review.', 400);
+            return $this->error('Your account is currently under admin review.', 301);
         }
 
         // check does user have brandkit

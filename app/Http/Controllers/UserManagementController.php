@@ -92,7 +92,7 @@ class UserManagementController extends Controller
                 return $user->appointed_network ? $user->appointed_network : "-";
             })
             ->addColumn('company_type', function ($user) {
-                return $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '-');
+                return $user->company_type == 1 ? "Sole Trader" : ($user->company_type == 2 ? "Limited Company" : '-');
             })
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);

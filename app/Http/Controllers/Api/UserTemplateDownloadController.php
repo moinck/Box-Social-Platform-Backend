@@ -168,16 +168,16 @@ class UserTemplateDownloadController extends Controller
             $section->addTextBreak(1);
 
             // Add Category
-            $replacements = Helpers::specialCharactersReplacments();
-            $categoryName = $writtenData['category_name'];
-            $categoryName = str_replace(array_keys($replacements), array_values($replacements), $categoryName);
+            // $replacements = Helpers::specialCharactersReplacments();
+            // $categoryName = $writtenData['category_name'];
+            // $categoryName = str_replace(array_keys($replacements), array_values($replacements), $categoryName);
 
-            $section->addText('Category: ', $labelFont, 'contentStyle');
-            $section->addText($categoryName, $contentFont);
-            $section->addTextBreak(2);
+            // $section->addText('Category: ', $labelFont, 'contentStyle');
+            // $section->addText($categoryName, $contentFont);
+            // $section->addTextBreak(2);
             
             // Add Description with HTML parsing
-            $section->addText('Description:', $labelFont, 'contentStyle');
+            $section->addText('Caption:', $labelFont, 'contentStyle');
             $description = $writtenData['description'];
             
             // Parse HTML content from Quill editor
@@ -186,12 +186,12 @@ class UserTemplateDownloadController extends Controller
             $section->addTextBreak(2);
             
             // Add Warning Message
-            if (isset($writtenData['warning_message'])) {
-                $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
-                $warning_message = $writtenData['warning_message'];
-                $warning_message = str_replace(array_keys($replacements), array_values($replacements), $warning_message);
-                $section->addText(htmlspecialchars_decode($warning_message), $warningFont, 'contentStyle');
-            }
+            // if (isset($writtenData['warning_message'])) {
+            //     $section->addText('⚠️ Warning:', $labelFont, 'contentStyle');
+            //     $warning_message = $writtenData['warning_message'];
+            //     $warning_message = str_replace(array_keys($replacements), array_values($replacements), $warning_message);
+            //     $section->addText(htmlspecialchars_decode($warning_message), $warningFont, 'contentStyle');
+            // }
     
             if ($isImages == 'true') {
                 // Add separator before image
