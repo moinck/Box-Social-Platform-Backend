@@ -44,7 +44,7 @@ class UserManagementController extends Controller
             ->when($request->filled('is_admin_verified'), function ($query) use ($request) {
                 $query->where('is_admin_verified','=', $request->is_admin_verified);
             })
-            ->latest();
+            ->latest()->get();
 
         return DataTables::of($users)
             ->addIndexColumn()
