@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
-Route::get('/dail-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
+Route::get('/daily-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
 Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
 Route::middleware('auth')->group(function () {
