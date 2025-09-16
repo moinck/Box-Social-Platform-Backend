@@ -101,7 +101,7 @@ class UserManagementController extends Controller
 
                 $button = "";
                 if ($user->is_admin_verified == false) {
-                    $button = '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon admin-verify-btn" title="Need to Verify" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-verified-badge-fill"></i></a>';
+                    $button = '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon admin-verify-btn" data-bs-toggle="tooltip" title="Need to Verify" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-verified-badge-fill"></i></a>';
                 }
 
                 return $button.'
@@ -162,6 +162,7 @@ class UserManagementController extends Controller
         $user = User::find($userId);
         if ($user) {
 
+            $old_email = $user->email;
             $authorisation_type = isset($request->direct_authorised) ? $request->direct_authorised : (isset($request->appointed_representative) ? $request->appointed_representative : 0);
 
             $user->first_name = $request->edit_first_name;
@@ -175,6 +176,25 @@ class UserManagementController extends Controller
             $user->company_type = $request->company_type;
 
             if ($user->save()) {
+
+                if ($user->email != $old_email) {
+                    $email_setting = EmailContent::where('slug','user_email_update')->first();
+                    if ($email_setting) {
+        
+                        $format_content = $email_setting->content;
+                        $format_content = str_replace('|user_name|', "<b>".$user->first_name."</b>", $format_content);
+                        $format_content = str_replace('|new_email|', "<b>".$user->email."</b>", $format_content);
+                        $format_content = str_replace('|old_email|', "<b>".$old_email."</b>", $format_content);
+        
+                        $data = [
+                            'email' => $user->email,
+                            'subject' => $email_setting->subject,
+                            'content' => $format_content
+                        ];
+                        Helpers::sendDynamicContentEmail($data);
+                    }
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User updated successfully.'

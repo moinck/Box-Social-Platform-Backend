@@ -171,7 +171,7 @@ class RegisterController extends Controller
 
                 DB::commit();
 
-                return response()->json([
+            return response()->json([
                     'success' => true,
                     'message' => 'User registered successfully. Please check your email for verification link.',
                     'data' => [
@@ -190,7 +190,7 @@ class RegisterController extends Controller
                         ],
                         'verification_token' => Helpers::encrypt($token),
                     ],
-                ], 200);
+            ], 200);
             }
 
         } catch (\Exception $e) {
@@ -333,8 +333,8 @@ class RegisterController extends Controller
         }
 
         $fca_number_exists = User::where('fca_number',$fcaNumber)->exists();
-
-        if ($fca_number_exists) {
+        $fcaNumber = FcaNumbers::where('fca_number',$fcaNumber)->exists();
+        if ($fca_number_exists || $fcaNumber) {
             $returnResponse = [
                 'status' => '0',
                 'Message' => 'FCA number already exists.'
