@@ -28,6 +28,7 @@ use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\DataBackupController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -36,7 +37,7 @@ Route::middleware('guest')->group(function () {
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
-
+Route::get('/daily-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
 Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
 Route::middleware('auth')->group(function () {
