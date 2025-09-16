@@ -45,7 +45,7 @@ class AuthApiController extends Controller
         $userToken = UserTokens::where(function ($query) use ($verificationToken) {
             $query->where('token', $verificationToken)
                 ->where('type', 'email-verification')
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                // ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
                 ->where('is_used', false);
         })->first();
 
@@ -68,10 +68,6 @@ class AuthApiController extends Controller
         // Mark email as verified
         $user->markEmailAsVerified();
         event(new Verified($user));
-        
-        if ($user->is_admin_verified == false) {
-            return $this->error('Your account is currently under admin review.', 301);
-        }
 
         // check does user have brandkit
         $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;

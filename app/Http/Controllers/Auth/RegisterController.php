@@ -124,11 +124,7 @@ class RegisterController extends Controller
             // send notification of new registration
             Helpers::sendNotification($user, "new-registration");
 
-            // Send verification email
-            $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
-            Helpers::sendVerificationMail($user, $token);
-
-            if ($request->is_domain_verified == false) {
+            if ($user->is_admin_verified == false) {
                 $email_setting = EmailContent::where('slug','user_register_acount_in_review')->first();
                 if ($email_setting) {
                     $link = "<b><a href='mailto:support@boxsocials.com'>support@boxsocials.com</a></b>";
@@ -144,29 +140,58 @@ class RegisterController extends Controller
                     ];
                     Helpers::sendDynamicContentEmail($data);
                 }
-            }
 
-            DB::commit();
+                DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User registered successfully. Please check your email for verification link.',
-                'data' => [
-                    'user' => [
-                        'id' => Helpers::encrypt($user->id),
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'email' => $user->email,
-                        'company_name' => $user->company_name,
-                        'website' => $user->website,
-                        'fca_number' => $user->fca_number,
-                        'created_at' => $user->created_at->format('d-m-Y h:i A'),
-                        'is_verified' => $user->is_verified ? true : false,
-                        'is_subscribed' => false,
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User registered successfully.',
+                    'data' => [
+                        'user' => [
+                            'id' => Helpers::encrypt($user->id),
+                            'first_name' => $user->first_name,
+                            'last_name' => $user->last_name,
+                            'email' => $user->email,
+                            'company_name' => $user->company_name,
+                            'website' => $user->website,
+                            'fca_number' => $user->fca_number,
+                            'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                            'is_verified' => $user->is_verified ? true : false,
+                            'is_admin_verified' => $user->is_admin_verified ? true : false,
+                            'is_subscribed' => false,
+                        ],
+                        'verification_token' => null,
                     ],
-                    'verification_token' => Helpers::encrypt($token),
-                ],
-            ], 200);
+                ], 301);
+
+            } else {
+                // Send verification email
+                $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
+                Helpers::sendVerificationMail($user, $token);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User registered successfully. Please check your email for verification link.',
+                    'data' => [
+                        'user' => [
+                            'id' => Helpers::encrypt($user->id),
+                            'first_name' => $user->first_name,
+                            'last_name' => $user->last_name,
+                            'email' => $user->email,
+                            'company_name' => $user->company_name,
+                            'website' => $user->website,
+                            'fca_number' => $user->fca_number,
+                            'created_at' => $user->created_at->format('d-m-Y h:i A'),
+                            'is_verified' => $user->is_verified ? true : false,
+                            'is_admin_verified' => $user->is_admin_verified ? true : false,
+                            'is_subscribed' => false,
+                        ],
+                        'verification_token' => Helpers::encrypt($token),
+                    ],
+                ], 200);
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
