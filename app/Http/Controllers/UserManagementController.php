@@ -8,6 +8,7 @@ use App\Models\EmailContent;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -302,6 +303,7 @@ class UserManagementController extends Controller
     /** User Account Verify By Admin */
     public function userAccountVerify(Request $request)
     {
+        DB::beginTransaction();
         try {
 
             $userId = $request->user_id;
@@ -338,6 +340,11 @@ class UserManagementController extends Controller
                     Helpers::sendDynamicContentEmail($data);
                 }
             }
+            
+            $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
+            Helpers::sendVerificationMail($user, $token);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -345,6 +352,7 @@ class UserManagementController extends Controller
             ]);
 
         } catch (Exception $e){
+            DB::rollBack();
             Log::error($e);
             return response()->json([
                 'success' => false,
