@@ -162,7 +162,7 @@ class RegisterController extends Controller
                         ],
                         'verification_token' => null,
                     ],
-                ], 301);
+                ], 200);
 
             } else {
                 // Send verification email
