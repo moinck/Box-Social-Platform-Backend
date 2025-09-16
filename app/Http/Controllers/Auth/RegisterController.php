@@ -265,6 +265,14 @@ class RegisterController extends Controller
         // $user = Auth::user();
         // $user = User::where('email', $request->email)->first();
 
+        if ($user->is_admin_verified == false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is currently under admin review.',
+                'data' => []
+            ], 403);
+        }
+
         // Check if email is verified
         if (!$user->hasVerifiedEmail()) {
             return response()->json([
@@ -279,14 +287,6 @@ class RegisterController extends Controller
                         'is_verified' => $user->is_verified,
                     ]
                 ]
-            ], 403);
-        }
-
-        if ($user->is_admin_verified == false) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Your account is currently under admin review.',
-                'data' => []
             ], 403);
         }
 
