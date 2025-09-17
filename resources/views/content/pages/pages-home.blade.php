@@ -631,7 +631,16 @@
                     error: function(xhr) {
                         hideBSPLoader();
                         console.log(xhr.responseText);
-                        showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorMessages = '';
+                            for (let key in errors) {
+                                errorMessages += errors[key].join(' ') + ' ';
+                            }
+                            showSweetAlert('error', 'Validation Error!', errorMessages);
+                        } else {
+                            showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        }
                     }
                 });
             });
