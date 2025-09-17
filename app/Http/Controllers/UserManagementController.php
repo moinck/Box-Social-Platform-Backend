@@ -146,18 +146,60 @@ class UserManagementController extends Controller
     {
         $userId = Helpers::decrypt($request->edit_user_id);
 
-        $request->validate([
-            'edit_first_name' => 'required|string|max:255',
-            'edit_last_name' => 'required|string|max:255',
-            'edit_company_name' => 'required|string|max:255',
-            'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
-            'user_fca_number' => 'required|string|max:255',
-            'user_account_status' => 'string|in:active,inactive',
-            'company_type' => 'required',
-            'appointed_network' => 'required_if:appointed_representative,1|required_if:appointed_representative,2',
-            'appointed_representative' => 'required_without:direct_authorised',
-            'direct_authorised' => 'required_without:appointed_representative',
-        ]);
+            $request->validate([
+                'edit_first_name' => 'required|string|max:255',
+                'edit_last_name' => 'required|string|max:255',
+                'edit_company_name' => 'required|string|max:255',
+                'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
+                'user_fca_number' => 'required|string|max:255',
+                'user_account_status' => 'string|in:active,inactive',
+                'company_type' => 'required',
+                'appointed_network' => 'required_if:appointed_representative,1|required_if:appointed_representative,2',
+                'appointed_representative' => 'required_without:direct_authorised',
+                'direct_authorised' => 'required_without:appointed_representative',
+            ],[
+                // Custom messages for edit_first_name
+                'edit_first_name.required' => 'Please enter the first name.',
+                'edit_first_name.string' => 'The first name must be a valid string.',
+                'edit_first_name.max' => 'The first name cannot exceed 255 characters.',
+
+                // Custom messages for edit_last_name
+                'edit_last_name.required' => 'Please enter the last name.',
+                'edit_last_name.string' => 'The last name must be a valid string.',
+                'edit_last_name.max' => 'The last name cannot exceed 255 characters.',
+
+                // Custom messages for edit_company_name
+                'edit_company_name.required' => 'Please enter the company name.',
+                'edit_company_name.string' => 'The company name must be a valid string.',
+                'edit_company_name.max' => 'The company name cannot exceed 255 characters.',
+
+                // Custom messages for edit_user_email
+                'edit_user_email.required' => 'Please enter an email address.',
+                'edit_user_email.email' => 'Please enter a valid email address.',
+                'edit_user_email.max' => 'The email address cannot exceed 255 characters.',
+                'edit_user_email.unique' => 'This email address is already in use by another account.',
+
+                // Custom messages for user_fca_number
+                'user_fca_number.required' => 'Please enter the FCA number.',
+                'user_fca_number.string' => 'The FCA number must be a valid string.',
+                'user_fca_number.max' => 'The FCA number cannot exceed 255 characters.',
+
+                // Custom messages for user_account_status
+                'user_account_status.string' => 'Account status must be a valid string.',
+                'user_account_status.in' => 'Account status must be either active or inactive.',
+
+                // Custom messages for company_type
+                'company_type.required' => 'Please select a company type.',
+
+                // Custom messages for appointed_network
+                'appointed_network.required_if' => 'Appointed network is required when appointed representative is selected.',
+
+                // Custom messages for appointed_representative
+                'appointed_representative.required_without' => 'Either appointed representative or directly authorised must be provided.',
+
+                // Custom messages for direct_authorised
+                'direct_authorised.required_without' => 'Either directly authorised or appointed representative must be provided.',
+            ]);
 
         $user = User::find($userId);
         if ($user) {
