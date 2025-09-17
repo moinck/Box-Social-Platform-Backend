@@ -35,7 +35,7 @@
                             <tbody>
                                 <tr>
                                     <td align="center">
-                                        <img src="{{ asset('assets/img/box-logo-horizontal.png') }}" alt="Box Socials Logo" style="display:block; margin:0 auto; width:300px; max-width:100%; height:auto;">
+                                        <img src="https://admin.boxsocials.com/assets/img/box-logo-horizontal.png" alt="Box Socials Logo" style="display:block; margin:0 auto; width:300px; max-width:100%; height:auto;">
                                     </td>
                                 </tr>
                             </tbody>
