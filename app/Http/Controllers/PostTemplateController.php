@@ -78,7 +78,7 @@ class PostTemplateController extends Controller
                 'status',
                 'created_at',
             ])
-            ->latest();
+            ->latest()->get();
 
         return DataTables::of($postTemplates)
             ->addIndexColumn()

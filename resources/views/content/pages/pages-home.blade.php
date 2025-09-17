@@ -456,10 +456,10 @@
                             notEmpty: {
                                 message: 'Please enter your first name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]+$/,
-                                message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]+$/,
+                            //     message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 min: 2,
                                 max: 50,
@@ -472,10 +472,10 @@
                             notEmpty: {
                                 message: 'Please enter your last name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]*$/,
-                                message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]*$/,
+                            //     message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 max: 50,
                                 message: 'Last name must be less than 50 characters'
