@@ -172,6 +172,49 @@ class ProfileManagementApiController extends Controller
         $user->company_type = $request->company_type;
         $user->save();
 
+        $profileUrl = $user->profile_image;
+        if (!empty($profileUrl)) {
+            // check if it is digitalocean url or not
+            if (strpos($profileUrl, 'https://') !== 0) {
+                $profileUrl = asset($profileUrl);
+            }
+        }
+
+        $is_take_free_plan = UserSubscription::where('user_id', $userId)->where('plan_id',1)->exists();
+    
+        $userSubscription = UserSubscription::where('user_id', $userId)
+            ->latest()
+            ->first();
+
+        $is_plan_expiring = false;
+        $is_plan_canceled = false;
+
+        if ($userSubscription) {
+            $is_plan_expiring = $userSubscription->current_period_end ? Carbon::now()->diffInHours(Carbon::parse($userSubscription->current_period_end), false) <= 24 : false;
+
+            $hoursLeft = Carbon::now()->diffInHours(
+                Carbon::parse($userSubscription->current_period_end),
+                false
+            );
+
+            $is_plan_expiring = false;
+            if ($userSubscription->plan_id == 2 && $hoursLeft && $hoursLeft >= 0 && $hoursLeft <= 24) {
+                $is_plan_expiring = true;
+            }
+            
+            if ($userSubscription->is_subscription_cancel == true) {
+                $is_plan_canceled = true;
+            }
+        }
+
+        $plan_id = Helpers::encrypt(3); // £780 plan
+
+        if ($userSubscription && $userSubscription->plan_id == 1 || !$userSubscription) {
+            $plan_flag = 1;
+        } else {
+            $plan_flag = 3;
+        }
+
         $returnData = [];
         $returnData['user'] = [
             'id' => Helpers::encrypt($user->id),
@@ -187,6 +230,13 @@ class ProfileManagementApiController extends Controller
             'authorisation_type' => $user->authorisation_type,
             'appointed_network' => $user->appointed_network,
             'company_type' => $user->company_type,
+            'is_brandkit' => $user->hasBrandKit(),
+            'is_subscribed' => $user->subscription ? true : false,
+            'is_plan_expiring' => $is_plan_expiring,
+            'is_plan_canceled' => $is_plan_canceled,
+            'plan_id' => $plan_id,
+            'plan_flag' => $plan_flag,
+            'is_take_free_plan' => $is_take_free_plan,
         ];
 
         return $this->success($returnData, 'Profile updated successfully');
