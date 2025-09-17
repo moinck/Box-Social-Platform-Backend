@@ -7,7 +7,7 @@
     {{-- this email send to admin , to inform that new contact form is submitted --}}
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="{{ asset('assets/img/box-logo-horizontal.png') }}" 
+        <img src="https://admin.boxsocials.com/assets/img/box-logo-horizontal.png" 
             alt="Box Socials Logo"
             style="display:block; margin:0 auto; width:300px; max-width:100%; height:auto;">
     </div>
