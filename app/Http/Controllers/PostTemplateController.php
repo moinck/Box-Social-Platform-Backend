@@ -56,7 +56,7 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
+        $postTemplates = PostTemplate::whereHas('category')->with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
             ->when($request->has('category') && $request->category != '', function ($query) use ($request) {
                 $query->where('category_id', $request->category);
             })
