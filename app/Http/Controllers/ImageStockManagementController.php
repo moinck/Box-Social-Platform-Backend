@@ -250,13 +250,6 @@ class ImageStockManagementController extends Controller
             
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
 
-            /** Activity Log */
-            Helpers::activityLog([
-                'title' => "Delete Stock Image",
-                'description' => "Delete admin stock image. [".$imageIds."]",
-                'url' => route('image-management.delete.saved-images')
-            ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Images deleted successfully',
