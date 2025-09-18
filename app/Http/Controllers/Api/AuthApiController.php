@@ -101,7 +101,7 @@ class AuthApiController extends Controller
             'title' => "User Email Verify",
             'description' => "User email verify on the platform. User: ".$user->email,
             'url' => "api/email/verify"
-        ]);
+        ],$user->id);
 
         return $this->success($returnData, 'Email verified successfully');
     }
@@ -218,7 +218,7 @@ class AuthApiController extends Controller
                     'title' => "Forget Password",
                     'description' => "User forget the password. User : ".$user->email,
                     'url' => "api/forget-password"
-                ]);
+                ],$user->id);
 
                 return $this->success([
                     'verification_token' => $encyptedToken
@@ -351,7 +351,7 @@ class AuthApiController extends Controller
             'title' => "Reset Password",
             'description' => "User password reset successfully. User: ".$user->email,
             'url' => "api/reset-password"
-        ]);
+        ],$user->id);
 
         return $this->success([], 'Password reset successfully');
     }
