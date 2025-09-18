@@ -48,10 +48,10 @@
 <body>
     <div class="invoice-box">
         <!-- Header -->
-        <table style="width:100%; margin-bottom:20px; border:none;">
+        <table style="width:100%; margin-bottom:15px; border:none;">
             <tr style="border:none;">
                 <td style="border:none; display:flex; align-items:center;">
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/box-logo-horizontal.png'))) }}" style="height:45px;"></br>
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/img/box-socials-tm.png'))) }}" style="height:95px;"></br>
                     
                 </td>
                 <td style="border:none; text-align:right; vertical-align:middle;">

@@ -141,6 +141,17 @@ class RegisterController extends Controller
                     Helpers::sendDynamicContentEmail($data);
                 }
 
+                $admin_email_setting = EmailContent::where('slug','new_account_pending_admin_approval')->first();
+                if ($admin_email_setting) {
+                    $data = [
+                        // 'email' => "contact@fsdigitalmarketing.co.uk",
+                        'email' => "dev.iihtest@yopmail.com",
+                        'subject' => $admin_email_setting->subject,
+                        'content' => $admin_email_setting->content
+                    ];
+                    Helpers::sendDynamicContentEmail($data);
+                }
+
                 $message = "Without verified domain.";
 
                 DB::commit();

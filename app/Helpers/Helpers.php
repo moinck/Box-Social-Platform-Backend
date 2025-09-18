@@ -1223,6 +1223,7 @@ class Helpers
             'user_register_acount_in_review' => "Welcome Email -  ACCOUNT IN REVIEW",
             'user_register_acount_reviewed' => "Welcome Email -  ACCOUNT REVIEWED",
             'user_email_update' => "User Email Update",
+            'new_account_pending_admin_approval' => "New Account Pending Admin Approval",
         ];
     }
 

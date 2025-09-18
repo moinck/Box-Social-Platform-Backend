@@ -232,7 +232,7 @@
                                                                                                     alt="" {{--
                                                                                                     src="https://fc5ee4b8-eea2-4077-8cb6-25e056548ad3.b-cdn.net/e/7f0dca7b-3155-48b5-bfdb-6db82a6757a5/bd214918-cea1-43b1-8f5b-f75f6fcf311b.png" />
                                                                                                 --}}
-                                                                                                src="{{ asset('assets/img/box-logo-horizontal.png') }}"
+                                                                                                src="{{ asset('assets/img/box-socials-tm.png') }}"
                                                                                                 />
                                                                                             </div>
                                                                                         </td>
