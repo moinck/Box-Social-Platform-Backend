@@ -145,7 +145,7 @@ class RegisterController extends Controller
                 if ($admin_email_setting) {
                     $data = [
                         // 'email' => "contact@fsdigitalmarketing.co.uk",
-                        'email' => "dev.iihtest@yopmail.com",
+                        'email' => "jayp.iihglobal@gmail.com",
                         'subject' => $admin_email_setting->subject,
                         'content' => $admin_email_setting->content
                     ];

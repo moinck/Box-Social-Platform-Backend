@@ -226,7 +226,7 @@
                                                                                         <td class="t1">
                                                                                             <div style="font-size:0px;">
                                                                                                 <img class="t0"
-                                                                                                    style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;"
+                                                                                                    style="display:block;border:0;height:auto;width:100px;Margin:0;max-width:100%;"
                                                                                                     width="202"
                                                                                                     height="121.85236447520184"
                                                                                                     alt="" {{--
