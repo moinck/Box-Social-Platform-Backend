@@ -141,9 +141,27 @@ class RegisterController extends Controller
                     Helpers::sendDynamicContentEmail($data);
                 }
 
-                DB::commit();
+                $message = "Without verified domain.";
 
-                return response()->json([
+                DB::commit();
+                $token = null;
+            } else {
+                // Send verification email
+                $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
+                Helpers::sendVerificationMail($user, $token);
+                $token = Helpers::encrypt($token);
+                $message = "With verified domain.";
+                DB::commit();
+            }
+
+            /** User Activity Log */
+            Helpers::activityLog([
+                'title' => "User Registration",
+                'description' => "New user registered on the platform. ". $message ." User: ".$user->email,
+                'url' => "api/register"
+            ]);
+
+            return response()->json([
                     'success' => true,
                     'message' => 'User registered successfully.',
                     'data' => [
@@ -160,38 +178,9 @@ class RegisterController extends Controller
                             'is_admin_verified' => $user->is_admin_verified ? true : false,
                             'is_subscribed' => false,
                         ],
-                        'verification_token' => null,
+                        'verification_token' => $token,
                     ],
                 ], 200);
-
-            } else {
-                // Send verification email
-                $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
-                Helpers::sendVerificationMail($user, $token);
-
-                DB::commit();
-
-            return response()->json([
-                    'success' => true,
-                    'message' => 'User registered successfully. Please check your email for verification link.',
-                    'data' => [
-                        'user' => [
-                            'id' => Helpers::encrypt($user->id),
-                            'first_name' => $user->first_name,
-                            'last_name' => $user->last_name,
-                            'email' => $user->email,
-                            'company_name' => $user->company_name,
-                            'website' => $user->website,
-                            'fca_number' => $user->fca_number,
-                            'created_at' => $user->created_at->format('d-m-Y h:i A'),
-                            'is_verified' => $user->is_verified ? true : false,
-                            'is_admin_verified' => $user->is_admin_verified ? true : false,
-                            'is_subscribed' => false,
-                        ],
-                        'verification_token' => Helpers::encrypt($token),
-                    ],
-            ], 200);
-            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -334,6 +323,13 @@ class RegisterController extends Controller
 
         // check does user have brandkit
         $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Login",
+            'description' => "User login on the platform. User: ".$user->email,
+            'url' => "api/login"
+        ]);
 
         return response()->json([
             'success' => true,

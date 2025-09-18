@@ -69,6 +69,13 @@ class ImageStockManagementController extends Controller
                 ProcessStockImageUpload::dispatch($imge->id);
             }
 
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Stock Image Save",
+                'description' => "Admin stock image save. Tag :".$request->custom_tag_name,
+                'url' => route('stock-image-management.get.saved-topics')
+            ]);
+
             // update saved images count
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
             return response()->json([
@@ -242,6 +249,14 @@ class ImageStockManagementController extends Controller
             }
             
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Delete Stock Image",
+                'description' => "Delete admin stock image. [".$imageIds."]",
+                'url' => route('image-management.delete.saved-images')
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Images deleted successfully',

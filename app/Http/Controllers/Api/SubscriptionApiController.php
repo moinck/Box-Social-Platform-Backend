@@ -162,6 +162,13 @@ class SubscriptionApiController extends Controller
 
                 DB::commit();
 
+                /** User Activity Log */
+                Helpers::activityLog([
+                    'title' => "User Subscription",
+                    'description' => "User take free plan subscription. User: ".$user->email,
+                    'url' => "api/user-subscription/subscribe"
+                ]);
+
                 // return success response
                 return response()->json([
                     'status' => true,
@@ -252,6 +259,13 @@ class SubscriptionApiController extends Controller
             $newPayment->save();
 
             DB::commit();
+
+            /** User Activity Log */
+            Helpers::activityLog([
+                'title' => "User Subscription",
+                'description' => "User take £780 pro plan subscription. User: ".$user->email,
+                'url' => "api/user-subscription/subscribe"
+            ]);
 
             $returnData = [
                 'subscription_plan' => 'premium-plan',

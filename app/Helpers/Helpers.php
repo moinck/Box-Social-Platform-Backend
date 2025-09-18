@@ -1245,7 +1245,7 @@ class Helpers
     /** User Activity Log */
     public static function activityLog($activityLogData){
         $userName = "";
-        $userId = '';
+        $userId = null;
         if(Auth::check()){
             $userId = Auth::user()->id;
             $userName =  Auth::user()->first_name." ".Auth::user()->last_name;
@@ -1266,7 +1266,7 @@ class Helpers
             'url' => $activityLogData['url'],
             'description_text' => strip_tags($activityLogData['description']),
         ];
-        $activityLog->info = ['user' => $user, 'activity' => $activity];
+        $activityLog->info = json_encode(['user'     => $user, 'activity' => $activity], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $activityLog->save();
         return true;
     }

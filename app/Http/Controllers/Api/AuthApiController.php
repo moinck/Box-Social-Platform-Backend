@@ -96,6 +96,13 @@ class AuthApiController extends Controller
             'token_type' => 'Bearer',
         ];
 
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Email Verify",
+            'description' => "User email verify on the platform. User: ".$user->email,
+            'url' => "api/email/verify"
+        ]);
+
         return $this->success($returnData, 'Email verified successfully');
     }
 
@@ -206,6 +213,13 @@ class AuthApiController extends Controller
                 $encyptedToken = Helpers::encrypt($token);
                 Mail::to($user->email)->send(new ForgetPasswordMail($encyptedToken, $user));
     
+                /** User Activity Log */
+                Helpers::activityLog([
+                    'title' => "Forget Password",
+                    'description' => "User forget the password. User : ".$user->email,
+                    'url' => "api/forget-password"
+                ]);
+
                 return $this->success([
                     'verification_token' => $encyptedToken
                 ], 'Password reset email sent successfully');
@@ -331,6 +345,14 @@ class AuthApiController extends Controller
             'user_id' => $user->id,
             'type' => 'forget-password'
         ])->update(['is_used' => true]);
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "Reset Password",
+            'description' => "User password reset successfully. User: ".$user->email,
+            'url' => "api/reset-password"
+        ]);
+
         return $this->success([], 'Password reset successfully');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helpers;
 use App\Models\IconManagement;
 use Illuminate\Http\Request;
 
@@ -33,6 +34,13 @@ class IconManagementController extends Controller
                 ]
             );
         }
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Icon Saved",
+            'description' => "Admin Panel: Icon Saved. Tag Name: ". $customTagName,
+            'url' => route('icon-management.store')
+        ]);
 
         return response()->json([
             'success' => true,
@@ -91,7 +99,17 @@ class IconManagementController extends Controller
         $request->validate([
             'deleteIconIds' => 'required',
         ]);
+        $iconManagement = IconManagement::whereIn('id',$request->deleteIconIds)->get();
+        $iconUrls = collect($iconManagement)->pluck('icon_url')->toArray();
         IconManagement::whereIn('id', $request->deleteIconIds)->delete();
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Delete Icons",
+            'description' => "Admin Panel: Delete Icons. Icons URL: (". implode(', ',$iconUrls) . ")",
+            'url' => route('icon-management.delete.saved-icon')
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Icons deleted successfully',

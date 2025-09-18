@@ -237,6 +237,13 @@ class UserManagementController extends Controller
                     }
                 }
 
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "User Details Update",
+                    'description' => "Admin Panel: User details update. User: ". $user->email,
+                    'url' => route('user.update')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User updated successfully.'
@@ -267,6 +274,14 @@ class UserManagementController extends Controller
         if ($user) {
             $user->status = $user->status == 'active' ? 'inactive' : 'active';
             $user->save();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Change User Status",
+                'description' => "Admin Panel: Change User status. User: ". $user->email.". Changed Status: ".$user->status,
+                'url' => route('user.account-status')
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Account status updated successfully.'
@@ -344,6 +359,14 @@ class UserManagementController extends Controller
         if ($user) {
             $deleteUser = Helpers::deleteUserData($userId);
             if ($deleteUser === true) {
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "User Delete",
+                    'description' => "Admin Panel: Delete user. User: ". $user->email,
+                    'url' => route('user.delete')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User deleted successfully.'
@@ -407,6 +430,13 @@ class UserManagementController extends Controller
             Helpers::sendVerificationMail($user, $token);
 
             DB::commit();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "User Account Verified",
+                'description' => "Admin Panel: User account verified. User: ". $user->email,
+                'url' => route('user.account-verify')
+            ]);
 
             return response()->json([
                 'success' => true,

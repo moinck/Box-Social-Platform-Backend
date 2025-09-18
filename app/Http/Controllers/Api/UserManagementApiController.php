@@ -42,6 +42,14 @@ class UserManagementApiController extends Controller
             return $this->error('You are not allowed to delete admin account', 403);
         }
 
+        $user = User::select('id','email')->where('id', $user->id)->first();
+         /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "Delete User Account",
+            'description' => "Delete user account. User: ".$user->email,
+            'url' => "api/user-account/delete"
+        ]);
+
         $deleteUser = Helpers::deleteUserData($userId);
         if ($deleteUser === true) {
             return $this->success([], 'Your Account deleted successfully', 401);

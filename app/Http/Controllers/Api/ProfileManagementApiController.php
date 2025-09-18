@@ -239,6 +239,13 @@ class ProfileManagementApiController extends Controller
             'is_take_free_plan' => $is_take_free_plan,
         ];
 
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Profile",
+            'description' => "User profile update successfully. User: ".$user->email,
+            'url' => "api/profile-management/update"
+        ]);
+
         return $this->success($returnData, 'Profile updated successfully');
     }
 
@@ -314,6 +321,13 @@ class ProfileManagementApiController extends Controller
             'is_brandkit' => $user->hasBrandKit(),
             'is_subscribed' => $user->subscription ? true : false,
         ];
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Profile Image",
+            'description' => "User profile image update successfully. User: ".$user->email,
+            'url' => "api/profile-management/profile/update"
+        ]);
 
         return $this->success($returnData, 'Profile updated successfully');
     }
