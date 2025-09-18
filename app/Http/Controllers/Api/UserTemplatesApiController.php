@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -195,6 +196,7 @@ class UserTemplatesApiController extends Controller
             }
 
             $templateName = [];
+            DB::beginTransaction();
             try {
                 $decyptedId = Helpers::decrypt($templateData['template_id']);
 
@@ -247,7 +249,9 @@ class UserTemplatesApiController extends Controller
                     'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
                     'post_content_data' => $postContentArray,
                 ];
+                DB::commit();
             } catch (Exception $e) {
+                DB::rollBack();
                 $errors[$index] = ['error' => 'Failed to save template: ' . $e->getMessage()];
             }
         }
