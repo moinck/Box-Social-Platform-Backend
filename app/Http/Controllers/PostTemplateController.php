@@ -164,7 +164,7 @@ class PostTemplateController extends Controller
                 /** Activity Log */
                 Helpers::activityLog([
                     'title' => "Delete Post Template",
-                    'description' => "Admin Panel: Post Template is ".$value->template_name.". Post Template Content: ".$value->postContent->title.". Post Template Category: ".$value->category->name.". Post Template Sub-Category: ".$value->subCategory->name,
+                    'description' => "Admin Panel: Post Template is ".$value->template_name.". Post Template Content: ".(isset($value->postContent) ? $value->postContent->title : '-').". Post Template Category: ".(isset($value->category) ? $value->category->name : '-').". Post Template Sub-Category: ".(isset($value->subCategory) ? $value->subCategory->name : '-'),
                     'url' => route('post-content.delete')
                 ]);
 
@@ -250,7 +250,7 @@ class PostTemplateController extends Controller
                 /** Activity Log */
                 Helpers::activityLog([
                     'title' => "Duplicate Post Template",
-                    'description' => "Admin Panel: Post Template is ".$postTemplate->template_name.". Post Template Content: ".$postTemplate->postContent->title.". Post Template Category: ".$postTemplate->category->name.". Post Template Sub-Category: ".$postTemplate->subCategory->name,
+                    'description' => "Admin Panel: Post Template is ".$postTemplate->template_name.". Post Template Content: ".(isset($postTemplate->postContent) ? $postTemplate->postContent->title : '-').". Post Template Category: ".(isset($postTemplate->category) ? $postTemplate->category->name : '-').". Post Template Sub-Category: ".(isset($postTemplate->subCategory) ? $postTemplate->subCategory->name : '-'),
                     'url' => route('post-template.create-duplicate')
                 ]);
                 

@@ -82,7 +82,7 @@ class PostContentController extends Controller
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Create Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".$postContent->category->name.". Post Content Sub-Category: ".$postContent->subCategory->name,
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
             'url' => route('post-content.store')
         ]);
 
@@ -125,7 +125,7 @@ class PostContentController extends Controller
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Update Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".$postContent->category->name.". Post Content Sub-Category: ".$postContent->subCategory->name,
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
             'url' => route('post-content.update')
         ]);
 
@@ -191,7 +191,7 @@ class PostContentController extends Controller
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Delete Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".$postContent->category->name.". Post Content Sub-Category: ".$postContent->subCategory->name,
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
             'url' => route('post-content.delete')
         ]);
 
