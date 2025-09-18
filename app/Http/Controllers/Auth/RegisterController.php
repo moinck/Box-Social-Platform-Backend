@@ -170,7 +170,7 @@ class RegisterController extends Controller
                 'title' => "User Registration",
                 'description' => "New user registered on the platform. ". $message ." User: ".$user->email,
                 'url' => "api/register"
-            ]);
+            ],$user->id);
 
             return response()->json([
                     'success' => true,

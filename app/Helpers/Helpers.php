@@ -1244,10 +1244,9 @@ class Helpers
     }
 
     /** User Activity Log */
-    public static function activityLog($activityLogData){
+    public static function activityLog($activityLogData,$userId=null){
         $userName = "";
-        $userId = null;
-        if(Auth::check()){
+        if(Auth::check() && $userId == null){
             $userId = Auth::user()->id;
             $userName =  Auth::user()->first_name." ".Auth::user()->last_name;
         }
