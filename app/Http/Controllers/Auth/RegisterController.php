@@ -143,9 +143,14 @@ class RegisterController extends Controller
 
                 $admin_email_setting = EmailContent::where('slug','new_account_pending_admin_approval')->first();
                 if ($admin_email_setting) {
+
+                    $email = "dev.iihtest@yopmail.com";
+                    if (config('app.env') == "live" || config('app.env') == "production") {
+                        $email = "support@boxsocials.com";
+                    }
+
                     $data = [
-                        // 'email' => "support@boxsocials.com",
-                        'email' => "jayp.iihglobal@gmail.com",
+                        'email' => $email,
                         'subject' => $admin_email_setting->subject,
                         'content' => $admin_email_setting->content
                     ];
