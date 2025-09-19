@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class BrandKit extends Model
 {
@@ -15,8 +16,27 @@ class BrandKit extends Model
         'design_style_id',
         'base64_logo',
         'warning_title',
-        'warning_message'
+        'warning_message',
+        'logo',
     ];
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($brandKit) {
+            Cache::forget('brandkit_' . $brandKit->user_id);
+        });
+
+        static::updated(function ($brandKit) {
+            Cache::forget('brandkit_' . $brandKit->user_id);
+        });
+
+        static::deleted(function ($brandKit) {
+            Cache::forget('brandkit_' . $brandKit->user_id);
+        });
+    }
 
     public function designStyle()
     {

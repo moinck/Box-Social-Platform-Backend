@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\PostTemplate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TemplateApiController extends Controller
 {
@@ -52,7 +53,7 @@ class TemplateApiController extends Controller
             $tempObj = new PostTemplate();
             $tempObj->category_id = $categoryId;
             $tempObj->template_image = $imagePath;
-            $tempObj->template_data = json_encode($request->template_data);
+            $tempObj->template_data = $request->template_data;
     
             if ($request->has('sub_category_id') && $subCategoryId !== null) {
                 $tempObj->sub_category_id = $subCategoryId;
@@ -170,10 +171,11 @@ class TemplateApiController extends Controller
 
         // get all post content data of post_content_ids
         if (!empty($decryptedPostContentIds) && !empty($decryptedTemplateIds)) {
-            $postContents = PostContent::select('id','title','warning_message')->whereIn('id', $decryptedPostContentIds)->get();
+            $postContents = PostContent::select('id','title','warning_message','category_id')->whereIn('id', $decryptedPostContentIds)->get();
             $postContentData['post_content_data'] = $postContents->map(function ($postContent) {
                 return [
                     'id' => Helpers::encrypt($postContent->id),
+                    'category_id' => Helpers::encrypt($postContent->category_id),
                     'title' => $postContent->title,
                     'warning_message' => $postContent->warning_message ? $postContent->warning_message : '',
                 ];
@@ -195,7 +197,10 @@ class TemplateApiController extends Controller
     
             // Apply post_content filter if needed
             if (!empty($decryptedPostContentIds) && empty($decryptedTemplateIds)) {
-                $query->whereIn('post_content_id', $decryptedPostContentIds);
+                $query->where(function ($q) use ($decryptedPostContentIds) {
+                    $q->whereIn('post_content_id', $decryptedPostContentIds)
+                        ->orWhereNull('post_content_id');
+                });
             }
     
             // Apply template_ids filter (if provided)
@@ -216,24 +221,20 @@ class TemplateApiController extends Controller
                         'category_id' => Helpers::encrypt($t->category_id),
                         'post_content_id' => $postContentId,
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
+                        'base64_template_image' => isset($t->template_image) ? Helpers::imageUrlToBase64($t->template_image) : '',
                         'template_data' => isset($t->template_data) ? $t->template_data : '',
                     ];
                 } else {
                     return [
                         'id' => Helpers::encrypt($t->id),
                         'category_id' => Helpers::encrypt($t->category_id),
-                        'post_content_id' => Helpers::encrypt($t->post_content_id ?? null),
+                        'post_content_id' => $t->post_content_id ? Helpers::encrypt($t->post_content_id) : null,
                         'template_image' => isset($t->template_image) ? asset($t->template_image) : '',
                     ];
                 }
             })->toArray();
         }
 
-        // $returnData = [
-        //     "template_data" => $tempData,
-        //     "post_content_data" => $postContentData,
-        // ];
-        // dd($postContentData);
         $returnData = array_merge($tempData, $postContentData);
     
         return $this->success($returnData, 'Template fetched successfully');
@@ -297,10 +298,12 @@ class TemplateApiController extends Controller
         if ($request->has('post_content_id') && $request->post_content_id) {
             $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
             $adminTemplate->post_content_id = $decryptedPostContentId;
+        } else {
+            $adminTemplate->post_content_id = null;
         }
 
         $adminTemplate->template_image = $updateImageUrl ?? null;
-        $adminTemplate->template_data = json_encode($request->template_data);
+        $adminTemplate->template_data = $request->template_data;
         $adminTemplate->save();
 
 
@@ -332,5 +335,236 @@ class TemplateApiController extends Controller
         $template->delete();
 
         return $this->success([], 'Template deleted successfully');
+    }
+
+    /** Old Get Text Content Template */
+    public function getTextContentTemplateListOld(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'category_ids' => 'nullable|array',
+                'sub_category_ids' => 'nullable|array',
+                'post_content_ids' => 'nullable|array',
+                'template_ids' => 'nullable|array',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationError('Validation failed', $validator->errors());
+            }
+
+            // Decrypt category IDs
+            $decryptedCategoryIds = [];
+            if ($request->has('category_ids') && !empty($request->category_ids)) {
+                $decryptedCategoryIds = array_map(function ($id) {
+                    return Helpers::decrypt($id);
+                }, $request->category_ids);
+            }
+            
+            // Decrypt sub category and post content IDs
+            $decryptedSubCategoryIds = $request->has('sub_category_ids') && !empty($request->sub_category_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->sub_category_ids) : [];
+            $decryptedPostContentIds = $request->has('post_content_ids') && !empty($request->post_content_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->post_content_ids) : [];
+            $decryptedTemplateIds = $request->has('template_ids') && !empty($request->template_ids)
+            ? array_map([Helpers::class, 'decrypt'], $request->template_ids) : [];
+
+            // Fetch the categories from DB
+            $categories = Categories::select('id','name')->whereIn('id', $decryptedCategoryIds)->get();
+            $postContents = PostContent::select('id','title','category_id','warning_message')->whereIn('id',$decryptedPostContentIds)->get();
+            $tempData = [];
+
+            foreach ($categories as $category) {
+
+                $query = PostTemplate::with('category:id,name')
+                    ->where('status', 1)
+                    ->where('category_id', $category->id);
+
+                // Apply sub_category filter if needed
+                if (!empty($decryptedSubCategoryIds) && empty($decryptedTemplateIds)) {
+                    $query->where(function ($q) use ($decryptedSubCategoryIds) {
+                        $q->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                            ->orWhereNull('sub_category_id');
+                    });
+                }
+        
+                // Apply post_content filter if needed
+                if (!empty($decryptedPostContentIds) && empty($decryptedTemplateIds)) {
+                    $query->where(function ($q) use ($decryptedPostContentIds) {
+                        $q->whereIn('post_content_id', $decryptedPostContentIds)
+                            ->orWhereNull('post_content_id');
+                    });
+                }
+
+                // Apply template_ids filter (if provided)
+                if (!empty($decryptedTemplateIds)) {
+                    $query->whereIn('id', $decryptedTemplateIds);
+                }
+
+                $templates = $query->latest()->get();
+                
+                $categoryName = $category->name ?? 'Uncategorized';
+                $tempContentData = [];
+
+                foreach ($templates as $template) {
+
+                    $postContent = $postContents->where('id',$template->post_content_id)->where('category_id',$category->id)->first();
+                    
+                    $templateData = [];
+                    if (!empty($decryptedTemplateIds)) {
+                        $templateData = [
+                            'base64_template_image' => isset($template->template_image) ? Helpers::imageUrlToBase64($template->template_image) : '',
+                            'template_data' => isset($template->template_data) ? $template->template_data : '',
+                        ];
+                    }
+                    
+                    $tempContentData[] = array_merge([
+                        'id' => Helpers::encrypt($template->id),
+                        'category_id' => Helpers::encrypt($template->category_id),
+                        'post_content_id' => $template->post_content_id ? Helpers::encrypt($template->post_content_id) : null,
+                        'template_image' => isset($template->template_image) ? asset($template->template_image) : '',
+                        'title' => $postContent && $postContent['title'] ? $postContent['title'] : null,
+                        'warning_message' => $postContent && $postContent['warning_message'] ? $postContent['warning_message'] : ''
+                    ],$templateData);
+
+                }
+
+                $tempData[] = [
+                    'id' => Helpers::encrypt($category->id),
+                    'name' => $categoryName,
+                    'post_content_data' => $tempContentData
+                ];
+            }
+
+            return $this->success($tempData, 'Template fetched successfully');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong', 500);
+        }
+    }
+
+    /** Optimize Get Test Content Template Optimize */
+    public function getTextContentTemplateList(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'category_ids' => 'nullable|array',
+                'sub_category_ids' => 'nullable|array',
+                'post_content_ids' => 'nullable|array',
+                'template_ids' => 'nullable|array',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationError('Validation failed', $validator->errors());
+            }
+
+            // Decrypt all IDs at once where applicable
+            $decryptedCategoryIds = collect($request->input('category_ids', []))
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->all();
+
+            $decryptedSubCategoryIds = collect($request->input('sub_category_ids', []))
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->all();
+
+            $decryptedPostContentIds = collect($request->input('post_content_ids', []))
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->all();
+
+            $decryptedTemplateIds = collect($request->input('template_ids', []))
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->all();
+
+                
+                // Fetch categories in one query
+            $categories = Categories::select('id', 'name')
+                ->whereIn('id', $decryptedCategoryIds)
+                ->get();
+                
+            // Fetch post contents in one query
+            $postContents = PostContent::select('id', 'title', 'category_id', 'warning_message')
+                ->whereIn('id', $decryptedPostContentIds)
+                ->get()
+                ->groupBy('id');
+
+            // Extract category IDs once
+            $categoryIds = $categories->pluck('id')->all();
+
+            // Fetch templates once with necessary filters
+            
+
+            if (!empty($decryptedTemplateIds)) {
+                $postTemplatesQuery = PostTemplate::with('category:id,name')
+                ->where('status', 1)
+                ->whereIn('category_id', $categoryIds);
+                
+                $postTemplatesQuery->whereIn('id', $decryptedTemplateIds);
+            } else {
+                                $postTemplatesQuery = PostTemplate::select('id','category_id','sub_category_id','design_style_id','post_content_id','template_image','template_name')->with('category:id,name')
+                ->where('status', 1)
+                ->whereIn('category_id', $categoryIds);
+
+                if (!empty($decryptedSubCategoryIds)) {
+                    $postTemplatesQuery->where(function ($query) use ($decryptedSubCategoryIds) {
+                        $query->whereIn('sub_category_id', $decryptedSubCategoryIds)
+                            ->orWhereNull('sub_category_id');
+                    });
+                }
+                if (!empty($decryptedPostContentIds)) {
+                    $postTemplatesQuery->where(function ($query) use ($decryptedPostContentIds) {
+                        $query->whereIn('post_content_id', $decryptedPostContentIds)
+                            ->orWhereNull('post_content_id');
+                    });
+                }
+
+            }
+
+            $postTemplates = $postTemplatesQuery->latest()
+                ->get()
+                ->groupBy('category_id');
+
+            $tempData = [];
+
+            foreach ($categories as $category) {
+
+                $templates = $postTemplates->get($category->id, collect());
+
+                $tempContentData = $templates->map(function ($template) use ($postContents, $decryptedTemplateIds) {
+                    $postContent = $postContents->get($template->post_content_id)?->first();
+
+                    $templateData = [];
+                    if (!empty($decryptedTemplateIds)) {
+                        $templateData = [
+                            'base64_template_image' => $template->template_image ? Helpers::imageUrlToBase64($template->template_image) : '',
+                            'template_data' => $template->template_data ?? '',
+                        ];
+                    }
+
+                    return array_merge([
+                        'id' => Helpers::encrypt($template->id),
+                        'category_id' => Helpers::encrypt($template->category_id),
+                        'post_content_id' => $template->post_content_id ? Helpers::encrypt($template->post_content_id) : null,
+                        'template_image' => $template->template_image ? asset($template->template_image) : '',
+                        'title' => $postContent->title ?? null,
+                        'warning_message' => $postContent->warning_message ?? '',
+                    ], $templateData);
+                })->all();
+
+                $tempData[] = [
+                    'id' => Helpers::encrypt($category->id),
+                    'name' => $category->name ?? 'Uncategorized',
+                    'post_content_data' => $tempContentData
+                ];
+
+            }
+
+            return $this->success($tempData, 'Template fetched successfully');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong.',500);    
+        }
     }
 }

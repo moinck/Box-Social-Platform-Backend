@@ -6,14 +6,17 @@ use App\Http\Controllers\Api\BetaTesterController;
 use App\Http\Controllers\Api\BrnadKitApiController;
 use App\Http\Controllers\Api\CategoriesApiController;
 use App\Http\Controllers\Api\IconManagementAPiController;
+use App\Http\Controllers\Api\NotificationApiController;
 use App\Http\Controllers\Api\PostContentApiController;
 use App\Http\Controllers\Api\PrivacyPolicyApiController;
 use App\Http\Controllers\Api\ProfileManagementApiController;
 use App\Http\Controllers\Api\StockImageApiController;
+use App\Http\Controllers\Api\SubscriptionApiController;
 use App\Http\Controllers\Api\SubscriptionPlanApiController;
 use App\Http\Controllers\Api\TemplateApiController;
 use App\Http\Controllers\Api\TermsAndConditionApiController;
 use App\Http\Controllers\Api\UserDownloadsManagementApiController;
+use App\Http\Controllers\Api\UserManagementApiController;
 use App\Http\Controllers\Api\UserSubscriptionHistoryApiController;
 use App\Http\Controllers\Api\UserSubscriptionNewApiController;
 use App\Http\Controllers\Api\UserTemplateDownloadController;
@@ -26,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::post('/fca-check', [RegisterController::class, 'checkFca']);
+Route::post('/check-email-domain', [RegisterController::class, 'checkEmailDomain']);
 
 // Email verification routes
 Route::post('/email/verify', [AuthApiController::class, 'verify'])
@@ -82,10 +86,12 @@ Route::group([
 
         // stock image api
         Route::get('/stock-image/get', [StockImageApiController::class, 'get']);
+        Route::get('/stock-image/uploaded', [StockImageApiController::class, 'getUploadedStockImage']);
         
         // admin-template API
         Route::get('/template/get/{id}', [TemplateApiController::class, 'getTemplate']);
         Route::post('/template/list', [TemplateApiController::class, 'getTemplateList']);
+        Route::post('/text-content/template/list', [TemplateApiController::class, 'getTextContentTemplateList']);
         Route::post('/template/delete', [TemplateApiController::class, 'delete']);
 
         // User templates APIS
@@ -95,17 +101,27 @@ Route::group([
         Route::post('/user-template/multiple/store', [UserTemplatesApiController::class, 'MultiStore']);
         Route::post('/user-template/update', [UserTemplatesApiController::class, 'update']);
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
-        Route::get('/user-template/download/document/{id}', [UserTemplateDownloadController::class, 'downloadDocument']);
+        Route::post('/user-template/download/document', [UserTemplateDownloadController::class, 'downloadDocument']);
 
         // user subscription api
-        Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
+        // Route::post('/user-subscription/subscribe', [UserSubscriptionNewApiController::class, 'subscribe']);
         Route::get('/user-subscription/current', [UserSubscriptionNewApiController::class, 'getCurrentSubscription']);
-        Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
+        // Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancelSubscription']);
         Route::get('/user-subscription/download-limit', [UserSubscriptionNewApiController::class, 'downloadLimit']);
 
         // user downloads Mangement
         Route::get('/user-downloads/state', [UserDownloadsManagementApiController::class, 'currentState']);
         Route::get('/user-downloads/increment', [UserDownloadsManagementApiController::class, 'incrementDownload']);
+        Route::get('/saved-template-count/increment', [UserDownloadsManagementApiController::class, 'incrementSavedTemplateCount']);
+
+        /** New Subscription API */
+        Route::post('/user-subscription/subscribe', [SubscriptionApiController::class, 'userPlanSubscribe']);
+        Route::post('/user-subscription/verify', [SubscriptionApiController::class, 'userSubscriptionVerify']);
+        Route::post('/user-subscription/cancel', [SubscriptionApiController::class, 'cancelSubscription']);
+        Route::get('/user-subscription/canceled-verification', [SubscriptionApiController::class, 'verifyUserSubscriptionCanceled']);
+        Route::post('/user-subscription/continue', [SubscriptionApiController::class, 'continueSubscription']);
+        Route::get('/user-subscription/generate-invoice', [SubscriptionApiController::class, 'generateSubscriptionInvoice']);
+        Route::post('/user-subscription/coupon-verify', [SubscriptionApiController::class, 'couponVerify']);
 
         // Subscription Plan History API
         Route::get('/user-subscription/history', [UserSubscriptionHistoryApiController::class, 'userSubscriptionHistory']);
@@ -117,8 +133,15 @@ Route::group([
         Route::post('/user-image/store', [StockImageApiController::class, 'store']);
         Route::post('/user-image/delete', [StockImageApiController::class, 'delete']);
 
+        // user management api
+        Route::post('/user-account/delete', [UserManagementApiController::class, 'deleteUserAccount']);
+
         // logout api
         Route::post('/logout', [RegisterController::class, 'logout']);
+
+        //User Notification
+        Route::get('/notifications', [NotificationApiController::class, 'list']);
+
     });
 });
 // ======================================================================================================
@@ -142,6 +165,7 @@ Route::group([
 
     // get stock image
     Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
+    Route::get('/admin/stock-image/uploaded', [StockImageApiController::class, 'getUploadedStockImage']);
     
     // icon management api
     Route::get('/icon-management/list', [IconManagementAPiController::class, 'list']);
@@ -152,6 +176,7 @@ Route::group([
 Route::post('/store/contact-us', [ContactUsController::class, 'store']);
 Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
 Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
+Route::get('/cookie-policy', [TermsAndConditionApiController::class, 'cookiePolicy']);
 
 
 
@@ -160,6 +185,7 @@ Route::get('/user-subscription/success', [UserSubscriptionNewApiController::clas
 Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class, 'cancel']);
 
 // Webhook route (no authentication, but signature verification)
-Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
+// Route::post('/stripe/webhook', [UserSubscriptionNewApiController::class, 'webhook']);
+Route::post('/stripe/webhook', [SubscriptionApiController::class, 'webhook']);
 
 Route::post('/mail/beta-tester', [BetaTesterController::class, 'sendBetaTesterMail']);

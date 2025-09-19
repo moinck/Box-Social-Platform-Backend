@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\Helpers;
+use App\Models\Notification;
 use App\Models\UserSubscription;
 use App\Models\UserDownloads;
 use Illuminate\Console\Command;
@@ -17,6 +18,8 @@ class CheckExpiredSubscriptions extends Command
      * @var string
      */
     // protected $signature = 'app:check-expired-subscriptions';
+    // to check dry run mode use below command
+    // php artisan subscriptions:check-expired --dry-run
     protected $signature = 'subscriptions:check-expired {--dry-run : Show what would be updated without making changes}';
 
 
@@ -46,7 +49,7 @@ class CheckExpiredSubscriptions extends Command
             // ->whereNotIn('status', ['cancelled', 'canceled']) // Handle both spellings
             // ->whereNotIn('stripe_status', ['cancelled', 'canceled'])
             ->where('status', 'active')
-            ->where('stripe_status', 'active')
+            ->whereIn('stripe_status', ['active','paid'])
             ->get();
             
         if ($expiredSubscriptions->isEmpty()) {
@@ -74,7 +77,6 @@ class CheckExpiredSubscriptions extends Command
                     // Update subscription status
                     $subscription->status = 'ended';
                     $subscription->stripe_status = 'canceled';
-                    $subscription->cancelled_at = $currentDateTime;
                     $subscription->ends_at = $currentDateTime;
                     $subscription->save();
                     
@@ -146,6 +148,16 @@ class CheckExpiredSubscriptions extends Command
             foreach ($upcomingExpired as $subscription) {
                 $user = $subscription->user;
                 $userName = $user ? $user->name : 'Unknown User';
+                $user['expiring_at'] = $subscription->current_period_end;
+
+                $useNotificationExists = Notification::where('user_id', $user->id)
+                    ->where('type','subscription-expiring-soon')
+                    ->whereBetween('created_at',[Carbon::now()->startOfDay(),Carbon::now()->endOfDay()])
+                    ->exists();
+
+                if (!$useNotificationExists) {
+                    Helpers::sendNotification($user, "subscription-expiring-soon");
+                }
                 $this->line("  - {$userName} (ID: {$subscription->id}) expires on {$subscription->current_period_end}");
             }
         } else {

@@ -5,10 +5,12 @@
 @section('main-content')
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="http://178.128.45.173:9162/assets/img/Box-media-logo.svg" alt="Box Social Logo" class="logo-img"
-            style="width: 100px; height: 100px; display: block; margin: 0 auto;">
+        <img src="{{ asset('assets/img/box-socials-tm.png') }}" 
+            alt="Box Socials Logo"
+            style="display:block; margin:0 auto; width:100px; max-width:100%; height:auto;">
     </div>
 
+    <hr>
     <!-- Title -->
     <div class="email-title"
         style="text-align: center; font-size: 26px; color: #222; font-weight: 600; margin-bottom: 10px; line-height: 1.3;">
@@ -18,7 +20,7 @@
     <!-- Description -->
     <div class="email-description"
         style="text-align: center; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
-        Just one more step — tap the button below to confirm your email and unlock your full experience.
+        Just one more step…Please confirm your email address by tapping the button below
     </div>
 
     <!-- CTA Button -->
@@ -46,5 +48,11 @@
             Or copy and paste this link in your browser:<br>
             <a href="{{ $verification_link }}" style="color: #F4D106; word-break: break-all; font-size: 12px;">{{ $verification_link }}</a>
         </p>
+    </div> --}}
+
+    <!-- Description -->
+    {{-- <div class="email-description"
+        style="text-align: left; font-size: 16px; color: #555; margin-bottom: 32px; line-height: 1.5;">
+        If you find any issue or have any questions, please contact support at <a href="mailto:help@boxsocials.com" style="color: #F4D106;">help@boxsocials.com</a>.
     </div> --}}
 @endsection

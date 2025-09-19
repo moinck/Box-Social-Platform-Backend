@@ -12,11 +12,11 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie','local/*','stage/*', 'storage/*', 'live/storage/*'],
 
     'allowed_methods' => ['*'], // Allow all HTTP methods (GET, POST, etc.)
 
-    'allowed_origins' => ['http://178.128.45.173:9163','http://localhost:3000'], // React app origin
+    'allowed_origins' => ['http://178.128.45.173:9163','http://localhost:3000','https://admin.boxsocials.com','https://boxsocials.com','https://www.boxsocials.com'], // React app origin
 
     'allowed_origins_patterns' => [],
 

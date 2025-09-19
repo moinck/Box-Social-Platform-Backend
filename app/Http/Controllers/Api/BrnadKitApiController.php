@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\BrandKit;
 use App\Models\SocialMedia;
 use Faker\Extension\Helper;
+use Illuminate\Support\Facades\Cache;
 
 class BrnadKitApiController extends Controller
 {
@@ -75,8 +76,10 @@ class BrnadKitApiController extends Controller
 
         $brandKitObj = BrandKit::where('user_id', $decryptedUserId)->first();
 
+        $isUpdate = true;
         if (empty($brandKitObj)) {
             $brandKitObj = new BrandKit();
+            $isUpdate = false;
         }
 
         $uploadLogoUrl = $request->logo;
@@ -150,6 +153,14 @@ class BrnadKitApiController extends Controller
             $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
         }
 
+        /** User Activity Log */
+        $message =  $isUpdate ? "brandkit updated" : "brandkit saved";
+        Helpers::activityLog([
+            'title' => "Brandkit",
+            'description' => "User ".$message." successfully. User: ".$brandKitObj->user->email,
+            'url' => "api/brandkit/store"
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'BrandKit updated successfully',
@@ -185,43 +196,39 @@ class BrnadKitApiController extends Controller
             return $this->error('Unauthorized', 401);
         }
 
-        $brandKitObj = BrandKit::where('user_id', $user->id)->first();
-        if (empty($brandKitObj)) {
-            return $this->error('BrandKit not found', 404);
-        }
+        $cacheKey = 'brandkit_' . $user->id;
 
-        $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
-        $SocialMediaIcon = [];
-        if (!empty($SocialMediaObj)) {
-            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
-        }
+        // $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
+            
+            $brandKitObj = BrandKit::with(['socialMedia', 'designStyle'])->where('user_id', $user->id)->first();
+            if (!$brandKitObj) {
+                // return null; // Handle later outside cache
+                return $this->error('BrandKit not found', 404);
+            }
 
-        // design style
-        $designStyle = DesignStyles::where('id', $brandKitObj->design_style_id)->first();
-        if (empty($designStyle)) {
-            $designStyle = null;
-        }
+            // Social Media Icons
+            $socialMediaIcon = optional($brandKitObj->socialMedia)->social_media_icon
+                ? json_decode($brandKitObj->socialMedia->social_media_icon, true)
+                : [];
 
-        $path = $brandKitObj->logo;
-        $mime = pathinfo($path, PATHINFO_EXTENSION);
-        if ($mime == 'svg') {
-            $mime = 'svg+xml';
-        }
-        $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            // Design Style Name
+            // $designStyle = optional($brandKitObj->designStyle)->name;
 
-        // if ($brandKitObj->base64_logo == null) {
-        //     $brandKitObj->base64_logo = $base64Image;
-        //     $brandKitObj->save();
-        // }
+            $path = $brandKitObj->logo;
+            $base64Image = null;
+            if (!empty($path)) {
+                $mime = pathinfo($path, PATHINFO_EXTENSION);
+                if ($mime == 'svg') {
+                    $mime = 'svg+xml';
+                }
+                $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data Fetched Successfully.',
-            'data' => [
+            $data = [
                 "id" => Helpers::encrypt($brandKitObj->id),
                 "user_id" => Helpers::encrypt($brandKitObj->user_id),
                 "logo" => $base64Image,
-                "logo_url" => asset($brandKitObj->logo),
+                "logo_url" => $brandKitObj->logo ? asset($brandKitObj->logo) : null,
                 "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
                 "company_name" => $brandKitObj->company_name,
                 "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,
@@ -236,9 +243,21 @@ class BrnadKitApiController extends Controller
                 "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
                 "show_website_on_post" => $brandKitObj->show_website_on_post,
                 "show_address_on_post" => $brandKitObj->show_address_on_post,
-                "social_media_icon_show" => $SocialMediaIcon,
+                "social_media_icon_show" => $socialMediaIcon,
                 // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
-            ],
+            ];
+
+        // });
+
+        // if ($brandKitObj->base64_logo == null) {
+        //     $brandKitObj->base64_logo = $base64Image;
+        //     $brandKitObj->save();
+        // }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Fetched Successfully.',
+            'data' => $data,
         ], 200);
     }
 

@@ -226,13 +226,13 @@
                                                                                         <td class="t1">
                                                                                             <div style="font-size:0px;">
                                                                                                 <img class="t0"
-                                                                                                    style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;"
+                                                                                                    style="display:block;border:0;height:auto;width:100px;Margin:0;max-width:100%;"
                                                                                                     width="202"
                                                                                                     height="121.85236447520184"
                                                                                                     alt="" {{--
                                                                                                     src="https://fc5ee4b8-eea2-4077-8cb6-25e056548ad3.b-cdn.net/e/7f0dca7b-3155-48b5-bfdb-6db82a6757a5/bd214918-cea1-43b1-8f5b-f75f6fcf311b.png" />
                                                                                                 --}}
-                                                                                                src="{{ asset('assets/img/box-logo-horizontal.png') }}"
+                                                                                                src="{{ asset('assets/img/box-socials-tm.png') }}"
                                                                                                 />
                                                                                             </div>
                                                                                         </td>
@@ -479,7 +479,7 @@
                                                                                         <td class="t46">
                                                                                             <p class="t45"
                                                                                                 style="margin:0;Margin:0;font-family:Roboto,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">
-                                                                                                The Box Social Team</p>
+                                                                                                The Box Socials Team</p>
                                                                                         </td>
                                                                                     </tr>
                                                                                 </table>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\SubscriptionPlans;
 use App\Models\User;
 use App\Models\UserDownloads;
+use Illuminate\Support\Facades\Cache;
 
 class UserSubscription extends Model
 {
@@ -20,6 +21,8 @@ class UserSubscription extends Model
         'stripe_price_id',
         'stripe_status',
         'stripe_payment_method_id',
+        'client_secret',
+        'stripe_payment_intent_id',
         'response_meta',
         'amount_paid',
         'currency',
@@ -39,10 +42,24 @@ class UserSubscription extends Model
         'cancellation_bonus_granted_at',
         'cancellation_bonus_days',
         'total_download_limit',
+        'total_saved_limit',
         'daily_download_limit',
         'downloads_used_today',
         'total_downloads_used',
         'reset_date',
+        'is_next_sub_continue',
+        'is_subscription_cancel',
+        'sub_cancel_reason',
+        'child_sub_cancel_reason',
+        'invoice_number',
+        'coupon_id',
+        'coupon_code',
+        'coupon_name',
+        'coupon_type',
+        'coupon_discount',
+        'coupon_currency',
+        'coupon_discount_id',
+        'coupon_discounted_amt'
     ];
 
     public function user()
@@ -88,11 +105,11 @@ class UserSubscription extends Model
     /**
      * Record a download (post download or creation - both count as 1)
      */
-    public function recordDownload($count = 1)
+    public function recordDownload($count = 1, $type=null) // $type = 1 => For Saved, 2 => For Download
     {
         $tracker = $this->downloadTracker;
         
-        return $tracker->incrementDownload($count);
+        return $tracker->incrementDownload($count,$type);
     }
 
     /**
@@ -103,5 +120,15 @@ class UserSubscription extends Model
         $tracker = $this->downloadTracker;
         
         return $tracker->canDownload();
+    }
+
+    /**
+     * Check if user can saved
+     */
+    public function canSaved()
+    {
+        $tracker = $this->downloadTracker;
+
+        return $tracker->canSaved();
     }
 }

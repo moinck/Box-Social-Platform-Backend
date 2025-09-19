@@ -48,7 +48,7 @@ class CategoriesController extends Controller
                         </label>';
             })
             ->addColumn('created_at', function ($category) {
-                return Helpers::dateFormate($category->created_at);
+                return '<span data-order="' . $category->created_at . '">' . Helpers::dateFormate($category->created_at) . '</span>';
             })
             ->addColumn('action', function ($category) {
                 $categoryId = Helpers::encrypt($category->id);
@@ -59,7 +59,7 @@ class CategoriesController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-category-id="' . $categoryId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['image', 'status', 'action'])
+            ->rawColumns(['image', 'status', 'created_at', 'action'])
             ->make(true);
     }
 
@@ -75,7 +75,8 @@ class CategoriesController extends Controller
             'category_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_description' => 'required|string',
             'category_status' => 'required|string|in:active,inactive',
-            'category_coming_soon' => 'required|string|in:true,false',
+            'category_coming_soon' => 'required|string',
+            'custom_label' => 'required_if:category_coming_soon,2',
             'subcategory_name' => 'nullable|array',
             'subcategory_name.*' => 'required|string|max:255',
         ]);
@@ -88,15 +89,19 @@ class CategoriesController extends Controller
         $category->image = $image_url;
         $category->description = $request->category_description;
         $category->status = $request->category_status == 'active' ? true : false;
-        $category->is_comming_soon = $request->category_coming_soon == 'true' ? true : false;
+        $category->is_comming_soon = $request->category_coming_soon;
+        $category->custom_label = isset($request->custom_label) ? $request->custom_label : null;
         $category->save();
 
+        $subCategoryName = [];
         // add subcategories
         if ($request->has('subcategory_name')) {
             foreach ($request->subcategory_name as $index => $subcategory_name) {
                 $subcategory = new Categories();
                 $subcategory->name = $subcategory_name;
                 $subcategory->parent_id = $category->id;
+
+                $subCategoryName[] = $subcategory->name;
 
                 // Check if 'subcategory_coming_soon' is set and if the current index has 'on' value
                 if ($request->has('subcategory_coming_soon') && isset($request->subcategory_coming_soon[$index]) && $request->subcategory_coming_soon[$index] == 'on') {
@@ -107,6 +112,13 @@ class CategoriesController extends Controller
                 $subcategory->save();
             }
         }
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Create Category & Sub-Category",
+            'description' => "Admin Panel:  Category Name: (". $request->category_name . "). Sub-Category Name: (".implode(', ', $subCategoryName).")",
+            'url' => route('categories.store')
+        ]);
 
         return response()->json([
             'success' => true,
@@ -138,7 +150,8 @@ class CategoriesController extends Controller
             'edit_category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'edit_category_description' => 'required|string',
             'edit_category_status' => 'required|string|in:active,inactive',
-            'edit_category_coming_soon' => 'required|string|in:true,false',
+            'edit_category_coming_soon' => 'required|string',
+            'edit_custom_label' => 'required_if:edit_category_coming_soon,2',
             'edit_subcategory_ids' => 'nullable|json',
         ]);
 
@@ -148,7 +161,8 @@ class CategoriesController extends Controller
             $category->name = $request->edit_category_name;
             $category->description = $request->edit_category_description;
             $category->status = $request->edit_category_status == 'active' ? true : false;
-            $category->is_comming_soon = $request->edit_category_coming_soon == 'true' ? true : false;
+            $category->is_comming_soon = $request->edit_category_coming_soon;
+            $category->custom_label = isset($request->edit_custom_label) ? $request->edit_custom_label : null;
 
             if ($request->hasFile('edit_category_image')) {
                 // delete old image
@@ -166,6 +180,7 @@ class CategoriesController extends Controller
             // update subcategories
             // if subcategory id is 0 then create new subcategory
             // else update subcategory
+            $subCategoryName = [];
             if ($request->has('edit_subcategory_ids') && $request->edit_subcategory_ids != null) {
                 $subCategories = json_decode($request->edit_subcategory_ids, true);
                 $subCategoryIds = array_column($subCategories, 'id');
@@ -185,6 +200,8 @@ class CategoriesController extends Controller
                         $subcategory->is_comming_soon = $subCategory['coming_soon'];
                         $subcategory->save();
                     }
+                    $subCategoryName[] = $subcategory->name;
+
                 }
 
                 // delete subcategories that are not in the request
@@ -196,6 +213,13 @@ class CategoriesController extends Controller
                     $deleteSubcategory->delete();
                 }
             }
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Update Category & Sub-Category",
+                'description' => "Admin Panel:  Category Name: (". $request->category_name . "). Sub-Category Name: (".implode(', ', $subCategoryName).")",
+                'url' => route('categories.update')
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -224,6 +248,14 @@ class CategoriesController extends Controller
                 Helpers::deleteImage($category->image);
             }
             $category->delete();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Delete Category",
+                'description' => "Admin Panel: Deleted Category Name: ".$category->name,
+                'url' => route('categories.delete')
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Category deleted successfully.'
@@ -248,6 +280,13 @@ class CategoriesController extends Controller
         if ($category) {
             $category->status = $category->status == true ? false : true;
             $category->save();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Change Category Status",
+                'description' => "Admin Panel: Category Name : ".$category->name.". Status is ".($category->status ? "true" : "false"),
+                'url' => route('categories.change-status')
+            ]);
 
             return response()->json([
                 'success' => true,

@@ -3,14 +3,17 @@
     use Illuminate\Support\Facades\Route;
     $containerNav = $configData['contentLayout'] === 'compact' ? 'container-xxl' : 'container-fluid';
     $navbarDetached = $navbarDetached ?? '';
-    $appType = env('APP_ENV');
+    $appType = config('app.env');
     if ($appType == 'local') {
         $appType = 'LOCAL';
     } elseif ($appType == 'stage') {
         $appType = 'STAGING';
     }
 
-    $profileUrl = Auth::user()->profile_image ?? asset('assets/img/avatars/5.png');
+    $profileUrl = (Auth::user()->profile_image == null || Auth::user()->profile_image == '') ? asset('assets/img/avatars/5.png') : Auth::user()->profile_image;
+    if (!str_starts_with('https://', Auth::user()->profile_image)) {
+        $profileUrl = asset(Auth::user()->profile_image);
+    }
     $profileName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
 @endphp
 

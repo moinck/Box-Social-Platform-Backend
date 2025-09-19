@@ -98,6 +98,7 @@
                                 Cancel
                             </button>
                         </div>
+                        <input type="hidden" id="isValidate" value="0" readonly>
                     </form>
                 </div>
             </div>
@@ -170,6 +171,7 @@
                 ['link', 'image', 'video', 'formula'],
                 [
                     {'insert-name': 'Name'},
+                    // {'insert-email': 'Email'},
                     {'insert-phone': 'Phone'},
                     {'insert-website': 'Website'},
                 ],
@@ -194,6 +196,11 @@
                                 this.quill.insertText(cursorPosition, '|phone|');
                                 this.quill.setSelection(cursorPosition + 7);
                             },
+                            'insert-email': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|email|');
+                                this.quill.setSelection(cursorPosition + 7);
+                            },
                             'insert-website': function() {
                                 const cursorPosition = this.quill.getSelection().index;
                                 this.quill.insertText(cursorPosition, '|website|');
@@ -206,6 +213,7 @@
             });
             $('.ql-insert-name').attr('title', 'Click to insert Name');
             $('.ql-insert-phone').attr('title', 'Click to insert Phone');
+            $('.ql-insert-email').attr('title', 'Click to insert Email');
             $('.ql-insert-website').attr('title', 'Click to insert Website');
             // update hidden post description
             createPostDescription.on('text-change', function() {
@@ -292,6 +300,7 @@
             // post category change event
             $('#post_category').change(function() {
                 var category_id = $(this).val();
+                var isValidate = $("#isValidate").val();
                 if (category_id.length == 0) {
                     $('#post_sub_category').html('<option value="">Select Subcategory</option>');
                     $('#selectSubCategory-div').addClass('d-none');
@@ -322,6 +331,7 @@
                             });
                             $('#post_sub_category').html(option);
                             $('#selectSubCategory-div').removeClass('d-none');
+                            $("#isValidate").val(1);
 
                             validator.revalidateField('post_sub_category');
                             validator.addField(`post_sub_category`, {
@@ -333,11 +343,14 @@
                             });
 
                         } else {
-                            $('#post_sub_category').html(
-                                '<option value="">Select Subcategory</option>');
+                            
+                            $('#post_sub_category').html('<option value="">Select Subcategory</option>');
                             $('#selectSubCategory-div').addClass('d-none');
                             validator.revalidateField('post_sub_category');
-                            // validator.removeField(`post_sub_category`);
+                            if (isValidate == 1) {
+                                validator.removeField(`post_sub_category`);
+                            }
+                            $("#isValidate").val(0);
                         }
                     }
                 });

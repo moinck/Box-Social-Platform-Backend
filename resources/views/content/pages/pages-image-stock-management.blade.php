@@ -168,6 +168,11 @@
                                             </div>
                                             <div class="row mt-5" id="saved_images">
                                             </div>
+                                            
+                                            <!-- No more images indicator -->
+                                            {{-- <div id="no-more-images" class="text-center mt-3" style="display: none;">
+                                                <p class="text-muted">No more images to load</p>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -235,17 +240,37 @@
             $(document).on('click', '#saved-img-tab-btn', function (e) {
                 e.preventDefault();
             });
+            // --------------------------------------------------
+
+            // Global variables for pagination
+            let currentPage = 1;
+            let isLoadingMore = false;
+            let hasMoreImages = true;
+            let currentSelectedTopic = null;
 
             // load image when user comes to saved images tab
             $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-saved-image-section"]', function (e) {
+                resetPagination();
                 loadSavedImages();
                 GetSavedTopics();
+                setupScrollListener();
+
+                // also reset all the things
+                currentPage = 1;
+                isLoadingMore = false;
+                hasMoreImages = true;
+                currentSelectedTopic = null;
+
+                // scroll to top
+                $("#saved_images").scrollTop(0);
             });
+            // --------------------------------------------------
 
             // on change of tab hide delete button
             $(document).on('shown.bs.tab', 'button[data-bs-target="#navs-image-home-section"]', function (e) {
                 $('.delete_select_images').addClass('d-none');
             });
+            // --------------------------------------------------
 
             // only show save button if any image is selected
             $(document).on('change', '.search-image-checkbox', function () {
@@ -264,74 +289,129 @@
             // on change of saved topics list
             $(document).on('change', '#saved_topics_list', function () {
                 var selectedTopic = $(this).val();
-                if (selectedTopic != 0) {
-                    loadSavedImages(selectedTopic);
-                } else {
-                    loadSavedImages();
-                }
+                currentSelectedTopic = selectedTopic != 0 ? selectedTopic : null;
+                resetPagination();
+                loadSavedImages(currentSelectedTopic, true); // true = reset content
             })
+            // --------------------------------------------------
+
+            // Function to reset pagination variables
+            function resetPagination() {
+                currentPage = 1;
+                isLoadingMore = false;
+                hasMoreImages = true;
+                $('#no-more-images').hide();
+            }
+            // --------------------------------------------------
+
+            // Function to setup scroll listener for lazy loading
+            function setupScrollListener() {
+                // Remove existing scroll listener to avoid duplicates
+                $('#saved_images').off('scroll.savedImages');
+                
+                // Add new scroll listener to saved_images div
+                $('#saved_images').on('scroll.savedImages', function() {
+                    // Check if we're near the bottom of the saved_images div
+                    if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight - 50) {
+                        if (!isLoadingMore && hasMoreImages) {
+                            currentPage++;
+                            loadSavedImages(currentSelectedTopic, false); // false = append to existing content
+                        }
+                    }
+                });
+            }
+            // --------------------------------------------------
 
             // Function to load saved images
-            function loadSavedImages(selectedTopic = null) {
+            function loadSavedImages(selectedTopic = null, resetContent = true) {
+                if (isLoadingMore) return; // Prevent multiple simultaneous requests
+                
+                isLoadingMore = true;
+                
                 // hide delete button
                 $('.delete_select_images').addClass('d-none');
                 var url = "{{ route('image-management.get.saved-images') }}";
+                
                 $.ajax({
                     type: 'get',
                     url: url,
                     data: {
-                        selectedTopic: selectedTopic
+                        selectedTopic: selectedTopic,
+                        offset: currentPage,
+                        limit: 24
                     },
                     beforeSend: function () {
                         showBSPLoader();
                     },
                     complete: function () {
                         hideBSPLoader();
+                        isLoadingMore = false;
                     },
                     success: function (data) {
-                        var image = "";
                         var newImage = "";
                         var getData = data.data;
+                        
+                        // Update hasMoreImages based on response
+                        hasMoreImages = data.pagination.has_more;
+                        
+                        if (getData.length === 0 && currentPage === 1) {
+                            $("#saved_images").html('<div class="col-12 text-center"><p class="text-muted">No saved images found</p></div>');
+                            return;
+                        }
 
+                        // Get current number of images to continue the grid layout
+                        let startIndex = resetContent ? 0 : $("#saved_images .col-md").length;
+                        
                         $.each(getData, function (i, settings) {
                             var image_url = settings.image_url;
                             var imageId = settings.id;
                             var imageExists = settings.image_exists;
                             var tagName = settings.tag_name ?? 'Saved-image';
+                            var currentIndex = startIndex + i;
 
                             // if image does not exist then show not available image
                             if (imageExists != true) {
                                 image_url = "{{ asset('assets/img/image_not_available.jpg') }}";
                             }
 
-                            // in1 row show only 4 images
-                            if (i % 4 === 0) {
-                                newImage += `
-                                        <div class="row">
-                                    `;
+                            // in 1 row show only 4 images
+                            if (currentIndex % 4 === 0) {
+                                newImage += `<div class="row">`;
                             }
+                            
                             newImage += `
-                                    <div class="col-md mb-md-0 mb-5">
-                                        <div class="form-check custom-option custom-option-image custom-option-image-check">
-                                            <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
-                                            <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
-                                            <span class="custom-option-body">
-                                                <img src="${image_url}" alt="${tagName}"/>
-                                            </span>
-                                            </label>
-                                        </div>
+                                <div class="col-md mb-md-0 mb-5 pb-5">
+                                    <div class="form-check custom-option custom-option-image custom-option-image-check">
+                                        <input class="form-check-input saved-image-checkbox" type="checkbox" data-image-id="${imageId}" value="${image_url}" id="saved-image-${imageId}"/>
+                                        <label class="form-check-label custom-option-content" for="saved-image-${imageId}">
+                                        <span class="custom-option-body">
+                                            <img src="${image_url}" alt="${tagName}" style="width: 100%; height:250px; object-fit: cover;"/>
+                                        </span>
+                                        </label>
                                     </div>
-                                `;
-                            if (i % 4 === 3) {
-                                newImage += `
-                                        </div>
-                                    `;
+                                </div>
+                            `;
+                            
+                            if (currentIndex % 4 === 3 || (startIndex + i) === (getData.length - 1)) {
+                                newImage += `</div>`;
                             }
                         });
 
-                        $("#saved_images").html(newImage);
+                        if (resetContent) {
+                            $("#saved_images").html(newImage);
+                        } else {
+                            $("#saved_images").append(newImage);
+                        }
+                        
+                        // Show "no more images" message if there are no more images to load
+                        if (!hasMoreImages && getData.length > 0) {
+                            $('#no-more-images').show();
+                        } else {
+                            $('#no-more-images').hide();
+                        }
                     },
                     error: function (error) {
+                        isLoadingMore = false;
                         hideBSPLoader();
                         console.log(error);
                     }
@@ -339,6 +419,12 @@
             }
             // --------------------------------------------------
 
+            // Clean up scroll listener when leaving the page or tab
+            $(document).on('hidden.bs.tab', 'button[data-bs-target="#navs-saved-image-section"]', function (e) {
+                $('#saved_images').off('scroll.savedImages');
+                resetPagination();
+            });
+            // --------------------------------------------------
             // get saved image topics
             function GetSavedTopics() {
                 var url = "{{ route('stock-image-management.get.saved-topics') }}";

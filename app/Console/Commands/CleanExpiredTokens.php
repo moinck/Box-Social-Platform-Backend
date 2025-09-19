@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Helpers;
 use App\Models\UserTokens;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class CleanExpiredTokens extends Command
 {
@@ -30,28 +30,22 @@ class CleanExpiredTokens extends Command
     public function handle()
     {
         try {
-            $tenDaysAgo = Carbon::now()->subDays(10)->toDateTimeString();
-            UserTokens::where(function ($query) use ($tenDaysAgo) {
-                $query->where('created_at', '<', $tenDaysAgo)
-                    ->where('is_used', true);
-            })->delete();
-
             // also remove personal access tokens
-            $twentyDaysAgo = Carbon::now()->subDays(20)->toDateTimeString();
+            $thirtyDaysAgo = Carbon::now()->subDays(30)->toDateTimeString();
+
+            // right now no need to delete user tokens
+            // UserTokens::where(function ($query) use ($thirtyDaysAgo) {
+            //     $query->where('created_at', '<', $thirtyDaysAgo)
+            //         ->where('is_used', true);
+            // })->delete();
+
             DB::table('personal_access_tokens')
-                ->where('created_at', '<', $twentyDaysAgo)
+                ->where('created_at', '<', $thirtyDaysAgo)
                 ->delete();
 
-            Log::info('Expired tokens cleaned successfully', [
-                'today' => Carbon::now()->toDateTimeString(),
-            ]);
             return $this->info('Expired tokens cleaned successfully');
         } catch (\Exception $th) {
-            Log::error('Failed to clean expired tokens', [
-                'today' => Carbon::now()->toDateTimeString(),
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
+            Helpers::sendErrorMailToDeveloper($th);
             return $this->error('Failed to clean expired tokens');
         }
     }

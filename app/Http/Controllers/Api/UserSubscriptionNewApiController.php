@@ -12,6 +12,7 @@ use App\Models\UserSubscription;
 use App\Http\Controllers\Controller;
 use App\Models\Payments;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -207,7 +208,7 @@ class UserSubscriptionNewApiController extends Controller
 
             if (!$sessionId || !$subscriptionId) {
                 // return redirect(config('app.frontend_url') . '/subscription/error?message=Invalid session');
-                return redirect('http://178.128.45.173:9163/subscription_error?message=Invalid session');
+                return redirect(config('app.frontend_url') .'/subscription_error?message=Invalid session');
             }
 
             // Verify session with Stripe
@@ -217,7 +218,7 @@ class UserSubscriptionNewApiController extends Controller
 
             if ($session->payment_status !== 'paid') {
                 // return redirect(config('app.frontend_url') . '/subscription_error?message=Payment not completed');
-                return redirect('http://178.128.45.173:9163/subscription_error?message=Payment not completed');
+                return redirect(config('app.frontend_url') .'/subscription_error?message=Payment not completed');
             }
 
             $descyptedSubscriptionId = Helpers::decrypt($subscriptionId);
@@ -228,7 +229,7 @@ class UserSubscriptionNewApiController extends Controller
             
             if (!$userSubscription || $userSubscription->stripe_checkout_session_id !== $sessionId) {
                 // return redirect(config('app.frontend_url') . '/subscription_error?message=Invalid subscription');
-                return redirect('http://178.128.45.173:9163/subscription_error?message=Invalid subscription');
+                return redirect(config('app.frontend_url') .'/subscription_error?message=Invalid subscription');
             }
 
             // Get subscription details from Stripe
@@ -280,7 +281,7 @@ class UserSubscriptionNewApiController extends Controller
             DB::commit();
 
             // return redirect(config('app.frontend_url') . 'subscription_success?subscription_id=' . $subscriptionId);
-            return redirect('http://178.128.45.173:9163/subscription_success?subscription_id=' . $subscriptionId);
+            return redirect(config('app.frontend_url') .'/subscription_success?subscription_id=' . $subscriptionId);
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Subscription Created successfully',
@@ -313,7 +314,7 @@ class UserSubscriptionNewApiController extends Controller
             }
 
             // return redirect(config('app.frontend_url') . '/subscription_cancel');
-            return redirect('http://178.128.45.173:9163/subscription_cancel?message=Subscription incomplete');
+            return redirect(config('app.frontend_url') .'/subscription_cancel?message=Subscription incomplete');
             // return response()->json([
             //     'status' => true,
             //     'message' => 'Subscription cancelled successfully',
@@ -322,7 +323,7 @@ class UserSubscriptionNewApiController extends Controller
         } catch (\Exception $e) {
             // Log::error('Subscription cancel error: ' . $e->getMessage(),['function' => 'cancel', 'data' => $e->getTraceAsString()]);
             Helpers::sendErrorMailToDeveloper($e);
-            return redirect('http://178.128.45.173:9163/subscription_cancel?message=Subscription incomplete');
+            return redirect(config('app.frontend_url') .'/subscription_cancel?message=Subscription incomplete');
         }
     }
 
@@ -425,10 +426,14 @@ class UserSubscriptionNewApiController extends Controller
 
     public function getCurrentSubscription()
     {
+
+        $userId = Auth::id();
+        
         $subscription = UserSubscription::with('plan:id,name,price','downloadTracker')
-            ->where('user_id', Auth::id())
-            ->where('status', 'active')
-            ->first();
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->first();
+
         if (empty($subscription)) {
             return response()->json([
                 'status' => false,
@@ -438,35 +443,29 @@ class UserSubscriptionNewApiController extends Controller
             ]);
         }
 
-        $planDetails = [];
-        $downloadCountDetails = [];
-        if($subscription){
-            $planDetails = [
-                'id' => Helpers::encrypt($subscription->plan->id),
-                'name' => $subscription->plan->name,
-            ];
+        $planDetails = [
+            'id' => Helpers::encrypt($subscription->plan->id),
+            'name' => $subscription->plan->name,
+        ];
 
-            $downloadCountDetails = $subscription->downloadTracker->getDownloadStats();
-        }
-            
-        $returnData = [];
-        if($subscription){
-            $returnData = [
-                'id' => Helpers::encrypt($subscription->id),
-                'status' => $subscription->status,
-                'amount_paid' => $subscription->amount_paid,
-                'currency' => $subscription->currency,
-                'current_period_start' => date("d-m-Y",strtotime($subscription->current_period_start)),
-                'current_period_end' => date("d-m-Y",strtotime($subscription->current_period_end)),
-                'plan_details' => $planDetails,
-                'download_count_details' => $downloadCountDetails,
-            ];
-        }
+        $downloadCountDetails = $subscription->downloadTracker ? $subscription->downloadTracker->getDownloadStats() : [];
+
+        $data = [
+            'id' => Helpers::encrypt($subscription->id),
+            'status' => $subscription->status,
+            'amount_paid' => $subscription->amount_paid,
+            'currency' => $subscription->currency,
+            'current_period_start' => date("d-m-Y",strtotime($subscription->current_period_start)),
+            'current_period_end' => date("d-m-Y",strtotime($subscription->current_period_end)),
+            'plan_details' => $planDetails,
+            'download_count_details' => $downloadCountDetails,
+        ];
+
         // $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->stripe_subscription_id);
         return response()->json([
             'status' => true,
             'message' => 'Subscription fetched successfully',
-            'data' => $returnData,
+            'data' => $data,
             'stripe_subscription' => []
         ]);
     }

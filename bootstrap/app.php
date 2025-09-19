@@ -29,20 +29,43 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {
-        // $schedule->call(CleanExpiredTokens::class)->daily();
+        // clean expired auth tokens
+        $schedule->command('app:clean-expired-tokens')
+            ->daily()
+            ->at('01:30')
+            ->timezone('Europe/London')
+            ->withoutOverlapping()
+            ->runInBackground();
 
         // reset user's monthly downloads
         $schedule->command('downloads:reset-monthly')
                 ->monthlyOn(1, '00:01')
+                ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
 
         // check user's expired subscriptions
         $schedule->command('subscriptions:check-expired')
-                ->daily()
-                ->at('02:00')
+                ->everyFiveMinutes()
+                ->timezone('Europe/London')
                 ->withoutOverlapping()
                 ->runInBackground();
+
+        //Free Trial Subscription Last Day mail
+        $schedule->command('SendLastDaySubMail')
+                ->daily()
+                ->at('10:00')
+                ->timezone('Europe/London')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+        //Telescope Data Delete every hour
+        $schedule->command('telescope:prune --hours=6')
+                ->everyThreeHours()
+                ->timezone('Europe/London')
+                ->withoutOverlapping()
+                ->runInBackground();
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

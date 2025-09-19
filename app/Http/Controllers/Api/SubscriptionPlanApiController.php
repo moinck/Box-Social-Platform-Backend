@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPlans;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionPlanApiController extends Controller
 {
@@ -14,18 +15,24 @@ class SubscriptionPlanApiController extends Controller
 
     public function list()
     {
-        $subscritionPlans = SubscriptionPlans::where('is_active', true)->get();
+        $cacheKey = 'subscription_plans_list';
 
-        $returnData = [];
-        foreach ($subscritionPlans as $plan) {
-            $returnData[] = [
-                'id' => Helpers::encrypt($plan->id),
-                'name' => $plan->name,
-                'price' => $plan->price,
-                'currency' => $plan->currency,
-            ];
-        }
+        // $returnData = Cache::remember($cacheKey, env('CACHE_TIME'), function () {
+            $subscritionPlans = SubscriptionPlans::where('is_active', true)->get();
 
-        return $this->success($returnData, 'Subscription Plans List');
+            $data = [];
+            foreach ($subscritionPlans as $plan) {
+                $data[] = [
+                    'id' => Helpers::encrypt($plan->id),
+                    'name' => $plan->name,
+                    'price' => $plan->price,
+                    'currency' => $plan->currency,
+                ];
+            }
+
+            // return $data;
+        // });
+
+        return $this->success($data, 'Subscription Plans List');
     }
 }

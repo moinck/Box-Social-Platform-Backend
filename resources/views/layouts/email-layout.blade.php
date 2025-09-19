@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title','Box Social Email')</title>
+    <title>@yield('title','Box Socials Email')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* Email client support for media queries varies, but modern clients support them */
@@ -68,9 +68,9 @@
                     
                     <!-- Footer -->
                     <div class="footer-text" style="text-align: center; font-size: 13px; color: #999; margin-top: 40px; line-height: 1.6;">
-                        Didn't request this email?<br>
-                        You can safely ignore it, and no changes will be made.<br><br>
-                        <strong>— The Box Social Team</strong>
+                        {{-- Didn't request this email?<br>
+                        You can safely ignore it, and no changes will be made.<br><br> --}}
+                        <strong>— The Box Socials Team</strong>
                     </div>
                     
                 </div>

@@ -38,7 +38,7 @@ class RegisterVerificationMail extends Mailable
      */
     public function content(): Content
     {
-        $verificationUrl = "http://178.128.45.173:9163/email/verification-success?token=".$this->token;
+        $verificationUrl = config('app.frontend_url') ."/email/verification-success?token=".$this->token;
 
         return new Content(
             view: 'content.email.verify-email',

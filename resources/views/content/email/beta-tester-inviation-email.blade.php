@@ -35,7 +35,7 @@
                             <tbody>
                                 <tr>
                                     <td align="center">
-                                        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="" style="display:block;width: 100%;height:50px;" width="183" height="36">
+                                        <img src="{{ asset('assets/img/box-socials-tm.png') }}" alt="Box Socials Logo" style="display:block; margin:0 auto; width:100px; max-width:100%; height:auto;">
                                     </td>
                                 </tr>
                             </tbody>
@@ -70,7 +70,7 @@
                 <tr>
                     <td>
                         <p style="font-weight: bold;margin:0;">Best regards,</p>
-                        <p style="font-weight: bold;margin-top:0;">Box Social</p>
+                        <p style="font-weight: bold;margin-top:0;">Box Socials</p>
                     </td>
                 </tr>
             </tbody>

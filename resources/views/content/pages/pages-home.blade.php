@@ -59,6 +59,9 @@
                         <th>Company Name</th>
                         <th>Email Address</th>
                         <th>FCA number</th>
+                        <th>Authorisation Type</th>
+                        <th>Network Name</th>
+                        <th>Company Type</th>
                         <th>Created Date</th>
                         <th>Account Status</th>
                         <th class="table-action-col">Action</th>
@@ -122,6 +125,39 @@
                                 <label class="form-check-label" for="user_is_verified">
                                     <span>User is Verified</span>
                                 </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="direct_authorised" name="direct_authorised" checked="" >
+                                <label class="form-check-label" for="direct_authorised">
+                                    <span>Directly Authorised</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="2" id="appointed_representative" name="appointed_representative" checked="" >
+                                <label class="form-check-label" for="appointed_representative">
+                                    <span>Appointed Representative</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-none" id="networkDiv">
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" id="appointed_network" name="appointed_network" class="form-control" />
+                                <label for="appointed_network">Which network are you an Appointed Representative of?</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <select id="company_type" name="company_type" class="form-select"
+                                    aria-label="Default select example">
+                                    <option value="">Select Type</option>
+                                    <option value="1">Sole Trader</option>
+                                    <option value="2">Limited Company</option>
+                                </select>
+                                <label for="company_type">Are you a sole trader or limited company?</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -208,6 +244,7 @@
                         data: function (d) {
                             d.is_brandkit = $('#brandkit_filter').val();
                             d.account_status = $('#account_status_filter').val();
+                            d.is_admin_verified = $('#admin_verified_filter').val();
                         },
                         beforeSend: function () {
                             showBSPLoader();
@@ -224,14 +261,15 @@
                         // Create a row to hold the two select filters
                         targetDiv.append(`
                             <div class="row">
-                                <div class="col-md-6" id="brandkit-filter-container"></div>
-                                <div class="col-md-6" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="brandkit-filter-container"></div>
+                                <div class="col-md-4" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="admin-verified-filter-container"></div>
                             </div>`);
 
                         // Append brandkit filter
                         $('#brandkit-filter-container').append(`
                             <select class="form-select input-sm" id="brandkit_filter">
-                                <option value="">User Brand Configuration</option>
+                                <option value="">Brand Configuration</option>
                                 <option value="1">Configured</option>
                                 <option value="2">Not Configured</option>
                             </select>
@@ -255,13 +293,30 @@
                         $('#account_status_filter').on('change', function() {
                             UserTable.draw();
                         });
+
+                        // Append admin verified user filter
+                        $('#admin-verified-filter-container').append(`
+                            <select class="form-select input-sm" id="admin_verified_filter">
+                                <option value="">Verification Status</option>
+                                <option value="1">Verified</option>
+                                <option value="0">Not Verified</option>
+                            </select>
+                        `);
+
+                        // Filter results on account status select change
+                        $('#admin_verified_filter').on('change', function() {
+                            UserTable.draw();
+                        });
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex',orderable: false, searchable: false},
                         { data: 'name', name: 'name'},
                         { data: 'company_name', name: 'company_name'},
                         { data: 'email', name: 'email'},
                         { data: 'fca_number', name: 'fca_number'},
+                        { data: 'authorisation_type', name: 'authorisation_type', orderable: false},
+                        { data: 'appointed_network', name: 'appointed_network', orderable: false},
+                        { data: 'company_type', name: 'company_type', orderable: false},
                         { data: 'created_date', name: 'created_date'},
                         { data: 'account_status', name: 'account_status', orderable: false, searchable: false},
                         { data: 'action', name: 'action', orderable: false, searchable: false}
@@ -283,6 +338,8 @@
             $(document).on('change', '#user-account-status', function() {
                 var status = $(this).is(':checked') ? 1 : 0;
                 var userId = $(this).data('id');
+                var table = $('#user-data-table').DataTable();
+
                 $.ajax({
                     url: "{{ route('user.account-status') }}",
                     type: "POST",
@@ -294,7 +351,8 @@
                     success: function(response) {
                         if (response.success == true) {
                             showSweetAlert('success', 'Updated!', 'User account status has been updated successfully.');
-                            UserDataTable();
+                            // UserDataTable();
+                            reloadDataTablePreservingPage(table); 
                         } else {
                             showSweetAlert('error', 'Error!', 'Something went wrong.');
                         }
@@ -330,6 +388,32 @@
 
                             $('#user_has_brandkit').prop('checked', response.data.has_brandkit);
                             $('#user_is_verified').prop('checked', response.data.is_verified);
+
+                            
+                            let authType = response.data.authorisation_type;
+
+                            // Set checkboxes
+                            $('#direct_authorised').prop('checked', authType == 1);
+                            $('#appointed_representative').prop('checked', authType == 2);
+                            
+                            // Company Type mapping
+                            
+                            $("#company_type").val(response.data.company_type ? response.data.company_type : '');
+
+                            if (authType == 2) {
+                                // Show extra fields
+                                $("#networkDiv").removeClass('d-none');
+
+                                // Fill values
+                                $("#appointed_network").val(response.data.appointed_network);
+                            } else {
+                                // Hide extra fields
+                                $("#networkDiv").addClass('d-none');
+
+                                // Clear values (optional)
+                                $("#appointed_network").val('');
+                            }
+
                             $('#edit_user_id').val(userId);
                         } else {
                             // toastr.error(response.message);
@@ -345,6 +429,23 @@
             });
             // -------------------------------------------
 
+            // Change Authorisation
+            $("#direct_authorised, #appointed_representative").on("change", function () {
+                if ($(this).attr("id") === "appointed_representative") {
+                    // If Appointed Representative is checked
+                    $("#appointed_representative").prop("checked", true);
+                    $("#direct_authorised").prop("checked", false);
+                    $("#networkDiv").removeClass("d-none"); // Show the input
+                } else {
+                    // If Directly Authorised is checked
+                    $("#direct_authorised").prop("checked", true);
+                    $("#appointed_representative").prop("checked", false);
+                    $("#networkDiv").addClass("d-none"); // Hide the input
+                    $("#appointed_network").val(""); // Clear input
+                }
+            });
+            //---------------------------------------------------------------
+
             // var editUserForm = $('#edit-user-form');
             const formValidationExamples = document.getElementById('edit-user-form');
 
@@ -355,10 +456,10 @@
                             notEmpty: {
                                 message: 'Please enter your first name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]+$/,
-                                message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]+$/,
+                            //     message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 min: 2,
                                 max: 50,
@@ -371,10 +472,10 @@
                             notEmpty: {
                                 message: 'Please enter your last name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]*$/,
-                                message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]*$/,
+                            //     message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 max: 50,
                                 message: 'Last name must be less than 50 characters'
@@ -432,6 +533,54 @@
                                 message: 'Please select account status'
                             }
                         }
+                    },
+                    company_type: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please select company type'
+                            }
+                        }
+                    },
+                    appointed_network: {
+                        validators: {
+                            callback: {
+                                message: 'Please enter your appointed network',
+                                callback: function(input) {
+                                    const isRep = document.getElementById('appointed_representative').checked;
+                                    if (isRep && input.value.trim() === '') {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    },
+                    // At least one checkbox required
+                    direct_authorised: {
+                        validators: {
+                            callback: {
+                                message: 'Please select either Directly Authorised or Appointed Representative',
+                                callback: function() {
+                                    return (
+                                        document.getElementById('direct_authorised').checked ||
+                                        document.getElementById('appointed_representative').checked
+                                    );
+                                }
+                            }
+                        }
+                    },
+                    appointed_representative: {
+                        validators: {
+                            callback: {
+                                message: 'Please select either Directly Authorised or Appointed Representative',
+                                callback: function() {
+                                    return (
+                                        document.getElementById('direct_authorised').checked ||
+                                        document.getElementById('appointed_representative').checked
+                                    );
+                                }
+                            }
+                        }
                     }
                 },
                 plugins: {
@@ -441,7 +590,7 @@
                         rowSelector: function(field, ele) {
                             // Customize row selector based on your form layout
                             if (['edit_first_name', 'edit_last_name', 'user_fca_number',
-                                    'user_account_status'
+                                    'user_account_status', 'direct_authorised', 'appointed_representative'
                                 ].includes(field)) {
                                 return '.col-md-6';
                             }
@@ -456,6 +605,7 @@
                 // Form is valid, proceed with form submission
                 var form = $('#edit-user-form');
                 var formData = new FormData(form[0]); // Creates FormData object
+                var table = $('#user-data-table').DataTable();
 
                 $.ajax({
                     url: "{{ route('user.update') }}",
@@ -474,13 +624,23 @@
                             showSweetAlert('success', 'Updated !',
                                 'User has been updated successfully.');
                             $('#edit-user-modal').modal('hide');
-                            UserDataTable();
+                            // UserDataTable();
+                            reloadDataTablePreservingPage(table);
                         }
                     },
                     error: function(xhr) {
                         hideBSPLoader();
                         console.log(xhr.responseText);
-                        showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorMessages = '';
+                            for (let key in errors) {
+                                errorMessages += errors[key].join(' ') + ' ';
+                            }
+                            showSweetAlert('error', 'Validation Error!', errorMessages);
+                        } else {
+                            showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        }
                     }
                 });
             });
@@ -490,14 +650,17 @@
             $(document).on('click', '.delete-user-btn', function() {
                 var userId = $(this).data('user-id');
                 var userName = $(this).data('user-name');
+                var table = $('#user-data-table').DataTable();
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You want to delete " + userName + " account!",
+                    footer: '<p class="text-danger mb-0">Note: All data associated with this account will be deleted.</p>',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
                     customClass: {
-                        confirmButton: 'btn btn-primary me-3',
+                        confirmButton: 'btn btn-danger me-3',
                         cancelButton: 'btn btn-outline-secondary'
                     },
                     buttonsStyling: false
@@ -519,7 +682,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'User has been deleted.');
-                                    UserDataTable();
+                                    // UserDataTable();
+                                    reloadDataTablePreservingPage(table);
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }
@@ -587,6 +751,60 @@
                 xhr.send(exportFormData);
             }
             // ----------------------------------------------------------
+
+            // Admin Verified User
+            $(document).on('click','.admin-verify-btn', function () {
+                
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+                var table = $('#user-data-table').DataTable();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want verify " + userName + " account!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, verify!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('user.account-verify') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                user_id: userId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Verified!', 'User has been verified.');
+                                    // UserDataTable();
+                                    reloadDataTablePreservingPage(table);
+                                } else {
+                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+                
+
+            });
         });
     </script>
 @endsection

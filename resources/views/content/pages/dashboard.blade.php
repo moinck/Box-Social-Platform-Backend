@@ -251,6 +251,13 @@
                 <div class="card-body">
                     <ul class="p-0 m-0">
                         @foreach ($pageData['recentUsers'] as $user)
+                            @php
+                                $profileImage = $user->profile_image;
+                                $profileUrl = ($profileImage == null || $profileImage == '') ? asset('assets/img/avatars/5.png') : $profileImage;
+                                if (!str_starts_with('https://', $profileImage)) {
+                                    $profileUrl = asset($profileImage);
+                                }
+                            @endphp
                             <li class="d-flex align-items-center mb-4 pb-2">
                                 <div class="avatar flex-shrink-0 me-4">
                                     <img src="{{ $user->profile_image ? asset($user->profile_image) : asset('assets/img/avatars/5.png') }}"

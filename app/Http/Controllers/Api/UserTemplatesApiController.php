@@ -13,6 +13,8 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -137,7 +139,7 @@ class UserTemplatesApiController extends Controller
             'category_id' => $categoryId ?? null,
             'template_name' => $request->template_name,
             'template_image' => $imageUrl ?? null,
-            'template_data' => json_encode($request->template_data),
+            'template_data' => $request->template_data,
         ]);
 
         // send mail
@@ -193,6 +195,8 @@ class UserTemplatesApiController extends Controller
                 continue; // Skip this template and continue with next
             }
 
+            $templateName = [];
+            DB::beginTransaction();
             try {
                 $decyptedId = Helpers::decrypt($templateData['template_id']);
 
@@ -210,14 +214,24 @@ class UserTemplatesApiController extends Controller
                     $categoryId = PostTemplate::find($decyptedId)->category_id;
                 }
 
+                // Log::info('Template data type: ' . gettype($templateData['template_data']));
+
+                $templateDataString = is_array($templateData['template_data']) 
+                    ? json_encode($templateData['template_data']) 
+                    : $templateData['template_data'];
+                
+                // Log::info('Template data type: ' . gettype($templateDataString));
+
                 $userTemplate = UserTemplates::create([
                     'user_id' => $user->id,
                     'template_id' => $decyptedId,
                     'category_id' => $categoryId,
                     'template_name' => $templateData['template_name'],
                     'template_image' => $imageUrl ?? null,
-                    'template_data' => json_encode($templateData['template_data']),
+                    'template_data' => $templateDataString,
                 ]);
+
+                $templateName[] = $templateData['template_name'];
 
                 // Send mail
                 if (isset($templateData['send_mail']) && $templateData['send_mail'] == "1") {
@@ -235,7 +249,9 @@ class UserTemplatesApiController extends Controller
                     'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
                     'post_content_data' => $postContentArray,
                 ];
+                DB::commit();
             } catch (Exception $e) {
+                DB::rollBack();
                 $errors[$index] = ['error' => 'Failed to save template: ' . $e->getMessage()];
             }
         }
@@ -263,6 +279,13 @@ class UserTemplatesApiController extends Controller
         if (!empty($errors)) {
             $message .= ', ' . count($errors) . ' failed';
         }
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Template",
+            'description' => "User template saved successfully. User: ".$user->email.". Template Name: (".implode(', ',$templateName).").",
+            'url' => "api/user-template/multiple/store"
+        ]);
 
         return $this->success($response, $message);
     }
@@ -310,7 +333,7 @@ class UserTemplatesApiController extends Controller
 
         $userTemplate->template_name = $request->template_name;
         $userTemplate->template_image = $imageUrl ?? null;
-        $userTemplate->template_data = json_encode($request->template_data);
+        $userTemplate->template_data = $request->template_data;
         $userTemplate->save();
 
 
@@ -330,6 +353,14 @@ class UserTemplatesApiController extends Controller
             'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
             'post_content_data' => $postContentArray,
         ];
+
+        $user = User::select('id','email')->where('id', $userTemplate->user_id)->first();
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Template",
+            'description' => "User template update successfully. Template Name: ".$userTemplate->template_name.". User: ".$user->email,
+            'url' => "api/user-template/update"
+        ]);
 
         return $this->success($returnData, 'User template updated successfully');
     }
@@ -356,6 +387,14 @@ class UserTemplatesApiController extends Controller
         }
 
         $userTemplate->delete();
+
+        $user = User::select('id','email')->where('id', $userTemplate->user_id)->first();
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Template",
+            'description' => "User template delete successfully. Template Name: ".$userTemplate->template_name.". Category Name: ".$userTemplate->category->name.". User: ".$user->email,
+            'url' => "api/user-template/delete"
+        ]);
 
         return $this->success([], 'User template deleted successfully');
     }

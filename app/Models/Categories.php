@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Categories extends Model
 {
@@ -14,7 +15,26 @@ class Categories extends Model
         'description',
         'status',
         'is_comming_soon',
+        'custom_label',
     ];
+
+    /** Boot method on clear cache */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            Cache::forget('categories_list');
+        });
+
+        static::updated(function ($user) {
+            Cache::forget('categories_list');
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('categories_list');
+        });
+    }
 
     public function parent()
     {
@@ -32,10 +52,10 @@ class Categories extends Model
      */
     public static function getActiveCategoeyList()
     {
-        return Categories::select(['id', 'name'])->where(function ($query) {
+        return Categories::select(['id', 'name', 'is_comming_soon'])->where(function ($query) {
             $query->where('status', true)
-                ->where('parent_id', null)
-                ->where('is_comming_soon', false);
+                ->where('parent_id', null);
+                // ->where('is_comming_soon', false);
         })->orderBy('name', 'asc')->get();
     }
 }

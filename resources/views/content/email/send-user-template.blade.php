@@ -5,8 +5,9 @@
 @section('main-content')
     <!-- Logo Section -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <img src="http://178.128.45.173:9162/assets/img/box-logo-horizontal.png" alt="Box Social Logo" class="logo-img"
-            style="width: 200px; height: auto; display: block; margin: 0 auto;">
+        <img src="{{ asset('assets/img/box-socials-tm.png') }}" 
+            alt="Box Socials Logo"
+            style="display:block; margin:0 auto; width:100px; max-width:100%; height:auto;">
     </div>
 
     <hr>
@@ -64,7 +65,7 @@
 
     <!-- CTA Button -->
     <div style="text-align: center; margin: 30px 0;">
-        <a href="http://178.128.45.173:9163/dashboard" target="_blank" class="dashboard-button"
+        <a href="{{ config('app.frontend_url')  }}/dashboard" target="_blank" class="dashboard-button"
             style="background-color: #F4D106; 
             color: #000;
             padding: 14px 32px; 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helpers;
+use App\Jobs\ProcessStockImageUpload;
 use App\Models\ImageStockManagement;
 use Illuminate\Http\Request;
 
@@ -58,10 +60,21 @@ class ImageStockManagementController extends Controller
                     ], 
                     [
                         'tag_name' => $request->custom_tag_name,
-                        'user_id' => auth()->user()->id
+                        'user_id' => auth()->user()->id,
+                        'is_expired' => 0,
                     ]
                 );
+
+                // dispatch job to upload image to cloud
+                ProcessStockImageUpload::dispatch($imge->id);
             }
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Stock Image Save",
+                'description' => "Admin stock image save. Tag :".$request->custom_tag_name,
+                'url' => route('stock-image-management.get.saved-topics')
+            ]);
 
             // update saved images count
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
@@ -111,7 +124,7 @@ class ImageStockManagementController extends Controller
                 ];
                 return [
                     'success' => false,
-                    'message' => 'Request failed',
+                    'message' => 'Request failed, Please try different keyword.',
                     'data' => $returndata
                 ];
             }
@@ -138,7 +151,7 @@ class ImageStockManagementController extends Controller
                 ];
                 return [
                     'success' => false,
-                    'message' => 'cURL Error: ' . curl_error($ch),
+                    'message' => 'Request failed, Please try different keyword.',
                     'data' => $returndata
                 ];
             } else {
@@ -155,7 +168,7 @@ class ImageStockManagementController extends Controller
     }
     
 
-    public function savedImages(Request $request)
+    public function OldsavedImages(Request $request)
     {
         $images = ImageStockManagement::where('user_id', auth()->user()->id)
         ->when($request->selectedTopic != null && $request->selectedTopic != 0, function ($query) use ($request) {
@@ -177,14 +190,66 @@ class ImageStockManagementController extends Controller
         ]);
     }
 
+    public function savedImages(Request $request)
+    {
+        $limit = $request->limit ?? 24; // default to 24 if not provided
+        $page = $request->offset ?? 1; // treat 'offset' as page number
+        $page = $page == 0 ? 1 : $page;
+        $realOffset = ($page - 1) * $limit;
+
+        $query = ImageStockManagement::where('user_id', auth()->user()->id)
+            ->when($request->selectedTopic != null && $request->selectedTopic != 0, function ($query) use ($request) {
+                return $query->where('tag_name', $request->selectedTopic);
+            })
+            ->latest();
+
+        // Get total count for pagination
+        $totalImages = $query->count();
+        
+        $images = $query->offset($realOffset)
+            ->limit($limit)
+            ->get()
+            ->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'tag_name' => $image->tag_name,
+                    'image_url' => $image->image_url,
+                    'image_exists' => pathinfo($image->image_url, PATHINFO_EXTENSION) ? true : false,
+                ];
+            });
+        
+        return response()->json([
+            'success' => true,
+            'data' => $images,
+            'pagination' => [
+                'current_page' => $page,
+                'total_images' => $totalImages,
+                'per_page' => $limit,
+                'has_more' => ($realOffset + $limit) < $totalImages
+            ]
+        ]);
+    }
+
     // delete saved images
     public function deleteSavedImages(Request $request)
     {
         $imageIds = $request->image_ids;
 
         if (!empty($imageIds)) {
-            ImageStockManagement::whereIn('id', $imageIds)->delete();
+            $allDeleteImageData = ImageStockManagement::whereIn('id', $imageIds)->get();
+
+            foreach ($allDeleteImageData as $key => $value) {
+                // check if url has 'digitaloceanspaces'
+                if (strpos($value->image_url, 'digitaloceanspaces') !== false) {
+                    Helpers::deleteImage($value->image_url);
+                    $value->delete();
+                } else {
+                    $value->delete();
+                }
+            }
+            
             $savedImagesCount = ImageStockManagement::where('user_id', auth()->user()->id)->count() ?? 0;
+
             return response()->json([
                 'success' => true,
                 'message' => 'Images deleted successfully',

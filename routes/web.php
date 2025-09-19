@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PostTemplateController;
 use App\Http\Controllers\SubscriptionPlansController;
 use App\Http\Controllers\UserManagementController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\BrnadconfigurationController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\CookiePolicyController;
+use App\Http\Controllers\EmailsContentController;
 use App\Http\Controllers\IconManagementController;
 use App\Http\Controllers\IconMangementsController;
 use App\Http\Controllers\ImageStockManagementController;
@@ -24,6 +27,8 @@ use App\Http\Controllers\ProjectTestController;
 use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\DataBackupController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -32,6 +37,8 @@ Route::middleware('guest')->group(function () {
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
+Route::get('/daily-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
+Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
 Route::middleware('auth')->group(function () {
     // Route::get('/home', [HomePage::class, 'index'])->name('pages-home');
@@ -69,6 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class, 'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class, 'accountStatus'])->name('user.account-status');
     Route::post('/user/export', [UserManagementController::class, 'export'])->name('user.export');
+    Route::post('/user/account-verify', [UserManagementController::class, 'userAccountVerify'])->name('user.account-verify');
 
     // Profile Management Controller
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management');
@@ -84,7 +92,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/subscription-management/datatable', [UserSubscriptionController::class, 'dataTable'])->name('subscription-management.data-table');
         Route::get('/subscription-management/show/{id}', [UserSubscriptionController::class, 'show'])->name('subscription-management.show');
         Route::post('/subscription-management/delete', [UserSubscriptionController::class, 'destroy'])->name('subscription-management.delete');
-        
+        Route::post('/subscription-management/export', [UserSubscriptionController::class, 'exportSubscriptionDetails'])->name('subscription-management.export');
+        Route::post('/subscription-management/generate-invoice', [UserSubscriptionController::class, 'generateSubscriptionInvoice'])->name('subscription-management.generate-invoice');
+
+        // payments controller
+        Route::get('/payment-history', [PaymentsController::class, 'index'])->name('payment-history');
+        Route::get('/payment-history/datatable', [PaymentsController::class, 'dataTable'])->name('payment-history.data-table');
+
         // icon management controller
         Route::get('/icon-management', [IconManagementController::class, 'index'])->name('icon-management');
         Route::post('/icon-management/store', [IconManagementController::class, 'store'])->name('icon-management.store');
@@ -161,9 +175,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/terms-and-condition/update', [TermsAndConditionController::class, 'update'])->name('terms-and-condition.update');
         Route::get('/terms-and-condition/datatable', [TermsAndConditionController::class, 'dataTable'])->name('terms-and-condition.data-table');
         Route::post('/terms-and-condition/delete', [TermsAndConditionController::class, 'destroy'])->name('terms-and-condition.delete');
+
+        // cookie policy controller
+        Route::get('/cookie-policy', [CookiePolicyController::class, 'cookiePolicy'])->name('cookie-policy');
+        Route::post('cookie-policy/save', [CookiePolicyController::class, 'saveCookiePolicy'])->name('cookie-policy.save');
+
+        /** Email content controller */
+        Route::match(['GET','POST'],'/email-settings', [EmailsContentController::class, 'index'])->name('email-settings');
+        Route::get('/email-settings/edit/{id?}', [EmailsContentController::class, 'createOrEdit'])->name('email-settings.create');
+        Route::post('/email-settings/save', [EmailsContentController::class, 'saveEmailContent'])->name('email-settings.save');
+        Route::post('/email-settings/delete', [EmailsContentController::class, 'deleteEmailContent'])->name('email-settings.delete');
+        
     });
-
+    
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
+    
     Route::get('/get/user', [RegisterController::class, 'GetAllUser']);
+
 });

@@ -24,7 +24,7 @@ class ContactUsController extends Controller
     // data table function
     public function contactUsDataTable(Request $request)
     {
-        $contactUs = ContactUs::latest()->get();
+        $contactUs = ContactUs::latest();
 
         return DataTables::of($contactUs)
             ->addIndexColumn()
@@ -44,9 +44,9 @@ class ContactUsController extends Controller
                 return $contactUs->message;
             })
             ->addColumn('created_date', function ($contactUs) {
-                return Helpers::dateFormate($contactUs->created_at);
+                return '<span data-order="' . $contactUs->created_date . '">' . Helpers::dateFormate($contactUs->created_date) . '</span>';
             })
-            ->rawColumns(['checkbox'])
+            ->rawColumns(['checkbox','created_date'])
             ->make(true);
     }
 

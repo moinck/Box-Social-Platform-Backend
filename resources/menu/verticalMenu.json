@@ -22,6 +22,13 @@
             "role": ["admin"]
         },
         {
+            "url": "/payment-history",
+            "name": "Payment History",
+            "icon": "menu-icon tf-icons ri-secure-payment-line",
+            "slug": "payment-history",
+            "role": ["admin"]
+        },
+        {
             "url": "/brand-configuration",
             "name": "Brand Configuration",
             "icon": "menu-icon tf-icons ri-list-settings-fill",
@@ -79,7 +86,7 @@
         },
         {
             "url": "/terms-and-condition/edit/TTJ0UTNQeWt1WWhYSEF5cWxtbGVLZz09",
-            "name": "Terms and Condition",
+            "name": "Terms & Conditions",
             "icon": "menu-icon tf-icons ri-newspaper-line",
             "slug": "terms-and-condition",
             "role": ["admin"]

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\CustomVerifyEmail;
 use App\Models\UserSubscription;
-
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -30,7 +30,11 @@ class User extends Authenticatable
         'password',
         'status',
         'role',
+        'authorisation_type',
+        'appointed_network',
+        'company_type',
         'profile_image',
+        'is_admin_verified',
     ];
 
     /**

@@ -39,12 +39,13 @@ class AuthApiController extends Controller
             return $this->validationError('Invalid verification token', $validator->errors());
         }
 
+        // do not decrypt token
         $verificationToken = $request->verification_token;
 
         $userToken = UserTokens::where(function ($query) use ($verificationToken) {
             $query->where('token', $verificationToken)
                 ->where('type', 'email-verification')
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
+                // ->where('created_at', '>=', Carbon::now()->subMinutes(5)->toDateTimeString())
                 ->where('is_used', false);
         })->first();
 
@@ -64,14 +65,15 @@ class AuthApiController extends Controller
             return $this->error('Email is already verified', 400);
         }
 
-        // gernerte token
-        $LoginToken = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
-        // check does user have brandkit
-        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
-
         // Mark email as verified
         $user->markEmailAsVerified();
         event(new Verified($user));
+
+        // check does user have brandkit
+        $isBrandkit = BrandKit::where('user_id', $user->id)->exists() ? true : false;
+
+        // gernerte token
+        $LoginToken = $user->createToken('auth_token', ['*'], now()->addDays(3))->plainTextToken;
 
         $userToken->update([
             'is_used' => true
@@ -93,6 +95,13 @@ class AuthApiController extends Controller
             'access_token' => $LoginToken,
             'token_type' => 'Bearer',
         ];
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Email Verify",
+            'description' => "User email verify on the platform. User: ".$user->email,
+            'url' => "api/email/verify"
+        ],$user->id);
 
         return $this->success($returnData, 'Email verified successfully');
     }
@@ -204,6 +213,13 @@ class AuthApiController extends Controller
                 $encyptedToken = Helpers::encrypt($token);
                 Mail::to($user->email)->send(new ForgetPasswordMail($encyptedToken, $user));
     
+                /** User Activity Log */
+                Helpers::activityLog([
+                    'title' => "Forget Password",
+                    'description' => "User forget the password. User : ".$user->email,
+                    'url' => "api/forget-password"
+                ],$user->id);
+
                 return $this->success([
                     'verification_token' => $encyptedToken
                 ], 'Password reset email sent successfully');
@@ -329,6 +345,14 @@ class AuthApiController extends Controller
             'user_id' => $user->id,
             'type' => 'forget-password'
         ])->update(['is_used' => true]);
+
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "Reset Password",
+            'description' => "User password reset successfully. User: ".$user->email,
+            'url' => "api/reset-password"
+        ],$user->id);
+
         return $this->success([], 'Password reset successfully');
     }
 }

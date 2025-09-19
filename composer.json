@@ -9,6 +9,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.2",
+    "barryvdh/laravel-dompdf": "^3.1",
     "intervention/image": "^3.11",
     "laravel/framework": "^11.0",
     "laravel/jetstream": "^5.3",
@@ -18,6 +19,7 @@
     "league/flysystem-aws-s3-v3": "^3.29",
     "maatwebsite/excel": "*",
     "phpoffice/phpword": "^1.4",
+    "predis/predis": "^3.2",
     "pusher/pusher-php-server": "^7.2",
     "stripe/stripe-php": "^17.4",
     "yajra/laravel-datatables-oracle": "^11.1"
@@ -26,6 +28,7 @@
     "fakerphp/faker": "^1.23",
     "laravel/pint": "^1.13",
     "laravel/sail": "^1.26",
+    "laravel/telescope": "^5.11",
     "mockery/mockery": "^1.6",
     "nunomaduro/collision": "^8.0",
     "phpunit/phpunit": "^10.5",

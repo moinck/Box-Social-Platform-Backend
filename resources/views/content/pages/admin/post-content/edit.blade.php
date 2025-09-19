@@ -100,6 +100,7 @@
                                 Cancel
                             </button>
                         </div>
+                        <input type="hidden" id="isValidate" value="0" readonly>
                     </form>
                 </div>
             </div>
@@ -181,6 +182,7 @@
                 ['link', 'image', 'video', 'formula'],
                 [
                     {'insert-name': 'Name'},
+                    // {'insert-email': 'Email'},
                     {'insert-phone': 'Phone'},
                     {'insert-website': 'Website'},
                 ],
@@ -204,6 +206,11 @@
                                 this.quill.insertText(cursorPosition, '|phone|');
                                 this.quill.setSelection(cursorPosition + 7);
                             },
+                            'insert-email': function() {
+                                const cursorPosition = this.quill.getSelection().index;
+                                this.quill.insertText(cursorPosition, '|email|');
+                                this.quill.setSelection(cursorPosition + 7);
+                            },
                             'insert-website': function() {
                                 const cursorPosition = this.quill.getSelection().index;
                                 this.quill.insertText(cursorPosition, '|website|');
@@ -216,6 +223,7 @@
             });
             $('.ql-insert-name').attr('title', 'Click to insert Name');
             $('.ql-insert-phone').attr('title', 'Click to insert Phone');
+            $('.ql-insert-email').attr('title', 'Click to insert Email');
             $('.ql-insert-website').attr('title', 'Click to insert Website');
             // update hidden post description
             editPostDescription.on('text-change', function () {
@@ -315,6 +323,9 @@
 
             // get sub category
             function GetSubCategory(category_id) {
+
+                var isValidate = $("#isValidate").val();
+
                 $.ajax({
                     url: '{{ route('post-content.sub-category.get.data') }}',
                     type: 'GET',
@@ -341,6 +352,7 @@
                             });
                             $('#post_content_edit_sub_category').html(option);
                             $('#selectSubCategory-edit-div').removeClass('d-none');
+                            $("#isValidate").val(1);
 
                             validator.revalidateField('post_content_edit_sub_category');
                             validator.addField(`post_content_edit_sub_category`, {
@@ -355,10 +367,13 @@
                             var subCategoryField = $('#post_content_edit_sub_category');
                             if (editSubCategoryId != 0) {
                                 validator.revalidateField('post_content_edit_sub_category');
+                            }
+                            if (isValidate == 1) {
                                 validator.removeField(`post_content_edit_sub_category`);
                             }
                             subCategoryField.html('<option value="">Select Subcategory</option>');
                             $('#selectSubCategory-edit-div').addClass('d-none');
+                            $("#isValidate").val(0);
                         }
                     }
                 });

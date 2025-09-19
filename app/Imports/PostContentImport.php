@@ -26,15 +26,18 @@ class PostContentImport implements ToCollection
                 }
                 $categoryName = $row[1];
                 $subCategoryName = $row[2] ?? null;
-                $category = Categories::where('name','like', "%$categoryName%")->first();
                 $subCategory = null;
-                if ($subCategoryName) {
-                    $subCategory = Categories::where('name','like', "%$subCategoryName%")->where('parent_id', $category->id)->first();
+                $category = Categories::where('name','like', "%$categoryName%")->first();
+                if ($subCategoryName && $category) {
+                    $subCategory = Categories::where(function ($query) use ($subCategoryName, $category) {
+                        $query->where('name','like', "%$subCategoryName%")
+                            ->where('parent_id', $category->id);
+                    })->first();
                 }
                 if ($category) {
                     PostContent::create([
                         'category_id' => $category->id,
-                        'sub_category_id' => $subCategory->id ?? null,
+                        'sub_category_id' => $subCategory ? $subCategory->id : null,
                         'title' => $row[3] ?? null,
                         'description' => $row[4] ?? null,
                         'warning_message' => $row[5] ?? null,
@@ -42,9 +45,10 @@ class PostContentImport implements ToCollection
                 }
             }
             DB::commit();
+            return $skipRecords;
         } catch (\Exception $e) {
             DB::rollBack();
-            Helpers::sendErrorMailToDeveloper($e);
+            Helpers::sendErrorMailToDeveloper($e,'import post content data');
             throw $e;
         }
     }

@@ -3,20 +3,35 @@
 namespace App\Helpers;
 
 use App\Events\NewNotificationEvent;
+use App\Mail\DynamicContentMail;
 use App\Mail\RegisterVerificationMail;
+use App\Models\BrandKit;
+use App\Models\FcaNumbers;
+use App\Models\ImageStockManagement;
 use App\Models\Notification;
+use App\Models\User;
+use App\Models\UserActivityLog;
+use App\Models\UserDownloads;
+use App\Models\UserSubscription;
+use App\Models\UserTemplates;
 use App\Models\UserTokens;
 use App\Notifications\CustomVerifyEmail;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pusher\Pusher;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\InvalidRequestException;
+use Stripe\StripeClient;
 
 class Helpers
 {
@@ -250,7 +265,7 @@ class Helpers
             }
 
             // add enviroment name
-            $envName = env('APP_ENV');
+            $envName = config('app.env') ?? env('APP_ENV','local');
             
             // Generate a unique name for the image
             $image_name = $prefix . "_" . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -321,7 +336,7 @@ class Helpers
             $storagePath = str_replace('storage/', '', $path);
             
             if (Storage::disk('public')->exists($storagePath)) {
-                Storage::disk('public')->delete($storagePath);
+                // Storage::disk('public')->delete($storagePath);
                 // Log::info("File deleted successfully: " . $path);
             } else {
                 // Log::info("File does not exist at: " . $path);
@@ -346,7 +361,7 @@ class Helpers
                 $relativePath = str_replace($doSpacesUrl . '/', '', $path);
                 
                 if (Storage::disk('digitalocean')->exists($relativePath)) {
-                    Storage::disk('digitalocean')->delete($relativePath);
+                    // Storage::disk('digitalocean')->delete($relativePath);
                     // Log::info("File deleted successfully from DigitalOcean: " . $path);
                 } else {
                     // Log::info("File does not exist in DigitalOcean: " . $path);
@@ -356,7 +371,7 @@ class Helpers
                 $storagePath = str_replace('storage/', '', $path);
                 
                 if (Storage::disk('public')->exists($storagePath)) {
-                    Storage::disk('public')->delete($storagePath);
+                    // Storage::disk('public')->delete($storagePath);
                     // Log::info("File deleted successfully from local storage: " . $path);
                 } else {
                     // Log::info("File does not exist in local storage: " . $path);
@@ -673,24 +688,40 @@ class Helpers
     {
         $title = "";
         $body = "";
+        $fullName = ($data->first_name ?? '')." ".($data->last_name ?? '');
+        $dataId = $data->id ?? null;
         switch ($type) {
             case 'new-registration':
-                $fullName = $data->first_name." ".$data->last_name;
                 $title = "New Registration";
                 $body = "New user ".$fullName." registered";
                 break;
             case 'new-contact-us':
                 $title = "New Feedback";
                 $body = "New feedback is given by ".$data->name;
+                $dataId = null;
+                break;
+            case 'new-subscription':
+                $title = "New Subscription";
+                $body = "User " .$fullName." taken subscription";
+                break;
+            case 'subscription-expiring-soon':
+                $title = "Subscription Expiration";
+                $body = "The subscription for user " .$fullName." will expire on ".Carbon::parse($data->expiring_at)->format('d-m-Y');
+                break;
+            case 'subscription-failed':
+                $title = "Payment Failed";
+                $body = "The subscription payment of user ".$fullName." is failed.";
                 break;
             default:
                 $title = "New Notification";
                 $body = "New notification is submitted";
+                $dataId = null;
                 break;
         }
 
         if($title && $body){
             $newnotification = Notification::create([
+                'user_id' => $dataId,
                 'tital' => $title,
                 'body' => $body,
                 'type' => $type,
@@ -834,7 +865,7 @@ class Helpers
      * @param mixed $errorData
      * @return void
      */
-    public static function sendErrorMailToDeveloper($errorData)
+    public static function sendErrorMailToDeveloper($errorData,$functionName = 'New Error Report')
     {
         $newErrorData = [
             'environment' => config('app.env'),
@@ -846,6 +877,7 @@ class Helpers
             'line' => $errorData->getLine(),
             'trace' => $errorData->getTraceAsString(),
             'message' => $errorData->getMessage(),
+            'functionName' => $functionName,
             'exception' => get_class($errorData),
             'version' => config('app.version') ?? "1.0",
         ];
@@ -855,7 +887,7 @@ class Helpers
             // send mail to developer
             Mail::send([], [], function ($message) use ($view) {
                 $message->html($view);
-                $message->to('pratikdev.iihglobal@gmail.com');
+                $message->to(['pratikdev.iihglobal@gmail.com','jayp.iihglobal@gmail.com','martik.iihglobal@gmail.com']);
                 $message->subject('New Error Report');
             });
         }
@@ -871,6 +903,371 @@ class Helpers
     {
         Mail::to($to)->send($mailableClass);
 
+        return true;
+    }
+
+    /**
+     * Convert image URL to base64 format
+     * 
+     * @param string $imagePath
+     * @param int $timeout Timeout in seconds (default: 30)
+     * @return string|null Returns base64 string or null on failure
+     */
+    public static function imageUrlToBase64($imagePath, $timeout = 30)
+    {
+        try {
+            if (empty($imagePath)) {
+                Log::warning('Empty image path provided');
+                return null;
+            }
+
+            // Check if it's a local storage path (doesn't start with http)
+            if (!str_starts_with($imagePath, 'http')) {
+                return self::handleLocalImage($imagePath);
+            }
+
+            // Handle external URL
+            return self::handleExternalImage($imagePath, $timeout);
+
+        } catch (Exception $e) {
+            Log::error('Error converting image to base64', [
+                'path' => $imagePath,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Handle local storage images
+     */
+    public static function handleLocalImage($imagePath)
+    {
+        // Remove leading slash if present
+        $imagePath = ltrim($imagePath, '/');
+        
+        // Get full path from public directory
+        $fullPath = public_path($imagePath);
+        
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            Log::warning('Local image file not found', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Get file content
+        $imageContent = file_get_contents($fullPath);
+        
+        if ($imageContent === false) {
+            Log::warning('Could not read local image file', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Get mime type from file extension
+        $mimeType = self::getMimeTypeFromPath($fullPath);
+        
+        if (!$mimeType) {
+            Log::warning('Could not determine mime type for local image', ['path' => $fullPath]);
+            return null;
+        }
+
+        // Convert to base64
+        $base64 = base64_encode($imageContent);
+        
+        return "data:{$mimeType};base64,{$base64}";
+    }
+
+    /**
+     * Handle external image URLs
+     */
+    public static function handleExternalImage($imageUrl, $timeout)
+    {
+        // Validate URL
+        if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            Log::warning('Invalid external image URL provided', ['url' => $imageUrl]);
+            return null;
+        }
+
+        // Fetch the image using Laravel HTTP client
+        $response = Http::timeout($timeout)->get($imageUrl);
+
+        // Check if request was successful
+        if (!$response->successful()) {
+            Log::warning('Failed to fetch external image', [
+                'url' => $imageUrl,
+                'status' => $response->status()
+            ]);
+            return null;
+        }
+
+        // Get image content
+        $imageContent = $response->body();
+        
+        // Check if content is not empty
+        if (empty($imageContent)) {
+            Log::warning('Empty external image content', ['url' => $imageUrl]);
+            return null;
+        }
+
+        // Get content type from response headers
+        $contentType = $response->header('Content-Type');
+        
+        // Validate that it's an image
+        if (!$contentType || !str_starts_with($contentType, 'image/')) {
+            Log::warning('External URL does not point to an image', [
+                'url' => $imageUrl,
+                'content_type' => $contentType
+            ]);
+            return null;
+        }
+
+        // Convert to base64
+        $base64 = base64_encode($imageContent);
+        
+        return "data:{$contentType};base64,{$base64}";
+    }
+
+    /**
+     * Get MIME type from file path/extension
+     */
+    public static function getMimeTypeFromPath($filePath)
+    {
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        
+        $mimeTypes = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/x-icon',
+        ];
+
+        return $mimeTypes[$extension] ?? null;
+    }
+
+    /** 
+     * Generate Subscription Invoice
+     */
+    public static function generateSubscriptionInvoice($subscriptionId)
+    {
+        $subscription = UserSubscription::with('user:id,first_name,last_name,email','plan:id,name,interval,interval_count')
+                ->where('id',$subscriptionId)
+                ->first();
+
+        if (!$subscription) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data not found.'
+            ]);
+        }
+
+        $stripe = new StripeClient(config('services.stripe.secret_key'));
+
+        $invoice_number = $subscription->invoice_number;
+        if (!$subscription->invoice_number && $subscription->plan_id != 1) {
+            $invoices = $stripe->invoices->all([
+                'subscription' => $subscription->stripe_subscription_id,
+                'limit' => 1,
+            ])->data[0] ?? null;
+            
+            $invoice_number = $invoices && isset($invoices['number']) && $invoices['number'] ? $invoices['number'] : null;
+            $subscription->invoice_number = $invoice_number;
+            $subscription->save();
+        }
+
+        $pdf = Pdf::loadView('content.pages.user-subscription.invoice',compact('subscription'))->setPaper('a4', 'portrait');
+
+        $fileName = 'Invoice' . rand(0,999999999) . '.pdf';
+        if ($invoice_number) {
+            $fileName = 'Invoice' . $invoice_number . '.pdf';
+        }
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+            'Cache-Control'       => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'              => 'no-cache',
+        ]);
+    }
+
+    /**
+     * Delete User's all Data
+     * @param mixed $userId
+     * @return bool
+     */
+    public static function deleteUserData($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) {
+            return false;
+        }
+        try {
+            DB::beginTransaction();
+
+            // add fca number
+            FcaNumbers::updateOrCreate([
+                'fca_number' => $user->fca_number,
+            ], [
+                'fca_name' => $user->company_name,
+            ]);
+    
+            // stock image delete
+            // $user->imageStockManagement()->delete();
+            $allDeleteImageData = ImageStockManagement::where('user_id', $userId)->get();
+    
+            foreach ($allDeleteImageData as $value) {
+                Helpers::deleteImage($value->image_url);
+                $value->delete();
+            }
+    
+            // brand kit delete
+            // $user->brandKit()->delete();
+            $userBrandKit = BrandKit::where('user_id', $userId)->first();
+            if (!empty($userBrandKit)) {
+                Helpers::deleteImage($userBrandKit->logo);
+                $userBrandKit->delete();
+            }
+    
+            // subscription (all) delete
+            // $user->subscription()->delete();
+            $userSubscription = UserSubscription::where('user_id', $userId)->get();
+            if (!empty($userSubscription)) {
+                foreach ($userSubscription as $value) {
+                    if ($value->plan_id != 1) {
+
+                        if (!empty($value->stripe_subscription_id)) {
+                            try {
+
+                                $stripe = new StripeClient(config('services.stripe.secret_key'));
+
+                                // Always fetch the subscription from Stripe
+                                $stripeSub = $stripe->subscriptions->retrieve($value->stripe_subscription_id, []);
+
+                                // Cancel if it's not already canceled
+                                if ($stripeSub->status !== 'canceled') {
+                                    // first cancel subscription from stripe
+                                    $stripe->subscriptions->cancel($value->stripe_subscription_id, [
+                                        'cancellation_details' => [
+                                            'comment' => 'user deleted their account',
+                                            // 'reason' => 'account_deleted',
+                                        ],
+                                    ]);
+                                }
+
+                            } catch (InvalidRequestException $e) {
+                                // Most common: "No such subscription" (already deleted or never existed)
+                                Log::warning("Stripe invalid request for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            } catch (ApiErrorException $e) {
+                                // Any other Stripe API error (network, auth, etc.)
+                                Log::error("Stripe API error for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            } catch (\Exception $e) {
+                                // Catch-all for unexpected issues
+                                Log::error("Unexpected error for subscription {$value->stripe_subscription_id} - {$value->id}: " . $e->getMessage());
+                            }
+                        }
+    
+                        $value->delete();
+                    } else {
+                        $value->delete();
+                    }
+                }
+            }
+    
+            // user downloads
+            $userDownloads = UserDownloads::where('user_id', $userId)->get();
+            if (!empty($userDownloads)) {
+                foreach ($userDownloads as $value) {
+                    $value->delete();
+                }
+            }
+    
+            // user template delete
+            $userTemplate = UserTemplates::where('user_id', $userId)->get();
+            if (!empty($userTemplate)) {
+                foreach ($userTemplate as $value) {
+                    Helpers::deleteImage($value->template_image);
+                    $value->delete();
+                }
+            }
+    
+            // delete usertokens
+            $userTokens = UserTokens::where('user_id', $userId)->get();
+            if (!empty($userTokens)) {
+                foreach ($userTokens as $value) {
+                    $value->delete();
+                }
+            }
+    
+            $user->delete();
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            // dd($e);
+            Log::error($e);
+            Helpers::sendErrorMailToDeveloper($e,'User account delete API.');
+            return false;
+        }   
+    }
+
+    /** Email type list */
+    public static function emailType()
+    {
+        return [
+            'before_first_oct_mail' => "BEFORE 1st OCT",
+            'after_first_oct_mail' => "FROM 1st OCT",
+            'welcome_beta_trial' => "Welcome to Your Box Socials Beta Trial 🎉",
+            'user_register_acount_in_review' => "Welcome Email -  ACCOUNT IN REVIEW",
+            'user_register_acount_reviewed' => "Welcome Email -  ACCOUNT REVIEWED",
+            'user_email_update' => "User Email Update",
+            'new_account_pending_admin_approval' => "New Account Pending Admin Approval",
+        ];
+    }
+
+    /** Send Dynamic Email Content */
+    public static function sendDynamicContentEmail($data)
+    {
+        Mail::to($data['email'])->send(new DynamicContentMail($data));
+    }
+
+    /** Special Characters Replacements */
+    public static function specialCharactersReplacments()
+    {
+        return [
+            '&' => 'And',
+            '<' => '',
+            '>' => ''
+        ];
+    }
+
+    /** User Activity Log */
+    public static function activityLog($activityLogData,$userId=null){
+        $userName = "";
+        if(Auth::check() && $userId == null){
+            $userId = Auth::user()->id;
+            $userName =  Auth::user()->first_name." ".Auth::user()->last_name;
+        }
+        $activityLog = new UserActivityLog();
+        $activityLog->user_id = $userId;
+        $user =
+        [
+            'userName' => $userName,
+            'userAgent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
+            'userIP' => isset($_SERVER['HTTP_USER_AGENT'])? $_SERVER['REMOTE_ADDR'] : '',
+        ];
+        $activity =
+        [
+            'title' => $activityLogData['title'],
+            'description' => $activityLogData['description'],
+            'date_time' => Carbon::now()->format('d-m-Y | h:i A'),
+            'url' => $activityLogData['url'],
+            'description_text' => strip_tags($activityLogData['description']),
+        ];
+        $activityLog->info = json_encode(['user'     => $user, 'activity' => $activity], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $activityLog->save();
         return true;
     }
 }

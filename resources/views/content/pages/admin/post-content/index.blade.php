@@ -195,6 +195,8 @@
 
                         // Filter results on category select change
                         $('#category_filter').on('change', function() {
+                            // if category change, then make sub category value empty
+                            $('#sub_category_filter').val('');
                             PostContentTable.draw();
                         });
 
@@ -227,9 +229,17 @@
                                 });
                             });
                         }
+                        var css = `.select2-container--default .select2-results > .select2-results__options {
+                            max-height: 11.5rem;
+                            overflow-y: auto;
+                        }`;
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.appendChild(document.createTextNode(css));
+                        document.head.appendChild(style);
                     },
                     columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex',orderable: false, searchable: false},
                         { data: 'post_title', name: 'post_title'},
                         { data: 'post_category', name: 'post_category'},
                         { data: 'post_sub_category', name: 'post_sub_category'},
@@ -254,6 +264,8 @@
             // delete post content
             $(document).on('click', '.delete-post-content-btn', function() {
                 var postId = $(this).data('post-id');
+                var table = $('#post-content-data-table').DataTable();
+                
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -283,7 +295,8 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     showSweetAlert('success', 'Deleted!', 'Post Content has been deleted.');
-                                    PostContentDataTable();
+                                    // PostContentDataTable();
+                                    reloadDataTablePreservingPage(table); 
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }

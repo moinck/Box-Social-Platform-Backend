@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class PostTemplateController extends Controller
 {
@@ -55,7 +56,8 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
+        $postTemplates = PostTemplate::whereHas('category')
+            ->with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
             ->when($request->has('category') && $request->category != '', function ($query) use ($request) {
                 $query->where('category_id', $request->category);
             })
@@ -81,6 +83,9 @@ class PostTemplateController extends Controller
 
         return DataTables::of($postTemplates)
             ->addIndexColumn()
+            ->addColumn('checkbox', function ($data) {
+                return '<input type="checkbox" class="form-check-input template-checkbox" name="template_id[]" value="' . Helpers::encrypt($data->id) . '">';
+            })
             ->addColumn('template_image', function ($data) {
                 $categoryName = $data->category->name;
                 $templateImage = $data->template_image;
@@ -123,12 +128,12 @@ class PostTemplateController extends Controller
                 return $data->status;
             })
             ->addColumn('created_at', function ($data) {
-                return Helpers::dateFormate($data->created_at);
+                return '<span data-order="' . $data->created_at . '">' . Helpers::dateFormate($data->created_at) . '</span>';
             })
             ->addColumn('action', function ($data) {
                 $postTemplateId = Helpers::encrypt($data->id);
                 $adminAccessToken = Session::get('admin_access_token') ?? '';
-                $editUrl = "http://178.128.45.173:9163/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
+                $editUrl = config('app.frontend_url') . "/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
                 // $downloadUrl = route('download.document', $postTemplateId);
                 // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
                 //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
@@ -142,18 +147,31 @@ class PostTemplateController extends Controller
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
-            ->rawColumns(['action', 'post_content', 'template_image', 'status', 'created_at'])
+            ->rawColumns(['checkbox','action', 'post_content', 'template_image', 'status', 'created_at'])
             ->make(true);
     }
 
     public function destroy(Request $request)
     {
-        $decryptedId = Helpers::decrypt($request->post_template_id);
-        $postTemplate = PostTemplate::find($decryptedId);
-        if ($postTemplate) {
-            // delete post-template image
-            Helpers::deleteImage($postTemplate->template_image);
-            $postTemplate->delete();
+        $decryptedIds = collect($request->post_template_id)->map(function ($encryptedId) {
+            return Helpers::decrypt($encryptedId);
+        })->toArray();
+
+        $postTemplates = PostTemplate::select('id','template_image')->whereIn('id',$decryptedIds)->get();
+        if ($postTemplates->isNotEmpty()) {
+            foreach ($postTemplates as $key => $value) {
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "Delete Post Template",
+                    'description' => "Admin Panel: Post Template is ".$value->template_name.". Post Template Content: ".(isset($value->postContent) ? $value->postContent->title : '-').". Post Template Category: ".(isset($value->category) ? $value->category->name : '-').". Post Template Sub-Category: ".(isset($value->subCategory) ? $value->subCategory->name : '-'),
+                    'url' => route('post-content.delete')
+                ]);
+
+                // delete post-template image
+                Helpers::deleteImage($value->template_image);
+                $value->delete();
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Post Template deleted successfully.'
@@ -168,14 +186,34 @@ class PostTemplateController extends Controller
 
     public function changeStatus(Request $request)
     {
-        $decryptedId = Helpers::decrypt($request->id);
-        $postTemplate = PostTemplate::find($decryptedId);
-        if ($postTemplate) {
-            $postTemplate->status = !$postTemplate->status;
-            $postTemplate->save();
+
+        $type = $request->type;
+        $decryptedIds = collect($request->post_template_id)->map(function ($encryptedId) {
+            return Helpers::decrypt($encryptedId);
+        })->toArray();
+
+        $postTemplates = PostTemplate::select('id','status')->whereIn('id',$decryptedIds)->get();
+        
+        if ($postTemplates->isNotEmpty()) {
+
+            foreach ($postTemplates as $key => $value) {
+                if ($type == "single") {
+                    $value->status = !$value->status;
+                } else if ($type == "bulk" && $value->status == 1) {
+                    $value->status = !$value->status;
+                }
+
+                $value->save();
+            }
+
+            $message = "Post Template status has been updated successfully.";
+            if ($type == "bulk") {
+                $message = "Post Template has been disabled successfully.";
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Post Template status changed successfully.'
+                'message' => $message
             ]);
         } else {
             return response()->json([
@@ -189,31 +227,135 @@ class PostTemplateController extends Controller
     {
         $decryptedId = Helpers::decrypt($request->post_template_id);
         $postTemplate = PostTemplate::find($decryptedId);
+        
         if (!empty($postTemplate)) {
             $templateImage = $postTemplate->template_image;
-
-            // Generate new unique filename
-            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
-            $newFilename = 'admin_template_'.time().'.'.$extension;
+            $newUrl = null;
             
-            $uploadNewFile = new UploadedFile($templateImage, $newFilename, $extension, null, true);
-
-            $newUrl = Helpers::uploadImage('admin_template', $uploadNewFile, 'images/admin-post-templates');
-
-            // Create the duplicate record
-            $newPostTemplate = $postTemplate->replicate();
-            $newPostTemplate->template_image = $newUrl;
-            $newPostTemplate->save();
+            // Check if the image is from Digital Ocean or local storage
+            if ($this->isDigitalOceanUrl($templateImage)) {
+                // Handle Digital Ocean URL - download and re-upload
+                $newUrl = $this->duplicateDigitalOceanImage($templateImage);
+            } else {
+                // Handle local file - existing logic
+                $newUrl = $this->duplicateLocalImage($templateImage);
+            }
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Duplicate Post Template created successfully.'
-            ]);
+            if ($newUrl) {
+                // Create the duplicate record
+                $newPostTemplate = $postTemplate->replicate();
+                $newPostTemplate->template_image = $newUrl;
+                $newPostTemplate->save();
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "Duplicate Post Template",
+                    'description' => "Admin Panel: Post Template is ".$postTemplate->template_name.". Post Template Content: ".(isset($postTemplate->postContent) ? $postTemplate->postContent->title : '-').". Post Template Category: ".(isset($postTemplate->category) ? $postTemplate->category->name : '-').". Post Template Sub-Category: ".(isset($postTemplate->subCategory) ? $postTemplate->subCategory->name : '-'),
+                    'url' => route('post-template.create-duplicate')
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Duplicate Post Template created successfully.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to duplicate image.'
+                ]);
+            }
         } else {
             return response()->json([
                 'success' => false,
                 'message' => 'Post Template not found.'
             ]);
+        }
+    }
+
+    /**
+     * Check if the URL is from Digital Ocean Spaces
+     */
+    private function isDigitalOceanUrl($url)
+    {
+        // Adjust this condition based on your Digital Ocean URL pattern
+        // Common patterns: contains 'digitaloceanspaces.com' or your specific endpoint
+        return strpos($url, 'digitaloceanspaces.com') !== false || 
+            strpos($url, 'cdn.digitaloceanspaces.com') !== false ||
+            // Add your specific Digital Ocean endpoint here
+            strpos($url, config('filesystems.disks.spaces.endpoint')) !== false;
+    }
+
+    /**
+     * Duplicate image from Digital Ocean by downloading and re-uploading
+     */
+    private function duplicateDigitalOceanImage($imageUrl)
+    {
+        try {
+            // Download the image content
+            $imageContent = file_get_contents($imageUrl);
+            if ($imageContent === false) {
+                return null;
+            }
+            
+            // Get the original filename and extension
+            $originalFilename = basename(parse_url($imageUrl, PHP_URL_PATH));
+            $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+            
+            // Generate new unique filename
+            $newFilename = 'admin_template_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
+            
+            // Create a temporary file
+            $tempPath = sys_get_temp_dir() . '/' . $newFilename;
+            file_put_contents($tempPath, $imageContent);
+            
+            // Create UploadedFile object from the temporary file
+            $uploadedFile = new UploadedFile(
+                $tempPath,
+                $newFilename,
+                mime_content_type($tempPath),
+                null,
+                true // test parameter - set to true for temporary files
+            );
+            
+            $prefix = 'admin_template_' . rand(1000, 9999);
+            $newUrl = Helpers::uploadImage($prefix, $uploadedFile, 'images/admin-post-templates');
+            
+            // Clean up temporary file
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            
+            return $newUrl;
+            
+        } catch (\Exception $e) {
+            Log::error('Error duplicating Digital Ocean image: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Duplicate local image - existing logic
+     */
+    private function duplicateLocalImage($templateImage)
+    {
+        try {
+            // Check if the local file exists
+            $fullPath = public_path($templateImage);
+            if (!file_exists($fullPath)) {
+                return null;
+            }
+            
+            // Generate new unique filename
+            $extension = pathinfo($templateImage, PATHINFO_EXTENSION);
+            $newFilename = 'admin_template_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
+            $prefix = 'admin_template_' . rand(1000, 9999);
+            
+            $uploadNewFile = new UploadedFile($fullPath, $newFilename, null, null, true);
+            return Helpers::uploadImage($prefix, $uploadNewFile, 'images/admin-post-templates');
+            
+        } catch (\Exception $e) {
+            Log::error('Error duplicating local image: ' . $e->getMessage());
+            return null;
         }
     }
 }

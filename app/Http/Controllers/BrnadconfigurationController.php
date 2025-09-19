@@ -41,12 +41,10 @@ class BrnadconfigurationController extends Controller
                 return $data->email;
             })
             ->addColumn('created_date', function ($data) {
-                $date = Helpers::dateFormate($data->created_at);
-                return $date;
+                return '<span data-order="' . $data->created_at . '">' . Helpers::dateFormate($data->created_at) . '</span>';
             })
             ->addColumn('updated_date', function ($data) {
-                $date = Helpers::dateFormate($data->updated_at);
-                return $date;
+                return '<span data-order="' . $data->updated_at . '">' . Helpers::dateFormate($data->updated_at) . '</span>';
             })
             ->addColumn('action', function ($data) {
                 $id = Helpers::encrypt($data->id);
@@ -190,6 +188,13 @@ class BrnadconfigurationController extends Controller
             // delete logo with data
             Helpers::deleteImage($brandKit->logo);
             $brandKit->delete();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Delete Brandkit",
+                'description' => "Admin Panel: Delete Brandkit User : ".$brandKit->user->email,
+                'url' => route('brand-configuration.delete')
+            ]);
 
             return response()->json([
                 'success' => true,
