@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Dummay FCA Number')
+@section('title', 'Dummy FCA Number')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
