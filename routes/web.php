@@ -29,6 +29,7 @@ use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\DataBackupController;
+use App\Http\Controllers\YoutubeVideoController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -185,6 +186,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/email-settings/edit/{id?}', [EmailsContentController::class, 'createOrEdit'])->name('email-settings.create');
         Route::post('/email-settings/save', [EmailsContentController::class, 'saveEmailContent'])->name('email-settings.save');
         Route::post('/email-settings/delete', [EmailsContentController::class, 'deleteEmailContent'])->name('email-settings.delete');
+
+        /** YouTube Video Controller */
+        Route::match(['GET','POST'],'/youtube-video', [YoutubeVideoController::class, 'index'])->name('youtube-video');
+        Route::get('/youtube-video/link-edit/{id}', [YoutubeVideoController::class,'editYoutubeVideo'])->name('youtube-video.edit');
+        Route::post('/youtube-video/save', [YoutubeVideoController::class, 'saveYoutubeVideo'])->name('youtube-video.save');
+        Route::post('/youtube-video/delete', [YoutubeVideoController::class, 'deleteYoutubeVideo'])->name('youtube-video.delete');
+        Route::post('/post-template/account-status', [YoutubeVideoController::class, 'changeStatus'])->name('youtube-video.change-status');
         
     });
     
