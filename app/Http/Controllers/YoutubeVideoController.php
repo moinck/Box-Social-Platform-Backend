@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class YoutubeVideoController extends Controller
@@ -95,11 +96,19 @@ class YoutubeVideoController extends Controller
         DB::beginTransaction();
         try {
     
-            $request->validate([
+            $validator = Validator::make($request->all(),[
                 'title' => 'required|string|max:255',
                 'link' => 'required|string',
                 'video_link_status' => 'required|string|in:active,inactive',
             ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
             $video_link_id = Helpers::decrypt($request->video_link_id);
             $title = $request->title;
@@ -125,7 +134,10 @@ class YoutubeVideoController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            return redirect()->back()->with('error','Something went wrong.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.'
+            ]);
         }
     }
 
@@ -150,7 +162,7 @@ class YoutubeVideoController extends Controller
             ], 404);
 
         } catch (Exception $e) {
-            Log::error('Error fetching video link: ' . $e->getMessage());
+            Log::error($e);
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.'
