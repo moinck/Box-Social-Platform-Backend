@@ -76,8 +76,10 @@ class BrnadKitApiController extends Controller
 
         $brandKitObj = BrandKit::where('user_id', $decryptedUserId)->first();
 
+        $isUpdate = true;
         if (empty($brandKitObj)) {
             $brandKitObj = new BrandKit();
+            $isUpdate = false;
         }
 
         $uploadLogoUrl = $request->logo;
@@ -150,6 +152,14 @@ class BrnadKitApiController extends Controller
         if (!empty($SocialMediaObj)) {
             $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
         }
+
+        /** User Activity Log */
+        $message =  $isUpdate ? "brandkit updated" : "brandkit saved";
+        Helpers::activityLog([
+            'title' => "Brandkit",
+            'description' => "User ".$message." successfully. User: ".$brandKitObj->user->email,
+            'url' => "api/brandkit/store"
+        ]);
 
         return response()->json([
             'success' => true,

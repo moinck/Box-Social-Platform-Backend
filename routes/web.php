@@ -28,6 +28,7 @@ use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\DataBackupController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -36,7 +37,7 @@ Route::middleware('guest')->group(function () {
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
 });
-
+Route::get('/daily-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
 Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');
 
 Route::middleware('auth')->group(function () {
@@ -75,6 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/delete', [UserManagementController::class, 'destroy'])->name('user.delete');
     Route::post('/user/account-status', [UserManagementController::class, 'accountStatus'])->name('user.account-status');
     Route::post('/user/export', [UserManagementController::class, 'export'])->name('user.export');
+    Route::post('/user/account-verify', [UserManagementController::class, 'userAccountVerify'])->name('user.account-verify');
 
     //Deleted FCA Number
     Route::match(['GET','POST'],'/user/fca-numbers', [UserManagementController::class, 'fcaNumberList'])->name('user.fca-number.list');

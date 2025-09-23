@@ -256,6 +256,7 @@
                         data: function (d) {
                             d.is_brandkit = $('#brandkit_filter').val();
                             d.account_status = $('#account_status_filter').val();
+                            d.is_admin_verified = $('#admin_verified_filter').val();
                         },
                         beforeSend: function () {
                             showBSPLoader();
@@ -272,14 +273,15 @@
                         // Create a row to hold the two select filters
                         targetDiv.append(`
                             <div class="row">
-                                <div class="col-md-6" id="brandkit-filter-container"></div>
-                                <div class="col-md-6" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="brandkit-filter-container"></div>
+                                <div class="col-md-4" id="account-status-filter-container"></div>
+                                <div class="col-md-4" id="admin-verified-filter-container"></div>
                             </div>`);
 
                         // Append brandkit filter
                         $('#brandkit-filter-container').append(`
                             <select class="form-select input-sm" id="brandkit_filter">
-                                <option value="">User Brand Configuration</option>
+                                <option value="">Brand Configuration</option>
                                 <option value="1">Configured</option>
                                 <option value="2">Not Configured</option>
                             </select>
@@ -301,6 +303,20 @@
 
                         // Filter results on account status select change
                         $('#account_status_filter').on('change', function() {
+                            UserTable.draw();
+                        });
+
+                        // Append admin verified user filter
+                        $('#admin-verified-filter-container').append(`
+                            <select class="form-select input-sm" id="admin_verified_filter">
+                                <option value="">Verification Status</option>
+                                <option value="1">Verified</option>
+                                <option value="0">Not Verified</option>
+                            </select>
+                        `);
+
+                        // Filter results on account status select change
+                        $('#admin_verified_filter').on('change', function() {
                             UserTable.draw();
                         });
                     },
@@ -452,10 +468,10 @@
                             notEmpty: {
                                 message: 'Please enter your first name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]+$/,
-                                message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]+$/,
+                            //     message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 min: 2,
                                 max: 50,
@@ -468,10 +484,10 @@
                             notEmpty: {
                                 message: 'Please enter your last name'
                             },
-                            regexp: {
-                                regexp: /^[a-zA-Z\s'-]*$/,
-                                message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
-                            },
+                            // regexp: {
+                            //     regexp: /^[a-zA-Z\s'-]*$/,
+                            //     message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
+                            // },
                             stringLength: {
                                 max: 50,
                                 message: 'Last name must be less than 50 characters'
@@ -627,7 +643,16 @@
                     error: function(xhr) {
                         hideBSPLoader();
                         console.log(xhr.responseText);
-                        showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorMessages = '';
+                            for (let key in errors) {
+                                errorMessages += errors[key].join(' ') + ' ';
+                            }
+                            showSweetAlert('error', 'Validation Error!', errorMessages);
+                        } else {
+                            showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        }
                     }
                 });
             });
@@ -738,6 +763,60 @@
                 xhr.send(exportFormData);
             }
             // ----------------------------------------------------------
+
+            // Admin Verified User
+            $(document).on('click','.admin-verify-btn', function () {
+                
+                var userId = $(this).data('user-id');
+                var userName = $(this).data('user-name');
+                var table = $('#user-data-table').DataTable();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want verify " + userName + " account!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, verify!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('user.account-verify') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                user_id: userId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Verified!', 'User has been verified.');
+                                    // UserDataTable();
+                                    reloadDataTablePreservingPage(table);
+                                } else {
+                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+                
+
+            });
         });
     </script>
 @endsection

@@ -10,6 +10,7 @@ use App\Models\FcaNumbers;
 use App\Models\ImageStockManagement;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\UserActivityLog;
 use App\Models\UserDownloads;
 use App\Models\UserSubscription;
 use App\Models\UserTemplates;
@@ -19,6 +20,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -1221,6 +1223,8 @@ class Helpers
             'welcome_beta_trial' => "Welcome to Your Box Socials Beta Trial 🎉",
             'user_register_acount_in_review' => "Welcome Email -  ACCOUNT IN REVIEW",
             'user_register_acount_reviewed' => "Welcome Email -  ACCOUNT REVIEWED",
+            'user_email_update' => "User Email Update",
+            'new_account_pending_admin_approval' => "New Account Pending Admin Approval",
         ];
     }
 
@@ -1238,5 +1242,33 @@ class Helpers
             '<' => '',
             '>' => ''
         ];
+    }
+
+    /** User Activity Log */
+    public static function activityLog($activityLogData,$userId=null){
+        $userName = "";
+        if(Auth::check() && $userId == null){
+            $userId = Auth::user()->id;
+            $userName =  Auth::user()->first_name." ".Auth::user()->last_name;
+        }
+        $activityLog = new UserActivityLog();
+        $activityLog->user_id = $userId;
+        $user =
+        [
+            'userName' => $userName,
+            'userAgent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
+            'userIP' => isset($_SERVER['HTTP_USER_AGENT'])? $_SERVER['REMOTE_ADDR'] : '',
+        ];
+        $activity =
+        [
+            'title' => $activityLogData['title'],
+            'description' => $activityLogData['description'],
+            'date_time' => Carbon::now()->format('d-m-Y | h:i A'),
+            'url' => $activityLogData['url'],
+            'description_text' => strip_tags($activityLogData['description']),
+        ];
+        $activityLog->info = json_encode(['user'     => $user, 'activity' => $activity], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $activityLog->save();
+        return true;
     }
 }

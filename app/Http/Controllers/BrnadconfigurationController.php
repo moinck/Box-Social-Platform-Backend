@@ -189,6 +189,13 @@ class BrnadconfigurationController extends Controller
             Helpers::deleteImage($brandKit->logo);
             $brandKit->delete();
 
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Delete Brandkit",
+                'description' => "Admin Panel: Delete Brandkit User : ".$brandKit->user->email,
+                'url' => route('brand-configuration.delete')
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Brand Kit deleted successfully'

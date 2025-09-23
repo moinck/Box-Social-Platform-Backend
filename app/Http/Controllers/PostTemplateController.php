@@ -56,7 +56,8 @@ class PostTemplateController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postTemplates = PostTemplate::with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
+        $postTemplates = PostTemplate::whereHas('category')
+            ->with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
             ->when($request->has('category') && $request->category != '', function ($query) use ($request) {
                 $query->where('category_id', $request->category);
             })
@@ -78,7 +79,7 @@ class PostTemplateController extends Controller
                 'status',
                 'created_at',
             ])
-            ->latest();
+            ->latest()->get();
 
         return DataTables::of($postTemplates)
             ->addIndexColumn()
@@ -159,6 +160,14 @@ class PostTemplateController extends Controller
         $postTemplates = PostTemplate::select('id','template_image')->whereIn('id',$decryptedIds)->get();
         if ($postTemplates->isNotEmpty()) {
             foreach ($postTemplates as $key => $value) {
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "Delete Post Template",
+                    'description' => "Admin Panel: Post Template is ".$value->template_name.". Post Template Content: ".(isset($value->postContent) ? $value->postContent->title : '-').". Post Template Category: ".(isset($value->category) ? $value->category->name : '-').". Post Template Sub-Category: ".(isset($value->subCategory) ? $value->subCategory->name : '-'),
+                    'url' => route('post-content.delete')
+                ]);
+
                 // delete post-template image
                 Helpers::deleteImage($value->template_image);
                 $value->delete();
@@ -237,6 +246,13 @@ class PostTemplateController extends Controller
                 $newPostTemplate = $postTemplate->replicate();
                 $newPostTemplate->template_image = $newUrl;
                 $newPostTemplate->save();
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "Duplicate Post Template",
+                    'description' => "Admin Panel: Post Template is ".$postTemplate->template_name.". Post Template Content: ".(isset($postTemplate->postContent) ? $postTemplate->postContent->title : '-').". Post Template Category: ".(isset($postTemplate->category) ? $postTemplate->category->name : '-').". Post Template Sub-Category: ".(isset($postTemplate->subCategory) ? $postTemplate->subCategory->name : '-'),
+                    'url' => route('post-template.create-duplicate')
+                ]);
                 
                 return response()->json([
                     'success' => true,

@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::post('/fca-check', [RegisterController::class, 'checkFca']);
+Route::post('/check-email-domain', [RegisterController::class, 'checkEmailDomain']);
 
 // Email verification routes
 Route::post('/email/verify', [AuthApiController::class, 'verify'])

@@ -71,12 +71,19 @@ class PostContentController extends Controller
             'warning_message' => 'nullable',
         ]);
 
-        PostContent::create([
+        $postContent = PostContent::create([
             'title' => $request->post_title,
             'category_id' => $request->post_category,
             'sub_category_id' => $request->post_sub_category,
             'description' => $request->post_description,
             'warning_message' => $request->warning_message,
+        ]);
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Create Post Content",
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'url' => route('post-content.store')
         ]);
 
         return redirect()->route('post-content')->with('success', 'Post Content Created Successfully');
@@ -113,6 +120,15 @@ class PostContentController extends Controller
             'warning_message' => $request->warning_message,
         ]);
 
+        $postContent = PostContent::find($request->post_id);
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Update Post Content",
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'url' => route('post-content.update')
+        ]);
+
         return redirect()->route('post-content')->with('success', 'Post Content Updated Successfully');
     }
 
@@ -125,7 +141,7 @@ class PostContentController extends Controller
             ->when($request->sub_category_id && $request->sub_category_id != 0, function ($query) use ($request) {
                 $query->where('sub_category_id', $request->sub_category_id);
             })
-            ->latest();
+            ->latest()->get();
 
         return DataTables::of($postContents)
             ->addIndexColumn()
@@ -171,6 +187,14 @@ class PostContentController extends Controller
     {
         $postId = Helpers::decrypt($request->post_id);
         $postContent = PostContent::find($postId);
+
+        /** Activity Log */
+        Helpers::activityLog([
+            'title' => "Delete Post Content",
+            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'url' => route('post-content.delete')
+        ]);
+
         $postContent->delete();
 
         return response()->json([

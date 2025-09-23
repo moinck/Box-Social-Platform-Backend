@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Exports\UsersExport;
 use App\Helpers\Helpers;
+use App\Models\EmailContent;
 use App\Models\FcaNumbers;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -27,21 +29,24 @@ class UserManagementController extends Controller
     public function userDataTable(Request $request)
     {
         $users = User::where('role', 'customer')
-            ->when($request->is_brandkit, function ($query) use ($request) {
+            ->when($request->filled('is_brandkit'), function ($query) use ($request) {
                 if ($request->is_brandkit == 1) {
                     $query->whereHas('brandKit');
                 } else if($request->is_brandkit == 2) {
                     $query->whereDoesntHave('brandKit');
                 }
             })
-            ->when($request->account_status && $request->account_status != null, function ($query) use ($request) {
+            ->when($request->filled('account_status'), function ($query) use ($request) {
                 if ($request->account_status == 1) {
                     $query->where('status', '=', 'active');
                 } elseif ($request->account_status == 2) {
                     $query->where('status', '=', 'inactive');
                 }
             })
-            ->latest();
+            ->when($request->filled('is_admin_verified'), function ($query) use ($request) {
+                $query->where('is_admin_verified','=', $request->is_admin_verified);
+            })
+            ->latest()->get();
 
         return DataTables::of($users)
             ->addIndexColumn()
@@ -89,12 +94,18 @@ class UserManagementController extends Controller
                 return $user->appointed_network ? $user->appointed_network : "-";
             })
             ->addColumn('company_type', function ($user) {
-                return $user->company_type == 1 ? "Solo Trader" : ($user->company_type == 2 ? "Limited Company" : '-');
+                return $user->company_type == 1 ? "Sole Trader" : ($user->company_type == 2 ? "Limited Company" : '-');
             })
             ->addColumn('action', function ($user) {
                 $userId = Helpers::encrypt($user->id);
                 $name = $user->first_name . ' ' . $user->last_name;
-                return '
+
+                $button = "";
+                if ($user->is_admin_verified == false) {
+                    $button = '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon admin-verify-btn" data-bs-toggle="tooltip" title="Need to Verify" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-verified-badge-fill"></i></a>';
+                }
+
+                return $button.'
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit User" data-user-id="' . $userId . '"><i class="ri-edit-box-line"></i></a>
                     <a href="javascript:;" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-user-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete User" data-user-name="' . $name . '" data-user-id="' . $userId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
@@ -136,22 +147,65 @@ class UserManagementController extends Controller
     {
         $userId = Helpers::decrypt($request->edit_user_id);
 
-        $request->validate([
-            'edit_first_name' => 'required|string|max:255',
-            'edit_last_name' => 'required|string|max:255',
-            'edit_company_name' => 'required|string|max:255',
-            'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
-            'user_fca_number' => 'required|string|max:255',
-            'user_account_status' => 'string|in:active,inactive',
-            'company_type' => 'required',
-            'appointed_network' => 'required_if:appointed_representative,1|required_if:appointed_representative,2',
-            'appointed_representative' => 'required_without:direct_authorised',
-            'direct_authorised' => 'required_without:appointed_representative',
-        ]);
+            $request->validate([
+                'edit_first_name' => 'required|string|max:255',
+                'edit_last_name' => 'required|string|max:255',
+                'edit_company_name' => 'required|string|max:255',
+                'edit_user_email' => 'required|email|max:255|unique:users,email,' . $userId,
+                'user_fca_number' => 'required|string|max:255',
+                'user_account_status' => 'string|in:active,inactive',
+                'company_type' => 'required',
+                'appointed_network' => 'required_if:appointed_representative,1|required_if:appointed_representative,2',
+                'appointed_representative' => 'required_without:direct_authorised',
+                'direct_authorised' => 'required_without:appointed_representative',
+            ],[
+                // Custom messages for edit_first_name
+                'edit_first_name.required' => 'Please enter the first name.',
+                'edit_first_name.string' => 'The first name must be a valid string.',
+                'edit_first_name.max' => 'The first name cannot exceed 255 characters.',
+
+                // Custom messages for edit_last_name
+                'edit_last_name.required' => 'Please enter the last name.',
+                'edit_last_name.string' => 'The last name must be a valid string.',
+                'edit_last_name.max' => 'The last name cannot exceed 255 characters.',
+
+                // Custom messages for edit_company_name
+                'edit_company_name.required' => 'Please enter the company name.',
+                'edit_company_name.string' => 'The company name must be a valid string.',
+                'edit_company_name.max' => 'The company name cannot exceed 255 characters.',
+
+                // Custom messages for edit_user_email
+                'edit_user_email.required' => 'Please enter an email address.',
+                'edit_user_email.email' => 'Please enter a valid email address.',
+                'edit_user_email.max' => 'The email address cannot exceed 255 characters.',
+                'edit_user_email.unique' => 'This email address is already in use by another account.',
+
+                // Custom messages for user_fca_number
+                'user_fca_number.required' => 'Please enter the FCA number.',
+                'user_fca_number.string' => 'The FCA number must be a valid string.',
+                'user_fca_number.max' => 'The FCA number cannot exceed 255 characters.',
+
+                // Custom messages for user_account_status
+                'user_account_status.string' => 'Account status must be a valid string.',
+                'user_account_status.in' => 'Account status must be either active or inactive.',
+
+                // Custom messages for company_type
+                'company_type.required' => 'Please select a company type.',
+
+                // Custom messages for appointed_network
+                'appointed_network.required_if' => 'Appointed network is required when appointed representative is selected.',
+
+                // Custom messages for appointed_representative
+                'appointed_representative.required_without' => 'Either appointed representative or directly authorised must be provided.',
+
+                // Custom messages for direct_authorised
+                'direct_authorised.required_without' => 'Either directly authorised or appointed representative must be provided.',
+            ]);
 
         $user = User::find($userId);
         if ($user) {
 
+            $old_email = $user->email;
             $authorisation_type = isset($request->direct_authorised) ? $request->direct_authorised : (isset($request->appointed_representative) ? $request->appointed_representative : 0);
 
             $user->first_name = $request->edit_first_name;
@@ -165,6 +219,32 @@ class UserManagementController extends Controller
             $user->company_type = $request->company_type;
 
             if ($user->save()) {
+
+                if ($user->email != $old_email) {
+                    $email_setting = EmailContent::where('slug','user_email_update')->first();
+                    if ($email_setting) {
+        
+                        $format_content = $email_setting->content;
+                        $format_content = str_replace('|user_name|', "<b>".$user->first_name."</b>", $format_content);
+                        $format_content = str_replace('|new_email|', "<b>".$user->email."</b>", $format_content);
+                        $format_content = str_replace('|old_email|', "<b>".$old_email."</b>", $format_content);
+        
+                        $data = [
+                            'email' => $user->email,
+                            'subject' => $email_setting->subject,
+                            'content' => $format_content
+                        ];
+                        Helpers::sendDynamicContentEmail($data);
+                    }
+                }
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "User Details Update",
+                    'description' => "Admin Panel: User details update. User: ". $user->email,
+                    'url' => route('user.update')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User updated successfully.'
@@ -195,6 +275,14 @@ class UserManagementController extends Controller
         if ($user) {
             $user->status = $user->status == 'active' ? 'inactive' : 'active';
             $user->save();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "Change User Status",
+                'description' => "Admin Panel: Change User status. User: ". $user->email.". Changed Status: ".$user->status,
+                'url' => route('user.account-status')
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Account status updated successfully.'
@@ -272,6 +360,14 @@ class UserManagementController extends Controller
         if ($user) {
             $deleteUser = Helpers::deleteUserData($userId);
             if ($deleteUser === true) {
+
+                /** Activity Log */
+                Helpers::activityLog([
+                    'title' => "User Delete",
+                    'description' => "Admin Panel: Delete user. User: ". $user->email,
+                    'url' => route('user.delete')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User deleted successfully.'
@@ -286,6 +382,74 @@ class UserManagementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User not found.'
+            ]);
+        }
+    }
+
+    /** User Account Verify By Admin */
+    public function userAccountVerify(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $userId = $request->user_id;
+
+            $user = User::find(Helpers::decrypt($userId));
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data not found.'
+                ]);
+            }
+
+            $user->is_admin_verified = true;
+            $user->save();
+
+            if ($user->is_admin_verified == true) {
+                $email_setting = EmailContent::where('slug','user_register_acount_reviewed')->first();
+                if ($email_setting) {
+                    $websiteLink = "<b><a href='https://www.boxsocials.com'>www.boxsocials.com</a></b>";
+                    $youtubeLink = "<b><a href='https://www.youtube.com/@BoxSocialsUK'><i>@‌BoxSocialsUK</i></a></b>";
+                    $plateFormLink = "<b><a href='https://boxsocials.com/faqs'><i>Box Socials platform</i></a></b>";
+    
+                    $format_content = $email_setting->content;
+                    $format_content = str_replace('|first_name|', "<b>".$user->first_name."</b>", $format_content);
+                    $format_content = str_replace('|website_link|', $websiteLink, $format_content);
+                    $format_content = str_replace('|youtube_link|', $youtubeLink, $format_content);
+                    $format_content = str_replace('|platform_link|', $plateFormLink, $format_content);
+    
+                    $data = [
+                        'email' => $user->email,
+                        'subject' => $email_setting->subject,
+                        'content' => $format_content
+                    ];
+                    Helpers::sendDynamicContentEmail($data);
+                }
+            }
+            
+            $token = Helpers::generateVarificationToken($user, $request, 'email-verification');
+            Helpers::sendVerificationMail($user, $token);
+
+            DB::commit();
+
+            /** Activity Log */
+            Helpers::activityLog([
+                'title' => "User Account Verified",
+                'description' => "Admin Panel: User account verified. User: ". $user->email,
+                'url' => route('user.account-verify')
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verified successfully.'
+            ]);
+
+        } catch (Exception $e){
+            DB::rollBack();
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Somthing went wrong.'
             ]);
         }
     }

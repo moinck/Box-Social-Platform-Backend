@@ -493,13 +493,18 @@ class TemplateApiController extends Controller
             $categoryIds = $categories->pluck('id')->all();
 
             // Fetch templates once with necessary filters
-            $postTemplatesQuery = PostTemplate::with('category:id,name')
-                ->where('status', 1)
-                ->whereIn('category_id', $categoryIds);
+            
 
             if (!empty($decryptedTemplateIds)) {
+                $postTemplatesQuery = PostTemplate::with('category:id,name')
+                ->where('status', 1)
+                ->whereIn('category_id', $categoryIds);
+                
                 $postTemplatesQuery->whereIn('id', $decryptedTemplateIds);
             } else {
+                                $postTemplatesQuery = PostTemplate::select('id','category_id','sub_category_id','design_style_id','post_content_id','template_image','template_name')->with('category:id,name')
+                ->where('status', 1)
+                ->whereIn('category_id', $categoryIds);
 
                 if (!empty($decryptedSubCategoryIds)) {
                     $postTemplatesQuery->where(function ($query) use ($decryptedSubCategoryIds) {
