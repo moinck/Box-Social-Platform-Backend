@@ -351,18 +351,21 @@ class UserTemplatesApiController extends Controller
                 
                 // Log::info('Template data type: ' . gettype($templateDataString));
 
+                $templateJsonUrl = null;
+                if ($templateData['template_data']) {
+                    $prefix = 'template_json_' . rand(1000, 9999) . '_' . time();
+                    $templateJsonUrl = Helpers::uploadImage($prefix, $templateData['template_data'], 'json/template-data');   
+                }
+
                 $userTemplate = UserTemplates::create([
                     'user_id' => $user->id,
                     'template_id' => $decyptedId,
                     'category_id' => $categoryId,
                     'template_name' => $templateData['template_name'],
                     'template_image' => $imageUrl ?? null,
-                    'template_data' => null
+                    'template_data' => null,
+                    'template_url' => $templateJsonUrl
                 ]);
-
-                if ($templateData['template_data']) {
-                    ProcessJsonFileUpload::dispatch($userTemplate->id,$templateData['template_data']->getRealPath(),$templateData['template_data']->getClientOriginalExtension(),2);
-                }
 
                 $templateName[] = $templateData['template_name'];
 
@@ -381,6 +384,7 @@ class UserTemplatesApiController extends Controller
                     'id' => Helpers::encrypt($userTemplate->id),
                     'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
                     'post_content_data' => $postContentArray,
+                    'template_json_url' => $templateJsonUrl
                 ];
                 DB::commit();
             } catch (Exception $e) {
@@ -498,6 +502,100 @@ class UserTemplatesApiController extends Controller
         return $this->success($returnData, 'User template updated successfully');
     }
 
+    /** Update New API */
+    public function templateUpdateNew(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'template_id' => 'required',
+            'template_name' => 'required|string',
+            'template_image' => 'required',
+            'template_data' => 'required',
+            "send_mail" => 'nullable|string',
+        ], [
+            'template_image.regex' => 'Invalid image format',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError('Validation failed', $validator->errors());
+        }
+
+        $decyptedId = Helpers::decrypt($request->template_id);
+
+
+        $userTemplate = UserTemplates::with('template.postContent')->find($decyptedId);
+
+        if (!$userTemplate) {
+            return $this->error('User template not found', 404);
+        }
+        $oldTemplateImage = $userTemplate->template_image;
+        $oldTemplateJsonUrl = $userTemplate->template_url;
+
+        // upload image
+        // $imageUrl = null;
+        // if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+        //     $imageUrl = Helpers::handleBase64Image($request->template_image, 'user_template', 'images/user-template-images');
+
+        //     if ($oldTemplateImage && $oldTemplateImage != null) {
+        //         Helpers::deleteImage($oldTemplateImage);
+        //     }
+        // }
+
+
+        $imageUrl = $oldTemplateImage;
+        if ($request->has('template_image')) {
+            $prefix = 'user_template_' . rand(1000, 9999);
+            $imageUrl = Helpers::uploadImage($prefix, $request->template_image, 'images/user-template-images');
+
+            if ($oldTemplateImage && $oldTemplateImage != null && $imageUrl) {
+                Helpers::deleteImage($oldTemplateImage);
+            }
+        }
+
+        $templateJsonUrl = $oldTemplateJsonUrl;
+        if ($request->has('template_data')) {
+            $prefix = 'template_json_' . rand(1000, 9999) . '_' . time();
+            $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/template-data');   
+
+            if ($oldTemplateJsonUrl && $oldTemplateJsonUrl != null && $templateJsonUrl) {
+                Helpers::deleteImage($oldTemplateJsonUrl);
+            }
+        }
+
+        $userTemplate->template_name = $request->template_name;
+        $userTemplate->template_image = $imageUrl ?? null;
+        // $userTemplate->template_data = $request->template_data;
+        $userTemplate->template_url = $templateJsonUrl;
+        $userTemplate->save();
+
+        // send mail
+        if ($request->send_mail && $request->send_mail == "1") {
+            $this->sendTemplateMail($userTemplate, 'update');
+        }
+
+        $postContentData = $userTemplate->template->postContent ?? null;
+        $postContentArray = [
+            'title' => $postContentData->title ?? null,
+            'description' => $postContentData->description ?? null,
+        ];
+
+        $returnData = [
+            'id' => Helpers::encrypt($userTemplate->id),
+            'template_url' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+            'post_content_data' => $postContentArray,
+            'template_json_url' => $templateJsonUrl
+        ];
+
+        $user = User::select('id','email')->where('id', $userTemplate->user_id)->first();
+        /** User Activity Log */
+        Helpers::activityLog([
+            'title' => "User Template",
+            'description' => "User template update successfully. Template Name: ".$userTemplate->template_name.". User: ".$user->email,
+            'url' => "api/user-template/update"
+        ]);
+
+        return $this->success($returnData, 'User template updated successfully');
+    }
+
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -517,6 +615,10 @@ class UserTemplatesApiController extends Controller
 
         if ($userTemplate->template_image && $userTemplate->template_image != null) {
             Helpers::deleteImage($userTemplate->template_image);
+        }
+
+        if ($userTemplate->template_url && $userTemplate->template_url != null) {
+            Helpers::deleteImage($userTemplate->template_url);
         }
 
         $userTemplate->delete();

@@ -101,6 +101,7 @@ Route::group([
         Route::post('/user-template/multiple/store', [UserTemplatesApiController::class, 'MultiStore']);
         Route::post('/user-template/multiple/new-store', [UserTemplatesApiController::class, 'multiStoreNew']);
         Route::post('/user-template/update', [UserTemplatesApiController::class, 'update']);
+        Route::post('/user-template/new-update', [UserTemplatesApiController::class, 'templateUpdateNew']);
         Route::post('/user-template/delete', [UserTemplatesApiController::class, 'delete']);
         Route::post('/user-template/download/document', [UserTemplateDownloadController::class, 'downloadDocument']);
 
@@ -160,6 +161,10 @@ Route::group([
     Route::post('/template/store', [TemplateApiController::class, 'store']);
     Route::get('/admin-template/get/{id}', [TemplateApiController::class, 'getTemplate']);
     Route::post('/template/update', [TemplateApiController::class, 'update']);
+
+    /** Admin Create & Update Template New API */
+    Route::post('/template/new-store', [TemplateApiController::class, 'newStoreTemplate']);
+    Route::post('/template/new-update', [TemplateApiController::class, 'newUpdateTemplate']);
     
     // post content api
     Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);
