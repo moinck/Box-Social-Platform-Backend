@@ -6,6 +6,7 @@ use App\Events\NewNotificationEvent;
 use App\Mail\DynamicContentMail;
 use App\Mail\RegisterVerificationMail;
 use App\Models\BrandKit;
+use App\Models\DummyFcaNumber;
 use App\Models\FcaNumbers;
 use App\Models\ImageStockManagement;
 use App\Models\Notification;
@@ -1113,6 +1114,12 @@ class Helpers
             ], [
                 'fca_name' => $user->company_name,
             ]);
+
+            $dummyFcaNumber = DummyFcaNumber::where('fca_number',$user->fca_number)->first();
+            if ($dummyFcaNumber) {
+                FcaNumbers::where('fca_number',$user->fca_number)->delete();
+                $dummyFcaNumber->delete();
+            }
     
             // stock image delete
             // $user->imageStockManagement()->delete();

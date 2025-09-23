@@ -29,6 +29,7 @@ use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Controllers\VideoStockController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\DataBackupController;
+use App\Http\Controllers\DummyFcaNumberController;
 use App\Http\Controllers\FaqCalendarImageController;
 use App\Http\Controllers\YoutubeVideoController;
 
@@ -187,6 +188,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/email-settings/edit/{id?}', [EmailsContentController::class, 'createOrEdit'])->name('email-settings.create');
         Route::post('/email-settings/save', [EmailsContentController::class, 'saveEmailContent'])->name('email-settings.save');
         Route::post('/email-settings/delete', [EmailsContentController::class, 'deleteEmailContent'])->name('email-settings.delete');
+
+        /** Dummy FCA Number controller */
+        Route::match(['GET','POST'],'/dummy-fca-number', [DummyFcaNumberController::class, 'index'])->name('dummy-fca-number');
+        Route::post('/dummy-fca-number/store', [DummyFcaNumberController::class, 'store'])->name('dummy-fca-number.store');
+        Route::get('/dummy-fca-number/edit/{id}', [DummyFcaNumberController::class, 'edit'])->name('dummy-fca-number.edit');
+        Route::post('/dummy-fca-number/update', [DummyFcaNumberController::class, 'update'])->name('dummy-fca-number.update');
+        Route::post('/dummy-fca-number/delete', [DummyFcaNumberController::class, 'destroy'])->name('dummy-fca-number.delete');
 
         /** YouTube Video Controller */
         Route::match(['GET','POST'],'/youtube-video', [YoutubeVideoController::class, 'index'])->name('youtube-video');
