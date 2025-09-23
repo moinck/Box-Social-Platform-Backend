@@ -355,9 +355,11 @@
                             },
                             success: function(response) {
                                 if (response.success == true) {
+                                    FaqCalendarDataTable();
                                     showSweetAlert('success', 'Deleted!', 'Calendar record has been deleted.');
                                 } else {
-                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                    FaqCalendarDataTable();
+                                    showSweetAlert('error', 'Message!', 'Something went wrong.');
                                 }
                             },
                             error: function(xhr, status, error) {

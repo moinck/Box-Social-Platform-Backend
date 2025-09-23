@@ -182,8 +182,7 @@ class FaqCalendarImageController extends Controller
                 DB::commit();
                 return response()->json([
                     'success' => true,
-                    'message' => 'Record deleted successfully.',
-                    'data' => $calendarRec
+                    'message' => 'Record deleted successfully.'
                 ]);
             } else {
                 return response()->json([
