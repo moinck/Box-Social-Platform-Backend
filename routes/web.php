@@ -81,6 +81,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/export', [UserManagementController::class, 'export'])->name('user.export');
     Route::post('/user/account-verify', [UserManagementController::class, 'userAccountVerify'])->name('user.account-verify');
 
+    //Deleted FCA Number
+    Route::match(['GET','POST'],'/user/fca-numbers', [UserManagementController::class, 'fcaNumberList'])->name('user.fca-number.list');
+    Route::post('/fca-number/delete', [UserManagementController::class, 'fcaNumberDelete'])->name('user.fca-number.delete');
+
     // Profile Management Controller
     Route::get('/profile-management', [ProfileManagementController::class, 'index'])->name('profile-management');
     Route::post('/profile-management/update', [ProfileManagementController::class, 'update'])->name('profile-management.update');

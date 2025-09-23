@@ -1113,6 +1113,7 @@ class Helpers
                 'fca_number' => $user->fca_number,
             ], [
                 'fca_name' => $user->company_name,
+                'account_deleted_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
 
             $dummyFcaNumber = DummyFcaNumber::where('fca_number',$user->fca_number)->first();
