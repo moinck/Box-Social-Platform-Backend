@@ -47,6 +47,7 @@
                         <th>Company Name</th>
                         <th>Account Created Date/Time</th>
                         <th>Account Deleted Date/Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
             </table>
@@ -98,6 +99,7 @@
                         { data: 'fca_name', name: 'fca_name'},
                         { data: 'created_date', name: 'created_date'},
                         { data: 'account_deleted_at', name: 'account_deleted_at'},
+                        { data: 'action', name: 'action', searchable: false, orderable: false},
                     ],
                     language: {
                         paginate: {
@@ -111,6 +113,53 @@
                 });
             }
             // -------------------------------------------
+
+            $(document).on('click', '.delete-content-btn', function() {
+                var fcaNumberId = $(this).data('fca_number-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3',
+                        cancelButton: 'btn btn-outline-secondary'
+                    },
+                    buttonsStyling: false
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: "{{ route('user.fca-number.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                id: fcaNumberId
+                            },
+                            beforeSend: function () {
+                                showBSPLoader();
+                            },
+                            complete: function () {
+                                hideBSPLoader();
+                            },
+                            success: function(response) {
+                                if (response.success == true) {
+                                    showSweetAlert('success', 'Deleted!', response.message);
+                                    FCANumberDataTable();
+                                } else {
+                                    showSweetAlert('error', 'Message!', response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                hideBSPLoader();
+                                console.log(xhr.responseText);
+                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                            }
+                        });
+                    }
+                });
+            });
+
         });
     </script>
 @endsection

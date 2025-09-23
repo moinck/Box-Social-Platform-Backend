@@ -477,7 +477,14 @@ class UserManagementController extends Controller
                     )->addColumn('account_deleted_at', function ($fcaNumbers) {
                         return $fcaNumbers->account_deleted_at != null ? '<span data-order="' . $fcaNumbers->account_deleted_at . '">' . Helpers::dateFormate($fcaNumbers->account_deleted_at) . '</span>' : '-';
                     })
-                    ->rawColumns(['fca_number', 'fca_name','created_date','account_deleted_at'])
+                    ->addColumn('action', function ($fcaNumbers) {
+                        $FcaNumberId = Helpers::encrypt($fcaNumbers->id);
+                        return '
+                            <a href="javascript:;" title="Delete FCA Number" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-content-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" data-fca_number-id="' . $FcaNumberId . '"><i class="ri-delete-bin-line"></i></a>
+                        ';
+                    })
+                    ->rawColumns(['fca_number', 'fca_name','created_date','account_deleted_at','action'])
                     ->make(true);
 
             }
@@ -487,6 +494,37 @@ class UserManagementController extends Controller
         } catch (Exception $e) {
             Log::error($e);
             return redirect()->back()->with('error', 'Something went wrong.');
+        }
+    }
+
+    /** Delete FCA number */
+    public function fcaNumberDelete(Request $request)
+    {
+        try {
+
+            $id = Helpers::decrypt($request->id);
+            $fcaNumber = FcaNumbers::find($id);
+
+            if ($fcaNumber) {
+                $fcaNumber->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Fca number deleted successfully."
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => "Data not found."
+            ]);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.'
+            ]);
         }
     }
 }
