@@ -90,6 +90,13 @@
             "icon": "menu-icon tf-icons ri-newspaper-line",
             "slug": "terms-and-condition",
             "role": ["admin"]
+        },
+        {
+            "url": "/youtube-video",
+            "name": "YouTube Video Links",
+            "icon": "menu-icon tf-icons ri-youtube-fill",
+            "slug": "youtube-video",
+            "role": ["admin"]
         }
     ]
 }

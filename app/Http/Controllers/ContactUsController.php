@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Mail\ContactUsMail;
 use App\Models\ContactUs;
 use App\Models\User;
+use App\Models\YoutubeVideoLink;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -107,5 +108,20 @@ class ContactUsController extends Controller
         $contactUs = ContactUs::whereIn('id', $request->contact_us_ids)->delete();
 
         return $this->success([], 'Feedback deleted successfully');
+    }
+
+    /** List of youtube video */
+    public function youtubeVideoLinks(Request $request)
+    {
+        $videoLinks = YoutubeVideoLink::where('is_active',1)->get();
+
+        $response = $videoLinks->map(function ($videoLink) {
+            return [
+                'title' => $videoLink->title,
+                'link'  => $videoLink->link,
+            ];
+        })->toArray();
+
+        return $this->success($response, 'Active video links fetched successfully.');
     }
 }

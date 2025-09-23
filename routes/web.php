@@ -30,6 +30,8 @@ use App\Http\Controllers\VideoStockController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\DataBackupController;
 use App\Http\Controllers\DummyFcaNumberController;
+use App\Http\Controllers\FaqCalendarImageController;
+use App\Http\Controllers\YoutubeVideoController;
 
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
@@ -193,6 +195,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/dummy-fca-number/edit/{id}', [DummyFcaNumberController::class, 'edit'])->name('dummy-fca-number.edit');
         Route::post('/dummy-fca-number/update', [DummyFcaNumberController::class, 'update'])->name('dummy-fca-number.update');
         Route::post('/dummy-fca-number/delete', [DummyFcaNumberController::class, 'destroy'])->name('dummy-fca-number.delete');
+
+        /** YouTube Video Controller */
+        Route::match(['GET','POST'],'/youtube-video', [YoutubeVideoController::class, 'index'])->name('youtube-video');
+        Route::get('/youtube-video/link-edit/{id}', [YoutubeVideoController::class,'editYoutubeVideo'])->name('youtube-video.edit');
+        Route::post('/youtube-video/save', [YoutubeVideoController::class, 'saveYoutubeVideo'])->name('youtube-video.save');
+        Route::post('/youtube-video/delete', [YoutubeVideoController::class, 'deleteYoutubeVideo'])->name('youtube-video.delete');
+        Route::post('/post-template/account-status', [YoutubeVideoController::class, 'changeStatus'])->name('youtube-video.change-status');
+
+        /** FAQ Calendar Images Controller */
+        Route::match(['GET','POST'],'/faq-calendar', [FaqCalendarImageController::class, 'index'])->name('faq-calendar');
+        Route::get('/faq-calendar/edit/{id}', [FaqCalendarImageController::class,'editFaqCalendar'])->name('faq-calendar.edit');
+        Route::post('/faq-calendar/save', [FaqCalendarImageController::class, 'saveFaqCalendar'])->name('faq-calendar.save');
+        Route::post('/faq-calendar/delete', [FaqCalendarImageController::class, 'deleteFaqCalendar'])->name('faq-calendar.delete');
         
     });
     
