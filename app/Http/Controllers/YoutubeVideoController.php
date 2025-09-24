@@ -29,7 +29,7 @@ class YoutubeVideoController extends Controller
                     ->addColumn('image_url', function ($videoLinks) {
                         return '<a href="' . $videoLinks->link . '" target="_blank">
                             <img src="' . $videoLinks->image_url . '" alt="Image" width="120">
-                        </a><br><br><a href="'.$videoLinks->link.'" style="color:black;">'.$videoLinks->link.'</a>';
+                        </a><br><br><a href="'.$videoLinks->link.'" target="_blank" style="color:black;">'.$videoLinks->link.'</a>';
                     })
                     ->addColumn('video_link', function ($videoLinks) {
                         $link = $videoLinks->link; // direct YouTube link from DB

@@ -109,6 +109,7 @@
                                 <label for="video_link_status">Status</label>
                             </div>
                         </div>
+                        <input type="hidden" name="is_image_exists" id="is_image_exists" value="0">
                         <div class="col-12 text-center d-flex flex-wrap justify-content-center gap-4 row-gap-4">
                             <button type="submit" class="btn btn-primary">Save</button>
                             <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
@@ -275,6 +276,7 @@
             $(document).on('click','#video-link-add-btn', function () {
                 $('#add-video-link-form')[0].reset();
                 $("#video_link_id").val('');
+                $("#is_image_exists").val(0);
                 addVideoLinkFV.resetForm();
                 $('#add-video-link-modal').modal('show');
             });
@@ -347,6 +349,15 @@
 
                             // Fix: match DB values (1 = active, 0 = inactive)
                             $('#video_link_status').val(response.data.is_active == 1 ? 'active' : 'inactive');
+
+                            if (response.data.image_url) {
+                                // Remove "required" validator for edit
+                                $("#is_image_exists").val(1);                                
+                                addVideoLinkFV.updateValidatorOption('image', 'notEmpty', 'enabled', false);
+                            } else {
+                                // No image in DB → still required
+                                addVideoLinkFV.updateValidatorOption('image', 'notEmpty', 'enabled', true);
+                            }
 
                             // Show modal for editing
                             $('#add-video-link-modal').modal('show');
