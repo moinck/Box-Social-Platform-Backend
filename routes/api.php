@@ -178,6 +178,7 @@ Route::get('/privacy-policy/get', [PrivacyPolicyApiController::class, 'get']);
 Route::get('/terms-and-condition/get', [TermsAndConditionApiController::class, 'get']);
 Route::get('/cookie-policy', [TermsAndConditionApiController::class, 'cookiePolicy']);
 Route::get('/youtube-video', [ContactUsController::class, 'youtubeVideoLinks']);
+Route::get('/calendar-events', [ContactUsController::class, 'calendarImage']);
 
 
 // Public routes (no authentication required - for Stripe redirects)

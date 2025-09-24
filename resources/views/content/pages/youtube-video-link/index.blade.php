@@ -56,6 +56,7 @@
                         <th>No</th>
                         <th>Title</th>
                         <th>Link</th>
+                        <th>Image</th>
                         <th>Status</th>
                         <th class="table-action-col">Action</th>
                     </tr>
@@ -89,6 +90,12 @@
                                 <textarea id="link" rows="3" name="link" class="form-control h-px-75"
                                     placeholder="Youtube Video Link"></textarea>
                                 <label for="link">Link</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating form-floating-outline">
+                                <input type="file" id="image" name="image" class="form-control" placeholder="User Image" accept="image/*">
+                                <label for="image">Image</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -149,6 +156,7 @@
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'title', name: 'title'},
+                        { data: 'image_url', name: 'image_url'},
                         { data: 'video_link', name: 'video_link'},
                         { data: 'status', name: 'status'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
@@ -199,6 +207,19 @@
                                 message: 'Please select video link status'
                             }
                         }
+                    },
+                    image: {
+                        validators: {
+                            notEmpty: {
+                                message: 'Please upload an image'
+                            },
+                            file: {
+                                extension: 'jpg,jpeg,png,gif',
+                                type: 'image/jpeg,image/png,image/gif',
+                                maxSize: 2 * 1024 * 1024, // 2 MB
+                                message: 'Please choose a valid image file (jpg, jpeg, png, gif) under 2MB'
+                            }
+                        }
                     }
                 },
                 plugins: {
@@ -207,7 +228,7 @@
                         eleValidClass: '',
                         rowSelector: function(field, ele) {
                             // Customize row selector based on your form layout
-                            if (['title', 'link', 'video_link_status'].includes(field)) {
+                            if (['title', 'link', 'video_link_status','image'].includes(field)) {
                                 return '.col-12';
                             }
                             return '.col-12';

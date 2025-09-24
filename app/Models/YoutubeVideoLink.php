@@ -9,6 +9,7 @@ class YoutubeVideoLink extends Model
     protected $fillable = [
         'title',
         'link',
+        'image_url',
         'is_active',
     ];
 }
