@@ -11,5 +11,6 @@ class FcaNumbers extends Model
     protected $fillable = [
         'fca_number',
         'fca_name',
+        'account_deleted_at',
     ];
 }

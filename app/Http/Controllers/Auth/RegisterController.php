@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Models\BrandKit;
+use App\Models\DummyFcaNumber;
 use App\Models\EmailContent;
 use App\Models\FcaNumbers;
 use App\ResponseTrait;
@@ -176,6 +177,12 @@ class RegisterController extends Controller
                 'description' => "New user registered on the platform. ". $message ." User: ".$user->email,
                 'url' => "api/register"
             ],$user->id);
+
+            $dummyFcaNumber = DummyFcaNumber::where('fca_number',$user->fca_number)->first();
+            if ($dummyFcaNumber) {
+                $dummyFcaNumber->user_id = $user->id;
+                $dummyFcaNumber->save();
+            }
 
             return response()->json([
                     'success' => true,
@@ -404,8 +411,6 @@ class RegisterController extends Controller
         $response = Http::withHeaders($headers)->get('https://register.fca.org.uk/services/V0.1/Firm/' . $request->fca_number);
         $data = $response->json();
 
-
-
         if (!empty($data['Data'][0]["Name"])) {
             $nameUrl = $data['Data'][0]["Name"];
 
@@ -419,12 +424,27 @@ class RegisterController extends Controller
                 'Company Name' => $companyName
             ];
         } else {
-            $returnResponse = [
-                'status' => '0',
-                'Message' => 'Please Enter Valid FCA Number'
-            ];
 
-            return response()->json($returnResponse, 422);
+            $dummyFcaNumber = DummyFcaNumber::where('fca_number',$request->fca_number)->first();
+            
+            if ($dummyFcaNumber) {
+
+                $returnResponse = [
+                    'status' => 1,
+                    'Company Name' => $dummyFcaNumber->company_name
+                ];
+
+                return response()->json($returnResponse, 200);
+
+            } else {
+                $returnResponse = [
+                    'status' => '0',
+                    'Message' => 'Please Enter Valid FCA Number'
+                ];
+
+                return response()->json($returnResponse, 422);
+            }
+
         }
 
         return response()->json($returnResponse, 200);

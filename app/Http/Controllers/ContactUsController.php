@@ -7,8 +7,12 @@ use App\Mail\ContactUsMail;
 use App\Mail\DynamicContentMail;
 use App\Models\ContactUs;
 use App\Models\EmailContent;
+use App\Models\FaqCalendar;
 use App\Models\User;
+use App\Models\YoutubeVideoLink;
 use App\ResponseTrait;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -142,5 +146,39 @@ class ContactUsController extends Controller
         $response = Http::post($webhookUrl, $request);
 
         exit();
+    }
+    /** List of youtube video */
+    public function youtubeVideoLinks(Request $request)
+    {
+        $videoLinks = YoutubeVideoLink::where('is_active',1)->get();
+
+        $response = $videoLinks->map(function ($videoLink) {
+            return [
+                'title' => $videoLink->title,
+                'link'  => $videoLink->link,
+                'image_url' => $videoLink->image_url,
+            ];
+        })->toArray();
+
+        return $this->success($response, 'Active video links fetched successfully.');
+    }
+
+    /** List of calendar image */
+    public function calendarImage(Request $request)
+    {
+        $calendarImages = FaqCalendar::where('year', Carbon::now()->format('Y'))
+            ->where('month', '>=', Carbon::now()->format('m'))
+            ->get();
+
+        $response = $calendarImages->map(function ($calendarImage) {
+            return [
+                'year' => $calendarImage->year,
+                'link'  => Helpers::getMonth()[$calendarImage->month],
+                'image_url' => $calendarImage->image_url,
+            ];
+        })->toArray();
+
+        return $this->success($response, 'Current year calendar fetched successfully.');
+
     }
 }

@@ -6,6 +6,7 @@ use App\Events\NewNotificationEvent;
 use App\Mail\DynamicContentMail;
 use App\Mail\RegisterVerificationMail;
 use App\Models\BrandKit;
+use App\Models\DummyFcaNumber;
 use App\Models\FcaNumbers;
 use App\Models\ImageStockManagement;
 use App\Models\Notification;
@@ -1112,7 +1113,14 @@ class Helpers
                 'fca_number' => $user->fca_number,
             ], [
                 'fca_name' => $user->company_name,
+                'account_deleted_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
+
+            $dummyFcaNumber = DummyFcaNumber::where('fca_number',$user->fca_number)->first();
+            if ($dummyFcaNumber) {
+                FcaNumbers::where('fca_number',$user->fca_number)->delete();
+                $dummyFcaNumber->delete();
+            }
     
             // stock image delete
             // $user->imageStockManagement()->delete();
@@ -1269,5 +1277,24 @@ class Helpers
         $activityLog->info = json_encode(['user'     => $user, 'activity' => $activity], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $activityLog->save();
         return true;
+    }
+
+    /** Get Months */
+    public static function getMonth()
+    {
+        return [
+            1  => 'January',
+            2  => 'February',
+            3  => 'March',
+            4  => 'April',
+            5  => 'May',
+            6  => 'June',
+            7  => 'July',
+            8  => 'August',
+            9  => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
+        ];
     }
 }
