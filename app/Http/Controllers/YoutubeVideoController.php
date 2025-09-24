@@ -26,10 +26,10 @@ class YoutubeVideoController extends Controller
                     ->addColumn('title', function ($videoLinks) {
                         return $videoLinks->title;
                     })
-                    ->addColumn('image_url', function ($row) {
-                        return '<a href="' . $row->image_url . '" target="_blank">
-                            <img src="' . $row->image_url . '" alt="Image" width="180">
-                        </a>';
+                    ->addColumn('image_url', function ($videoLinks) {
+                        return '<a href="' . $videoLinks->link . '" target="_blank">
+                            <img src="' . $videoLinks->image_url . '" alt="Image" width="120">
+                        </a><br><br><a href="'.$videoLinks->link.'" style="color:black;">'.$videoLinks->link.'</a>';
                     })
                     ->addColumn('video_link', function ($videoLinks) {
                         $link = $videoLinks->link; // direct YouTube link from DB
@@ -45,11 +45,11 @@ class YoutubeVideoController extends Controller
                         }
 
                         if ($videoId) {
-                            return '<iframe width="200" height="100" 
+                            return '<iframe width="120" height="100" 
                                         src="https://www.youtube.com/embed/' . $videoId . '" 
                                         frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                         allowfullscreen>
-                                    </iframe>';
+                                    </iframe></br>';
                         }
 
                         return 'Invalid YouTube Link';
