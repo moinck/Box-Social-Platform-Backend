@@ -26,6 +26,11 @@ class YoutubeVideoController extends Controller
                     ->addColumn('title', function ($videoLinks) {
                         return $videoLinks->title;
                     })
+                    ->addColumn('image_url', function ($row) {
+                        return '<a href="' . $row->image_url . '" target="_blank">
+                            <img src="' . $row->image_url . '" alt="Image" width="180">
+                        </a>';
+                    })
                     ->addColumn('video_link', function ($videoLinks) {
                         $link = $videoLinks->link; // direct YouTube link from DB
                         $videoId = null;
@@ -40,7 +45,7 @@ class YoutubeVideoController extends Controller
                         }
 
                         if ($videoId) {
-                            return '<iframe width="200" height="120" 
+                            return '<iframe width="200" height="100" 
                                         src="https://www.youtube.com/embed/' . $videoId . '" 
                                         frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                         allowfullscreen>
@@ -77,7 +82,7 @@ class YoutubeVideoController extends Controller
                                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-youtube-video-id="' . $videoLinkId . '"><i class="ri-delete-bin-line"></i></a>
                         ';
                     })
-                    ->rawColumns(['video_link', 'status', 'action'])
+                    ->rawColumns(['video_link', 'image_url', 'status', 'action'])
                     ->make(true);
             }
 
@@ -100,6 +105,7 @@ class YoutubeVideoController extends Controller
                 'title' => 'required|string|max:255',
                 'link' => 'required|string',
                 'video_link_status' => 'required|string|in:active,inactive',
+                'image' => 'required_if:is_image_exists,0|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -114,13 +120,32 @@ class YoutubeVideoController extends Controller
             $title = $request->title;
             $link = $request->link;
 
+            $videoData = "";
+            $video_link_id = "";
+            if ($request->video_link_id) {
+                $video_link_id = Helpers::decrypt($request->video_link_id);
+                $videoData = YoutubeVideoLink::find($video_link_id);
+            }
+
+            $imageUrl = $videoData ? $videoData->image_url : null;
+            if (isset($request->image) && $request->file('image') ) {
+                $prefix = 'youtube';
+                $imageUrl = Helpers::uploadImage($prefix,$request->file('image'),'images/youtube');
+
+                if($videoData) {
+                    if($videoData->image_url) {
+                        Helpers::deleteImage($videoData->image_url);
+                    }
+                }
+            }
+
             YoutubeVideoLink::updateOrCreate(
                 [
                     'id' => $video_link_id
                 ],[
-                    'id' => $video_link_id,
                     'title' => $title,
                     'link' => $link,
+                    'image_url' => $imageUrl,
                     'is_active' => $request->video_link_status == 'active' ? 1 : 0,
                 ]
             );
@@ -180,6 +205,11 @@ class YoutubeVideoController extends Controller
             $videoLink = YoutubeVideoLink::where('id', $videoLinkId)->first();
 
             if($videoLink) {
+
+                if($videoLink->image_url) {
+                    Helpers::deleteImage($videoLink->image_url);
+                }
+
                 $videoLink->delete();
 
                 DB::commit();

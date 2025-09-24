@@ -72,7 +72,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body p-0">
                     <div class="text-center mb-6">
-                        <h4 class="mb-2">Video Link</h4>
+                        <h4 class="mb-2">FAQ Calendar</h4>
                     </div>
                     <form id="add-faq-calendar-form" class="row g-5" method="POST">
                         @csrf
