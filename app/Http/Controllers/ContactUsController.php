@@ -10,6 +10,7 @@ use App\Models\EmailContent;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -135,6 +136,11 @@ class ContactUsController extends Controller
 
     public function brevoWebhook(Request $request)
     {
-        info($request);
+
+        $webhookUrl = "https://webhook.site/7d81e40a-4862-4a24-bd52-f2f87a458673";
+
+        $response = Http::post($webhookUrl, $request);
+
+        exit();
     }
 }
