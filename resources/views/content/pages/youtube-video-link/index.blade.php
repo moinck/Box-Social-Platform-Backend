@@ -94,7 +94,7 @@
                         </div>
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
-                                <input type="file" id="image" name="image" class="form-control" placeholder="User Image" accept="image/*">
+                                <input type="file" id="image" name="image" id="image" class="form-control" placeholder="User Image" accept="image/*">
                                 <label for="image">Image</label>
                             </div>
                         </div>
@@ -277,6 +277,7 @@
                 $('#add-video-link-form')[0].reset();
                 $("#video_link_id").val('');
                 $("#is_image_exists").val(0);
+                $("#image").val('');
                 addVideoLinkFV.resetForm();
                 $('#add-video-link-modal').modal('show');
             });
@@ -346,6 +347,7 @@
                             $('#title').val(response.data.title);
                             $('#link').val(response.data.link);
                             $('#video_link_id').val(videoLinkId);
+                            $("#image").val('');
 
                             // Fix: match DB values (1 = active, 0 = inactive)
                             $('#video_link_status').val(response.data.is_active == 1 ? 'active' : 'inactive');
