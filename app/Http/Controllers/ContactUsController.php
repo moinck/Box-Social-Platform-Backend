@@ -132,7 +132,8 @@ class ContactUsController extends Controller
                     ->html($html);
 
                 // custom headers for Brevo
-                $message->getHeaders()->addTextHeader('X-Email-ID', Helpers::encrypt('2712'));
+                $header =  Helpers::asString(2712);
+                $message->getSwiftMessage()->getHeaders()->addTextHeader('X-SMTPAPI', $header);
             });
         }
 

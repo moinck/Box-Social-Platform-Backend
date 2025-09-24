@@ -1297,4 +1297,21 @@ class Helpers
             12 => 'December',
         ];
     }
+
+    public static function asString($emailLogId  ){
+        // if (config('app.STORAGE_FOLDER') != "live") {
+        //     $emailLogId = $emailLogId."_staging";
+        // }
+        $headerData = [
+            'unique_args' => [
+                'email_log_id' => $emailLogId,
+                //'attachments' => $emailattachments, ( $emailBody = "" , $emailattachments = array() )
+                //'body' => $emailBody
+            ]
+        ];
+        //return $headerData;
+        $json = json_encode($headerData);
+        $json = preg_replace('/(["\]}])([,:])(["\[{])/', '$1$2 $3', $json);
+        return wordwrap($json, 76, "\n   ");
+    }
 }
