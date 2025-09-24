@@ -55,8 +55,8 @@
                     <tr>
                         <th>No</th>
                         <th>Title</th>
-                        <th>Link</th>
-                        <th>Image</th>
+                        <th>Preview</th>
+                        <th>Video Link</th>
                         <th>Status</th>
                         <th class="table-action-col">Action</th>
                     </tr>
