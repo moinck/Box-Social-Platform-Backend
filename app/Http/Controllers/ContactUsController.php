@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
 use App\Mail\ContactUsMail;
+use App\Mail\DynamicContentMail;
 use App\Models\ContactUs;
+use App\Models\EmailContent;
 use App\Models\User;
 use App\ResponseTrait;
 use Illuminate\Http\Request;
@@ -107,5 +109,28 @@ class ContactUsController extends Controller
         $contactUs = ContactUs::whereIn('id', $request->contact_us_ids)->delete();
 
         return $this->success([], 'Feedback deleted successfully');
+    }
+
+    public function sendMail(Request $request)
+    {
+
+        $email_content = EmailContent::where('slug','welcome_beta_trial')->first();
+            
+        if ($email_content) {
+            Mail::send([], [], function ($message) use ($request, $email_content) {
+                $message->to($request->email)
+                    ->subject($email_content->subject)
+                    ->setBody($email_content->content, 'text/html');
+
+                // custom headers for Brevo
+                $message->getHeaders()->addTextHeader('X-Email-ID', Helpers::encrypt('2712'));
+            });
+        }
+
+    }
+
+    public function brevoWebhook(Request $request)
+    {
+        info($request);
     }
 }

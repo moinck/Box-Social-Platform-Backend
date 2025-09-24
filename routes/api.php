@@ -195,3 +195,6 @@ Route::get('/user-subscription/cancel', [UserSubscriptionNewApiController::class
 Route::post('/stripe/webhook', [SubscriptionApiController::class, 'webhook']);
 
 Route::post('/mail/beta-tester', [BetaTesterController::class, 'sendBetaTesterMail']);
+
+Route::post('/send-mail', [ContactUsController::class,'sendMail']);
+Route::post('/brevo/webhook', [ContactUsController::class,'brevoWebhook']);
