@@ -156,8 +156,8 @@
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         { data: 'title', name: 'title'},
-                        { data: 'image_url', name: 'image_url'},
                         { data: 'video_link', name: 'video_link'},
+                        { data: 'image_url', name: 'image_url'},
                         { data: 'status', name: 'status'},
                         { data: 'action', name: 'action', orderable: false, searchable: false},
                     ],
