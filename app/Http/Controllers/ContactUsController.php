@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Helpers;
 use App\Mail\ContactUsMail;
+use App\Mail\DynamicContentMail;
 use App\Models\ContactUs;
+use App\Models\EmailContent;
 use App\Models\FaqCalendar;
 use App\Models\User;
 use App\Models\YoutubeVideoLink;
@@ -12,6 +14,7 @@ use App\ResponseTrait;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -113,6 +116,37 @@ class ContactUsController extends Controller
         return $this->success([], 'Feedback deleted successfully');
     }
 
+    public function sendMail(Request $request)
+    {
+
+        $email_content = EmailContent::where('slug','welcome_beta_trial')->first();
+            
+        if ($email_content) {
+            Mail::send([], [], function ($message) use ($request, $email_content) {
+
+                $content = $email_content->content;
+                $html = view('content.email.dynamic-email-content',compact('content'))->render();
+
+                $message->to($request->email)
+                    ->subject($email_content->subject)
+                    ->html($html);
+
+                // custom headers for Brevo
+                $message->getHeaders()->addTextHeader('X-Email-ID', Helpers::encrypt('2712'));
+            });
+        }
+
+    }
+
+    public function brevoWebhook(Request $request)
+    {
+
+        $webhookUrl = "https://webhook.site/7d81e40a-4862-4a24-bd52-f2f87a458673";
+
+        $response = Http::post($webhookUrl, $request);
+
+        exit();
+    }
     /** List of youtube video */
     public function youtubeVideoLinks(Request $request)
     {

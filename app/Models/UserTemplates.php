@@ -15,6 +15,9 @@ class UserTemplates extends Model
         'template_name',
         'template_image',
         'template_data',
+        'template_url',
+        'uploaded_at',
+        'is_uploaded',
     ];
 
     public function user()
