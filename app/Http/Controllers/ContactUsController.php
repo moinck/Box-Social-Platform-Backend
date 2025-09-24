@@ -118,9 +118,13 @@ class ContactUsController extends Controller
             
         if ($email_content) {
             Mail::send([], [], function ($message) use ($request, $email_content) {
+
+                $content = $email_content->content;
+                $html = view('content.email.dynamic-email-content',compact('content'))->render();
+
                 $message->to($request->email)
                     ->subject($email_content->subject)
-                    ->setBody($email_content->content, 'text/html');
+                    ->html($html);
 
                 // custom headers for Brevo
                 $message->getHeaders()->addTextHeader('X-Email-ID', Helpers::encrypt('2712'));
