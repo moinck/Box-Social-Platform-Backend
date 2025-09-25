@@ -361,7 +361,7 @@ class Helpers
                 $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
                 $relativePath = str_replace($doSpacesUrl . '/', '', $path);
 
-                if(!empty($isDelete)) {
+                if(!empty($isDelete) && $isDelete == "isDelete") {
                     Storage::disk('digitalocean')->delete($relativePath);
                 }
                 

@@ -588,7 +588,7 @@ class UserTemplatesApiController extends Controller
             $imageUrl = Helpers::uploadImage($prefix, $request->template_image, 'images/user-template-images');
 
             if ($oldTemplateImage && $oldTemplateImage != null && $imageUrl) {
-                Helpers::deleteImage($oldTemplateImage);
+                Helpers::deleteImage($oldTemplateImage,'isDelete');
             }
         }
 
@@ -655,11 +655,11 @@ class UserTemplatesApiController extends Controller
         }
 
         if ($userTemplate->template_image && $userTemplate->template_image != null) {
-            Helpers::deleteImage($userTemplate->template_image);
+            Helpers::deleteImage($userTemplate->template_image,'isDelete');
         }
 
         if ($userTemplate->template_url && $userTemplate->template_url != null) {
-            Helpers::deleteImage($userTemplate->template_url);
+            Helpers::deleteImage($userTemplate->template_url,'isDelete');
         }
 
         $userTemplate->delete();
