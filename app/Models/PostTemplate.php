@@ -17,6 +17,9 @@ class PostTemplate extends Model
         'post_content_id',
         'template_data',
         'status',
+        'template_url',
+        'uploaded_at',
+        'is_uploaded',
     ];
 
     public function category()

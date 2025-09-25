@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\UsersExport;
 use App\Helpers\Helpers;
 use App\Models\EmailContent;
+use App\Models\FcaNumbers;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -449,6 +450,80 @@ class UserManagementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Somthing went wrong.'
+            ]);
+        }
+    }
+
+    /** Deleted FCA Number List */
+    public function fcaNumberList(Request $request)
+    {
+        try {
+
+            $fcaNumbers = FcaNumbers::whereNotNull('account_deleted_at')->latest()->get();
+
+            if ($request->ajax()) {
+
+                return DataTables::of($fcaNumbers)
+                    ->addIndexColumn()
+                    ->addColumn('fca_number', function ($fcaNumbers) {
+                        return $fcaNumbers->fca_number;
+                    })
+                    ->addColumn('fca_name', function ($fcaNumbers) {
+                        return $fcaNumbers->fca_name ?? '-';
+                    })
+                    ->addColumn('created_date', function ($fcaNumbers) {
+                        return '<span data-order="' . $fcaNumbers->created_at . '">' . Helpers::dateFormate($fcaNumbers->created_at) . '</span>';
+                    }
+                    )->addColumn('account_deleted_at', function ($fcaNumbers) {
+                        return $fcaNumbers->account_deleted_at != null ? '<span data-order="' . $fcaNumbers->account_deleted_at . '">' . Helpers::dateFormate($fcaNumbers->account_deleted_at) . '</span>' : '-';
+                    })
+                    ->addColumn('action', function ($fcaNumbers) {
+                        $FcaNumberId = Helpers::encrypt($fcaNumbers->id);
+                        return '
+                            <a href="javascript:;" title="Delete FCA Number" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-content-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" data-fca_number-id="' . $FcaNumberId . '"><i class="ri-delete-bin-line"></i></a>
+                        ';
+                    })
+                    ->rawColumns(['fca_number', 'fca_name','created_date','account_deleted_at','action'])
+                    ->make(true);
+
+            }
+
+            return view('content.pages.fca-numbers');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return redirect()->back()->with('error', 'Something went wrong.');
+        }
+    }
+
+    /** Delete FCA number */
+    public function fcaNumberDelete(Request $request)
+    {
+        try {
+
+            $id = Helpers::decrypt($request->id);
+            $fcaNumber = FcaNumbers::find($id);
+
+            if ($fcaNumber) {
+                $fcaNumber->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Fca number deleted successfully."
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => "Data not found."
+            ]);
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.'
             ]);
         }
     }
