@@ -598,7 +598,7 @@ class UserTemplatesApiController extends Controller
             $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/template-data');   
 
             if ($oldTemplateJsonUrl && $oldTemplateJsonUrl != null && $templateJsonUrl) {
-                Helpers::deleteImage($oldTemplateJsonUrl);
+                Helpers::deleteImage($oldTemplateJsonUrl,'isDelete');
             }
         }
 

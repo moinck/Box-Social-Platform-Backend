@@ -352,7 +352,7 @@ class Helpers
      * @param string $path
      * @return void
      */
-    public static function deleteImage($path)
+    public static function deleteImage($path,$isDelete=null)
     {
         try {
             // Check if it's a DigitalOcean URL
@@ -360,6 +360,10 @@ class Helpers
                 // Extract the file path from the full URL
                 $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
                 $relativePath = str_replace($doSpacesUrl . '/', '', $path);
+
+                if(!empty($isDelete)) {
+                    Storage::disk('digitalocean')->delete($relativePath);
+                }
                 
                 if (Storage::disk('digitalocean')->exists($relativePath)) {
                     // Storage::disk('digitalocean')->delete($relativePath);
