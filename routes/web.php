@@ -205,7 +205,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/youtube-video/link-edit/{id}', [YoutubeVideoController::class,'editYoutubeVideo'])->name('youtube-video.edit');
         Route::post('/youtube-video/save', [YoutubeVideoController::class, 'saveYoutubeVideo'])->name('youtube-video.save');
         Route::post('/youtube-video/delete', [YoutubeVideoController::class, 'deleteYoutubeVideo'])->name('youtube-video.delete');
-        Route::post('/post-template/account-status', [YoutubeVideoController::class, 'changeStatus'])->name('youtube-video.change-status');
+        Route::post('/youtube-video/account-status', [YoutubeVideoController::class, 'changeStatus'])->name('youtube-video.change-status');
 
         /** FAQ Calendar Images Controller */
         Route::match(['GET','POST'],'/faq-calendar', [FaqCalendarImageController::class, 'index'])->name('faq-calendar');
