@@ -352,35 +352,35 @@ class Helpers
      * @param string $path
      * @return void
      */
-    public static function deleteImage($path)
+   public static function deleteImage($path,$isDelete=null)
     {
         try {
             // Check if it's a DigitalOcean URL
-            if (config('app.env') == 'live' || config('app.env') == 'production') {
+            if (str_contains($path, env('DO_SPACES_URL')) || str_contains($path, env('DO_SPACES_ENDPOINT'))) {
+                // Extract the file path from the full URL
+                $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
+                $relativePath = str_replace($doSpacesUrl . '/', '', $path);
 
-                if (str_contains($path, env('DO_SPACES_URL')) || str_contains($path, env('DO_SPACES_ENDPOINT'))) {
-                    // Extract the file path from the full URL
-                    $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
-                    $relativePath = str_replace($doSpacesUrl . '/', '', $path);
-                    
-                    if (Storage::disk('digitalocean')->exists($relativePath)) {
-                        // Storage::disk('digitalocean')->delete($relativePath);
-                        // Log::info("File deleted successfully from DigitalOcean: " . $path);
-                    } else {
-                        // Log::info("File does not exist in DigitalOcean: " . $path);
-                    }
-                } else {
-                    // Handle local storage files (backward compatibility)
-                    $storagePath = str_replace('storage/', '', $path);
-                    
-                    if (Storage::disk('public')->exists($storagePath)) {
-                        // Storage::disk('public')->delete($storagePath);
-                        // Log::info("File deleted successfully from local storage: " . $path);
-                    } else {
-                        // Log::info("File does not exist in local storage: " . $path);
-                    }
+                if(!empty($isDelete)) {
+                    Storage::disk('digitalocean')->delete($relativePath);
                 }
-
+                
+                if (Storage::disk('digitalocean')->exists($relativePath)) {
+                    // Storage::disk('digitalocean')->delete($relativePath);
+                    // Log::info("File deleted successfully from DigitalOcean: " . $path);
+                } else {
+                    // Log::info("File does not exist in DigitalOcean: " . $path);
+                }
+            } else {
+                // Handle local storage files (backward compatibility)
+                $storagePath = str_replace('storage/', '', $path);
+                
+                if (Storage::disk('public')->exists($storagePath)) {
+                    // Storage::disk('public')->delete($storagePath);
+                    // Log::info("File deleted successfully from local storage: " . $path);
+                } else {
+                    // Log::info("File does not exist in local storage: " . $path);
+                }
             }
         } catch (Exception $e) {
             self::sendErrorMailToDeveloper($e);
@@ -1300,5 +1300,22 @@ class Helpers
             11 => 'November',
             12 => 'December',
         ];
+    }
+
+    public static function asString($emailLogId  ){
+        // if (config('app.STORAGE_FOLDER') != "live") {
+        //     $emailLogId = $emailLogId."_staging";
+        // }
+        $headerData = [
+            'unique_args' => [
+                'email_log_id' => $emailLogId,
+                //'attachments' => $emailattachments, ( $emailBody = "" , $emailattachments = array() )
+                //'body' => $emailBody
+            ]
+        ];
+        //return $headerData;
+        $json = json_encode($headerData);
+        $json = preg_replace('/(["\]}])([,:])(["\[{])/', '$1$2 $3', $json);
+        return wordwrap($json, 76, "\n   ");
     }
 }

@@ -15,6 +15,7 @@ use App\Models\PostTemplate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TemplateApiController extends Controller
 {
@@ -115,29 +116,31 @@ class TemplateApiController extends Controller
                 $imagePath = Helpers::uploadImage($prefix, $request->template_image, 'images/admin-post-templates');
             }
 
-            $templateJsonUrl = null;
-            if ($request->has('template_data')) {
-                $prefix = 'admin_template_json_' . rand(1000, 9999) . '_' . time();
-                $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/admin-template-data');   
-            }
-
             $tempObj = new PostTemplate();
             $tempObj->category_id = $categoryId;
             $tempObj->template_image = $imagePath;
             // $tempObj->template_data = $request->template_data;
-            $tempObj->template_url = $templateJsonUrl;
-    
+            
             if ($request->has('sub_category_id') && $subCategoryId !== null) {
                 $tempObj->sub_category_id = $subCategoryId;
             }
-    
+            
             if ($request->has('design_style_id') && $designStyleId) {
                 $tempObj->design_style_id = $designStyleId;
             }
-    
+            
             if ($request->has('post_content_id') && $postContentId) {
                 $tempObj->post_content_id = $postContentId;
             }
+            $tempObj->save();
+
+            $templateJsonUrl = null;
+            if ($request->has('template_data')) {
+                $prefix = 'admin_template_json_' . $tempObj->id;
+                $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/admin-template-data');   
+            }
+
+            $tempObj->template_url = $templateJsonUrl;
             $tempObj->save();
     
             $data = [
@@ -199,6 +202,56 @@ class TemplateApiController extends Controller
             'post_content_data' => isset($postContentData) ? $postContentData : null,
             'admin_template_data' => isset($adminTemplateData) ? $adminTemplateData : [],
             'template_data' => isset($tempObj->template_data) ? $tempObj->template_data : [],
+            'template_json_url' => $tempObj->template_url ?? null,
+        ];
+
+        if (!empty($tempObj)) {
+            return $this->success($data, 'Template Fetch successfully');
+        }
+    }
+
+    public function getTemplateNew(Request $request, $id)
+    {
+
+        $tempObj = PostTemplate::with('postContent')
+            ->where('id', Helpers::decrypt($id))->first();
+
+        if (!$tempObj) {
+            return $this->error('Template not found', 404);
+        }
+
+        // post content data
+        $postTemplateData = $tempObj->postContent ?? null;
+        if (!empty($postTemplateData)) {
+            $postContentData = [
+                "id" => Helpers::encrypt($postTemplateData->id),
+                "title" => $postTemplateData->title,
+                "warning_message" => $postTemplateData->warning_message ? $postTemplateData->warning_message : '',
+            ];
+        }
+
+        if(!empty($tempObj->template_url)){
+            // Remove the domain part to get the relative path
+            $relativePath = str_replace('https://boxsocialplatform.lon1.digitaloceanspaces.com/', '', $tempObj->template_url);
+            $updatedTemplateData = Storage::disk('digitalocean')->get($relativePath);
+        }else{
+            $updatedTemplateData = $tempObj->template_data;
+        }
+
+        $adminTemplateData = [
+            'category_id' => Helpers::encrypt($tempObj->category_id),
+            'sub_category_id' => $tempObj->sub_category_id ? Helpers::encrypt($tempObj->sub_category_id) : null,
+            'post_content_id' => $tempObj->post_content_id ? Helpers::encrypt($tempObj->post_content_id) : null,
+            'design_style_id' => $tempObj->design_style_id ? Helpers::encrypt($tempObj->design_style_id) : null,
+        ];
+
+        $data = [
+            'id' => Helpers::encrypt($tempObj->id),
+            'category_id' => Helpers::encrypt($tempObj->category_id),
+            'template_image' => isset($tempObj->template_image) ? asset($tempObj->template_image) : '',
+            'post_content_data' => isset($postContentData) ? $postContentData : null,
+            'admin_template_data' => isset($adminTemplateData) ? $adminTemplateData : [],
+            'template_data' => $updatedTemplateData,
             'template_json_url' => $tempObj->template_url ?? null,
         ];
 
@@ -436,7 +489,7 @@ class TemplateApiController extends Controller
 
         $templateJsonUrl = $oldTemplateJsonUrl;
         if ($request->has('template_data')) {
-            $prefix = 'admin_template_json_' . rand(1000, 9999) . '_' . time();
+            $prefix = 'admin_template_json_' . $adminTemplate->id;
             $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/admin-template-data');   
 
             if ($oldTemplateJsonUrl && $oldTemplateJsonUrl != null && $templateJsonUrl) {
