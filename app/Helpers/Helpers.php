@@ -352,7 +352,7 @@ class Helpers
      * @param string $path
      * @return void
      */
-    public static function deleteImage($path)
+   public static function deleteImage($path,$isDelete=null)
     {
         try {
             // Check if it's a DigitalOcean URL
@@ -360,6 +360,10 @@ class Helpers
                 // Extract the file path from the full URL
                 $doSpacesUrl = env('DO_SPACES_URL') ?: env('DO_SPACES_ENDPOINT');
                 $relativePath = str_replace($doSpacesUrl . '/', '', $path);
+
+                if(!empty($isDelete) && $isDelete == "isDelete") {
+                    Storage::disk('digitalocean')->delete($relativePath);
+                }
                 
                 if (Storage::disk('digitalocean')->exists($relativePath)) {
                     // Storage::disk('digitalocean')->delete($relativePath);
@@ -1113,6 +1117,7 @@ class Helpers
                 'fca_number' => $user->fca_number,
             ], [
                 'fca_name' => $user->company_name,
+                'account_deleted_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
 
             $dummyFcaNumber = DummyFcaNumber::where('fca_number',$user->fca_number)->first();
@@ -1295,5 +1300,22 @@ class Helpers
             11 => 'November',
             12 => 'December',
         ];
+    }
+
+    public static function asString($emailLogId  ){
+        // if (config('app.STORAGE_FOLDER') != "live") {
+        //     $emailLogId = $emailLogId."_staging";
+        // }
+        $headerData = [
+            'unique_args' => [
+                'email_log_id' => $emailLogId,
+                //'attachments' => $emailattachments, ( $emailBody = "" , $emailattachments = array() )
+                //'body' => $emailBody
+            ]
+        ];
+        //return $headerData;
+        $json = json_encode($headerData);
+        $json = preg_replace('/(["\]}])([,:])(["\[{])/', '$1$2 $3', $json);
+        return wordwrap($json, 76, "\n   ");
     }
 }
