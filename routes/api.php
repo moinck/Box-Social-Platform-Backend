@@ -97,6 +97,7 @@ Route::group([
         // User templates APIS
         Route::get('/user-template/list', [UserTemplatesApiController::class, 'list']);
         Route::get('/user-template/get/{id}', [UserTemplatesApiController::class, 'get']);
+        Route::get('/user-template/get-template/{id}', [UserTemplatesApiController::class, 'getTemplateNew']);
         Route::post('/user-template/store', [UserTemplatesApiController::class, 'store']);
         Route::post('/user-template/multiple/store', [UserTemplatesApiController::class, 'MultiStore']);
         Route::post('/user-template/multiple/new-store', [UserTemplatesApiController::class, 'multiStoreNew']);
@@ -165,6 +166,7 @@ Route::group([
     /** Admin Create & Update Template New API */
     Route::post('/template/new-store', [TemplateApiController::class, 'newStoreTemplate']);
     Route::post('/template/new-update', [TemplateApiController::class, 'newUpdateTemplate']);
+    Route::get('/admin-template/get-template/{id}', [TemplateApiController::class, 'getTemplateNew']);
     
     // post content api
     Route::post('/post-content/get/category', [PostContentApiController::class, 'getCategoryPostContent']);

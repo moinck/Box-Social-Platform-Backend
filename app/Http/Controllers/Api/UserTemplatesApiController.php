@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserTemplatesApiController extends Controller
@@ -88,6 +89,40 @@ class UserTemplatesApiController extends Controller
         }
 
         $updatedTemplateData = helpers::replaceFabricTemplateData($userTemplate->template_data, []);
+
+        $returnData = [
+            'id' => Helpers::encrypt($userTemplate->id),
+            'category' => $categoryName,
+            'template_name' => $userTemplate->template_name ?? null,
+            'template_image' => $userTemplate->template_image ? asset($userTemplate->template_image) : null,
+            'template_data' => $updatedTemplateData,
+            'template_json_url' => $userTemplate->template_url ?? null
+        ];
+
+        return $this->success($returnData, 'User template');
+    }
+
+    public function getTemplateNew($id)
+    {
+        $decyptedId = Helpers::decrypt($id);
+        $userTemplate = UserTemplates::with('category', 'template.category')->find($decyptedId);
+
+        if (!$userTemplate) {
+            return $this->error('User template not found', 404);
+        }
+
+        $categoryName = $userTemplate->category->name ?? null;
+        if (empty($categoryName)) {
+            $categoryName = $userTemplate->template->category->name ?? null;
+        }
+
+        if(!empty($userTemplate->template_url)){
+            // Remove the domain part to get the relative path
+            $relativePath = str_replace('https://boxsocialplatform.lon1.digitaloceanspaces.com/', '', $userTemplate->template_url);
+            $updatedTemplateData = Storage::disk('digitalocean')->get($relativePath);
+        }else{
+            $updatedTemplateData = helpers::replaceFabricTemplateData($userTemplate->template_data, []);
+        }
 
         $returnData = [
             'id' => Helpers::encrypt($userTemplate->id),
@@ -351,21 +386,27 @@ class UserTemplatesApiController extends Controller
                 
                 // Log::info('Template data type: ' . gettype($templateDataString));
 
-                $templateJsonUrl = null;
-                if ($templateData['template_data']) {
-                    $prefix = 'template_json_' . rand(1000, 9999) . '_' . time();
-                    $templateJsonUrl = Helpers::uploadImage($prefix, $templateData['template_data'], 'json/template-data');   
-                }
-
                 $userTemplate = UserTemplates::create([
                     'user_id' => $user->id,
                     'template_id' => $decyptedId,
                     'category_id' => $categoryId,
                     'template_name' => $templateData['template_name'],
                     'template_image' => $imageUrl ?? null,
-                    'template_data' => null,
-                    'template_url' => $templateJsonUrl
+                    'template_data' => null
                 ]);
+
+                $templateJsonUrl = null;
+                if ($templateData['template_data']) {
+                    $prefix = 'template_json_' . $userTemplate->id;
+                    $templateJsonUrl = Helpers::uploadImage($prefix, $templateData['template_data'], 'json/template-data');   
+                }
+
+                $userTemplate->update([
+                    'template_url' => $templateJsonUrl,
+                    'template_data' => null
+                ]);
+
+                $userTemplate = $userTemplate->refresh();
 
                 $templateName[] = $templateData['template_name'];
 
@@ -553,7 +594,7 @@ class UserTemplatesApiController extends Controller
 
         $templateJsonUrl = $oldTemplateJsonUrl;
         if ($request->has('template_data')) {
-            $prefix = 'template_json_' . rand(1000, 9999) . '_' . time();
+            $prefix = 'template_json_' . $userTemplate->id;
             $templateJsonUrl = Helpers::uploadImage($prefix, $request->template_data, 'json/template-data');   
 
             if ($oldTemplateJsonUrl && $oldTemplateJsonUrl != null && $templateJsonUrl) {
