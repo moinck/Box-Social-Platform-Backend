@@ -206,6 +206,6 @@ return [
     ],
 
     'prune' => [
-        'hours' => 6,  // Keep entries for 6 hours
+        'hours' => 120,  // Keep entries for 6 hours
     ],
 ];
