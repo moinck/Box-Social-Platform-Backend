@@ -56,9 +56,9 @@
         }
     </style>
 </head>
-<body style="font-family: 'Inter', Arial, sans-serif; background-color: #f2f4f8; margin: 0; padding: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+<body style="font-family: 'Inter', Arial, sans-serif; background-color: #f2f4f8; margin: 0; padding: 0; min-height: 20vh; display: flex; align-items: center; justify-content: center;">
     <!-- Centering wrapper table for better email client support -->
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f2f4f8; min-height: 100vh;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f2f4f8; min-height: 20vh;">
         <tr>
             <td align="center" valign="middle" style="padding: 40px 20px;">
                 <div class="email-container" style="max-width: 600px; width: 100%; background-color: #ffffff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); margin: 0 auto;">

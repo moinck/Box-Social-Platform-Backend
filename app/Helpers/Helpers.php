@@ -352,7 +352,7 @@ class Helpers
      * @param string $path
      * @return void
      */
-    public static function deleteImage($path,$isDelete=null)
+   public static function deleteImage($path,$isDelete=null)
     {
         try {
             // Check if it's a DigitalOcean URL
