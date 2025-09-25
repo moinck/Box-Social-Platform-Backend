@@ -31,7 +31,7 @@ class UserTemplatesApiController extends Controller
         $search = $request->search ?? '';
         $category = $request->category_id ?? '';
 
-        $userTemplates = UserTemplates::with('category', 'template.category', 'template.postContent')
+             $userTemplates = UserTemplates::select( 'id','user_id','template_id','category_id','template_name','template_image','updated_at')->with('category', 'template.category', 'template.postContent')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->whereHas('category', function ($query) use ($search) {
