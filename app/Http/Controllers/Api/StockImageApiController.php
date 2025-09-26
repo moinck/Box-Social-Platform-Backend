@@ -39,9 +39,9 @@ class StockImageApiController extends Controller
             })
             ->when($is_role, function ($query) use ($is_role) {
                 if($is_role == 1) {
-                    $query->where('is_uploaded_image',0);
+                    $query->where('is_admin_uploaded',0);
                 } else {
-                    $query->whereIn('is_uploaded_image',[0,1]);
+                    $query->whereIn('is_admin_uploaded',[0,1]);
                 }
             })
             ->latest()
