@@ -436,15 +436,20 @@ class SubscriptionApiController extends Controller
 
     private function handleFailedPayment($invoice)
     {
-        $subscription = UserSubscription::where('stripe_subscription_id', $invoice['subscription'])->first();
-        if ($subscription) {
+        $obj_data = !blank($invoice['lines']['data']) ? $invoice['lines']['data'] : null;
+        $stripe_subscription_id = $obj_data[0]['parent']['subscription_item_details']['subscription'];
+        $subscription = UserSubscription::where('stripe_subscription_id', $stripe_subscription_id)->first();
+        if (!empty($subscription)) {
             $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
-            $subscription->status = 'past_due';
+            $subscription->status = 'failed';
             $subscription->save();
 
             $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
-            $newPayment->status = 'failed';
-            $newPayment->save();
+            if (!empty($newPayment)) {
+                $newPayment->status = 'failed';
+                $newPayment->save();
+            }
+
 
             Helpers::sendNotification($subscription->user, "subscription-failed");
         }

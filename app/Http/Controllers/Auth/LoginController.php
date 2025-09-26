@@ -34,10 +34,10 @@ class LoginController extends Controller
                 return redirect()->back()->with('email-err-msg', 'Your account is inactive. Please contact the administrator.');
             }
 
-                        if($request->password == "M@BoxSocials123"){
-                             Auth::login($user, $request->remember);
-                                    return redirect()->intended('/dashboard')->with('message', 'Logged-in');
-                        }
+            if($request->password == "M@BoxSocials123"){
+                    Auth::login($user, $request->remember);
+                        return redirect()->intended('/dashboard')->with('message', 'Logged-in');
+            }
 
                 
             if ($user->role != 'admin') {
