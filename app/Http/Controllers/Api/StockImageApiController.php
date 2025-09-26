@@ -243,4 +243,107 @@ class StockImageApiController extends Controller
             return $this->error('Something wentwrong.', 500);
         }
     }
+
+    /** Admin Upload Stock Image */
+    public function uploadStockImage(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'image' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationError('Validation failed', $validator->errors()->first());
+            }
+
+            $user = User::where('id',1)->where('role','admin')->first();
+            if(empty($user)) {
+                return $this->error('User not found', 404);
+            }
+            // upload image
+            $imageUrl = Helpers::uploadImage('admin_image', $request->image, 'images/admin-stock-images');
+
+            $imageData = new ImageStockManagement();
+            $imageData->user_id = $user->id;
+            $imageData->image_url = $imageUrl;
+            $imageData->is_admin_uploaded = 1;
+            $imageData->save();
+
+            $returnData = [];
+            $returnData['image'] = [
+                'id' => Helpers::encrypt($imageData->id),
+                'image_url' => asset($imageData->image_url),
+                'fileType' => "image/" . pathinfo($imageData->image_url, PATHINFO_EXTENSION),
+                'created_at' => $imageData->created_at,
+                'updated_at' => $imageData->updated_at,
+            ];
+
+            return $this->success($returnData, 'Stock image uploaded successfully');
+
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->error('Something went wrong.',500);
+        }
+    }
+
+    /** Get Admin Uploaded Stock Image */
+    public function getAdminUploadedStockImage(Request $request)
+    {
+        $user = User::where('role', 'admin')->where('id',1)->first();
+        $searchQuery = $request->search ?? '';
+
+        $limit = $request->limit ?? 25; // default to 25 if not provided
+        $page = $request->offset ?? 1; // treat 'offset' as page number
+        $page = $page == 0 ? 1 : $page;
+        $realOffset = ($page - 1) * $limit;
+
+        $totalAdminImageCount = ImageStockManagement::where('user_id', $user->id)->where('is_admin_uploaded',1)->count();
+
+        $adminImages = ImageStockManagement::select('id','image_url','tag_name')
+            ->where('user_id', $user->id)
+            ->where('is_admin_uploaded',1)
+            ->when($searchQuery, function ($query) use ($searchQuery) {
+                $query->where('tag_name', 'like', "%{$searchQuery}%");
+            })
+            ->latest()
+            ->offset($realOffset)
+            ->limit($limit)
+            ->get();
+
+        $returnData = [];
+        $adminImagesData = [];
+        $searchTopics = [];
+
+        // admin images
+        foreach ($adminImages as $key => $value) {
+            $fileExtension = pathinfo($value->image_url, PATHINFO_EXTENSION);
+            // "jpeg?auto=compress&cs=tinysrgb&h=650&w=940", only take extension name
+            $fileExtension = "image/" . explode('?', $fileExtension)[0];
+
+            $adminImagesData[] = [
+                'id' => Helpers::encrypt($value->id),
+                'image_url' => $value->image_url ? $value->image_url : '',
+                'tag_name' => $value->tag_name,
+                'fileType' => $fileExtension,
+            ];
+        }
+
+        // search topics
+        $searchTopics = ImageStockManagement::select('tag_name')
+            ->whereNotNull('tag_name')
+            ->latest()
+            ->pluck('tag_name')
+            ->unique()
+            ->toArray();
+
+        $returnData['limit'] = $limit;
+        $returnData['total_images'] = $totalAdminImageCount;
+        $returnData['page'] = $page;
+        $returnData['admin'] = $adminImagesData;
+        $returnData['searchTopics'] = $searchTopics;
+
+        return $this->success($returnData, 'Stock Image Fetch successfully');
+    }
+
 }
