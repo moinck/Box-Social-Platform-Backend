@@ -451,18 +451,20 @@ class SubscriptionApiController extends Controller
         if (!empty($subscription)) {
             $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
             $subscription->status = 'failed';
-
             if (empty($subscription->webhook_called_at)) {
                 $subscription->webhook_called_at = Carbon::now();
             }
-
+            
             $subscription->save();
 
             $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
-            if(!empty($newPayment)) {
+            if (!empty($newPayment)) {
                 $newPayment->status = 'failed';
                 $newPayment->save();
             }
+
+           
+
 
             Helpers::sendNotification($subscription->user, "subscription-failed");
         }

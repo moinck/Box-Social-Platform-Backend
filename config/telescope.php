@@ -142,7 +142,7 @@ return [
         //     'ignore' => [],
         // ],
 
-        // Watchers\ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
+        Watchers\ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
 
         Watchers\CommandWatcher::class => [
             'enabled' => env('TELESCOPE_COMMAND_WATCHER', true),
@@ -185,12 +185,12 @@ return [
 
         // Watchers\NotificationWatcher::class => env('TELESCOPE_NOTIFICATION_WATCHER', true),
 
-        Watchers\QueryWatcher::class => [
-            'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
-            'ignore_packages' => true,
-            'ignore_paths' => [],
-            'slow' => 100,
-        ],
+        // Watchers\QueryWatcher::class => [
+        //     'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
+        //     'ignore_packages' => true,
+        //     'ignore_paths' => [],
+        //     'slow' => 100,
+        // ],
 
         Watchers\RedisWatcher::class => env('TELESCOPE_REDIS_WATCHER', true),
 
@@ -206,6 +206,6 @@ return [
     ],
 
     'prune' => [
-        'hours' => 6,  // Keep entries for 6 hours
+        'hours' => 120,  // Keep entries for 6 hours
     ],
 ];

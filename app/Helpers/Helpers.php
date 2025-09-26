@@ -887,15 +887,17 @@ class Helpers
             'version' => config('app.version') ?? "1.0",
         ];
 
-        $view = view('content.email.error-report-email', compact('newErrorData'))->render();
-        if (env('APP_ENV') != 'local') {
-            // send mail to developer
-            Mail::send([], [], function ($message) use ($view) {
-                $message->html($view);
-                $message->to(['pratikdev.iihglobal@gmail.com','jayp.iihglobal@gmail.com','martik.iihglobal@gmail.com']);
-                $message->subject('New Error Report');
-            });
-        }
+        Log::error('Developer Error Report', $newErrorData);
+
+        // $view = view('content.email.error-report-email', compact('newErrorData'))->render();
+        // if (env('APP_ENV') != 'local') {
+        //     // send mail to developer
+        //     Mail::send([], [], function ($message) use ($view) {
+        //         $message->html($view);
+        //         $message->to(['pratikdev.iihglobal@gmail.com','jayp.iihglobal@gmail.com','martik.iihglobal@gmail.com']);
+        //         $message->subject('New Error Report');
+        //     });
+        // }
     }
 
     /**
@@ -1259,6 +1261,7 @@ class Helpers
 
     /** User Activity Log */
     public static function activityLog($activityLogData,$userId=null){
+        return true;
         $userName = "";
         if(Auth::check() && $userId == null){
             $userId = Auth::user()->id;

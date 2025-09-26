@@ -60,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->runInBackground();
 
         //Telescope Data Delete every hour
-        $schedule->command('telescope:prune --hours=6')
+        $schedule->command('telescope:prune --hours=120')
                 ->everyThreeHours()
                 ->timezone('Europe/London')
                 ->withoutOverlapping()
