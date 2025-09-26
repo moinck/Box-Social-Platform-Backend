@@ -51,7 +51,7 @@ class ContactUsController extends Controller
                 return $contactUs->message;
             })
             ->addColumn('created_date', function ($contactUs) {
-                return '<span data-order="' . $contactUs->created_date . '">' . Helpers::dateFormate($contactUs->created_date) . '</span>';
+                return '<span data-order="' . $contactUs->created_at . '">' . Helpers::dateFormate($contactUs->created_at) . '</span>';
             })
             ->rawColumns(['checkbox','created_date'])
             ->make(true);
