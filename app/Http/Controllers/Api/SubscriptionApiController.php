@@ -592,12 +592,20 @@ class SubscriptionApiController extends Controller
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
             }
 
-            // if ($user_subscription->status == 'failed') {
-            //     if (!empty($user_subscription->webhook_called_at) || $user_subscription->created_at) {
-            //         $current_time = Carbon::now();
+            if (!empty($user_subscription->webhook_called_at) || $user_subscription->created_at) {
+                if ($user_subscription->status == 'failed') {
+                    $current_time = Carbon::now();
+                    $reference_time = !empty($user_subscription->webhook_called_at) ? Carbon::parse($user_subscription->webhook_called_at) : Carbon::parse($user_subscription->created_at);
 
-            //     }
-            // }
+                    $diffInMinutes = $reference_time->diffInMinutes($current_time);
+
+                    if ($diffInMinutes > 5) {
+                        return $this->error('Payment failed', 500);
+                    } else {
+                        return $this->success([], 'Your payment is in progress.', 206);
+                    }
+                }
+            }
 
             return $this->error('Payment failed', 500);
 
