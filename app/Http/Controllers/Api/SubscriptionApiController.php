@@ -377,6 +377,9 @@ class SubscriptionApiController extends Controller
         }
 
         switch ($event['type']) {
+            case 'customer.subscription.created':
+                $this->handleSubscriptionCreated($event['data']['object']);
+                break;
             case 'invoice.payment_succeeded':
                 $this->handleSuccessfulPayment($event['data']['object']);
                 break;
@@ -418,6 +421,10 @@ class SubscriptionApiController extends Controller
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
                 $userSubscription->reset_date = now()->addMonths(1)->startOfMonth()->format('Y-m-d');
 
+                if (empty($userSubscription->webhook_called_at)) {
+                    $userSubscription->webhook_called_at = Carbon::now();
+                }
+
                 $userSubscription->last_payment_date = now();
                 $userSubscription->save();
 
@@ -436,15 +443,24 @@ class SubscriptionApiController extends Controller
 
     private function handleFailedPayment($invoice)
     {
-        $subscription = UserSubscription::where('stripe_subscription_id', $invoice['subscription'])->first();
-        if ($subscription) {
+        $obj_data = !blank($invoice['lines']['data']) ? $invoice['lines']['data'] : null;
+        $stripe_subscription_id = $obj_data[0]['parent']['subscription_item_details']['subscription'];
+        $subscription = UserSubscription::where('stripe_subscription_id', $stripe_subscription_id)->first();
+        if (!empty($subscription)) {
             $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
-            $subscription->status = 'past_due';
+            $subscription->status = 'failed';
+
+            if (empty($subscription->webhook_called_at)) {
+                $subscription->webhook_called_at = Carbon::now();
+            }
+
             $subscription->save();
 
             $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
-            $newPayment->status = 'failed';
-            $newPayment->save();
+            if(!empty($newPayment)) {
+                $newPayment->status = 'failed';
+                $newPayment->save();
+            }
 
             Helpers::sendNotification($subscription->user, "subscription-failed");
         }
@@ -457,6 +473,10 @@ class SubscriptionApiController extends Controller
 
         if (!$subscription) {
             return;
+        }
+
+        if (empty($subscription->webhook_called_at)) {
+            $subscription->webhook_called_at = Carbon::now();
         }
 
         $item = $stripeSubscription['items']['data'][0] ?? null;
@@ -485,7 +505,27 @@ class SubscriptionApiController extends Controller
             $subscription->status = 'canceled';
             $subscription->stripe_status = 'canceled';
             $subscription->ends_at = now();
+
+            if (empty($subscription->webhook_called_at)) {
+                $subscription->webhook_called_at = Carbon::now();
+            }
+
             $subscription->save();
+        }
+    }
+
+    private function handleSubscriptionCreated($stripeSubscription)
+    {   
+        $subscription = UserSubscription::where('stripe_subscription_id', $stripeSubscription['id'])->first();
+
+        if (!$subscription) {
+            return;
+        }
+
+        if (empty($subscription->webhook_called_at)) {
+            $subscription->update([
+                'webhook_called_at' => Carbon::now()
+            ]);
         }
     }
 
@@ -551,6 +591,13 @@ class SubscriptionApiController extends Controller
             if ($user_subscription->stripe_status == "paid") {
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
             }
+
+            // if ($user_subscription->status == 'failed') {
+            //     if (!empty($user_subscription->webhook_called_at) || $user_subscription->created_at) {
+            //         $current_time = Carbon::now();
+
+            //     }
+            // }
 
             return $this->error('Payment failed', 500);
 
