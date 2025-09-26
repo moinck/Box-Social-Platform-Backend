@@ -267,6 +267,7 @@ class StockImageApiController extends Controller
             $imageData = new ImageStockManagement();
             $imageData->user_id = $user->id;
             $imageData->image_url = $imageUrl;
+            $imageData->is_admin_uploaded = 1;
             $imageData->save();
 
             $returnData = [];
@@ -297,10 +298,11 @@ class StockImageApiController extends Controller
         $page = $page == 0 ? 1 : $page;
         $realOffset = ($page - 1) * $limit;
 
-        $totalAdminImageCount = ImageStockManagement::where('user_id', $user->id)->count();
+        $totalAdminImageCount = ImageStockManagement::where('user_id', $user->id)->where('is_admin_uploaded',1)->count();
 
         $adminImages = ImageStockManagement::select('id','image_url','tag_name')
             ->where('user_id', $user->id)
+            ->where('is_admin_uploaded',1)
             ->when($searchQuery, function ($query) use ($searchQuery) {
                 $query->where('tag_name', 'like', "%{$searchQuery}%");
             })
