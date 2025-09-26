@@ -28,6 +28,7 @@ class StockImageApiController extends Controller
         $page = $request->offset ?? 1; // treat 'offset' as page number
         $page = $page == 0 ? 1 : $page;
         $realOffset = ($page - 1) * $limit;
+        $is_role = $request->is_role;
 
         $totalAdminImageCount = ImageStockManagement::whereIn('user_id', $adminIds)->count();
 
@@ -35,6 +36,13 @@ class StockImageApiController extends Controller
             ->whereIn('user_id', $adminIds)
             ->when($searchQuery, function ($query) use ($searchQuery) {
                 $query->where('tag_name', 'like', "%{$searchQuery}%");
+            })
+            ->when($is_role, function ($query) use ($is_role) {
+                if($is_role == 1) {
+                    $query->where('is_uploaded_image',0);
+                } else {
+                    $query->whereIn('is_uploaded_image',[0,1]);
+                }
             })
             ->latest()
             ->offset($realOffset)
