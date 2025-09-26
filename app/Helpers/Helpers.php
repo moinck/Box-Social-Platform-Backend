@@ -1238,6 +1238,8 @@ class Helpers
             'user_register_acount_reviewed' => "Welcome Email -  ACCOUNT REVIEWED",
             'user_email_update' => "User Email Update",
             'new_account_pending_admin_approval' => "New Account Pending Admin Approval",
+            'subscription_payment_success' => "Subscription Payment Success",
+            'subscription_payment_failed' => "Subscription Payment Failed",
         ];
     }
 
