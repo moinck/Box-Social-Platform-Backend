@@ -66,6 +66,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->withoutOverlapping()
                 ->runInBackground();
 
+        //Send Subscription Mail
+        $schedule->command('subscriptions:send-subscription-mail')
+                ->cron('*/20 * * * *')
+                ->timezone('Europe/London')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

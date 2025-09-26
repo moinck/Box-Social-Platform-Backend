@@ -151,6 +151,7 @@ class SubscriptionApiController extends Controller
             $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit ?? 0;
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->stripe_status = 'incomplete'; // Important: Set as incomplete
+            $newSubscription->is_mail_send = 0; // Important: Set as incomplete
             $newSubscription->save();
 
             // send notification to admin
@@ -335,6 +336,7 @@ class SubscriptionApiController extends Controller
         $userSubscription->current_period_end = now()->addDays(3);
         $userSubscription->trial_start = now();
         $userSubscription->trial_end = now()->addDays(3);
+        $userSubscription->is_mail_send = 1;
         $userSubscription->save();
 
         /** Send Mail to Users. Only User Register Between 16-Sep-2025 to 28-Sep-2025  */
@@ -599,10 +601,10 @@ class SubscriptionApiController extends Controller
 
                     $diffInMinutes = $reference_time->diffInMinutes($current_time);
 
-                    if ($diffInMinutes > 5) {
+                    if ($diffInMinutes >= 5) {
                         return $this->error('Payment failed', 500);
                     } else {
-                        return $this->success([], 'Your payment is in progress.', 206);
+                        return $this->success([], 'Payment is in process.', 206);
                     }
                 }
             }
