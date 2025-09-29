@@ -166,6 +166,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-template/delete', [PostTemplateController::class, 'destroy'])->name('post-template.delete');
         Route::post('/post-template/account-status', [PostTemplateController::class, 'changeStatus'])->name('post-template.change-status');
         Route::post('/post-template/create/duplicate', [PostTemplateController::class, 'duplicate'])->name('post-template.create-duplicate');
+        Route::get('/post-template/sub-category', [PostTemplateController::class, 'getSubCategory'])->name('post-template.sub-category.get.data');
+
 
         // privacy policy controller
         // Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacy-policy');
