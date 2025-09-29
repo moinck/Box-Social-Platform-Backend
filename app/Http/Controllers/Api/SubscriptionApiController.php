@@ -151,6 +151,7 @@ class SubscriptionApiController extends Controller
             $newSubscription->daily_download_limit = $subscriptionPlanDetail->daily_download_limit ?? 0;
             $newSubscription->status = 'incomplete'; // Important: Set as incomplete
             $newSubscription->stripe_status = 'incomplete'; // Important: Set as incomplete
+            $newSubscription->is_mail_send = 0; // Important: Set as incomplete
             $newSubscription->save();
 
             // send notification to admin
@@ -335,6 +336,7 @@ class SubscriptionApiController extends Controller
         $userSubscription->current_period_end = now()->addDays(3);
         $userSubscription->trial_start = now();
         $userSubscription->trial_end = now()->addDays(3);
+        $userSubscription->is_mail_send = 1;
         $userSubscription->save();
 
         /** Send Mail to Users. Only User Register Between 16-Sep-2025 to 28-Sep-2025  */
@@ -377,6 +379,9 @@ class SubscriptionApiController extends Controller
         }
 
         switch ($event['type']) {
+            case 'customer.subscription.created':
+                $this->handleSubscriptionCreated($event['data']['object']);
+                break;
             case 'invoice.payment_succeeded':
                 $this->handleSuccessfulPayment($event['data']['object']);
                 break;
@@ -418,6 +423,10 @@ class SubscriptionApiController extends Controller
                 $userSubscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
                 $userSubscription->reset_date = now()->addMonths(1)->startOfMonth()->format('Y-m-d');
 
+                if (empty($userSubscription->webhook_called_at)) {
+                    $userSubscription->webhook_called_at = Carbon::now();
+                }
+
                 $userSubscription->last_payment_date = now();
                 $userSubscription->save();
 
@@ -442,6 +451,10 @@ class SubscriptionApiController extends Controller
         if (!empty($subscription)) {
             $subscription->response_meta = json_encode($invoice, JSON_PRETTY_PRINT);
             $subscription->status = 'failed';
+            if (empty($subscription->webhook_called_at)) {
+                $subscription->webhook_called_at = Carbon::now();
+            }
+            
             $subscription->save();
 
             $newPayment = Payments::where('user_subscription_id',$subscription->id)->latest()->first();
@@ -449,6 +462,8 @@ class SubscriptionApiController extends Controller
                 $newPayment->status = 'failed';
                 $newPayment->save();
             }
+
+           
 
 
             Helpers::sendNotification($subscription->user, "subscription-failed");
@@ -462,6 +477,10 @@ class SubscriptionApiController extends Controller
 
         if (!$subscription) {
             return;
+        }
+
+        if (empty($subscription->webhook_called_at)) {
+            $subscription->webhook_called_at = Carbon::now();
         }
 
         $item = $stripeSubscription['items']['data'][0] ?? null;
@@ -490,7 +509,27 @@ class SubscriptionApiController extends Controller
             $subscription->status = 'canceled';
             $subscription->stripe_status = 'canceled';
             $subscription->ends_at = now();
+
+            if (empty($subscription->webhook_called_at)) {
+                $subscription->webhook_called_at = Carbon::now();
+            }
+
             $subscription->save();
+        }
+    }
+
+    private function handleSubscriptionCreated($stripeSubscription)
+    {   
+        $subscription = UserSubscription::where('stripe_subscription_id', $stripeSubscription['id'])->first();
+
+        if (!$subscription) {
+            return;
+        }
+
+        if (empty($subscription->webhook_called_at)) {
+            $subscription->update([
+                'webhook_called_at' => Carbon::now()
+            ]);
         }
     }
 
@@ -555,6 +594,21 @@ class SubscriptionApiController extends Controller
 
             if ($user_subscription->stripe_status == "paid") {
                 return $this->success($returnData, 'Payment has been paid successfully.', 200);
+            }
+
+            if (!empty($user_subscription->webhook_called_at) || $user_subscription->created_at) {
+                if ($user_subscription->status == 'failed') {
+                    $current_time = Carbon::now();
+                    $reference_time = !empty($user_subscription->webhook_called_at) ? Carbon::parse($user_subscription->webhook_called_at) : Carbon::parse($user_subscription->created_at);
+
+                    $diffInMinutes = $reference_time->diffInMinutes($current_time);
+
+                    if ($diffInMinutes >= 5) {
+                        return $this->error('Payment failed', 500);
+                    } else {
+                        return $this->success([], 'Payment is in process.', 206);
+                    }
+                }
             }
 
             return $this->error('Payment failed', 500);

@@ -59,7 +59,9 @@ class UserSubscription extends Model
         'coupon_discount',
         'coupon_currency',
         'coupon_discount_id',
-        'coupon_discounted_amt'
+        'coupon_discounted_amt',
+        'is_mail_send',
+        'webhook_called_at',
     ];
 
     public function user()
