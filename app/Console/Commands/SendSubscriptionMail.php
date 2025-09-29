@@ -40,7 +40,7 @@ class SendSubscriptionMail extends Command
             ->where('is_mail_send',0)
             ->get();
 
-        Log::info('Send Subscription Email: CRON Start');
+        // Log::info('Send Subscription Email: CRON Start');
 
         
         foreach ($subscription as $val) {
@@ -128,7 +128,7 @@ class SendSubscriptionMail extends Command
             }
         }
 
-        Log::info('Send Subscription Email: CRON End');
+        // Log::info('Send Subscription Email: CRON End');
 
     }
 }
