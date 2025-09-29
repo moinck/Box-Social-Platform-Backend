@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class PostTemplateController extends Controller
@@ -50,8 +51,12 @@ class PostTemplateController extends Controller
         // set token in session
         Session::put('admin_access_token', $currentAdminToken);
         $categories = Categories::getActiveCategoeyList();
+        $subCategories = Categories::whereNotNull(columns: 'parent_id')
+            // ->where('is_comming_soon', false)
+            ->select('id', 'name')
+            ->get();
 
-        return view('content.pages.admin.post-template.index', compact('categories', 'currentAdminToken'));
+        return view('content.pages.admin.post-template.index', compact('categories', 'currentAdminToken','subCategories'));
     }
 
     public function dataTable(Request $request)
@@ -60,6 +65,9 @@ class PostTemplateController extends Controller
             ->with('category:id,name', 'postContent:id,title', 'designStyle:id,name', 'subCategory:id,name')
             ->when($request->has('category') && $request->category != '', function ($query) use ($request) {
                 $query->where('category_id', $request->category);
+            })
+            ->when($request->sub_category_id && $request->sub_category_id != 0, function ($query) use ($request) {
+                $query->where('sub_category_id', $request->sub_category_id);
             })
             ->when($request->has('status') && $request->status != '', function ($query) use ($request) {
                 if ($request->status == 1) {
@@ -357,5 +365,29 @@ class PostTemplateController extends Controller
             Log::error('Error duplicating local image: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /** Get Post Template Sub-Category */
+    public function getSubCategory(Request $request)
+    {
+        $categories = Categories::whereNotNull(columns: 'parent_id')
+            ->where(function ($query) use ($request) {
+                $query->where('parent_id', $request->category_id);
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Subcategory Found',
+                'data' => []
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $categories
+        ]);
     }
 }

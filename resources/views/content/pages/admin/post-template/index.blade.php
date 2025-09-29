@@ -12,7 +12,8 @@
         'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss',
         'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss',
         'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
+        'resources/assets/vendor/libs/select2/select2.scss'
     ])
 @endsection
 
@@ -23,7 +24,8 @@
         'resources/assets/vendor/libs/@form-validation/popular.js',
         'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
         'resources/assets/vendor/libs/@form-validation/auto-focus.js',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
+        'resources/assets/vendor/libs/select2/select2.js'
     ])
 @endsection
 
@@ -134,6 +136,7 @@
                         url: "{{ route('post-template.data-table') }}",
                         data: function (d) {
                             d.category = $('#category_filter').val();
+                            d.sub_category_id = $('#sub_category_filter').val();
                             d.status = $('#status_filter').val();
                         },
                         beforeSend: function () {
@@ -149,10 +152,17 @@
                         targetDiv.prop('style','margin-top:1.25rem;margin-bottom:1.25rem');
 
                         // Create a row to hold the two md-3 divs
-                        targetDiv.append('<div class="row"><div class="col-md-6" id="category-filter-container"></div><div class="col-md-6" id="status-filter-container"></div></div>');
+                        targetDiv.append('<div class="row"><div class="col-md-4" id="category-filter-container"></div><div class="col-md-4 d-none" id="sub-category-filter-dropdown"></div><div class="col-md-4" id="status-filter-container"></div></div>');
 
                         // Append category filter
                         $('#category-filter-container').append('<select class="form-select input-sm" id="category_filter"><option value="">Categories</option></select>');
+
+                        // Append sub category filter
+                        $('#sub-category-filter-dropdown').append(`
+                            <select class="form-select input-sm" id="sub_category_filter">
+                                <option value="">All Sub Categories</option>
+                            </select>
+                        `);
 
                         // Append status filter
                         $('#status-filter-container').append(`<select class="form-select input-sm" id="status_filter">
@@ -163,10 +173,16 @@
 
                         // Parse the categories JSON data
                         var categories = JSON.parse('{!! addslashes($categories) !!}');
+                        var subCategories = JSON.parse('{!! addslashes($subCategories) !!}');
 
                         // Populate the category select with categories
                         $.each(categories, function(index, obj) {
                             $('#category_filter').append('<option value="' + obj.id + '">' + obj.name + '</option>');
+                        });
+
+                        // Populate the sub category select with sub categories
+                        $.each(subCategories, function(index, obj) {
+                            $('#sub_category_filter').append('<option data-id="' + obj.id + '" value="' + obj.id + '">' + obj.name + '</option>');
                         });
 
                         // Filter results on category select change
@@ -175,11 +191,50 @@
                             PostTemplateTable.draw();
                         });
 
+                        // Filter results on sub category select change
+                        $('#sub_category_filter').on('change', function() {
+                            PostTemplateTable.draw();
+                        });
+
                         // Filter results on status select change
                         $('#status_filter').on('change', function() {
                             // PostTemplateTable.columns('raw_status').search(this.value).draw();
                             PostTemplateTable.draw();
                         });
+
+                        // select2
+                        var select2_category = $('#category_filter');
+                        var select2_sub_category = $('#sub_category_filter');
+                        // add select2
+                        if (select2_category.length) {
+                            select2_category.each(function () {
+                                var $this = $(this);
+                                select2Focus($this);
+                                $this.wrap('<div class="position-relative"></div>').select2({
+                                    placeholder: 'Select Category',
+                                    dropdownParent: $this.parent()
+                                });
+                            });
+                        }
+                        if (select2_sub_category.length) {
+                            select2_sub_category.each(function () {
+                                var $this = $(this);
+                                select2Focus($this);
+                                $this.wrap('<div class="position-relative"></div>').select2({
+                                    placeholder: 'Select Sub Category',
+                                    dropdownParent: $this.parent()
+                                });
+                            });
+                        }
+                        var css = `.select2-container--default .select2-results > .select2-results__options {
+                            max-height: 11.5rem;
+                            overflow-y: auto;
+                        }`;
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.appendChild(document.createTextNode(css));
+                        document.head.appendChild(style);
+
                     },
                     columns: [
                         { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
@@ -446,6 +501,43 @@
                     $('#template-delete-btn-div').addClass('d-none');
                     $('#template-disabled-btn-div').addClass('d-none');
                 }
+            });
+            // -------------------------------------------
+
+            // sub category filter
+            $(document).on('change','#category_filter', function() {
+                // PostContentDataTable();
+                $.ajax({
+                    url: '{{ route('post-template.sub-category.get.data') }}',
+                    type: 'GET',
+                    data: {
+                        category_id: $(this).val()
+                    },
+                    beforeSend: function() {
+                        showBSPLoader();
+                    },
+                    complete: function() {
+                        hideBSPLoader();
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            $('#sub-category-filter-dropdown').removeClass('d-none');
+                            var responseData = data.data;
+                            var option = '';
+                            option += '<option value="0">Sub Categories</option>';
+                            responseData.forEach(function(item) {
+                                option += '<option value="' + item.id + '">' + item
+                                    .name + '</option>';
+                            });
+                            $('#sub_category_filter').html(option);
+                        } else {
+                            $('#sub-category-filter-dropdown').addClass('d-none');
+                            $('#sub_category_filter').html(
+                                '<option value="0">No Sub Categories</option>'
+                            );
+                        }
+                    }
+                });
             });
             // -------------------------------------------
 
