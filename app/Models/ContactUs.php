@@ -14,6 +14,9 @@ class ContactUs extends Model
         'phone',
         'subject',
         'message',
+        'email_subject',
+        'feedback_reply',
+        'is_replied',
         'ip_address',
         'user_agent',
     ];

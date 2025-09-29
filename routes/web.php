@@ -146,6 +146,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/feedback-management/datatable', [ContactUsController::class, 'contactUsDataTable'])->name('feedback-management.data-table');
         Route::post('/feedback-management/delete', [ContactUsController::class, 'destroy'])->name('feedback-management.delete');
         Route::get('/feedback-management/mail-preview', [ContactUsController::class, 'mailPreview'])->name('feedback-management.mail-preview');
+        Route::get('/feedback-management/view-reply/{id}', [ContactUsController::class, 'viewReply'])->name('feedback-management.view-reply');
+        Route::post('/feedback-management/send-reply', [ContactUsController::class, 'sendReply'])->name('feedback-management.send-reply');
 
         // post content controller
         Route::get('/post-content', [PostContentController::class, 'index'])->name('post-content');

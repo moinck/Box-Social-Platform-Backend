@@ -53,7 +53,16 @@ class ContactUsController extends Controller
             ->addColumn('created_date', function ($contactUs) {
                 return '<span data-order="' . $contactUs->created_at . '">' . Helpers::dateFormate($contactUs->created_at) . '</span>';
             })
-            ->rawColumns(['checkbox','created_date'])
+            ->addColumn('action', function ($contactUs) {
+                $contactUsId = Helpers::encrypt($contactUs->id);
+                return '
+                    <a href="javascript:;" title="View Reply" class="btn btn-sm btn-text-secondary rounded-pill btn-icon view-reply-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-feedback-id="' . $contactUsId . '"><i class="ri-eye-fill"></i></a>
+                    <a href="javascript:;" title="Send Reply" class="btn btn-sm btn-text-secondary rounded-pill btn-icon send-reply-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-feedback-id="' . $contactUsId . '"><i class="ri-send-plane-fill"></i></a>
+                ';
+            })
+            ->rawColumns(['checkbox','created_date','action'])
             ->make(true);
     }
 
@@ -181,5 +190,71 @@ class ContactUsController extends Controller
 
         return $this->success($response, 'Current year calendar fetched successfully.');
 
+    }
+
+    /** View Feedback Reply */
+    public function viewReply($id)
+    {
+        $id = Helpers::decrypt($id);
+        $reply = ContactUs::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $reply,
+        ]);
+    }
+
+    /** Semd Feedback Reply */
+    public function sendReply(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email'   => 'required|email|max:50',
+            'subject' => 'required|string|min:2|max:150',
+            'message' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $feedback_id = $request->feedback_id;
+        $id = Helpers::decrypt($feedback_id);
+        $email = $request->email;
+        $subsject = $request->subject;
+        $message = $request->message;
+
+        $contactUs = ContactUs::findOrFail($id);
+        if (empty($contactUs)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Feedback not found',
+            ], 404);
+        }
+
+        $contactUs->email_subject = $subsject;
+        $contactUs->feedback_reply = $message;
+        $contactUs->is_replied = 1;
+        $contactUs->save();
+
+        $query = "<b>Query:</b> ". $contactUs->message . "<br><br> ";
+        $message = "<b>Reply:</b> " . $message;
+
+        $data = [
+            'name'    => $contactUs->name,
+            'email'   => $email,
+            'subject' => $subsject,
+            'content' => $query . $message,
+        ];
+
+        Mail::to($email)->send(new DynamicContentMail($data));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reply sent successfully',
+        ]);
     }
 }
