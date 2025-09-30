@@ -145,6 +145,7 @@ class TemplateApiController extends Controller
     
             $data = [
                 "id" => Helpers::encrypt($tempObj->id),
+                "url" =>  $templateJsonUrl,
             ];
             DB::commit();
             return $this->success($data, 'Template create successfully');
@@ -525,8 +526,13 @@ class TemplateApiController extends Controller
         $adminTemplate->template_url = $templateJsonUrl;
         $adminTemplate->save();
 
+        $data = [
+            "id" => Helpers::encrypt($adminTemplate->id),
+            "url" =>  $adminTemplate->template_url,
+        ];
 
-        return $this->success([], 'Template updated successfully');
+
+        return $this->success($data, 'Template updated successfully');
     }
 
     public function delete(Request $request)
@@ -759,9 +765,17 @@ class TemplateApiController extends Controller
 
                     $templateData = [];
                     if (!empty($decryptedTemplateIds)) {
+
+                        $template_data = $template->template_data;
+
+                        if(!empty($template->template_url)){
+                            $relativePath = str_replace('https://boxsocialplatform.lon1.digitaloceanspaces.com/', '', $template->template_url);
+                            $template_data = Storage::disk('digitalocean')->get($relativePath);
+                        }
+
                         $templateData = [
                             'base64_template_image' => $template->template_image ? Helpers::imageUrlToBase64($template->template_image) : '',
-                            'template_data' => $template->template_data ?? '',
+                            'template_data' =>  $template_data ?? '',
                             'template_json_url' => $template->template_url ?? '',
                         ];
                     }
