@@ -1,0 +1,349 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+:root {
+    --bs-warning-rgb: 253, 181, 40;
+}
+
+.light-style .menu .app-brand.demo {
+    height: 64px;
+}
+
+.dark-style .menu .app-brand.demo {
+    height: 64px;
+}
+
+.app-brand-logo.demo svg {
+    width: 38px;
+    height: 20px;
+}
+
+.app-brand-text.demo {
+    font-size: 1.25rem;
+    letter-spacing: 0.15px;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+    padding-top: 64px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+    z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks>* {
+    display: block !important;
+}
+
+.demo-inline-spacing>* {
+    margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing>* {
+    margin-top: 1.25rem !important;
+    margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing.demo-only-element> :first-child {
+    margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg>* {
+    margin-top: 1.875rem !important;
+    margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-lg.demo-only-element> :first-child {
+    margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl>* {
+    margin-top: 5rem !important;
+    margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-xl.demo-only-element> :first-child {
+    margin-top: 0 !important;
+}
+
+.rtl-only {
+    display: none !important;
+    text-align: left !important;
+    direction: ltr !important;
+}
+
+[dir='rtl'] .rtl-only {
+    display: block !important;
+}
+
+/* Dropdown buttons going out of small screens */
+@media (max-width: 576px) {
+    #dropdown-variation-demo .btn-group .text-truncate {
+        width: 300px;
+        position: relative;
+    }
+
+    #dropdown-variation-demo .btn-group .text-truncate::after {
+        position: absolute;
+        top: 45%;
+        right: 0.65rem;
+    }
+}
+
+/* Update the default width of container */
+.container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
+    max-width: 1550px !important;
+}
+
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    margin-top: 1.25rem;
+}
+
+.layout-demo-placeholder img {
+    width: 900px;
+}
+
+.layout-demo-info {
+    text-align: center;
+    margin-top: 1.25rem;
+}
+
+/*
+* Project Custom CSS
+******************************************************************************/
+
+.user-table-header {
+    justify-content: space-between;
+}
+
+/* loader css */
+#box-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #F4D106;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.logo-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.loader-logo {
+    width: 70px;
+    height: 90px;
+    object-fit: contain;
+}
+
+.loader-text {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* custom option image */
+.custom-option-image {
+    border-color: #F4D106;
+}
+
+.custom-option-image:hover {
+    border-color: #F4D106 !important;
+}
+
+.custom-option:hover {
+    background-color: #F4D106 !important;
+}
+
+.search-image-checkbox,
+.saved-image-checkbox {
+    border-color: #F4D106 !important;
+}
+
+.custom-option-image .form-check-input:checked {
+    border-color: #F4D106 !important;
+}
+
+.row #sortable-cards,
+#saved_images {
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.br-1 {
+    border-radius: 10px;
+}
+
+div.font-icon-btns {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.table-action-col {
+    width: 80px !important;
+}
+.table-date-col {
+    width: 190px !important;
+}
+
+.table-images {
+    width: 100px;
+    height: 100px;
+}
+
+.table-bordered.dataTable thead tr th {
+    text-align: center !important;
+}
+
+/* make first child content null, so that ascending and descending icon not show */
+.table-bordered.dataTable thead tr th:first-child::before {
+    content: '' !important;
+}
+
+.table-bordered.dataTable tbody {
+    text-align: center !important;
+}
+/* .table-bordered.dataTable tbody td {
+    padding: 0.7813rem 0.25rem !important;
+} */
+
+.template-image {
+    cursor: pointer;
+    width: 80px;
+    height: 100px;
+}
+
+.template-modal-image {
+    width: 100%;
+    height: 550px;
+    object-fit: contain;
+}
+
+/* for quill editor insert name, phone, description */
+.ql-insert-name {
+    width: max-content !important;
+}
+.ql-insert-email {
+    width: max-content !important;
+}
+.ql-insert-phone {
+    width: max-content !important;
+}
+.ql-insert-website {
+    width: max-content !important;
+}
+.ql-insert-name::before {
+    content: "Name";
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
+}
+.ql-insert-email::before {
+    content: "Email";
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
+}
+.ql-insert-phone::before {
+    content: "Phone";
+    /* content: "\1F4DE"; */
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
+}
+.ql-insert-website::before {
+    content: "Website";
+    /* to add custom icon */
+    /* content: "\1F4DD"; */
+    padding: 5px;
+    line-height: 1.375;
+    height: 1.5rem;
+    width: 1.5rem;
+    font-size: 0.8125rem;
+    --bs-bg-opacity: 1;
+    color: black !important;
+    border-radius: 10px !important;
+    background-color: #F4D106 !important;
+}
+
+/* over write CSS of sweet-alert */
+.swal2-modal.swal2-popup .swal2-title{
+    margin: 0.5rem auto 0.5rem !important;
+    line-height: 1 !important;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+    padding: 0.8em 1em 0 !important;
+}

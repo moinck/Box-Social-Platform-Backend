@@ -1,0 +1,95 @@
+{
+    "menu": [
+        {
+            "url": "/dashboard",
+            "name": "Dashboard",
+            "icon": "menu-icon tf-icons ri-home-smile-line",
+            "slug": "dashboard",
+            "role": ["admin","customer"]
+        },
+        {
+            "url": "/user",
+            "name": "User Management",
+            "icon": "menu-icon tf-icons ri-group-line",
+            "slug": "user",
+            "role": ["admin","customer"]
+        },
+        {
+            "url": "/subscription-management",
+            "name": "Subscription Management",
+            "icon": "menu-icon tf-icons ri-money-pound-box-line",
+            "slug": "subscription-management",
+            "role": ["admin"]
+        },
+        {
+            "url": "/payment-history",
+            "name": "Payment History",
+            "icon": "menu-icon tf-icons ri-secure-payment-line",
+            "slug": "payment-history",
+            "role": ["admin"]
+        },
+        {
+            "url": "/brand-configuration",
+            "name": "Brand Configuration",
+            "icon": "menu-icon tf-icons ri-list-settings-fill",
+            "slug": "brand-configuration",
+            "role": ["admin"]
+        },
+        {
+            "url": "/stock-image-management",
+            "name": "Stock Image Management",
+            "icon": "menu-icon tf-icons ri-folder-image-line",
+            "slug": "stock-image-management",
+            "role": ["admin","customer"]
+        },
+        {
+            "url": "/icon-management",
+            "name": "Icon Management",
+            "icon": "menu-icon tf-icons ri-layout-grid-line",
+            "slug": "icon-management",
+            "role": ["admin"]
+        },
+        {
+            "url": "/categories",
+            "name": "Categories",
+            "icon": "menu-icon tf-icons ri-archive-stack-line",
+            "slug": "categories",
+            "role": ["admin"]
+        },
+        {
+            "url": "/post-content",
+            "name": "Post Content",
+            "icon": "menu-icon tf-icons ri-profile-line",
+            "slug": "post-content",
+            "role": ["admin"]
+        },
+        {
+            "url": "/post-template",
+            "name": "Post Template",
+            "icon": "menu-icon tf-icons ri-layout-2-line",
+            "slug": "post-template",
+            "role": ["admin"]
+        },
+        {
+            "url": "/feedback-management",
+            "name": "Feedback Management",
+            "icon": "menu-icon tf-icons ri-contacts-book-3-line",
+            "slug": "feedback-management",
+            "role": ["admin"]
+        },
+        {
+            "url": "/privacy-policy/edit/TTJ0UTNQeWt1WWhYSEF5cWxtbGVLZz09",
+            "name": "Privacy Policy",
+            "icon": "menu-icon tf-icons ri-book-3-line",
+            "slug": "privacy-policy",
+            "role": ["admin"]
+        },
+        {
+            "url": "/terms-and-condition/edit/TTJ0UTNQeWt1WWhYSEF5cWxtbGVLZz09",
+            "name": "Terms & Conditions",
+            "icon": "menu-icon tf-icons ri-newspaper-line",
+            "slug": "terms-and-condition",
+            "role": ["admin"]
+        }
+    ]
+}

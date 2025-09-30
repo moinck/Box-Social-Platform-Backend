@@ -1,0 +1,301 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\DesignStyles;
+use App\ResponseTrait;
+use Illuminate\Http\Request;
+use App\Helpers\Helpers;
+use Illuminate\Support\Facades\Validator;
+use App\Models\BrandKit;
+use App\Models\SocialMedia;
+use Faker\Extension\Helper;
+use Illuminate\Support\Facades\Cache;
+
+class BrnadKitApiController extends Controller
+{
+    use ResponseTrait;
+
+    public function store(Request $request)
+    {
+
+        $request->merge([
+            'user_id' => Helpers::decrypt($request->user_id)
+        ]);
+
+        $decryptedUserId = $request->user_id;
+        if ($decryptedUserId == false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User ID is invalid.',
+                'errors' => 'User ID is invalid.',
+            ], 422);
+        }
+
+        // phone no regex -> regex:/^\+44\d{10}$/|
+
+        $rules = [
+            'email' => 'required|email',
+            'company_name' => 'required|string|max:255',
+            'logo' => 'required',
+            'user_id' => 'required|string|exists:users,id',
+            'address' => 'nullable|string|max:500',
+            'state' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|min:10|max:13',
+            'country' => 'nullable|string|max:100',
+            'website' => 'nullable|string',
+            'postal_code' => 'nullable|string|min:4|max:20',
+            'show_email_on_post' => 'nullable|boolean',
+            'show_phone_number_on_post' => 'nullable|boolean',
+            'show_website_on_post' => 'nullable|boolean',
+            'social_media_icon_show' => 'nullable|array',
+            'show_address_on_post' => 'nullable|boolean',
+            // 'design_style' => 'required|string|exists:design_styles,name',
+        ];
+
+        $messages = [
+            'email.required' => 'The email address is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'company_name.required' => 'The company name is required.',
+            'user_id.required' => 'User ID is required.',
+            'user_id.exists' => 'User does not exist.',
+            // 'design_style.required' => 'Design style is required.',
+            // 'design_style.exists' => 'Design style does not exist.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $brandKitObj = BrandKit::where('user_id', $decryptedUserId)->first();
+
+        if (empty($brandKitObj)) {
+            $brandKitObj = new BrandKit();
+        }
+
+        $uploadLogoUrl = $request->logo;
+        $logoUrl = null;
+        $oldLogoUrl = $brandKitObj->logo;
+        if ($uploadLogoUrl) {
+            // $logoUrl = Helpers::uploadImageFromUrl('brand_kit',$uploadLogoUrl, 'images/brand-kit-logos');
+            // $logoUrl = Helpers::uploadImage('brand_kit', $uploadLogoUrl, 'images/brand-kit-logos');
+
+            // Check if it's base64 data
+            if (strpos($uploadLogoUrl, 'data:image/') === 0) {
+                $logoUrl = Helpers::handleBase64Image($uploadLogoUrl,'brand_kit','images/brand-kit-logos');
+            } else {
+                // If it's not base64, handle as before (URL or regular file)
+                $logoUrl = Helpers::uploadImage('brand_kit', $uploadLogoUrl, 'images/brand-kit-logos');
+            }
+        }
+
+        // $designStyle = DesignStyles::where('name','like', "%$request->design_style%")->first();
+        // if (empty($designStyle)) {
+        //     $designStyle = null;
+        // }
+
+        $brandKitObj->logo = $logoUrl;
+        // $brandKitObj->base64_logo = $request->logo ?? null;
+        $brandKitObj->user_id = $decryptedUserId;
+        $brandKitObj->company_name = $request->company_name;
+        $brandKitObj->email = $request->email;
+        $brandKitObj->address = $request->address;
+        $brandKitObj->state = $request->state;
+        $brandKitObj->phone = $request->phone;
+        $brandKitObj->country = $request->country;
+        $brandKitObj->website = $request->website;
+        $brandKitObj->postal_code = $request->postal_code;
+        $brandKitObj->show_email_on_post = $request->show_email_on_post;
+        $brandKitObj->show_phone_number_on_post = $request->show_phone_number_on_post;
+        $brandKitObj->show_website_on_post = $request->show_website_on_post;
+        $brandKitObj->show_address_on_post = $request->show_address_on_post;
+        $brandKitObj->color = json_encode($request->color);
+        $brandKitObj->font = json_encode($request->font);
+        // $brandKitObj->design_style = $request->design_style;
+        // $brandKitObj->design_style_id = $designStyle->id ?? null;
+        $brandKitObj->save();
+
+        if ($oldLogoUrl) {
+            Helpers::deleteImage($oldLogoUrl);
+        }
+
+        $socialMediaIconArr = [];
+        if (!empty($request->social_media_icon_show)) {
+            foreach ($request->social_media_icon_show as $key => $value) {
+                $socialMediaIconArr[] = $value;
+            }
+
+            $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
+
+            if (empty($SocialMediaObj)) {
+                $SocialMediaObj = new SocialMedia();
+            }
+
+            $SocialMediaObj->brand_kits_id = $brandKitObj->id;
+            $SocialMediaObj->social_media_icon = json_encode($socialMediaIconArr, 1);
+            $SocialMediaObj->save();
+        }
+
+        $brandKitObj = BrandKit::where('user_id', $decryptedUserId)->first();
+
+        $SocialMediaObj = SocialMedia::where('brand_kits_id', $brandKitObj->id)->first();
+        $SocialMediaIcon = [];
+        if (!empty($SocialMediaObj)) {
+            $SocialMediaIcon = json_decode($SocialMediaObj->social_media_icon);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'BrandKit updated successfully',
+            'data' => [
+                "id" => Helpers::encrypt($brandKitObj->id),
+                "user_id" => Helpers::encrypt($brandKitObj->user_id),
+                "logo" => asset($brandKitObj->logo),
+                "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
+                "company_name" => $brandKitObj->company_name,
+                "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,
+                "email" => $brandKitObj->email,
+                "address" => $brandKitObj->address,
+                "state" => $brandKitObj->state,
+                "phone" => $brandKitObj->phone,
+                "country" => $brandKitObj->country,
+                "website" => $brandKitObj->website,
+                "postal_code" => $brandKitObj->postal_code,
+                "show_email_on_post" => $brandKitObj->show_email_on_post,
+                "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
+                "show_website_on_post" => $brandKitObj->show_website_on_post,
+                "show_address_on_post" => $brandKitObj->show_address_on_post,
+                "social_media_icon_show" => $SocialMediaIcon,
+                // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null)
+            ],
+        ], 200);
+    }
+
+    public function get(Request $request)
+    {
+        // check barer token
+        $user = $request->user();
+        if (!$user) {
+            return $this->error('Unauthorized', 401);
+        }
+
+        $cacheKey = 'brandkit_' . $user->id;
+
+        // $data = Cache::remember($cacheKey, env('CACHE_TIME'), function () use ($user) {
+            
+            $brandKitObj = BrandKit::with(['socialMedia', 'designStyle'])->where('user_id', $user->id)->first();
+            if (!$brandKitObj) {
+                // return null; // Handle later outside cache
+                return $this->error('BrandKit not found', 404);
+            }
+
+            // Social Media Icons
+            $socialMediaIcon = optional($brandKitObj->socialMedia)->social_media_icon
+                ? json_decode($brandKitObj->socialMedia->social_media_icon, true)
+                : [];
+
+            // Design Style Name
+            // $designStyle = optional($brandKitObj->designStyle)->name;
+
+            $path = $brandKitObj->logo;
+            $base64Image = null;
+            if (!empty($path)) {
+                $mime = pathinfo($path, PATHINFO_EXTENSION);
+                if ($mime == 'svg') {
+                    $mime = 'svg+xml';
+                }
+                $base64Image = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            }
+
+            $data = [
+                "id" => Helpers::encrypt($brandKitObj->id),
+                "user_id" => Helpers::encrypt($brandKitObj->user_id),
+                "logo" => $base64Image,
+                "logo_url" => $brandKitObj->logo ? asset($brandKitObj->logo) : null,
+                "color" => (!empty($brandKitObj->color)) ? json_decode($brandKitObj->color, true) : null,
+                "company_name" => $brandKitObj->company_name,
+                "font" => (!empty($brandKitObj->font)) ? json_decode($brandKitObj->font, 1) : null,
+                "email" => $brandKitObj->email,
+                "address" => $brandKitObj->address,
+                "state" => $brandKitObj->state,
+                "phone" => $brandKitObj->phone,
+                "country" => $brandKitObj->country,
+                "website" => $brandKitObj->website,
+                "postal_code" => $brandKitObj->postal_code,
+                "show_email_on_post" => $brandKitObj->show_email_on_post,
+                "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post,
+                "show_website_on_post" => $brandKitObj->show_website_on_post,
+                "show_address_on_post" => $brandKitObj->show_address_on_post,
+                "social_media_icon_show" => $socialMediaIcon,
+                // "design_style" => $designStyle->name ?? ($brandKitObj->design_style ?? null),
+            ];
+
+        // });
+
+        // if ($brandKitObj->base64_logo == null) {
+        //     $brandKitObj->base64_logo = $base64Image;
+        //     $brandKitObj->save();
+        // }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Fetched Successfully.',
+            'data' => $data,
+        ], 200);
+    }
+
+
+    /**
+     * Get design styles
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getDesignStyles(Request $request)
+    {
+        $designStyles = DesignStyles::all();
+
+        $returnData = [];
+        foreach ($designStyles as $key => $designStyle) {
+            $returnData[] = [
+                'id' => Helpers::encrypt($designStyle->id),
+                'name' => $designStyle->name,
+            ];
+        }
+        return $this->success($returnData, 'Design styles fetched successfully');
+    }
+
+    public function adminBrandKit(Request $request)
+    {
+        $brandKitObj = BrandKit::where('user_id', 1)->first();
+        if (empty($brandKitObj)) {
+            return $this->error('BrandKit not found', 404);
+        }
+
+        $returnData = [
+            "company_name" => $brandKitObj->company_name ?? null,
+            "email" => $brandKitObj->email ?? null,
+            "address" => $brandKitObj->address ?? null,
+            "state" => $brandKitObj->state ?? null,
+            "phone" => $brandKitObj->phone ?? null,
+            "country" => $brandKitObj->country ?? null,
+            "website" => $brandKitObj->website ?? null,
+            "postal_code" => $brandKitObj->postal_code ?? null,
+            "warning_title" => $brandKitObj->warning_title ?? null,
+            "warning_message" => $brandKitObj->warning_message ?? null,
+            "show_email_on_post" => $brandKitObj->show_email_on_post ?? 0,
+            "show_phone_number_on_post" => $brandKitObj->show_phone_number_on_post ?? 0,
+            "show_website_on_post" => $brandKitObj->show_website_on_post ?? 0,
+            "show_address_on_post" => $brandKitObj->show_address_on_post ?? 0,
+        ];
+
+        return $this->success($returnData, 'BrandKit fetched successfully');
+    }
+}
