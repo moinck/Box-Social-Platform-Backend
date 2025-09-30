@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('contact_us', function (Blueprint $table) {
-            $table->string('email_subject')->after('message')->nullable;
-            $table->text('feedback_reply')->after('email_subject')->nullable;
-            $table->boolean('is_replied')->after('feedback_reply')->nullable;
+            $table->string('email_subject')->after('message')->nullable();
+            $table->text('feedback_reply')->after('email_subject')->nullable();
+            $table->boolean('is_replied')->after('feedback_reply')->nullable();
         });
     }
 
