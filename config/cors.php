@@ -16,7 +16,8 @@ return [
 
     'allowed_methods' => ['*'], // Allow all HTTP methods (GET, POST, etc.)
 
-    'allowed_origins' => ['http://178.128.45.173:9163','http://localhost:3000','https://admin.boxsocials.com','https://boxsocials.com','https://www.boxsocials.com'], // React app origin
+    // 'allowed_origins' => ['http://178.128.45.173:9163','http://localhost:3000','https://admin.boxsocials.com','https://boxsocials.com','https://www.boxsocials.com','https://frontend.boxsocials.com','https://www.frontend.boxsocials.com'], // React app origin
+    'allowed_origins' => ['*'], // React app origin
 
     'allowed_origins_patterns' => [],
 
@@ -26,6 +27,6 @@ return [
 
     'max_age' => 0, // How long the results of a preflight request can be cached
 
-    'supports_credentials' => true, // Set to true if using cookies/sessions
+    'supports_credentials' => false, // Set to true if using cookies/sessions
 
 ];
