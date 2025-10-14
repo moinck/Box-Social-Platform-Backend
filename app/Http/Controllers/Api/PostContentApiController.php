@@ -204,21 +204,42 @@ class PostContentApiController extends Controller
     public function getCategoryPostContent(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_id' => 'nullable|string',
-            'sub_category_id' => 'nullable|string',
+            'category_id' => 'nullable|array',
+            'category_id.*' => 'string',
+            'sub_category_id' => 'nullable|array',
+            'sub_category_id.*' => 'string',
         ]);
 
         if ($validator->fails()) {
             return $this->validationError('Validation Error', $validator->errors());
         }
-
-        $categoryId = $request->category_id;
-        $subCategoryId = $request->sub_category_id;
-        $postContent = PostContent::when($categoryId, function ($query) use ($categoryId) {
-            return $query->where('category_id', Helpers::decrypt($categoryId));
-        })->when($subCategoryId, function ($query) use ($subCategoryId) {
-            return $query->where('sub_category_id', Helpers::decrypt($subCategoryId));
+        
+        
+        
+        // Get category and subcategory arrays
+        $categoryIds = $request->category_id ?? [];
+        $subCategoryIds = $request->sub_category_id ?? [];
+        
+        // Decrypt all IDs if needed
+        $categoryIds = array_map(fn($id) => Helpers::decrypt($id), $categoryIds);
+        $subCategoryIds = array_map(fn($id) => Helpers::decrypt($id), $subCategoryIds);
+        
+        // Query posts by multiple categories or subcategories
+        $postContent = PostContent::when(!empty($categoryIds), function ($query) use ($categoryIds) {
+            return $query->whereIn('category_id', $categoryIds);
+        })->when(!empty($subCategoryIds), function ($query) use ($subCategoryIds) {
+            return $query->whereIn('sub_category_id', $subCategoryIds);
         })->get();
+    
+    
+        // $categoryId = $request->category_id;
+        // $subCategoryId = $request->sub_category_id;
+        
+        // $postContent = PostContent::when($categoryId, function ($query) use ($categoryId) {
+        //     return $query->where('category_id', Helpers::decrypt($categoryId));
+        // })->when($subCategoryId, function ($query) use ($subCategoryId) {
+        //     return $query->where('sub_category_id', Helpers::decrypt($subCategoryId));
+        // })->get();
 
         if (!$postContent) {
             return $this->error('Post content not found', 404);

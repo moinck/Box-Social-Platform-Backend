@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Edit Post Content</h4>
+                    <h4 class="card-title mb-0">Edit Text Post</h4>
                 </div>
                 <div class="card-body mt-2">
                     <form id="edit-post-content-form" action="{{ route('post-content.update') }}" class="row g-5"
@@ -307,20 +307,40 @@
                     $('.ql-container').css("border",".0625rem solid #c8ced1")
                 }
             });
-
-            // post category change event
+            
+            var selectedCategoryId = $('#post_category').val();
+            if (selectedCategoryId) {
+                GetSubCategory(selectedCategoryId);
+            }
+            
+            // On change event for category select
             $('#post_category').change(function () {
                 var category_id = $(this).val();
-                if (category_id.length == 0) {
+
+                if (!category_id) {
                     $('#post_content_edit_sub_category').html('<option value="">Select Subcategory</option>');
                     $('#selectSubCategory-edit-div').addClass('d-none');
-                    validator.revalidateField('post_content_edit_sub_category');
-                    validator.removeField(`post_content_edit_sub_category`);
                     return;
                 }
+
                 GetSubCategory(category_id);
             });
 
+
+            // post category change event
+            // $('#post_category').change(function () {
+            //     var category_id = $(this).val();
+            //     if (category_id.length == 0) {
+            //         $('#post_content_edit_sub_category').html('<option value="">Select Subcategory</option>');
+            //         $('#selectSubCategory-edit-div').addClass('d-none');
+            //         validator.revalidateField('post_content_edit_sub_category');
+            //         validator.removeField(`post_content_edit_sub_category`);
+            //         return;
+            //     }
+            //     GetSubCategory(category_id);
+            // });
+            
+            
             // get sub category
             function GetSubCategory(category_id) {
 

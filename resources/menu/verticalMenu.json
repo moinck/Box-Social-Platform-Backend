@@ -58,7 +58,7 @@
         },
         {
             "url": "/post-content",
-            "name": "Post Content",
+            "name": "Text Post",
             "icon": "menu-icon tf-icons ri-profile-line",
             "slug": "post-content",
             "role": ["admin"]

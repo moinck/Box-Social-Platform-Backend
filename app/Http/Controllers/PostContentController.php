@@ -39,11 +39,27 @@ class PostContentController extends Controller
 
     public function subCategoryData(Request $request)
     {
-        $categories = Categories::whereNotNull(columns: 'parent_id')
-            ->where(function ($query) use ($request) {
-                $query->where('parent_id', $request->category_id);
-                    // ->where('is_comming_soon', false);
-            })
+        // $categories = Categories::whereNotNull(columns: 'parent_id')
+        //     ->where(function ($query) use ($request) {
+        //         $query->where('parent_id', $request->category_id);
+        //             // ->where('is_comming_soon', false);
+        //     })
+        //     ->orderBy('name', 'asc')
+        //     ->get();
+        
+        $categoryIds = [];
+
+        if ($request->has('category_ids')) {
+            $categoryIds = is_array($request->category_ids)
+                ? $request->category_ids
+                : [$request->category_ids];
+        } elseif ($request->has('category_id')) {
+            $categoryIds = [$request->category_id];
+        }
+
+        // Fetch subcategories matching any of the given category IDs
+        $categories = Categories::whereNotNull('parent_id')
+            ->whereIn('parent_id', $categoryIds)
             ->orderBy('name', 'asc')
             ->get();
 
@@ -64,30 +80,86 @@ class PostContentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'post_title' => 'required',
-            'post_category' => 'required|exists:categories,id',
-            'post_sub_category' => 'nullable|exists:categories,id',
-            'post_description' => 'required',
-            'warning_message' => 'nullable',
+            'post_title' => 'required|string|max:255',
+            'post_category' => 'required|array',
+            'post_category.*' => 'string', // We'll convert to int later
+            'post_sub_category' => 'nullable|array',
+            'post_sub_category.*' => 'string',
+            'post_description' => 'required|string',
+            'warning_message' => 'nullable|string',
         ]);
 
-        $postContent = PostContent::create([
-            'title' => $request->post_title,
-            'category_id' => $request->post_category,
-            'sub_category_id' => $request->post_sub_category,
-            'description' => $request->post_description,
-            'warning_message' => $request->warning_message,
-        ]);
+        $categoryIds = [];
+        foreach ($request->post_category as $cat) {
+            if (is_string($cat)) {
+                $categoryIds = array_merge($categoryIds, explode(',', $cat));
+            } elseif (is_array($cat)) {
+                $categoryIds = array_merge($categoryIds, $cat);
+            }
+        }
+        $categoryIds = array_map('intval', $categoryIds);
 
-        /** Activity Log */
+        $subCategoryIds = [];
+        if ($request->has('post_sub_category')) {
+            foreach ($request->post_sub_category as $sub) {
+                if (is_string($sub)) {
+                    $subCategoryIds = array_merge($subCategoryIds, explode(',', $sub));
+                } elseif (is_array($sub)) {
+                    $subCategoryIds = array_merge($subCategoryIds, $sub);
+                }
+            }
+            $subCategoryIds = array_map('intval', $subCategoryIds);
+        }
+
+        $subCategories = Categories::whereIn('id', $subCategoryIds)->get()->keyBy('id');
+
+        foreach ($categoryIds as $catId) {
+            if (!empty($subCategoryIds)) {
+                // Fetch subcategories that belong to this category
+                $validSubCategories = Categories::whereIn('id', $subCategoryIds)
+                    ->where('parent_id', $catId)
+                    ->get();
+
+                if ($validSubCategories->isEmpty()) {
+                    // No subcategory for this category
+                    PostContent::create([
+                        'title' => $request->post_title,
+                        'category_id' => $catId,
+                        'sub_category_id' => null,
+                        'description' => $request->post_description,
+                        'warning_message' => $request->warning_message,
+                    ]);
+                } else {
+                    foreach ($validSubCategories as $sub) {
+                        PostContent::create([
+                            'title' => $request->post_title,
+                            'category_id' => $catId,
+                            'sub_category_id' => $sub->id,
+                            'description' => $request->post_description,
+                            'warning_message' => $request->warning_message,
+                        ]);
+                    }
+                }
+            } else {
+                PostContent::create([
+                    'title' => $request->post_title,
+                    'category_id' => $catId,
+                    'sub_category_id' => null,
+                    'description' => $request->post_description,
+                    'warning_message' => $request->warning_message,
+                ]);
+            }
+        }
+
         Helpers::activityLog([
             'title' => "Create Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'description' => "Admin Panel: Post Content is ".$request->post_title,
             'url' => route('post-content.store')
         ]);
 
         return redirect()->route('post-content')->with('success', 'Post Content Created Successfully');
     }
+
 
     public function edit($id)
     {
