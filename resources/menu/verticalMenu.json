@@ -58,14 +58,14 @@
         },
         {
             "url": "/post-content",
-            "name": "Design Template",
+            "name": "Text Post",
             "icon": "menu-icon tf-icons ri-profile-line",
             "slug": "post-content",
             "role": ["admin"]
         },
         {
             "url": "/post-template",
-            "name": "Post Template",
+            "name": "Design Template",
             "icon": "menu-icon tf-icons ri-layout-2-line",
             "slug": "post-template",
             "role": ["admin"]

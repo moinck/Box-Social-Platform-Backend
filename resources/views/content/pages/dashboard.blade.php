@@ -92,7 +92,7 @@
 
         {{-- post template count --}}
         <div class="col-lg-3 col-sm-6">
-            <a href="{{ route('post-template') }}" title="Go to Post Template Management">
+            <a href="{{ route('post-template') }}" title="Go to Design Template Management">
                 <div class="card card-border-shadow-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center flex-wrap">

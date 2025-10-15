@@ -83,7 +83,7 @@ class AdminApiController extends Controller
         if (!$postTemplate) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Post Template not found',
+                'message' => 'Design Template not found',
             ]);
         }
 

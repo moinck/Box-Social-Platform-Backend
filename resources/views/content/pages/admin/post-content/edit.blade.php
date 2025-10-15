@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 card mb-6">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Edit Design Template</h4>
+                    <h4 class="card-title mb-0">Edit Text Post</h4>
                 </div>
                 <div class="card-body mt-2">
                     <form id="edit-post-content-form" action="{{ route('post-content.update') }}" class="row g-5"
