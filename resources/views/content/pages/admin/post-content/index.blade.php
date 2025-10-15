@@ -37,7 +37,7 @@
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row border-bottom user-table-header">
             <div class="head-label">
-                <h5 class="card-title mb-0">Text Post</h5>
+                <h5 class="card-title mb-0">Design Template</h5>
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
                 <div class="dt-buttons btn-group flex-wrap"> 
@@ -45,7 +45,7 @@
                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Content">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">Create Text Post</span>
+                            <span class="d-none d-sm-inline-block">Create Design Template</span>
                         </span>
                     </a>
                     <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="post-content-import-btn"

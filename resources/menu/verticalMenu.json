@@ -58,7 +58,7 @@
         },
         {
             "url": "/post-content",
-            "name": "Text Post",
+            "name": "Design Template",
             "icon": "menu-icon tf-icons ri-profile-line",
             "slug": "post-content",
             "role": ["admin"]
