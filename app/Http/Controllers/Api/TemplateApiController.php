@@ -154,7 +154,7 @@ class TemplateApiController extends Controller
         $tempObj->template_image = $imagePath;
         $tempObj->template_data = $request->template_data;
         $tempObj->design_style_id = $designStyleId;
-        $tempObj->post_content_id = $postContentId;
+        // $tempObj->post_content_id = $postContentId; // stop old flow
         $tempObj->save();
 
         DB::commit();
