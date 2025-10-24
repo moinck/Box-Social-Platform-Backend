@@ -20,7 +20,11 @@ class PostTemplate extends Model
         'template_url',
         'uploaded_at',
         'is_uploaded',
+        'category_id_json',
+        'sub_category_id_json',
     ];
+    
+    protected $appends = ['related_posts'];
 
     public function category()
     {
@@ -40,5 +44,17 @@ class PostTemplate extends Model
     public function postContent()
     {
         return $this->belongsTo(PostContent::class,'post_content_id','id');
+    }
+
+    public function getRelatedPostsAttribute()
+    {
+        $categoryIds = json_decode($this->category_id_json, true) ?? [];
+        $subCategoryIds = json_decode($this->sub_category_id_json, true) ?? [];
+
+        $posts = \App\Models\PostContent::whereIn('category_id', $categoryIds)
+                ->whereIn('sub_category_id', $subCategoryIds)
+                ->get();
+
+        return $posts;
     }
 }
