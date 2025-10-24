@@ -68,13 +68,33 @@
                         </ul>
                         <input type="hidden" name="post_category[]" id="selectedCategoryValues">
                         </div>
+                        
+                        <div class="col-12 col-md-6 dropdown-container d-none" id="monthContainer">
+                        <button id="monthDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="selectedMonths">Choose</span>
+                        </button>
+                        <label for="monthDropdown" class="dropdown-label">Select Month</label>
+                        <ul class="dropdown-menu w-100" id="monthMenu">
+                            @foreach($months as $month)
+                            <li>
+                                <label class="dropdown-item"><input type="checkbox" class="month-checkbox" value="{{ $month->month_number }}"> {{ $month->month_name }}
+                                </label>
+                            </li>
+                            @endforeach
+                        </ul>
+                        <input type="hidden" name="months" id="selectedMonthValues">
+                    </div>
+
+
 
                         {{-- Subcategory multi-checkbox dropdown --}}
-                        <div class="dropdown-container mt-3 d-none" id="subcategoryContainer">
-                        <label for="subcategoryDropdown" class="dropdown-label">Select Subcategories</label>
-                        <button id="subcategoryDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="col-12 col-md-6 dropdown-container d-none" id="subcategoryContainer">
+                            <button id="subcategoryDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             <span id="selectedSubcategories">Choose</span>
                         </button>
+                        <label for="subcategoryDropdown" class="dropdown-label">Select Subcategories</label>
+                        
                         <ul class="dropdown-menu w-100" id="subcategoryMenu"></ul>
                         <input type="hidden" name="post_sub_category[]" id="selectedSubcategoryValues">
                         </div>
@@ -310,6 +330,15 @@
                 $('#selectedCategoryValues').val(selected);
                 $('#selectedCategories').text(selected.length ? selected.length + ' selected' : 'Choose');
 
+                if (selected.includes('7')) {
+                    $('#monthContainer').removeClass('d-none');
+                } else {
+                    $('#monthContainer').addClass('d-none');
+                    $('#monthMenu input[type="checkbox"]').prop('checked', false);
+                    $('#selectedMonths').text('Choose');
+                    $('#selectedMonthValues').val('');
+                }
+                
                 if (selected.length === 0) {
                     $('#subcategoryContainer').addClass('d-none');
                     return;
@@ -344,7 +373,19 @@
                 error: function(err) {
                     console.log('AJAX Error:', err);
                 }
+                });
             });
+            
+            $(document).on('change', '.month-checkbox', function () {
+                let selected = [];
+                $('.month-checkbox:checked').each(function () {
+                    selected.push($(this).val());
+                });
+
+                $('#selectedMonths').text(selected.length ? selected.length + ' selected' : 'Choose');
+
+                // Set the comma-separated value into the hidden input
+                $('#selectedMonthValues').val(selected.join(','));
 
             });
 
@@ -400,7 +441,9 @@
         
         }
         
-        #create-post-content-form .dropdown-container button#categoryDropdown {        
+        #create-post-content-form .dropdown-container button#categoryDropdown,
+        #create-post-content-form .dropdown-container button#monthDropdown
+         {        
             padding: calc(.8555rem - 1px) calc(1rem - 1px);        
             height: 3.0000625rem;        
             min-height: 3.0000625rem;        
@@ -410,7 +453,8 @@
             justify-content: space-between;
         }
         
-        #create-post-content-form .dropdown-container button#categoryDropdown + label {
+        #create-post-content-form .dropdown-container button#categoryDropdown + label,
+        #create-post-content-form .dropdown-container button#monthDropdown + label {
             color: #f4d106 !important;
             top: 20px !important;
             position: absolute;
@@ -421,13 +465,15 @@
             opacity: 0;
             transition: all 0.5s ease-in-out;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown:focus + label {
+        #create-post-content-form .dropdown-container button#categoryDropdown:focus + label,
+        #create-post-content-form .dropdown-container button#monthDropdown:focus + label {
             top: -10px !important;
             background-color: #ffffff;
             opacity: 1;
             transition: all 0.5s ease-in-out;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown:focus {
+        #create-post-content-form .dropdown-container button#categoryDropdown:focus,
+        #create-post-content-form .dropdown-container button#monthDropdown:focus {
             border-color: #f4d106 !important;
         }
     </style>

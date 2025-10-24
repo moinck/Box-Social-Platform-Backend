@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PostTemplate extends Model
 {
-    protected $table = 'post_templates3';
+    protected $table = 'post_templates';
 
     protected $fillable = [
         'category_id',

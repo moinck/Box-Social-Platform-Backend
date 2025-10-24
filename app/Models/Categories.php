@@ -19,22 +19,22 @@ class Categories extends Model
     ];
 
     /** Boot method on clear cache */
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::created(function ($user) {
-            Cache::forget('categories_list');
-        });
+    //     static::created(function ($user) {
+    //         Cache::forget('categories_list');
+    //     });
 
-        static::updated(function ($user) {
-            Cache::forget('categories_list');
-        });
+    //     static::updated(function ($user) {
+    //         Cache::forget('categories_list');
+    //     });
 
-        static::deleted(function ($user) {
-            Cache::forget('categories_list');
-        });
-    }
+    //     static::deleted(function ($user) {
+    //         Cache::forget('categories_list');
+    //     });
+    // }
 
     public function parent()
     {

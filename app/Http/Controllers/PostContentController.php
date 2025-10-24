@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Helpers\Helpers;
 use App\Imports\PostContentImport;
 use App\Models\Categories;
+use App\Models\Month as ModelsMonth;
 use App\Models\PostContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Month;
 use Yajra\DataTables\Facades\DataTables;
 
 class PostContentController extends Controller
@@ -33,8 +36,11 @@ class PostContentController extends Controller
             })
             ->orderBy('name', 'asc')
             ->get();
+            
+            $months = ModelsMonth::get();
+          
 
-        return view('content.pages.admin.post-content.create', compact('categories'));
+        return view('content.pages.admin.post-content.create', compact('categories','months'));
     }
 
     public function subCategoryData(Request $request)
@@ -87,6 +93,8 @@ class PostContentController extends Controller
             'post_sub_category.*' => 'string',
             'post_description' => 'required|string',
             'warning_message' => 'nullable|string',
+            'months' => 'nullable|array',
+            'months.*' => 'integer',
         ]);
 
         $categoryIds = [];
@@ -113,6 +121,11 @@ class PostContentController extends Controller
 
         $subCategories = Categories::whereIn('id', $subCategoryIds)->get()->keyBy('id');
 
+        $monthIds = [];
+        if (!empty($request->months)) {
+            $monthIds = array_map('intval', explode(',', $request->months));
+        }
+
         foreach ($categoryIds as $catId) {
             if (!empty($subCategoryIds)) {
                 // Fetch subcategories that belong to this category
@@ -121,33 +134,66 @@ class PostContentController extends Controller
                     ->get();
 
                 if ($validSubCategories->isEmpty()) {
-                    // No subcategory for this category
-                    PostContent::create([
+                    
+                    $post = PostContent::create([
                         'title' => $request->post_title,
                         'category_id' => $catId,
                         'sub_category_id' => null,
                         'description' => $request->post_description,
                         'warning_message' => $request->warning_message,
                     ]);
+
+                    if (!empty($monthIds)) {
+                        foreach ($monthIds as $mId) {
+                            DB::table('post_content_months')->insert([
+                                'post_content_id' => $post->id,
+                                'month_id' => $mId,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+                    }
                 } else {
                     foreach ($validSubCategories as $sub) {
-                        PostContent::create([
+                        $post = PostContent::create([
                             'title' => $request->post_title,
                             'category_id' => $catId,
                             'sub_category_id' => $sub->id,
                             'description' => $request->post_description,
                             'warning_message' => $request->warning_message,
                         ]);
+
+                        if (!empty($monthIds)) {
+                            foreach ($monthIds as $mId) {
+                                DB::table('post_content_months')->insert([
+                                    'post_content_id' => $post->id,
+                                    'month_id' => $mId,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                        }
                     }
                 }
             } else {
-                PostContent::create([
+                $post = PostContent::create([
                     'title' => $request->post_title,
                     'category_id' => $catId,
                     'sub_category_id' => null,
                     'description' => $request->post_description,
                     'warning_message' => $request->warning_message,
                 ]);
+
+                if (!empty($monthIds)) {
+                    foreach ($monthIds as $mId) {
+                        DB::table('post_content_months')->insert([
+                            'post_content_id' => $post->id,
+                            'month_id' => $mId,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
             }
         }
 
