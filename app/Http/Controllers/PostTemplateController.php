@@ -118,9 +118,9 @@ class PostTemplateController extends Controller
                 $status = $data->status == true ? 'checked' : '';
                 $title = '';
                 if ($data->status == true) {
-                    $title = 'Click To Disable Post Template';
+                    $title = 'Click To Disable Design Template';
                 } else {
-                    $title = 'Click To Enable Post Template';
+                    $title = 'Click To Enable Design Template';
                 }
 
                 $postTemplateId = Helpers::encrypt($data->id);
@@ -143,15 +143,15 @@ class PostTemplateController extends Controller
                 $adminAccessToken = Session::get('admin_access_token') ?? '';
                 $editUrl = config('app.frontend_url') . "/admin/edit-templates?id=" . $postTemplateId . '&token=' . $adminAccessToken;
                 // $downloadUrl = route('download.document', $postTemplateId);
-                // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
+                // $downloadBtn = '<a href="' . $downloadUrl . '" title="Download Design Template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon download-post-template-btn"
                 //         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-download-line"></i></a>';
 
                 return '
-                    <a href="javascript::void(0);" title="Duplicate post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon duplicate-post-template-btn"
+                    <a href="javascript::void(0);" title="Duplicate design template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon duplicate-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-file-copy-line"></i></a>
-                    <a href="' . $editUrl . '" title="Edit post template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
+                    <a href="' . $editUrl . '" title="Edit design template" class="btn btn-sm btn-text-secondary rounded-pill btn-icon edit-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-edit-box-line"></i></a>
-                    <a href="javascript:;" title="Delete post template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
+                    <a href="javascript:;" title="Delete design template" class="btn btn-sm btn-text-danger rounded-pill btn-icon delete-post-template-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-post-template-id="' . $postTemplateId . '"><i class="ri-delete-bin-line"></i></a>
                 ';
             })
@@ -171,8 +171,8 @@ class PostTemplateController extends Controller
 
                 /** Activity Log */
                 Helpers::activityLog([
-                    'title' => "Delete Post Template",
-                    'description' => "Admin Panel: Post Template is ".$value->template_name.". Post Template Content: ".(isset($value->postContent) ? $value->postContent->title : '-').". Post Template Category: ".(isset($value->category) ? $value->category->name : '-').". Post Template Sub-Category: ".(isset($value->subCategory) ? $value->subCategory->name : '-'),
+                    'title' => "Delete Design Template",
+                    'description' => "Admin Panel: Design Template is ".$value->template_name.". Design Template Content: ".(isset($value->postContent) ? $value->postContent->title : '-').". Design Template Category: ".(isset($value->category) ? $value->category->name : '-').". Design Template Sub-Category: ".(isset($value->subCategory) ? $value->subCategory->name : '-'),
                     'url' => route('post-content.delete')
                 ]);
 
@@ -182,12 +182,12 @@ class PostTemplateController extends Controller
             }
             return response()->json([
                 'success' => true,
-                'message' => 'Post Template deleted successfully.'
+                'message' => 'Design Template deleted successfully.'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Post Template not found.'
+                'message' => 'Design Template not found.'
             ]);
         }
     }
@@ -214,9 +214,9 @@ class PostTemplateController extends Controller
                 $value->save();
             }
 
-            $message = "Post Template status has been updated successfully.";
+            $message = "Design Template status has been updated successfully.";
             if ($type == "bulk") {
-                $message = "Post Template has been disabled successfully.";
+                $message = "Design Template has been disabled successfully.";
             }
 
             return response()->json([
@@ -226,7 +226,7 @@ class PostTemplateController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Post Template not found.'
+                'message' => 'Design Template not found.'
             ]);
         }
     }
@@ -257,14 +257,14 @@ class PostTemplateController extends Controller
 
                 /** Activity Log */
                 Helpers::activityLog([
-                    'title' => "Duplicate Post Template",
-                    'description' => "Admin Panel: Post Template is ".$postTemplate->template_name.". Post Template Content: ".(isset($postTemplate->postContent) ? $postTemplate->postContent->title : '-').". Post Template Category: ".(isset($postTemplate->category) ? $postTemplate->category->name : '-').". Post Template Sub-Category: ".(isset($postTemplate->subCategory) ? $postTemplate->subCategory->name : '-'),
+                    'title' => "Duplicate Design Template",
+                    'description' => "Admin Panel: Design Template is ".$postTemplate->template_name.". Design Template Content: ".(isset($postTemplate->postContent) ? $postTemplate->postContent->title : '-').". Design Template Category: ".(isset($postTemplate->category) ? $postTemplate->category->name : '-').". Design Template Sub-Category: ".(isset($postTemplate->subCategory) ? $postTemplate->subCategory->name : '-'),
                     'url' => route('post-template.create-duplicate')
                 ]);
                 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Duplicate Post Template created successfully.'
+                    'message' => 'Duplicate Design Template created successfully.'
                 ]);
             } else {
                 return response()->json([
@@ -275,7 +275,7 @@ class PostTemplateController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Post Template not found.'
+                'message' => 'Design Template not found.'
             ]);
         }
     }
@@ -367,7 +367,7 @@ class PostTemplateController extends Controller
         }
     }
 
-    /** Get Post Template Sub-Category */
+    /** Get Design Template Sub-Category */
     public function getSubCategory(Request $request)
     {
         $categories = Categories::whereNotNull(columns: 'parent_id')

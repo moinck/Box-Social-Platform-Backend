@@ -89,30 +89,31 @@ class TemplateApiController extends Controller
     // }
     
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-        'category_id' => 'required|array|min:1',
-        'category_id.*' => 'required|string', 
-        
-        'sub_category_id' => 'nullable|array',
-        'sub_category_id.*' => 'required|string', 
+{
+    $validator = Validator::make($request->all(), [
+    'category_id' => 'required|array|min:1',
+    'category_id.*' => 'required|string', 
+    
+    'sub_category_id' => 'nullable|array',
+    'sub_category_id.*' => 'required|string', 
 
-        'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
-        'template_data' => 'required',
-        'design_style_id' => 'nullable|string',
-        'post_content_id' => 'nullable|string',
-        ], [
-            'template_image.regex' => 'Invalid image format',
-            'category_id.required' => 'At least one category is required',
-        ]);
+    'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+    'template_data' => 'required',
+    'design_style_id' => 'nullable|string',
+    'post_content_id' => 'nullable|string',
+], [
+    'template_image.regex' => 'Invalid image format',
+    'category_id.required' => 'At least one category is required',
+]);
 
-        if ($validator->fails()) {
-            return $this->validationError('Validation failed', $validator->errors());
-        }
+    if ($validator->fails()) {
+        return $this->validationError('Validation failed', $validator->errors());
+    }
 
-        try {
-            DB::beginTransaction();
+    try {
+        DB::beginTransaction();
 
+        // ✅ Decrypt arrays safely
         $categoryIds = collect($request->category_id)
             ->map(fn($id) => Helpers::decrypt($id))
             ->filter()
@@ -133,14 +134,14 @@ class TemplateApiController extends Controller
             ? Helpers::decrypt($request->design_style_id)
             : null;
 
-       
+        // ✅ Handle base64 image
         $imagePath = null;
         if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-        $prefix = 'admin_template_' . rand(1000, 9999);
+            $prefix = 'admin_template_' . rand(1000, 9999);
             $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
         }
 
-        
+        // ✅ Save template
         $tempObj = new PostTemplate();
                 
         $tempObj->category_id = $categoryIds[0] ?? null;  
@@ -150,23 +151,24 @@ class TemplateApiController extends Controller
         $tempObj->category_id_json = json_encode($categoryIds); // store as JSON array
         $tempObj->sub_category_id_json = !empty($subCategoryIds) ? json_encode($subCategoryIds) : null;
                 
-            $tempObj->template_image = $imagePath;
-            $tempObj->template_data = $request->template_data;
-                $tempObj->design_style_id = $designStyleId;
+        $tempObj->template_image = $imagePath;
+        $tempObj->template_data = $request->template_data;
+        $tempObj->design_style_id = $designStyleId;
         // $tempObj->post_content_id = $postContentId; // stop old flow
-            $tempObj->save();
-    
-            DB::commit();
+        $tempObj->save();
+
+        DB::commit();
 
         return $this->success([
             'id' => Helpers::encrypt($tempObj->id),
         ], 'Template created successfully');
-        } catch (Exception $e) {
-            DB::rollBack();
-            Helpers::sendErrorMailToDeveloper($e);
-            return $this->error('Something went wrong', 500);
-        }
+    } catch (Exception $e) {
+        DB::rollBack();
+        Helpers::sendErrorMailToDeveloper($e);
+        return $this->error('Something went wrong', 500);
     }
+}
+
 
     /** Store Template New API */
     public function newStoreTemplate(Request $request)
@@ -527,88 +529,93 @@ class TemplateApiController extends Controller
     //     return $this->success([], 'Template updated successfully');
     // }
     public function update(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'template_id' => 'required|string',
-            
-            'category_id' => 'required|array|min:1',
-            'category_id.*' => 'required|string',
-
-            'sub_category_id' => 'nullable|array',
-            'sub_category_id.*' => 'required|string',
-
-            'template_image' => 'nullable|string|regex:/^data:image\/[^;]+;base64,/',
-            'template_data' => 'required',
-            'design_style_id' => 'nullable|string',
-            'post_content_id' => 'nullable|string',
-        ], [
-            'template_image.regex' => 'Invalid image format',
-            'category_id.required' => 'At least one category is required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->validationError('Validation failed', $validator->errors());
-        }
-
-        $decryptedId = Helpers::decrypt($request->template_id);
-        $adminTemplate = PostTemplate::find($decryptedId);
+{
+    $validator = Validator::make($request->all(), [
+        'template_id' => 'required|string',
         
-        if (!$adminTemplate) {
-            return $this->error('Template not found', 404);
-        }
+        'category_id' => 'required|array|min:1',
+        'category_id.*' => 'required|string',
 
-        try {
-            DB::beginTransaction();
+        'sub_category_id' => 'nullable|array',
+        'sub_category_id.*' => 'required|string',
 
-            $categoryIds = collect($request->category_id)
-                ->map(fn($id) => Helpers::decrypt($id))
-                ->filter()
-                ->values()
-                ->toArray();
+        'template_image' => 'nullable|string|regex:/^data:image\/[^;]+;base64,/',
+        'template_data' => 'required',
+        'design_style_id' => 'nullable|string',
+        'post_content_id' => 'nullable|string',
+    ], [
+        'template_image.regex' => 'Invalid image format',
+        'category_id.required' => 'At least one category is required',
+    ]);
 
-            $subCategoryIds = collect($request->sub_category_id ?? [])
-                ->map(fn($id) => Helpers::decrypt($id))
-                ->filter()
-                ->values()
-                ->toArray();
+    if ($validator->fails()) {
+        return $this->validationError('Validation failed', $validator->errors());
+    }
 
-            $postContentId = $request->post_content_id
-                ? Helpers::decrypt($request->post_content_id)
-                : null;
+    $decryptedId = Helpers::decrypt($request->template_id);
+    $adminTemplate = PostTemplate::find($decryptedId);
 
-            $designStyleId = $request->design_style_id
-                ? Helpers::decrypt($request->design_style_id)
-                : null;
-        
-            $updateImageUrl = $adminTemplate->template_image;
-            if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-                $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
-                if (!empty($adminTemplate->template_image)) {
-                    Helpers::deleteImage($adminTemplate->template_image);
-                }
+    if (!$adminTemplate) {
+        return $this->error('Template not found', 404);
+    }
+
+    try {
+        DB::beginTransaction();
+
+        // ✅ Decrypt arrays safely
+        $categoryIds = collect($request->category_id)
+            ->map(fn($id) => Helpers::decrypt($id))
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $subCategoryIds = collect($request->sub_category_id ?? [])
+            ->map(fn($id) => Helpers::decrypt($id))
+            ->filter()
+            ->values()
+            ->toArray();
+
+        // ✅ Handle optional relations
+        $postContentId = $request->post_content_id
+            ? Helpers::decrypt($request->post_content_id)
+            : null;
+
+        $designStyleId = $request->design_style_id
+            ? Helpers::decrypt($request->design_style_id)
+            : null;
+
+        // ✅ Handle image
+        $updateImageUrl = $adminTemplate->template_image;
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+            $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
+            if (!empty($adminTemplate->template_image)) {
+                Helpers::deleteImage($adminTemplate->template_image);
             }
+        }
 
-            $adminTemplate->category_id = $categoryIds[0] ?? null;
-            $adminTemplate->sub_category_id = $subCategoryIds[0] ?? null;
+        // ✅ Update fields
+        $adminTemplate->category_id = $categoryIds[0] ?? null;
+        $adminTemplate->sub_category_id = $subCategoryIds[0] ?? null;
 
-            $adminTemplate->category_id_json = json_encode($categoryIds);
-            $adminTemplate->sub_category_id_json = !empty($subCategoryIds) ? json_encode($subCategoryIds) : null;
+        $adminTemplate->category_id_json = json_encode($categoryIds);
+        $adminTemplate->sub_category_id_json = !empty($subCategoryIds) ? json_encode($subCategoryIds) : null;
 
-            $adminTemplate->template_image = $updateImageUrl;
-            $adminTemplate->template_data = $request->template_data;
-            $adminTemplate->design_style_id = $designStyleId;
-            $adminTemplate->post_content_id = $postContentId;
+        $adminTemplate->template_image = $updateImageUrl;
+        $adminTemplate->template_data = $request->template_data;
+        $adminTemplate->design_style_id = $designStyleId;
+        $adminTemplate->post_content_id = $postContentId;
 
         $adminTemplate->save();
 
-            DB::commit();
+        DB::commit();
         return $this->success([], 'Template updated successfully');
-        } catch (Exception $e) {
-            DB::rollBack();
-            Helpers::sendErrorMailToDeveloper($e);
-            return $this->error('Something went wrong', 500);
-        }
+    } catch (Exception $e) {
+        DB::rollBack();
+        Helpers::sendErrorMailToDeveloper($e);
+        return $this->error('Something went wrong', 500);
     }
+}
+
 
     /** Update Template New API */
     public function newUpdateTemplate(Request $request)

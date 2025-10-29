@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Post Template')
+@section('title', 'Design Template')
 
 <!-- Vendor Styles -->
 @section('vendor-style')
@@ -37,16 +37,16 @@
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row border-bottom user-table-header">
             <div class="head-label">
-                <h5 class="card-title mb-0">Post Template</h5>
+                <h5 class="card-title mb-0">Design Template</h5>
             </div>
             <div class="d-flex gap-2">
                 <div class="dt-action-buttons text-end pt-3 pt-md-0">
                     <div class="dt-buttons btn-group flex-wrap"> 
                         <a href="{{ env('APP_FRONTEND', 'http://178.128.45.173:9163') }}/admin/create-templates?token={{ $currentAdminToken ?? '' }}" target="_blank" class="btn btn-secondary btn-primary waves-effect waves-light" 
-                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Post Template">
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create Design Template">
                             <span>
                                 <i class="ri-add-line ri-16px me-sm-2"></i>
-                                <span class="d-none d-sm-inline-block">Create Post Template</span>
+                                <span class="d-none d-sm-inline-block">Create Design Template</span>
                             </span>
                         </a>
                     </div>
@@ -391,7 +391,7 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     // PostTemplateDataTable();
-                                    showSweetAlert('success', 'Deleted!', 'Post Template has been deleted.');
+                                    showSweetAlert('success', 'Deleted!', 'Design Template has been deleted.');
                                     reloadDataTablePreservingPage(table); 
 
                                     // setTimeout(function() {
@@ -464,7 +464,7 @@
                             success: function(response) {
                                 if (response.success == true) {
                                     PostTemplateDataTable();
-                                    showSweetAlert('success', 'Created!', 'Duplicate Post Template has been created.');
+                                    showSweetAlert('success', 'Created!', 'Duplicate Design Template has been created.');
                                 } else {
                                     showSweetAlert('error', 'Error!', 'Something went wrong.');
                                 }

@@ -27,6 +27,7 @@ class SubscriptionPlanApiController extends Controller
                     'name' => $plan->name,
                     'price' => $plan->price,
                     'currency' => $plan->currency,
+                    'interval' => $plan->interval,
                 ];
             }
 

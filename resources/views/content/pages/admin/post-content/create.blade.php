@@ -384,6 +384,10 @@
                     error: function(err) {
                         console.log('AJAX Error:', err);
                     }
+                },
+                error: function(err) {
+                    console.log('AJAX Error:', err);
+                }
                 });
             });
             
