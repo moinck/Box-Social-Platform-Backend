@@ -21,59 +21,146 @@ class TemplateApiController extends Controller
 {
     use ResponseTrait;
 
+    // public function store(Request $request)
+    // {
+
+    //     $validator = Validator::make($request->all(), [
+    //         // 'category_id' => 'required|string',
+            
+    //         'category_id' => 'required|array|min:1',
+    //         'category_id.*' => 'integer|exists:categories,id',
+            
+    //         'sub_category_id' => 'nullable|array',
+    //         'sub_category_id.*' => 'integer|exists:categories,id',
+    
+    //         // 'sub_category_id' => 'nullable|string',
+    //         'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+    //         'template_data' => 'required', // or 'array' if JSON
+    //         'design_style_id' => 'nullable|string',
+    //         'post_content_id' => 'nullable|string',
+    //     ],[
+    //         'template_image.regex' => 'Invalid image format',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->validationError('Validation failed', $validator->errors());
+    //     }
+
+    //     $postContentId = $request->post_content_id ? Helpers::decrypt($request->post_content_id) : null;
+    //     $categoryId = $request->category_id ? Helpers::decrypt($request->category_id) : null;
+    //     $subCategoryId = $request->sub_category_id ? Helpers::decrypt($request->sub_category_id) : null;
+    //     $designStyleId = $request->design_style_id ? Helpers::decrypt($request->design_style_id) : null;
+
+    //     try {
+    //         DB::beginTransaction();
+    //         $imagePath = null;
+    //         if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+    //             $prefix = 'admin_template_'. rand(1000, 9999);
+    //             $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
+    //         }
+    //         $tempObj = new PostTemplate();
+    //         $tempObj->category_id = $categoryId;
+    //         $tempObj->template_image = $imagePath;
+    //         $tempObj->template_data = $request->template_data;
+    
+    //         if ($request->has('sub_category_id') && $subCategoryId !== null) {
+    //             $tempObj->sub_category_id = $subCategoryId;
+    //         }
+    
+    //         if ($request->has('design_style_id') && $designStyleId) {
+    //             $tempObj->design_style_id = $designStyleId;
+    //         }
+    
+    //         if ($request->has('post_content_id') && $postContentId) {
+    //             $tempObj->post_content_id = $postContentId;
+    //         }
+    //         $tempObj->save();
+    
+    //         $data = [
+    //             "id" => Helpers::encrypt($tempObj->id),
+    //         ];
+    //         DB::commit();
+    //         return $this->success($data, 'Template create successfully');
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         Helpers::sendErrorMailToDeveloper($e);
+    //         return $this->error('Something went wrong', 500);
+    //     }
+    // }
+    
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'category_id' => 'required|string',
-            'sub_category_id' => 'nullable|string',
-            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
-            'template_data' => 'required', // or 'array' if JSON
-            'design_style_id' => 'nullable|string',
-            'post_content_id' => 'nullable|string',
-        ],[
+        'category_id' => 'required|array|min:1',
+        'category_id.*' => 'required|string', 
+        
+        'sub_category_id' => 'nullable|array',
+        'sub_category_id.*' => 'required|string', 
+
+        'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+        'template_data' => 'required',
+        'design_style_id' => 'nullable|string',
+        'post_content_id' => 'nullable|string',
+        ], [
             'template_image.regex' => 'Invalid image format',
+            'category_id.required' => 'At least one category is required',
         ]);
 
         if ($validator->fails()) {
             return $this->validationError('Validation failed', $validator->errors());
         }
 
-        $postContentId = $request->post_content_id ? Helpers::decrypt($request->post_content_id) : null;
-        $categoryId = $request->category_id ? Helpers::decrypt($request->category_id) : null;
-        $subCategoryId = $request->sub_category_id ? Helpers::decrypt($request->sub_category_id) : null;
-        $designStyleId = $request->design_style_id ? Helpers::decrypt($request->design_style_id) : null;
-
         try {
             DB::beginTransaction();
-            $imagePath = null;
-            if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-                $prefix = 'admin_template_'. rand(1000, 9999);
-                $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
-            }
-            $tempObj = new PostTemplate();
-            $tempObj->category_id = $categoryId;
+
+        $categoryIds = collect($request->category_id)
+            ->map(fn($id) => Helpers::decrypt($id))
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $subCategoryIds = collect($request->sub_category_id ?? [])
+            ->map(fn($id) => Helpers::decrypt($id))
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $postContentId = $request->post_content_id
+            ? Helpers::decrypt($request->post_content_id)
+            : null;
+
+        $designStyleId = $request->design_style_id
+            ? Helpers::decrypt($request->design_style_id)
+            : null;
+
+       
+        $imagePath = null;
+        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+        $prefix = 'admin_template_' . rand(1000, 9999);
+            $imagePath = Helpers::handleBase64Image($request->template_image, $prefix, 'images/admin-post-templates');
+        }
+
+        
+        $tempObj = new PostTemplate();
+                
+        $tempObj->category_id = $categoryIds[0] ?? null;  
+        $tempObj->sub_category_id = $subCategoryIds[0] ?? null;
+        
+        
+        $tempObj->category_id_json = json_encode($categoryIds); // store as JSON array
+        $tempObj->sub_category_id_json = !empty($subCategoryIds) ? json_encode($subCategoryIds) : null;
+                
             $tempObj->template_image = $imagePath;
             $tempObj->template_data = $request->template_data;
-    
-            if ($request->has('sub_category_id') && $subCategoryId !== null) {
-                $tempObj->sub_category_id = $subCategoryId;
-            }
-    
-            if ($request->has('design_style_id') && $designStyleId) {
                 $tempObj->design_style_id = $designStyleId;
-            }
-    
-            if ($request->has('post_content_id') && $postContentId) {
-                $tempObj->post_content_id = $postContentId;
-            }
+        // $tempObj->post_content_id = $postContentId; // stop old flow
             $tempObj->save();
     
-            $data = [
-                "id" => Helpers::encrypt($tempObj->id),
-            ];
             DB::commit();
-            return $this->success($data, 'Template create successfully');
+
+        return $this->success([
+            'id' => Helpers::encrypt($tempObj->id),
+        ], 'Template created successfully');
         } catch (Exception $e) {
             DB::rollBack();
             Helpers::sendErrorMailToDeveloper($e);
@@ -194,6 +281,7 @@ class TemplateApiController extends Controller
             'sub_category_id' => $tempObj->sub_category_id ? Helpers::encrypt($tempObj->sub_category_id) : null,
             'post_content_id' => $tempObj->post_content_id ? Helpers::encrypt($tempObj->post_content_id) : null,
             'design_style_id' => $tempObj->design_style_id ? Helpers::encrypt($tempObj->design_style_id) : null,
+            'month_id'=> $tempObj->month_id ? Helpers::encrypt($tempObj->month_id) : null,
         ];
 
         $data = [
@@ -370,73 +458,156 @@ class TemplateApiController extends Controller
     }
     
 
+    // public function update(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'template_id' => 'required',
+    //         'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+    //         'template_data' => 'required',
+    //         'category_id' => 'required|string',
+    //         'sub_category_id' => 'nullable|string',
+    //         'design_style_id' => 'nullable|string',
+    //         'post_content_id' => 'nullable|string',
+    //     ],[
+    //         'template_image.regex' => 'Invalid image format',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->validationError('Validation failed', $validator->errors());
+    //     }
+
+    //     $decyptedId = Helpers::decrypt($request->template_id);
+
+        
+    //     $adminTemplate = PostTemplate::find($decyptedId);
+        
+    //     if (!$adminTemplate) {
+    //         return $this->error('Template not found', 404);
+    //     }
+    //     $oldTemplateImage = $adminTemplate->template_image;
+        
+    //     // upload image
+    //     $updateImageUrl = null;
+    //     if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+    //         $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
+
+    //         if ($oldTemplateImage && $oldTemplateImage != null) {
+    //             Helpers::deleteImage($oldTemplateImage);
+    //         }
+    //     }
+
+    //     // nullable
+    //     if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
+    //         $adminTemplate->sub_category_id = Helpers::decrypt($request->sub_category_id);
+    //     } else {
+    //         $adminTemplate->sub_category_id = null;
+    //     }
+
+    //     if ($request->has('category_id') && $request->category_id !== null) {
+    //         $adminTemplate->category_id = Helpers::decrypt($request->category_id);
+    //     }
+
+    //     if ($request->has('design_style_id') && $request->design_style_id) {
+    //         $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
+    //         $adminTemplate->design_style_id = $decryptedDesignStyleId;
+    //     }
+
+    //     if ($request->has('post_content_id') && $request->post_content_id) {
+    //         $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
+    //         $adminTemplate->post_content_id = $decryptedPostContentId;
+    //     } else {
+    //         $adminTemplate->post_content_id = null;
+    //     }
+
+    //     $adminTemplate->template_image = $updateImageUrl ?? null;
+    //     $adminTemplate->template_data = $request->template_data;
+    //     $adminTemplate->save();
+
+
+    //     return $this->success([], 'Template updated successfully');
+    // }
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'template_id' => 'required',
-            'template_image' => 'required|string|regex:/^data:image\/[^;]+;base64,/',
+            'template_id' => 'required|string',
+            
+            'category_id' => 'required|array|min:1',
+            'category_id.*' => 'required|string',
+
+            'sub_category_id' => 'nullable|array',
+            'sub_category_id.*' => 'required|string',
+
+            'template_image' => 'nullable|string|regex:/^data:image\/[^;]+;base64,/',
             'template_data' => 'required',
-            'category_id' => 'required|string',
-            'sub_category_id' => 'nullable|string',
             'design_style_id' => 'nullable|string',
             'post_content_id' => 'nullable|string',
-        ],[
+        ], [
             'template_image.regex' => 'Invalid image format',
+            'category_id.required' => 'At least one category is required',
         ]);
 
         if ($validator->fails()) {
             return $this->validationError('Validation failed', $validator->errors());
         }
 
-        $decyptedId = Helpers::decrypt($request->template_id);
-
-        
-        $adminTemplate = PostTemplate::find($decyptedId);
+        $decryptedId = Helpers::decrypt($request->template_id);
+        $adminTemplate = PostTemplate::find($decryptedId);
         
         if (!$adminTemplate) {
             return $this->error('Template not found', 404);
         }
-        $oldTemplateImage = $adminTemplate->template_image;
+
+        try {
+            DB::beginTransaction();
+
+            $categoryIds = collect($request->category_id)
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->filter()
+                ->values()
+                ->toArray();
+
+            $subCategoryIds = collect($request->sub_category_id ?? [])
+                ->map(fn($id) => Helpers::decrypt($id))
+                ->filter()
+                ->values()
+                ->toArray();
+
+            $postContentId = $request->post_content_id
+                ? Helpers::decrypt($request->post_content_id)
+                : null;
+
+            $designStyleId = $request->design_style_id
+                ? Helpers::decrypt($request->design_style_id)
+                : null;
         
-        // upload image
-        $updateImageUrl = null;
-        if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
-            $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
-
-            if ($oldTemplateImage && $oldTemplateImage != null) {
-                Helpers::deleteImage($oldTemplateImage);
+            $updateImageUrl = $adminTemplate->template_image;
+            if ($request->has('template_image') && strpos($request->template_image, 'data:image/') === 0) {
+                $updateImageUrl = Helpers::handleBase64Image($request->template_image, 'admin_template', 'images/admin-post-templates');
+                if (!empty($adminTemplate->template_image)) {
+                    Helpers::deleteImage($adminTemplate->template_image);
+                }
             }
-        }
 
-        // nullable
-        if ($request->has('sub_category_id') && $request->sub_category_id !== null) {
-            $adminTemplate->sub_category_id = Helpers::decrypt($request->sub_category_id);
-        } else {
-            $adminTemplate->sub_category_id = null;
-        }
+            $adminTemplate->category_id = $categoryIds[0] ?? null;
+            $adminTemplate->sub_category_id = $subCategoryIds[0] ?? null;
 
-        if ($request->has('category_id') && $request->category_id !== null) {
-            $adminTemplate->category_id = Helpers::decrypt($request->category_id);
-        }
+            $adminTemplate->category_id_json = json_encode($categoryIds);
+            $adminTemplate->sub_category_id_json = !empty($subCategoryIds) ? json_encode($subCategoryIds) : null;
 
-        if ($request->has('design_style_id') && $request->design_style_id) {
-            $decryptedDesignStyleId = Helpers::decrypt($request->design_style_id);
-            $adminTemplate->design_style_id = $decryptedDesignStyleId;
-        }
+            $adminTemplate->template_image = $updateImageUrl;
+            $adminTemplate->template_data = $request->template_data;
+            $adminTemplate->design_style_id = $designStyleId;
+            $adminTemplate->post_content_id = $postContentId;
 
-        if ($request->has('post_content_id') && $request->post_content_id) {
-            $decryptedPostContentId = Helpers::decrypt($request->post_content_id);
-            $adminTemplate->post_content_id = $decryptedPostContentId;
-        } else {
-            $adminTemplate->post_content_id = null;
-        }
-
-        $adminTemplate->template_image = $updateImageUrl ?? null;
-        $adminTemplate->template_data = $request->template_data;
         $adminTemplate->save();
 
-
+            DB::commit();
         return $this->success([], 'Template updated successfully');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Helpers::sendErrorMailToDeveloper($e);
+            return $this->error('Something went wrong', 500);
+        }
     }
 
     /** Update Template New API */

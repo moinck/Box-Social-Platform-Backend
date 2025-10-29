@@ -79,6 +79,8 @@ class CategoriesController extends Controller
             'custom_label' => 'required_if:category_coming_soon,2',
             'subcategory_name' => 'nullable|array',
             'subcategory_name.*' => 'required|string|max:255',
+            'subcategory_month' => 'nullable|array',
+            'subcategory_month.*' => 'nullable|integer|min:1|max:12',
         ]);
 
         $image = $request->file('category_image');
@@ -90,33 +92,42 @@ class CategoriesController extends Controller
         $category->description = $request->category_description;
         $category->status = $request->category_status == 'active' ? true : false;
         $category->is_comming_soon = $request->category_coming_soon;
-        $category->custom_label = isset($request->custom_label) ? $request->custom_label : null;
+        $category->custom_label = $request->category_coming_soon == 2 ? $request->custom_label : null;
+        $category->month_id = null; // Parent category does not have a month
         $category->save();
 
         $subCategoryName = [];
-        // add subcategories
+
         if ($request->has('subcategory_name')) {
             foreach ($request->subcategory_name as $index => $subcategory_name) {
                 $subcategory = new Categories();
                 $subcategory->name = $subcategory_name;
                 $subcategory->parent_id = $category->id;
+                $subcategory->status = true; // default active
+                $subcategory->month_id = null; // default null
 
-                $subCategoryName[] = $subcategory->name;
+                if ($request->has('subcategory_month') && isset($request->subcategory_month[$index]) && !empty($request->subcategory_month[$index])) {
+                    $subcategory->month_id = (int)$request->subcategory_month[$index];
+                }
 
-                // Check if 'subcategory_coming_soon' is set and if the current index has 'on' value
-                if ($request->has('subcategory_coming_soon') && isset($request->subcategory_coming_soon[$index]) && $request->subcategory_coming_soon[$index] == 'on') {
+                if (
+                    $request->has('subcategory_coming_soon') &&
+                    isset($request->subcategory_coming_soon[$index]) &&
+                    $request->subcategory_coming_soon[$index] == 'on'
+                ) {
                     $subcategory->is_comming_soon = true;
                 } else {
                     $subcategory->is_comming_soon = false;
                 }
                 $subcategory->save();
+                $subCategoryName[] = $subcategory->name;
             }
         }
 
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Create Category & Sub-Category",
-            'description' => "Admin Panel:  Category Name: (". $request->category_name . "). Sub-Category Name: (".implode(', ', $subCategoryName).")",
+            'description' => "Admin Panel: Category Name: (" . $request->category_name . "). Sub-Category Name: (" . implode(', ', $subCategoryName) . ")",
             'url' => route('categories.store')
         ]);
 
@@ -126,21 +137,50 @@ class CategoriesController extends Controller
         ]);
     }
 
+
+    // public function edit($id)
+    // {
+    //     $categoryId = Helpers::decrypt($id);
+    //     $category = Categories::with('children:id,name,parent_id,is_comming_soon,month_id')->find($categoryId);
+    //     if ($category) {
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $category
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Category not found.'
+    //         ]);
+    //     }
+    // }
+
     public function edit($id)
     {
         $categoryId = Helpers::decrypt($id);
-        $category = Categories::with('children:id,name,parent_id,is_comming_soon')->find($categoryId);
-        if ($category) {
-            return response()->json([
-                'success' => true,
-                'data' => $category
-            ]);
-        } else {
+
+        // Fetch category with its subcategories
+        $category = Categories::with(['children:id,name,parent_id,month_id,is_comming_soon'])
+            ->find($categoryId);
+
+        if (!$category) {
             return response()->json([
                 'success' => false,
                 'message' => 'Category not found.'
             ]);
         }
+
+        // Check if the category has month-based subcategories
+        $months = Categories::where('parent_id', $categoryId)
+            ->whereNotNull('month_id')
+            ->orderBy('month_id')
+            ->get(['id', 'name', 'month_id']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $category,
+            'months' => $months
+        ]);
     }
 
     public function update(Request $request)

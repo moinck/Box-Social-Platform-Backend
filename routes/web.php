@@ -33,12 +33,27 @@ use App\Http\Controllers\DummyFcaNumberController;
 use App\Http\Controllers\FaqCalendarImageController;
 use App\Http\Controllers\YoutubeVideoController;
 
+use Illuminate\Support\Facades\Mail;
+
 Route::middleware('guest')->group(function () {
     Route::redirect('/', '/login');
     Route::get('/login', [LoginController::class, 'index'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     // Route::get('/register', [RegisterController::class,'index'])->name('register');
     // Route::post('/register/check', [RegisterController::class,'register'])->name('register.check');
+});
+
+Route::get('/test-email', function () {
+    try {
+        Mail::raw('This is a test email from Laravel.', function ($message) {
+            $message->to('kaushar.coderkube@gmail.com') // replace with your email
+                    ->subject('Test Email from Brevo SMTP');
+        });
+
+        return 'Email sent successfully!';
+    } catch (\Exception $e) {
+        return 'Email failed: ' . $e->getMessage();
+    }
 });
 Route::get('/daily-backup', [DataBackupController::class, 'dailyBackup'])->name('dailyBackup');
 Route::get('/uploadMissingImages', [TestController::class, 'uploadMissingImages'])->name('uploadMissingImages');

@@ -174,6 +174,8 @@ Route::group([
     // get stock image
     Route::get('/admin/stock-image/get', [StockImageApiController::class, 'get']);
     Route::get('/admin/stock-image/uploaded', [StockImageApiController::class, 'getUploadedStockImage']);
+    Route::post('/admin/user-image/store', [StockImageApiController::class, 'store']);
+
     Route::post('/admin/stock-image/upload', [StockImageApiController::class, 'uploadStockImage']);
     Route::get('/admin/stock-image/get-uploaded-image', [StockImageApiController::class, 'getAdminUploadedStockImage']);
     

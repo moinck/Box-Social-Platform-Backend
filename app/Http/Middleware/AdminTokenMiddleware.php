@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Models\UserTokens;
+use App\Models\User;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Session;
@@ -48,6 +50,8 @@ class AdminTokenMiddleware
             ], 401);
         }
 
+        $user = User::find($validToken->user_id);
+        Auth::login($user);
         return $next($request);
     }
 }

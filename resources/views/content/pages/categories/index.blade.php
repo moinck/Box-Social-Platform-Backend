@@ -136,6 +136,10 @@
                                     <i class="fas fa-plus me-1"></i> Add Subcategory
                                 </button>
                             </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="enable_months_checkbox" />
+                                <label class="form-check-label" for="enable_months_checkbox">Enable Month Selection for Subcategories</label>
+                            </div>
                             <div id="subcategories-container">
                                 <!-- Subcategory fields will be added here dynamically -->
                             </div>
@@ -315,7 +319,6 @@
             });
             // -------------------------------------------
             
-            // validate the submit form
             const addCategoryForm = document.getElementById('add-category-form');
             const addCategoryFV = FormValidation.formValidation(addCategoryForm, {
                 fields: {
@@ -373,9 +376,8 @@
                         validators: {
                             callback: {
                                 message: 'Please enter your custom label',
-                                callback: function(data, validator, $field) {
+                                callback: function (data, validator, $field) {
                                     const comingSoonVal = $('#add-category-form [name="category_coming_soon"]').val();
-                                    
                                     if (comingSoonVal == 2) {
                                         return (data.value !== null && data.value.trim() !== '');
                                     }
@@ -389,8 +391,7 @@
                     trigger: new FormValidation.plugins.Trigger(),
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
-                        rowSelector: function(field, ele) {
-                            // Customize row selector based on your form layout
+                        rowSelector: function (field, ele) {
                             if (['category_name', 'category_image', 'category_description', 'custom_label'].includes(field)) {
                                 return '.col-12';
                             }
@@ -401,13 +402,11 @@
                         }
                     }),
                     submitButton: new FormValidation.plugins.SubmitButton(),
-                    // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
-                    // autoFocus: new FormValidation.plugins.AutoFocus()
                 }
-            }).on('core.form.valid', function() {
+            }).on('core.form.valid', function () {
                 // Form is valid, proceed with form submission
-                var form = $('#add-category-form');
-                var formData = new FormData(form[0]); // Creates FormData object
+                const form = $('#add-category-form');
+                const formData = new FormData(form[0]);
 
                 $.ajax({
                     url: "{{ route('categories.store') }}",
@@ -421,20 +420,21 @@
                     complete: function () {
                         hideBSPLoader();
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success == true) {
-                            showSweetAlert('success', 'Created !','Category has been created successfully.');
+                            showSweetAlert('success', 'Created !', 'Category has been created successfully.');
                             $('#add-category-modal').modal('hide');
                             CategoriesDataTable();
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         hideBSPLoader();
                         console.log(xhr.responseText);
                         showSweetAlert('error', 'Error !', 'Something went wrong.');
                     }
                 });
             });
+
             // ----------------------------------------------------------
 
             // change status function
@@ -785,14 +785,38 @@
 
             // add subcategory
             // let subcategoryCount = 0;
-            $(document).on('click', '#add-subcategory-btn', function() {
+            $(document).on('click', '#add-subcategory-btn', function () {
                 subcategoryCount++;
-                var subcategoriesContainer = $('#subcategories-container');
-                var subcategoryHtml = `
+                const subcategoriesContainer = $('#subcategories-container');
+                const isMonthEnabled = $('#enable_months_checkbox').is(':checked');
+
+                // Month dropdown HTML (only if enabled)
+                const monthDropdown = isMonthEnabled ? `
+                    <div class="form-floating form-floating-outline ms-2" style="width: 30%;">
+                        <select class="form-select subcategory-month" name="subcategory_month[${subcategoryCount}]" id="subcategory_month_${subcategoryCount}">
+                            <option value="">Select Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <label for="subcategory_month_${subcategoryCount}">Month</label>
+                    </div>` : '';
+
+                // Subcategory item HTML
+                const subcategoryHtml = `
                     <div class="col-12 mt-2 subcategory-item">
                         <ul style="padding-left:0;">
-                            <li class="mb-2 d-flex align-items-center justify-content-between">
-                                <div class="input-group input-group-merge">
+                            <li class="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="input-group input-group-merge" style="flex:1;">
                                     <div class="form-floating form-floating-outline">
                                         <input
                                             type="text"
@@ -804,18 +828,25 @@
                                         <label for="subcategory_name_${subcategoryCount}">Subcategory Name ${subcategoryCount}</label>
                                     </div>
                                 </div>
-                                <div class="form-check form-switch mx-2" style="width: 30%;">
+
+                                ${monthDropdown}
+
+                                <div class="form-check form-switch mx-2">
                                     <input class="form-check-input" type="checkbox" name="subcategory_coming_soon[${subcategoryCount}]" id="subcategory_coming_soon_${subcategoryCount}" />
                                     <label class="form-check-label" for="subcategory_coming_soon_${subcategoryCount}">Coming Soon</label>
                                 </div>
-                                <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
+
+                                <span class="input-group-text text-danger cursor-pointer remove-subcategory-btn">
+                                    <i class="ri-delete-bin-line"></i>
+                                </span>
                             </li>
                         </ul>
                     </div>
                 `;
+
                 subcategoriesContainer.append(subcategoryHtml);
 
-                // also add validation for subcategory name
+                // Revalidate new subcategory name
                 addCategoryFV.revalidateField('subcategory_name');
                 addCategoryFV.addField(`subcategory_name[${subcategoryCount}]`, {
                     validators: {
@@ -824,6 +855,17 @@
                         }
                     }
                 });
+
+                // If month is enabled, validate month dropdown too
+                if (isMonthEnabled) {
+                    addCategoryFV.addField(`subcategory_month[${subcategoryCount}]`, {
+                        validators: {
+                            notEmpty: {
+                                message: 'Month is required for Subcategory ' + subcategoryCount
+                            }
+                        }
+                    });
+                }
             });
             // ----------------------------------------------------------
 
@@ -917,5 +959,11 @@
             });
 
         });
+
+        $('#enable_months_checkbox').on('change', function () {
+        const enabled = $(this).is(':checked');
+        $('#subcategories-container').empty();
+        subcategoryCount = 0;
+    });
     </script>
 @endsection

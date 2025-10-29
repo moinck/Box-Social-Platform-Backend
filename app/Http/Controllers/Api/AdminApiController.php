@@ -42,7 +42,7 @@ class AdminApiController extends Controller
                 ];
             });
         
-        $subCategories = Categories::select('id', 'name','parent_id')
+        $subCategories = Categories::select('id', 'name','parent_id','month_id')
             ->where(function ($query) {
                 $query->whereNotNull('parent_id')
                     ->where('status', true);
@@ -54,6 +54,7 @@ class AdminApiController extends Controller
                     'id' => Helpers::encrypt($subCategory->id),
                     'name' => $subCategory->name,
                     'parent_id' => $subCategory->parent_id ? Helpers::encrypt($subCategory->parent_id) : null,
+                    'month_id'=> $subCategory->month_id
                 ];
             });
 
@@ -83,7 +84,7 @@ class AdminApiController extends Controller
         if (!$postTemplate) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Post Template not found',
+                'message' => 'Design Template not found',
             ]);
         }
 
