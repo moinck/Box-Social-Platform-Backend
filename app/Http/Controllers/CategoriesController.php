@@ -197,6 +197,7 @@ class CategoriesController extends Controller
 
         $categoryId = Helpers::decrypt($request->edit_category_id);
         $category = Categories::find($categoryId);
+
         if ($category) {
             $category->name = $request->edit_category_name;
             $category->description = $request->edit_category_description;
@@ -209,7 +210,6 @@ class CategoriesController extends Controller
                 if ($category->image) {
                     Helpers::deleteImage($category->image);
                 }
-
                 // upload new image
                 $image = $request->file('edit_category_image');
                 $image_url = Helpers::uploadImage('cat', $image, 'images/categories');
@@ -217,38 +217,52 @@ class CategoriesController extends Controller
             }
             $category->save();
 
-            // update subcategories
-            // if subcategory id is 0 then create new subcategory
-            // else update subcategory
+            // Update subcategories
             $subCategoryName = [];
             if ($request->has('edit_subcategory_ids') && $request->edit_subcategory_ids != null) {
                 $subCategories = json_decode($request->edit_subcategory_ids, true);
                 $subCategoryIds = array_column($subCategories, 'id');
                 $subCategoryNames = array_column($subCategories, 'name');
 
-
                 foreach ($subCategories as $subCategory) {
                     if ($subCategory['id'] == 0) {
+                        // Create new subcategory
                         $subcategory = new Categories();
                         $subcategory->name = $subCategory['name'];
                         $subcategory->parent_id = $category->id;
                         $subcategory->is_comming_soon = $subCategory['coming_soon'];
+                        $subcategory->status = true;
+
+                        // Handle month_id for new subcategory
+                        $subcategory->month_id = isset($subCategory['month_id']) && !empty($subCategory['month_id'])
+                            ? (int)$subCategory['month_id']
+                            : null;
+
                         $subcategory->save();
                     } else {
+                        // Update existing subcategory
                         $subcategory = Categories::where('id', $subCategory['id'])->first();
-                        $subcategory->name = $subCategory['name'];
-                        $subcategory->is_comming_soon = $subCategory['coming_soon'];
-                        $subcategory->save();
+                        if ($subcategory) {
+                            $subcategory->name = $subCategory['name'];
+                            $subcategory->is_comming_soon = $subCategory['coming_soon'];
+
+                            // Handle month_id for existing subcategory
+                            $subcategory->month_id = isset($subCategory['month_id']) && !empty($subCategory['month_id'])
+                                ? (int)$subCategory['month_id']
+                                : null;
+
+                            $subcategory->save();
+                        }
                     }
                     $subCategoryName[] = $subcategory->name;
-
                 }
 
-                // delete subcategories that are not in the request
+                // Delete subcategories that are not in the request
                 $deleteSubcategories = Categories::where('parent_id', $category->id)
                     ->whereNotIn('id', $subCategoryIds)
                     ->whereNotIn('name', $subCategoryNames)
                     ->get();
+
                 foreach ($deleteSubcategories as $deleteSubcategory) {
                     $deleteSubcategory->delete();
                 }
@@ -257,7 +271,7 @@ class CategoriesController extends Controller
             /** Activity Log */
             Helpers::activityLog([
                 'title' => "Update Category & Sub-Category",
-                'description' => "Admin Panel:  Category Name: (". $request->category_name . "). Sub-Category Name: (".implode(', ', $subCategoryName).")",
+                'description' => "Admin Panel: Category Name: (" . $request->edit_category_name . "). Sub-Category Name: (" . implode(', ', $subCategoryName) . ")",
                 'url' => route('categories.update')
             ]);
 
@@ -292,7 +306,7 @@ class CategoriesController extends Controller
             /** Activity Log */
             Helpers::activityLog([
                 'title' => "Delete Category",
-                'description' => "Admin Panel: Deleted Category Name: ".$category->name,
+                'description' => "Admin Panel: Deleted Category Name: " . $category->name,
                 'url' => route('categories.delete')
             ]);
 
@@ -324,7 +338,7 @@ class CategoriesController extends Controller
             /** Activity Log */
             Helpers::activityLog([
                 'title' => "Change Category Status",
-                'description' => "Admin Panel: Category Name : ".$category->name.". Status is ".($category->status ? "true" : "false"),
+                'description' => "Admin Panel: Category Name : " . $category->name . ". Status is " . ($category->status ? "true" : "false"),
                 'url' => route('categories.change-status')
             ]);
 

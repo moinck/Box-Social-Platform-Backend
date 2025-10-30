@@ -4,27 +4,12 @@
 
 <!-- Vendor Styles -->
 @section('vendor-style')
-    @vite([
-        'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-select-bs5/select.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss',
-        'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss',
-        'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
-    ])
+    @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-select-bs5/select.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss', 'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss', 'resources/assets/vendor/libs/@form-validation/form-validation.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
 @endsection
 
 <!-- Vendor Scripts -->
 @section('vendor-script')
-    @vite([
-        'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-        'resources/assets/vendor/libs/@form-validation/popular.js',
-        'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
-        'resources/assets/vendor/libs/@form-validation/auto-focus.js',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
-    ])
+    @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js', 'resources/assets/vendor/libs/@form-validation/popular.js', 'resources/assets/vendor/libs/@form-validation/bootstrap5.js', 'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 
 
@@ -38,14 +23,14 @@
                 <h5 class="card-title mb-0">Categories</h5>
             </div>
             <div class="dt-action-buttons text-end pt-3 pt-md-0">
-                <div class="dt-buttons btn-group flex-wrap"> 
+                <div class="dt-buttons btn-group flex-wrap">
                     <button class="btn btn-secondary btn-primary waves-effect waves-light" type="button" id="category-add-btn"
                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Category">
                         <span>
                             <i class="ri-add-line ri-16px me-sm-2"></i>
                             <span class="d-none d-sm-inline-block">Add Category</span>
                         </span>
-                    </button> 
+                    </button>
                 </div>
             </div>
         </div>
@@ -88,7 +73,7 @@
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
                                 <input type="file" id="category_image" name="category_image" class="form-control"
-                                    placeholder="Last Name"  accept="image/*"/>
+                                    placeholder="Last Name" accept="image/*" />
                                 <label for="category_image">Image</label>
                             </div>
                         </div>
@@ -138,7 +123,8 @@
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="enable_months_checkbox" />
-                                <label class="form-check-label" for="enable_months_checkbox">Enable Month Selection for Subcategories</label>
+                                <label class="form-check-label" for="enable_months_checkbox">Enable Month Selection for
+                                    Subcategories</label>
                             </div>
                             <div id="subcategories-container">
                                 <!-- Subcategory fields will be added here dynamically -->
@@ -171,28 +157,29 @@
                         <input type="hidden" name="edit_category_id" id="edit_category_id">
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
-                                <input type="text" id="edit_category_name" name="edit_category_name" class="form-control"
-                                    placeholder="Category Name" required />
+                                <input type="text" id="edit_category_name" name="edit_category_name"
+                                    class="form-control" placeholder="Category Name" required />
                                 <label for="edit_category_name">Category Name</label>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-floating form-floating-outline mt-6">
-                                <input type="file" id="edit_category_image" name="edit_category_image" class="form-control"
-                                    placeholder="Image"  accept="image/*"/>
+                                <input type="file" id="edit_category_image" name="edit_category_image"
+                                    class="form-control" placeholder="Image" accept="image/*" />
                                 <label for="edit_category_image">Image</label>
                             </div>
                             <small class="text-dark">only upload image if you want to change image</small>
                         </div>
                         <div class="col-6">
                             <div class="text-center">
-                                <img src="" alt="edit category image" class="img-fluid br-1" id="edit_category_image_preview" height="200" width="200">
+                                <img src="" alt="edit category image" class="img-fluid br-1"
+                                    id="edit_category_image_preview" height="200" width="200">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-floating form-floating-outline">
-                                <textarea id="edit_category_description" rows="3" name="edit_category_description" class="form-control h-px-75"
-                                    placeholder="Description"></textarea>
+                                <textarea id="edit_category_description" rows="3" name="edit_category_description"
+                                    class="form-control h-px-75" placeholder="Description"></textarea>
                                 <label for="edit_category_description">Description</label>
                             </div>
                         </div>
@@ -209,8 +196,8 @@
                         </div>
                         <div class="col-6">
                             <div class="form-floating form-floating-outline">
-                                <select id="edit_category_coming_soon" name="edit_category_coming_soon" class="form-select"
-                                    aria-label="Default select example">
+                                <select id="edit_category_coming_soon" name="edit_category_coming_soon"
+                                    class="form-select" aria-label="Default select example">
                                     <option value="">Select Coming Soon</option>
                                     <option value="1">Yes</option>
                                     <option value="2">Yes Custom</option>
@@ -221,17 +208,23 @@
                         </div>
                         <div class="col-12 d-none" id="edit_custom_label_div">
                             <div class="form-floating form-floating-outline">
-                                <input type="text" id="edit_custom_label" name="edit_custom_label" class="form-control"
-                                    placeholder="Custom Label" required />
+                                <input type="text" id="edit_custom_label" name="edit_custom_label"
+                                    class="form-control" placeholder="Custom Label" required />
                                 <label for="edit_custom_label">Custom Label</label>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <h5 class="mb-0">Subcategories</h5>
-                                <button type="button" class="btn btn-sm btn-primary" id="add-subcategory-edit-modal-btn">
+                                <button type="button" class="btn btn-sm btn-primary"
+                                    id="add-subcategory-edit-modal-btn">
                                     <i class="fas fa-plus me-1"></i> Add Subcategory
                                 </button>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="edit_enable_months_checkbox">
+                                <label class="form-check-label" for="enable_months_checkbox">Enable Month Selection for
+                                    Subcategories</label>
                             </div>
                             <div id="edit-subcategories-container">
                                 <!-- Subcategory fields will be added here dynamically -->
@@ -275,21 +268,43 @@
                     pageLength: 10,
                     ajax: {
                         url: "{{ route('categories.data-table') }}",
-                        beforeSend: function () {
+                        beforeSend: function() {
                             showBSPLoader();
                         },
-                        complete: function () {
+                        complete: function() {
                             hideBSPLoader();
                         }
                     },
-                    columns: [
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                        { data: 'name', name: 'name'},
-                        { data: 'image', name: 'image'},
-                        { data: 'description', name: 'description'},
-                        { data: 'status', name: 'status'},
-                        { data: 'created_at', name: 'created_at'},
-                        { data: 'action', name: 'action', orderable: false, searchable: false},
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'image',
+                            name: 'image'
+                        },
+                        {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        },
                     ],
                     language: {
                         paginate: {
@@ -305,7 +320,7 @@
             // -------------------------------------------
 
             // add category function
-            $(document).on('click','#category-add-btn', function () {
+            $(document).on('click', '#category-add-btn', function() {
                 // reset the form
                 $('#add-category-form')[0].reset();
                 $('.subcategory-item').remove();
@@ -318,7 +333,7 @@
                 $('#add-category-modal').modal('show');
             });
             // -------------------------------------------
-            
+
             const addCategoryForm = document.getElementById('add-category-form');
             const addCategoryFV = FormValidation.formValidation(addCategoryForm, {
                 fields: {
@@ -376,8 +391,9 @@
                         validators: {
                             callback: {
                                 message: 'Please enter your custom label',
-                                callback: function (data, validator, $field) {
-                                    const comingSoonVal = $('#add-category-form [name="category_coming_soon"]').val();
+                                callback: function(data, validator, $field) {
+                                    const comingSoonVal = $(
+                                        '#add-category-form [name="category_coming_soon"]').val();
                                     if (comingSoonVal == 2) {
                                         return (data.value !== null && data.value.trim() !== '');
                                     }
@@ -391,8 +407,10 @@
                     trigger: new FormValidation.plugins.Trigger(),
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
-                        rowSelector: function (field, ele) {
-                            if (['category_name', 'category_image', 'category_description', 'custom_label'].includes(field)) {
+                        rowSelector: function(field, ele) {
+                            if (['category_name', 'category_image', 'category_description',
+                                    'custom_label'
+                                ].includes(field)) {
                                 return '.col-12';
                             }
                             if (['category_status', 'category_coming_soon'].includes(field)) {
@@ -403,7 +421,7 @@
                     }),
                     submitButton: new FormValidation.plugins.SubmitButton(),
                 }
-            }).on('core.form.valid', function () {
+            }).on('core.form.valid', function() {
                 // Form is valid, proceed with form submission
                 const form = $('#add-category-form');
                 const formData = new FormData(form[0]);
@@ -414,20 +432,21 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    beforeSend: function () {
+                    beforeSend: function() {
                         showBSPLoader();
                     },
-                    complete: function () {
+                    complete: function() {
                         hideBSPLoader();
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success == true) {
-                            showSweetAlert('success', 'Created !', 'Category has been created successfully.');
+                            showSweetAlert('success', 'Created !',
+                                'Category has been created successfully.');
                             $('#add-category-modal').modal('hide');
                             CategoriesDataTable();
                         }
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         hideBSPLoader();
                         console.log(xhr.responseText);
                         showSweetAlert('error', 'Error !', 'Something went wrong.');
@@ -438,11 +457,11 @@
             // ----------------------------------------------------------
 
             // change status function
-            $(document).on('click', '#category-status', function (e) {
+            $(document).on('click', '#category-status', function(e) {
                 e.preventDefault();
                 var id = $(this).data('id');
                 var table = $('#categories-data-table').DataTable();
-                
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You want to change status!",
@@ -463,22 +482,25 @@
                                 id: id,
                                 _token: "{{ csrf_token() }}"
                             },
-                            beforeSend: function () {
+                            beforeSend: function() {
                                 showBSPLoader();
                             },
-                            complete: function () {
+                            complete: function() {
                                 hideBSPLoader();
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 if (response.success == true) {
-                                    showSweetAlert('success', 'Updated !','Category status has been updated successfully.');
-                                    reloadDataTablePreservingPage(table); 
+                                    showSweetAlert('success', 'Updated !',
+                                        'Category status has been updated successfully.'
+                                    );
+                                    reloadDataTablePreservingPage(table);
                                 }
                             },
-                            error: function (xhr) {
+                            error: function(xhr) {
                                 hideBSPLoader();
                                 console.log(xhr.responseText);
-                                showSweetAlert('error', 'Error !', 'Something went wrong.');
+                                showSweetAlert('error', 'Error !',
+                                    'Something went wrong.');
                             }
                         });
                     } else {
@@ -509,7 +531,7 @@
                             }
 
                             $('#edit_category_coming_soon').val(response.data.is_comming_soon);
-                           
+
                             if (response.data.is_comming_soon == 2) {
                                 $("#edit_custom_label_div").removeClass('d-none');
                                 $('#edit_custom_label').val(response.data.custom_label);
@@ -518,10 +540,11 @@
                                 $('#edit_custom_label').val(response.data.custom_label);
                             }
 
-                            // check ig image contain http o https
+                            // check if image contain http or https
                             var ImageUrl = response.data.image;
                             if (ImageUrl.startsWith('http://')) {
-                                $('#edit_category_image_preview').attr('src', "{{ asset('') }}" + ImageUrl);
+                                $('#edit_category_image_preview').attr('src',
+                                    "{{ asset('') }}" + ImageUrl);
                             } else {
                                 $('#edit_category_image_preview').attr('src', ImageUrl);
                             }
@@ -529,71 +552,123 @@
                             var subcategories = response.data.children;
                             var subcategoriesEditHtml = '';
                             subcategoryEditCount = 0;
+
+                            // Check if any subcategory has month data
+                            var hasMonthData = false;
+                            if (subcategories.length > 0) {
+                                hasMonthData = subcategories.some(function(subcategory) {
+                                    return subcategory.month_id !== null &&
+                                        subcategory.month_id !== undefined &&
+                                        subcategory.month_id !== '';
+                                });
+                            }
+
+                            // Set checkbox based on saved data
+                            $('#edit_enable_months_checkbox').prop('checked', hasMonthData);
+
+                            // Render subcategories
                             if (subcategories.length > 0) {
                                 subcategories.forEach(function(subcategory) {
                                     subcategoryEditCount++;
-                                    var subcategoryComingSoon = subcategory.is_comming_soon;
+                                    var subcategoryComingSoon = subcategory
+                                        .is_comming_soon;
+                                    var subcategoryMonthId = subcategory.month_id || '';
+
+                                    // Month dropdown - always include but control visibility with class
+                                    const monthDropdown = `
+                            <div class="form-floating form-floating-outline ms-2 edit-month-dropdown ${hasMonthData ? '' : 'd-none'}" style="width: 30%;">
+                                <select class="form-select edit-subcategory-month" name="edit_subcategory_month[${subcategoryEditCount}]" id="edit_subcategory_month_${subcategoryEditCount}">
+                                    <option value="">Select Month</option>
+                                    <option value="1" ${subcategoryMonthId == 1 ? 'selected' : ''}>January</option>
+                                    <option value="2" ${subcategoryMonthId == 2 ? 'selected' : ''}>February</option>
+                                    <option value="3" ${subcategoryMonthId == 3 ? 'selected' : ''}>March</option>
+                                    <option value="4" ${subcategoryMonthId == 4 ? 'selected' : ''}>April</option>
+                                    <option value="5" ${subcategoryMonthId == 5 ? 'selected' : ''}>May</option>
+                                    <option value="6" ${subcategoryMonthId == 6 ? 'selected' : ''}>June</option>
+                                    <option value="7" ${subcategoryMonthId == 7 ? 'selected' : ''}>July</option>
+                                    <option value="8" ${subcategoryMonthId == 8 ? 'selected' : ''}>August</option>
+                                    <option value="9" ${subcategoryMonthId == 9 ? 'selected' : ''}>September</option>
+                                    <option value="10" ${subcategoryMonthId == 10 ? 'selected' : ''}>October</option>
+                                    <option value="11" ${subcategoryMonthId == 11 ? 'selected' : ''}>November</option>
+                                    <option value="12" ${subcategoryMonthId == 12 ? 'selected' : ''}>December</option>
+                                </select>
+                                <label for="edit_subcategory_month_${subcategoryEditCount}">Month</label>
+                            </div>`;
 
                                     subcategoriesEditHtml += `
-                                        <div class="col-12 mt-2 edit-subcategory-item">
-                                            <ul style="padding-left:0;">
-                                                <li class="mb-2 d-flex align-items-center justify-content-between">
-                                                    <div class="input-group input-group-merge">
-                                                        <div class="form-floating form-floating-outline">
-                                                            <input
-                                                                type="text"
-                                                                class="form-control edit-subcategory-name"
-                                                                id="edit_subcategory_name_${subcategoryEditCount}"
-                                                                name="edit_subcategory_name[${subcategoryEditCount}]"
-                                                                data-subcategory-id="${subcategory.id}"
-                                                                placeholder="Subcategory ${subcategoryEditCount} Name"
-                                                                value="${subcategory.name}"
-                                                                aria-describedby="edit_subcategory_name_${subcategoryEditCount}" />
-                                                            <label for="edit_subcategory_name_${subcategoryEditCount}">Subcategory ${subcategoryEditCount} Name</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-check form-switch mx-2" style="width: 30%;">
-                                                        <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${subcategoryCount}]" ${subcategoryComingSoon == true ? 'checked' : ''} id="edit_subcategory_coming_soon_${subcategoryCount}" />
-                                                        <label class="form-check-label" for="edit_subcategory_coming_soon_${subcategoryCount}">Coming Soon</label>
-                                                    </div>
-                                                    <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
-                                                </li>
-                                            </ul>
+                            <div class="col-12 mt-2 edit-subcategory-item">
+                                <ul style="padding-left:0;">
+                                    <li class="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div class="input-group input-group-merge" style="flex:1;">
+                                            <div class="form-floating form-floating-outline">
+                                                <input
+                                                    type="text"
+                                                    class="form-control edit-subcategory-name"
+                                                    id="edit_subcategory_name_${subcategoryEditCount}"
+                                                    name="edit_subcategory_name[${subcategoryEditCount}]"
+                                                    data-subcategory-id="${subcategory.id}"
+                                                    placeholder="Subcategory ${subcategoryEditCount} Name"
+                                                    value="${subcategory.name}"
+                                                    aria-describedby="edit_subcategory_name_${subcategoryEditCount}" />
+                                                <label for="edit_subcategory_name_${subcategoryEditCount}">Subcategory ${subcategoryEditCount} Name</label>
+                                            </div>
                                         </div>
-                                    `;
+                                        
+                                        ${monthDropdown}
+                                        
+                                        <div class="form-check form-switch mx-2" style="width: 30%;">
+                                            <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${subcategoryEditCount}]" ${subcategoryComingSoon == true ? 'checked' : ''} id="edit_subcategory_coming_soon_${subcategoryEditCount}" />
+                                            <label class="form-check-label" for="edit_subcategory_coming_soon_${subcategoryEditCount}">Coming Soon</label>
+                                        </div>
+                                        <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="${subcategory.id}"><i class="ri-delete-bin-line"></i></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        `;
 
-                                    // also add validation for subcategory name
-                                    categoryEditFV.revalidateField('edit_subcategory_name');
-                                    categoryEditFV.addField(`edit_subcategory_name[${subcategoryEditCount}]`, {
-                                        validators: {
-                                            notEmpty: {
-                                                message: 'Subcategory ' + subcategoryEditCount + ' name is required'
+                                    // Add validation for subcategory name
+                                    categoryEditFV.addField(
+                                        `edit_subcategory_name[${subcategoryEditCount}]`, {
+                                            validators: {
+                                                notEmpty: {
+                                                    message: 'Subcategory ' +
+                                                        subcategoryEditCount +
+                                                        ' name is required'
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+
+                                    // Add validation for month field only if checkbox is enabled
+                                    if (hasMonthData) {
+                                        categoryEditFV.addField(
+                                            `edit_subcategory_month[${subcategoryEditCount}]`, {
+                                                validators: {
+                                                    notEmpty: {
+                                                        message: 'Month is required for Subcategory ' +
+                                                            subcategoryEditCount
+                                                    }
+                                                }
+                                            });
+                                    }
                                 });
 
                                 subcategoryEditCount = subcategories.length;
                             }
                             $('#edit-subcategories-container').html(subcategoriesEditHtml);
-                        } else {
-                            // toastr.error(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         console.log(xhr.responseText);
                     }
                 });
-                // clear edit user form validation
-                // categoryEditFV.resetForm();
                 $('#edit-category-modal').modal('show');
             });
+
             // -------------------------------------------
 
             // edit form validation & submission
             var editCategoryForm = document.getElementById('edit-category-form');
-            var categoryEditFV = FormValidation.formValidation( editCategoryForm,
-                {
+            var categoryEditFV = FormValidation.formValidation(editCategoryForm, {
                     fields: {
                         edit_category_name: {
                             validators: {
@@ -647,7 +722,9 @@
                                 callback: {
                                     message: 'Please enter your custom label',
                                     callback: function(data, validator, $field) {
-                                        const comingSoonVal = $('#edit-category-form [name="edit_category_coming_soon"]').val();
+                                        const comingSoonVal = $(
+                                                '#edit-category-form [name="edit_category_coming_soon"]')
+                                            .val();
                                         if (comingSoonVal == 2) {
                                             return (data.value !== null && data.value.trim() !== '');
                                         }
@@ -663,13 +740,16 @@
                             eleValidClass: '',
                             rowSelector: function(field, ele) {
                                 // Customize row selector based on your form layout
-                                if (['edit_category_name', 'edit_category_description','edit_custom_label'].includes(field)) {
+                                if (['edit_category_name', 'edit_category_description',
+                                        'edit_custom_label'
+                                    ].includes(field)) {
                                     return '.col-12';
                                 }
                                 if (['edit_category_image'].includes(field)) {
                                     return '.col-6';
                                 }
-                                if (['edit_category_coming_soon','edit_category_status'].includes(field)) {
+                                if (['edit_category_coming_soon', 'edit_category_status'].includes(
+                                        field)) {
                                     return '.col-6';
                                 }
                                 return '.col-12';
@@ -679,56 +759,71 @@
                         // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
                         // autoFocus: new FormValidation.plugins.AutoFocus()
                     }
-                }
-            ).on('core.form.valid', function() {
-                // Form is valid, proceed with form submission
-                var form = $('#edit-category-form');
-                var formData = new FormData(form[0]); // Creates FormData object
+                }).on('core.form.valid', function() {
+                    // Form is valid, proceed with form submission
+                    var form = $('#edit-category-form');
+                    var formData = new FormData(form[0]); // Creates FormData object
 
-                // get subcategory ids with name in array
-                var subcategoryIds = [];
-                $('.edit-subcategory-name').each(function() {
-                    // Find the corresponding checkbox within the same parent container
-                    var $parentLi = $(this).closest('li');
-                    var isComingSoon = $parentLi.find('input[type="checkbox"]').is(':checked');
+                    // get subcategory ids with name in array
+                })
+                .on('core.form.valid', function() {
+                    // Form is valid, proceed with form submission
+                    var form = $('#edit-category-form');
+                    var formData = new FormData(form[0]);
 
-                    subcategoryIds.push({
-                        id: $(this).data('subcategory-id') ?? 0,
-                        name: $(this).val(),
-                        coming_soon: isComingSoon ? true : false
+                    // Check if month selection is enabled
+                    const isMonthEnabled = $('#edit_enable_months_checkbox').prop('checked');
+
+                    // Get subcategory ids with name, coming_soon, AND month_id in array
+                    var subcategoryIds = [];
+                    $('.edit-subcategory-name').each(function() {
+                        // Find the corresponding elements within the same parent container
+                        var $parentLi = $(this).closest('li');
+                        var isComingSoon = $parentLi.find('input[type="checkbox"]').is(':checked');
+
+                        // Get the month value from the corresponding month dropdown
+                        var monthValue = $parentLi.find('.edit-subcategory-month').val();
+
+                        subcategoryIds.push({
+                            id: $(this).data('subcategory-id') ?? 0,
+                            name: $(this).val(),
+                            coming_soon: isComingSoon ? true : false,
+                            month_id: isMonthEnabled && monthValue ? monthValue :
+                                null // Set to null if checkbox is off or no value
+                        });
+                    });
+
+                    formData.append('edit_subcategory_ids', JSON.stringify(subcategoryIds));
+
+                    var table = $('#categories-data-table').DataTable();
+
+                    $.ajax({
+                        url: "{{ route('categories.update') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function() {
+                            showBSPLoader();
+                        },
+                        complete: function() {
+                            hideBSPLoader();
+                        },
+                        success: function(response) {
+                            if (response.success == true) {
+                                showSweetAlert('success', 'Updated !',
+                                    'Category has been updated successfully.');
+                                $('#edit-category-modal').modal('hide');
+                                reloadDataTablePreservingPage(table);
+                            }
+                        },
+                        error: function(xhr) {
+                            hideBSPLoader();
+                            console.log(xhr.responseText);
+                            showSweetAlert('error', 'Error !', 'Something went wrong.');
+                        }
                     });
                 });
-                formData.append('edit_subcategory_ids', JSON.stringify(subcategoryIds));
-
-                var table = $('#categories-data-table').DataTable();
-
-                $.ajax({
-                    url: "{{ route('categories.update') }}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function () {
-                        showBSPLoader();
-                    },
-                    complete: function () {
-                        hideBSPLoader();
-                    },
-                    success: function(response) {
-                        if (response.success == true) {
-                            showSweetAlert('success', 'Updated !','Category has been updated successfully.');
-                            $('#edit-category-modal').modal('hide');
-                            // CategoriesDataTable();
-                            reloadDataTablePreservingPage(table);
-                        }
-                    },
-                    error: function(xhr) {
-                        hideBSPLoader();
-                        console.log(xhr.responseText);
-                        showSweetAlert('error', 'Error !', 'Something went wrong.');
-                    }
-                });
-            });
             // ----------------------------------------------------------
 
             // delete category 
@@ -756,25 +851,28 @@
                                 _token: '{{ csrf_token() }}',
                                 category_id: categoryId
                             },
-                            beforeSend: function () {
+                            beforeSend: function() {
                                 showBSPLoader();
                             },
-                            complete: function () {
+                            complete: function() {
                                 hideBSPLoader();
                             },
                             success: function(response) {
                                 if (response.success == true) {
-                                    showSweetAlert('success', 'Deleted!', 'Category has been deleted.');
+                                    showSweetAlert('success', 'Deleted!',
+                                        'Category has been deleted.');
                                     // CategoriesDataTable();
                                     reloadDataTablePreservingPage(table);
                                 } else {
-                                    showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                    showSweetAlert('error', 'Error!',
+                                        'Something went wrong.');
                                 }
                             },
                             error: function(xhr, status, error) {
                                 hideBSPLoader();
                                 console.log(xhr.responseText);
-                                showSweetAlert('error', 'Error!', 'Something went wrong.');
+                                showSweetAlert('error', 'Error!',
+                                    'Something went wrong.');
                             }
                         });
                     }
@@ -785,7 +883,7 @@
 
             // add subcategory
             // let subcategoryCount = 0;
-            $(document).on('click', '#add-subcategory-btn', function () {
+            $(document).on('click', '#add-subcategory-btn', function() {
                 subcategoryCount++;
                 const subcategoriesContainer = $('#subcategories-container');
                 const isMonthEnabled = $('#enable_months_checkbox').is(':checked');
@@ -877,44 +975,62 @@
             });
             // ----------------------------------------------------------
 
-            // add edit subcategory
-            // new category have subcategory id = 0
             $(document).on('click', '#add-subcategory-edit-modal-btn', function() {
                 subcategoryEditCount++;
+                const isMonthEnabled = $('#edit_enable_months_checkbox').prop('checked');
 
-                var editSubcategoriesContainer = $('#edit-subcategories-container');
-                var subcategoryHtml = `
-                    <div class="col-12 mt-2 edit-subcategory-item">
-                        <ul style="padding-left:0;">
-                            <li class="mb-2 d-flex align-items-center justify-content-between">
-                                <div class="input-group input-group-merge">
-                                    <div class="form-floating form-floating-outline">
-                                        <input
-                                            type="text"
-                                            class="form-control edit-subcategory-name"
-                                            id="edit_subcategory_name_${subcategoryEditCount}"
-                                            name="edit_subcategory_name[${subcategoryEditCount}]"
-                                            data-subcategory-id="0"
-                                            placeholder="Subcategory ${subcategoryEditCount} Name"
-                                            aria-describedby="edit_subcategory_name_${subcategoryEditCount}" />
-                                        <label for="edit_subcategory_name_${subcategoryEditCount}">Subcategory ${subcategoryEditCount} Name</label>
-                                    </div>
-                                </div>
-                                <div class="form-check form-switch mx-2" style="width: 30%;">
-                                    <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${subcategoryEditCount}]" id="edit_subcategory_coming_soon_${subcategoryEditCount}" />
-                                    <label class="form-check-label" for="edit_subcategory_coming_soon_${subcategoryEditCount}">Coming Soon</label>
-                                </div>
-                                <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn" data-subcategory-id="0">
-                                    <i class="ri-delete-bin-line"></i>
-                                </span>
-                            </li>
-                        </ul>
+                const monthDropdown = `
+        <div class="form-floating form-floating-outline ms-2 edit-month-dropdown ${isMonthEnabled ? '' : 'd-none'}" style="width: 30%;">
+            <select class="form-select edit-subcategory-month" name="edit_subcategory_month[${subcategoryEditCount}]" id="edit_subcategory_month_${subcategoryEditCount}">
+                <option value="">Select Month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <label for="edit_subcategory_month_${subcategoryEditCount}">Month</label>
+        </div>`;
+
+                const newSubcategoryHtml = `
+        <div class="col-12 mt-2 edit-subcategory-item">
+            <ul style="padding-left:0;">
+                <li class="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="input-group input-group-merge" style="flex:1;">
+                        <div class="form-floating form-floating-outline">
+                            <input
+                                type="text"
+                                class="form-control edit-subcategory-name"
+                                id="edit_subcategory_name_${subcategoryEditCount}"
+                                name="edit_subcategory_name[${subcategoryEditCount}]"
+                                placeholder="Subcategory ${subcategoryEditCount} Name"
+                                aria-describedby="edit_subcategory_name_${subcategoryEditCount}" />
+                            <label for="edit_subcategory_name_${subcategoryEditCount}">Subcategory ${subcategoryEditCount} Name</label>
+                        </div>
                     </div>
-                `;
-                editSubcategoriesContainer.append(subcategoryHtml);
+                    
+                    ${monthDropdown}
+                    
+                    <div class="form-check form-switch mx-2" style="width: 30%;">
+                        <input class="form-check-input" type="checkbox" name="edit_subcategory_coming_soon[${subcategoryEditCount}]" id="edit_subcategory_coming_soon_${subcategoryEditCount}" />
+                        <label class="form-check-label" for="edit_subcategory_coming_soon_${subcategoryEditCount}">Coming Soon</label>
+                    </div>
+                    <span class="input-group-text text-danger cursor-pointer remove-edit-subcategory-btn"><i class="ri-delete-bin-line"></i></span>
+                </li>
+            </ul>
+        </div>
+    `;
 
-                // also add validation for subcategory name
-                categoryEditFV.revalidateField('edit_subcategory_name');
+                $('#edit-subcategories-container').append(newSubcategoryHtml);
+
+                // Add validation for subcategory name
                 categoryEditFV.addField(`edit_subcategory_name[${subcategoryEditCount}]`, {
                     validators: {
                         notEmpty: {
@@ -922,9 +1038,20 @@
                         }
                     }
                 });
+
+                // Add validation for month if checkbox is enabled
+                if (isMonthEnabled) {
+                    categoryEditFV.addField(`edit_subcategory_month[${subcategoryEditCount}]`, {
+                        validators: {
+                            notEmpty: {
+                                message: 'Month is required for Subcategory ' + subcategoryEditCount
+                            }
+                        }
+                    });
+                }
             });
             // ----------------------------------------------------------
-            
+
             // remove edit subcategory
             $(document).on('click', '.remove-edit-subcategory-btn', function() {
                 $(this).parent().parent().parent().remove();
@@ -945,7 +1072,7 @@
                     $("#custom_label").val('');
                 }
             });
-            
+
             //Edit: When type is Yes Custom show Input Box
             $(document).on('click', '#edit_category_coming_soon', function() {
                 var type = $(this).val();
@@ -960,10 +1087,36 @@
 
         });
 
-        $('#enable_months_checkbox').on('change', function () {
-        const enabled = $(this).is(':checked');
-        $('#subcategories-container').empty();
-        subcategoryCount = 0;
-    });
+        $(document).on('change', '#edit_enable_months_checkbox', function() {
+            const isChecked = $(this).prop('checked');
+
+            if (isChecked) {
+                // Show all month dropdowns
+                $('.edit-month-dropdown').removeClass('d-none');
+
+                // Add validation for all month fields
+                $('.edit-subcategory-month').each(function() {
+                    const fieldName = $(this).attr('name');
+                    const fieldNumber = fieldName.match(/\d+/)[0];
+
+                    categoryEditFV.addField(fieldName, {
+                        validators: {
+                            notEmpty: {
+                                message: 'Month is required for Subcategory ' + fieldNumber
+                            }
+                        }
+                    });
+                });
+            } else {
+                // Hide all month dropdowns
+                $('.edit-month-dropdown').addClass('d-none');
+
+                // Remove validation for all month fields
+                $('.edit-subcategory-month').each(function() {
+                    const fieldName = $(this).attr('name');
+                    categoryEditFV.removeField(fieldName);
+                });
+            }
+        });
     </script>
 @endsection
