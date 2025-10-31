@@ -22,7 +22,7 @@ class PostContentController extends Controller
             // ->where('is_comming_soon', false)
             ->select('id', 'name')
             ->get();
-        
+
         return view('content.pages.admin.post-content.index', compact('categories', 'subCategories'));
     }
 
@@ -32,21 +32,25 @@ class PostContentController extends Controller
             ->where(function ($query) {
                 $query->where('status', true)
                     ->where('parent_id', null);
-                    // ->where('is_comming_soon', false);
+                // ->where('is_comming_soon', false);
             })
             ->orderBy('name', 'asc')
             ->get();
-            
-            $months = ModelsMonth::get();
-          
 
-        return view('content.pages.admin.post-content.create', compact('categories','months'));
+        $months = ModelsMonth::get();
+
+
+        return view('content.pages.admin.post-content.create', compact('categories', 'months'));
     }
 
     public function subCategoryData(Request $request)
     {
         $categoryIds = (array) $request->input('category_ids', []);
         $monthIds = (array) $request->input('month_ids', []);
+
+        $monthIds = array_filter($monthIds, function ($value) {
+            return $value !== '' && $value !== null;
+        });
 
         if (empty($categoryIds)) {
             return response()->json([
@@ -56,34 +60,38 @@ class PostContentController extends Controller
             ]);
         }
 
-        // Step 1: Detect which categories have subcategories with month_id not null
         $categoriesWithMonth = Categories::whereIn('parent_id', $categoryIds)
             ->whereNotNull('month_id')
             ->distinct()
             ->pluck('parent_id')
             ->toArray();
 
-        // Step 2: Categories that do not depend on month
         $categoriesWithoutMonth = array_diff($categoryIds, $categoriesWithMonth);
 
-        // Step 3: Build the final query
         $query = Categories::query();
+        $query->where(function ($q) use (
+            $categoriesWithoutMonth,
+            $categoriesWithMonth,
+            $monthIds
+        ) {
 
-        // 3a. Add subcategories for non-month categories
-        if (!empty($categoriesWithoutMonth)) {
-            $query->whereIn('parent_id', $categoriesWithoutMonth)
-                ->whereNull('month_id');
-        }
+            if (!empty($categoriesWithoutMonth)) {
+                $q->whereIn('parent_id', $categoriesWithoutMonth)
+                    ->whereNull('month_id');
+            }
 
-        // 3b. Add subcategories for month-based categories only if month(s) are selected
-        if (!empty($monthIds) && !empty($categoriesWithMonth)) {
-            $query->orWhere(function ($q) use ($categoriesWithMonth, $monthIds) {
-                $q->whereIn('parent_id', $categoriesWithMonth)
-                ->whereIn('month_id', $monthIds);
-            });
-        }
+            if (!empty($categoriesWithMonth)) {
+                $q->orWhere(function ($sub) use ($categoriesWithMonth, $monthIds) {
 
-        // Step 4: Fetch all matching subcategories
+                    $sub->whereIn('parent_id', $categoriesWithMonth);
+
+                    if (!empty($monthIds)) {
+                        $sub->whereIn('month_id', $monthIds);
+                    }
+                });
+            }
+        });
+
         $categories = $query->orderBy('name', 'asc')->get();
 
         if ($categories->isEmpty()) {
@@ -91,16 +99,9 @@ class PostContentController extends Controller
                 'success' => false,
                 'message' => 'No Subcategory Found',
                 'data' => [],
-                'debug' => [
-                    'requested_category_ids' => $categoryIds,
-                    'requested_month_ids' => $monthIds,
-                    'with_month' => $categoriesWithMonth,
-                    'without_month' => $categoriesWithoutMonth,
-                ]
             ]);
         }
 
-        // Step 5: Return
         return response()->json([
             'success' => true,
             'data' => $categories,
@@ -112,11 +113,6 @@ class PostContentController extends Controller
             ]
         ]);
     }
-
-
-
-
-
 
     public function store(Request $request)
     {
@@ -169,7 +165,7 @@ class PostContentController extends Controller
                     ->get();
 
                 if ($validSubCategories->isEmpty()) {
-                    
+
                     $post = PostContent::create([
                         'title' => $request->post_title,
                         'category_id' => $catId,
@@ -234,7 +230,7 @@ class PostContentController extends Controller
 
         Helpers::activityLog([
             'title' => "Create Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title,
+            'description' => "Admin Panel: Post Content is " . $request->post_title,
             'url' => route('post-content.store')
         ]);
 
@@ -252,8 +248,11 @@ class PostContentController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        return view('content.pages.admin.post-content.edit', compact('postContent', 'categories', 'subCategories'));
+        $months = ModelsMonth::get();
+
+        return view('content.pages.admin.post-content.edit', compact('postContent', 'categories', 'subCategories','months'));
     }
+
 
     public function update(Request $request)
     {
@@ -278,7 +277,7 @@ class PostContentController extends Controller
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Update Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'description' => "Admin Panel: Post Content is " . $request->post_title . ". Post Content Category: " . (isset($postContent->category) ? $postContent->category->name : '-') . ". Post Content Sub-Category: " . (isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
             'url' => route('post-content.update')
         ]);
 
@@ -287,7 +286,7 @@ class PostContentController extends Controller
 
     public function dataTable(Request $request)
     {
-        $postContents = PostContent::with('category:id,name','subCategory:id,name')
+        $postContents = PostContent::with('category:id,name', 'subCategory:id,name')
             ->when($request->category_id && $request->category_id != 0, function ($query) use ($request) {
                 $query->where('category_id', $request->category_id);
             })
@@ -344,7 +343,7 @@ class PostContentController extends Controller
         /** Activity Log */
         Helpers::activityLog([
             'title' => "Delete Post Content",
-            'description' => "Admin Panel: Post Content is ".$request->post_title.". Post Content Category: ".(isset($postContent->category) ? $postContent->category->name : '-').". Post Content Sub-Category: ".(isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
+            'description' => "Admin Panel: Post Content is " . $request->post_title . ". Post Content Category: " . (isset($postContent->category) ? $postContent->category->name : '-') . ". Post Content Sub-Category: " . (isset($postContent->subCategory) ? $postContent->subCategory->name : '-'),
             'url' => route('post-content.delete')
         ]);
 

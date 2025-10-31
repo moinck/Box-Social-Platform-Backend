@@ -51,7 +51,7 @@
                             </div>
                         </div>
 
-                        {{-- category --}}
+                        {{-- category: keep single select as before --}}
                         <div class="col-12 col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <select name="post_category" id="post_category" class="form-select" data-choices
@@ -65,15 +65,59 @@
                             </div>
                         </div>
 
-                        {{-- sub category --}}
-                        <div class="col-12 col-md-12 d-none" id="selectSubCategory-edit-div">
-                            <div class="form-floating form-floating-outline">
-                                <select name="post_content_edit_sub_category" id="post_content_edit_sub_category"
-                                    class="form-select" data-choices data-choices-search-false>
-                                    <option value="">Select Subcategory</option>
-                                </select>
-                                <label for="post_content_edit_sub_category">Post Subcategory</label>
-                            </div>
+                        {{-- Month multi-checkbox dropdown (initially hidden; shown by JS when needed) --}}
+                        @php
+                            // Prepare selected months from old input or model (assumes months stored as comma separated string)
+                            $selectedMonthsArr = [];
+                            if (old('months')) {
+                                $selectedMonthsArr = explode(',', old('months'));
+                            } elseif (!empty($postContent->months)) {
+                                // if months stored as "1,2,3"
+                                $selectedMonthsArr = is_array($postContent->months) ? $postContent->months : explode(',', $postContent->months);
+                            }
+                        @endphp
+
+                        <div class="col-12 col-md-6 dropdown-container d-none" id="monthContainer">
+                            <button id="monthDropdown" type="button"
+                                class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span id="selectedMonths">{{ count($selectedMonthsArr) ? count($selectedMonthsArr) . ' selected' : 'Choose' }}</span>
+                            </button>
+                            <label for="monthDropdown" class="dropdown-label">Select Month</label>
+                            <ul class="dropdown-menu w-100" id="monthMenu">
+                                @foreach ($months as $month)
+                                    <li>
+                                        <label class="dropdown-item">
+                                            <input type="checkbox" class="month-checkbox" value="{{ $month->month_number }}"
+                                                {{ in_array((string)$month->month_number, array_map('strval', $selectedMonthsArr)) ? 'checked' : '' }}>
+                                            {{ $month->month_name }}
+                                        </label>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <input type="hidden" name="months" id="selectedMonthValues" value="{{ implode(',', $selectedMonthsArr) }}">
+                        </div>
+
+                        {{-- Subcategory multi-checkbox dropdown (will be filled by AJAX) --}}
+                        @php
+                            $selectedSubcategoryArr = [];
+                            if (old('post_sub_category')) {
+                                $selectedSubcategoryArr = is_array(old('post_sub_category')) ? old('post_sub_category') : [old('post_sub_category')];
+                            } elseif (!empty($postContent->sub_category_id)) {
+                                $selectedSubcategoryArr = [$postContent->sub_category_id];
+                            }
+                        @endphp
+
+                        <div class="col-12 col-md-6 dropdown-container d-none" id="subcategoryContainer">
+                            <button id="subcategoryDropdown" type="button"
+                                class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span id="selectedSubcategories">{{ count($selectedSubcategoryArr) ? count($selectedSubcategoryArr) . ' selected' : 'Choose' }}</span>
+                            </button>
+                            <label for="subcategoryDropdown" class="dropdown-label">Select Subcategories</label>
+
+                            <ul class="dropdown-menu w-100" id="subcategoryMenu"></ul>
+                            <input type="hidden" name="post_sub_category[]" id="selectedSubcategoryValues" value="{{ implode(',', $selectedSubcategoryArr) }}">
                         </div>
 
                         {{-- quill text description --}}
@@ -111,83 +155,28 @@
 @section('page-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        // const fullEditor = new Quill('#post_description', {
-        //     bounds: '#post_description',
-        //     placeholder: 'Type Something...',
-        //     modules: {
-        //         formula: true,
-        //         toolbar: fullToolbar
-        //     },
-        //     theme: 'snow'
-        // });
-
         $(document).ready(function () {
-            var editSubCategoryId = {{ $postContent->sub_category_id ?? 0 }};
-            var editCategoryId = {{ $postContent->category_id ?? 0 }};
-            if (editCategoryId != 0) {
-                GetSubCategory(editCategoryId);
-            }
+            // Grab preselected server-rendered values
+            const initialSelectedMonths = ($('#selectedMonthValues').val() || '').split(',').filter(Boolean);
+            const initialSelectedSubcategories = ($('#selectedSubcategoryValues').val() || '').split(',').filter(Boolean);
+            const editSubCategoryId = initialSelectedSubcategories.length ? initialSelectedSubcategories.map(String) : [];
+            const editSingleSubCategoryId = editSubCategoryId.length ? editSubCategoryId[0] : 0;
+            const editCategoryId = $('#post_category').val() || 0;
 
+            // Common Quill toolbar (same as Create)
             const fullToolbar = [
-                [
-                    {
-                        font: []
-                    },
-                    {
-                        size: []
-                    }
-                ],
+                [{ font: [] }, { size: [] }],
                 ['bold', 'italic', 'underline', 'strike'],
-                [
-                    {
-                        color: []
-                    },
-                    {
-                        background: []
-                    }
-                ],
-                [
-                    {
-                        script: 'super'
-                    },
-                    {
-                        script: 'sub'
-                    }
-                ],
-                [
-                    {
-                        header: '1'
-                    },
-                    {
-                        header: '2'
-                    },
-                    'blockquote',
-                    'code-block'
-                ],
-                [
-                    {
-                        list: 'ordered'
-                    },
-                    {
-                        list: 'bullet'
-                    },
-                    {
-                        indent: '-1'
-                    },
-                    {
-                        indent: '+1'
-                    }
-                ],
+                [{ color: [] }, { background: [] }],
+                [{ script: 'super' }, { script: 'sub' }],
+                [{ header: '1' }, { header: '2' }, 'blockquote', 'code-block'],
+                [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
                 [{ direction: 'rtl' }],
                 ['link', 'image', 'video', 'formula'],
-                [
-                    {'insert-name': 'Name'},
-                    {'insert-email': 'Email'},
-                    {'insert-phone': 'Phone'},
-                    {'insert-website': 'Website'},
-                ],
+                [{ 'insert-name': 'Name' }, { 'insert-email': 'Email' }, { 'insert-phone': 'Phone' }, { 'insert-website': 'Website' }],
                 ['clean']
             ];
+
             const editPostDescription = new Quill('#post_description', {
                 bounds: '#post_description',
                 placeholder: 'Type Something...',
@@ -221,24 +210,25 @@
                 },
                 theme: 'snow'
             });
+
             $('.ql-insert-name').attr('title', 'Click to insert Name');
             $('.ql-insert-phone').attr('title', 'Click to insert Phone');
             $('.ql-insert-email').attr('title', 'Click to insert Email');
             $('.ql-insert-website').attr('title', 'Click to insert Website');
+
             // update hidden post description
             editPostDescription.on('text-change', function () {
-                // $('#hiddenPostDescription').val(editPostDescription.root.innerHTML);
-                $('.ql-editor').hasClass('ql-blank') ? 
-                    $('#hiddenPostDescription').val('') : 
+                $('.ql-editor').hasClass('ql-blank') ?
+                    $('#hiddenPostDescription').val('') :
                     $('#hiddenPostDescription').val(editPostDescription.root.innerHTML);
+
                 if ($('.ql-editor').hasClass('ql-blank')) {
-                    $('.ql-toolbar').css("border","2px solid #ff4d49")
-                    // on container remove top border
-                    $('.ql-container').css("border","2px solid #ff4d49")
-                    $('.ql-container').css("border-top","none")
-                }else{
-                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
-                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                    $('.ql-toolbar').css("border","2px solid #ff4d49");
+                    $('.ql-container').css("border","2px solid #ff4d49");
+                    $('.ql-container').css("border-top","none");
+                } else {
+                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1");
+                    $('.ql-container').css("border",".0625rem solid #c8ced1");
                 }
                 validator.revalidateField('post_description');
             });
@@ -248,31 +238,18 @@
                 window.location.href = '{{ route('post-content') }}';
             });
 
-
-            // profile form validation
+            // form validation
             const formValidationExamples = document.getElementById('edit-post-content-form');
             const validator = FormValidation.formValidation(formValidationExamples, {
                 fields: {
                     post_title: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Please enter post title'
-                            }
-                        }
+                        validators: { notEmpty: { message: 'Please enter post title' } }
                     },
                     post_category: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Please select category'
-                            }
-                        }
+                        validators: { notEmpty: { message: 'Please select category' } }
                     },
                     post_description: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Please enter description'
-                            }
-                        }
+                        validators: { notEmpty: { message: 'Please enter description' } }
                     }
                 },
                 plugins: {
@@ -280,8 +257,7 @@
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
                         rowSelector: function (field, ele) {
-                            if (['post_title', 'post_category', 'post_description'
-                            ].includes(field)) {
+                            if (['post_title','post_category','post_description'].includes(field)) {
                                 return '.col-12';
                             }
                             return '.col-12';
@@ -293,112 +269,212 @@
             }).on('core.form.valid', function () {
                 $('#edit-post-content-form').submit();
             });
-            // -----------------------------------------------------
 
-            // for validation on quill editor
+            // for validation on quill editor visual
             $(document).on('click','#updatePostContentBtn', function () {
                 if ($('.ql-editor').hasClass('ql-blank')) {
-                    $('.ql-toolbar').css("border","2px solid #ff4d49")
-                    // on container remove top border
-                    $('.ql-container').css("border","2px solid #ff4d49")
-                    $('.ql-container').css("border-top","none")
-                }else{
-                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
-                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                    $('.ql-toolbar').css("border","2px solid #ff4d49");
+                    $('.ql-container').css("border","2px solid #ff4d49");
+                    $('.ql-container').css("border-top","none");
+                } else {
+                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1");
+                    $('.ql-container').css("border",".0625rem solid #c8ced1");
                 }
             });
-            
-            var selectedCategoryId = $('#post_category').val();
-            if (selectedCategoryId) {
-                GetSubCategory(selectedCategoryId);
-            }
-            
-            // On change event for category select
-            $('#post_category').change(function () {
-                var category_id = $(this).val();
 
-                if (!category_id) {
-                    $('#post_content_edit_sub_category').html('<option value="">Select Subcategory</option>');
-                    $('#selectSubCategory-edit-div').addClass('d-none');
+            // When category changes, or on load, fetch subcategories (and decide whether month should show)
+            function fetchSubcategoriesForCategory(categoryIds, monthIds = []) {
+                if (!categoryIds || categoryIds.length === 0) {
+                    $('#subcategoryMenu').empty();
+                    $('#subcategoryContainer').addClass('d-none');
+                    $('#monthContainer').addClass('d-none');
                     return;
                 }
-
-                GetSubCategory(category_id);
-            });
-
-
-            // post category change event
-            // $('#post_category').change(function () {
-            //     var category_id = $(this).val();
-            //     if (category_id.length == 0) {
-            //         $('#post_content_edit_sub_category').html('<option value="">Select Subcategory</option>');
-            //         $('#selectSubCategory-edit-div').addClass('d-none');
-            //         validator.revalidateField('post_content_edit_sub_category');
-            //         validator.removeField(`post_content_edit_sub_category`);
-            //         return;
-            //     }
-            //     GetSubCategory(category_id);
-            // });
-            
-            
-            // get sub category
-            function GetSubCategory(category_id) {
-
-                var isValidate = $("#isValidate").val();
 
                 $.ajax({
                     url: '{{ route('post-content.sub-category.get.data') }}',
                     type: 'GET',
                     data: {
-                        category_id: category_id
+                        category_id: categoryIds.length === 1 ? categoryIds[0] : categoryIds,
+                        category_ids: categoryIds, // send both for flexibility
+                        month_ids: monthIds.length ? monthIds : []
                     },
-                    beforeSend: function () {
-                        showBSPLoader();
-                    },
-                    complete: function () {
-                        hideBSPLoader();
-                    },
-                    success: function (data) {
-                        if (data.success) {
-                            var responseData = data.data;
-                            var option = '';
-                            option += '<option value="">Select Subcategory</option>';
-                            responseData.forEach(function (item) {
-                                if (editSubCategoryId == item.id) {
-                                    option += '<option value="' + item.id + '" selected>' + item.name + '</option>';
-                                } else {
-                                    option += '<option value="' + item.id + '">' + item.name + '</option>';
-                                }
-                            });
-                            $('#post_content_edit_sub_category').html(option);
-                            $('#selectSubCategory-edit-div').removeClass('d-none');
-                            $("#isValidate").val(1);
+                    beforeSend: showBSPLoader,
+                    complete: hideBSPLoader,
+                    success: function(response) {
+                        console.log('Edit API Response:', response);
 
-                            validator.revalidateField('post_content_edit_sub_category');
-                            validator.addField(`post_content_edit_sub_category`, {
-                                validators: {
-                                    notEmpty: {
-                                        message: 'Subcategory is required'
-                                    }
-                                }
-                            });
-
-                        } else {
-                            var subCategoryField = $('#post_content_edit_sub_category');
-                            if (editSubCategoryId != 0) {
-                                validator.revalidateField('post_content_edit_sub_category');
-                            }
-                            if (isValidate == 1) {
-                                validator.removeField(`post_content_edit_sub_category`);
-                            }
-                            subCategoryField.html('<option value="">Select Subcategory</option>');
-                            $('#selectSubCategory-edit-div').addClass('d-none');
-                            $("#isValidate").val(0);
+                        // Determine categories that require month (preferred from response.with_month)
+                        let categoriesWithMonth = [];
+                        if (response.with_month) {
+                            categoriesWithMonth = response.with_month.map(String);
+                        } else if (response.debug && response.debug.with_month) {
+                            categoriesWithMonth = response.debug.with_month.map(String);
                         }
+
+                        // Inspect items to see if any subcategory has month info (fallback)
+                        let dataHasMonth = false;
+                        if (response.data && Array.isArray(response.data)) {
+                            for (let i = 0; i < response.data.length; i++) {
+                                const item = response.data[i];
+                                if (item.hasOwnProperty('month_id') && item.month_id !== null && item.month_id !== '' && item.month_id !== 0) {
+                                    dataHasMonth = true;
+                                    break;
+                                }
+                                if (item.hasOwnProperty('month_number') && item.month_number !== null && item.month_number !== '') {
+                                    dataHasMonth = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        const hasMonthCategoryFromDebug = categoryIds.some(cat => categoriesWithMonth.includes(String(cat)));
+                        const shouldShowMonth = hasMonthCategoryFromDebug || dataHasMonth;
+
+                        // Show or hide month container
+                        if (shouldShowMonth || (monthIds && monthIds.length > 0)) {
+                            $('#monthContainer').removeClass('d-none');
+                        } else {
+                            $('#monthContainer').addClass('d-none');
+                            $('.month-checkbox').prop('checked', false);
+                            $('#selectedMonths').text('Choose');
+                            $('#selectedMonthValues').val('');
+                        }
+
+                        // Render subcategories if present
+                        if (response.success && response.data && response.data.length > 0) {
+                            const html = response.data.map(item => {
+                                const name = item.name || item.title || 'Unnamed';
+                                // mark checked if it is in preselected array
+                                const checked = editSubCategoryId.includes(String(item.id)) ? 'checked' : '';
+                                return `
+                                    <li>
+                                        <label class="dropdown-item">
+                                            <input type="checkbox" class="subcategory-checkbox" value="${item.id}" ${checked}>
+                                            ${name}
+                                        </label>
+                                    </li>`;
+                            }).join('');
+                            $('#subcategoryMenu').html(html);
+                            $('#subcategoryContainer').removeClass('d-none');
+
+                            // update selected count ui if pre-selected
+                            const preSelected = $('.subcategory-checkbox:checked').map(function(){ return $(this).val(); }).get();
+                            $('#selectedSubcategoryValues').val(preSelected.join(','));
+                            $('#selectedSubcategories').text(preSelected.length ? preSelected.length + ' selected' : 'Choose');
+                        } else {
+                            // no subcategories returned
+                            $('#subcategoryMenu').empty();
+                            $('#subcategoryContainer').addClass('d-none');
+
+                            // if month required but none selected - show hint
+                            if (shouldShowMonth && (!monthIds || monthIds.length === 0)) {
+                                // use alert or nicer UI as you prefer
+                                alert('Please select month to view related subcategories');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Edit API Error:', status, error, xhr && xhr.responseText);
+                        $('#subcategoryContainer').addClass('d-none');
                     }
                 });
             }
-            // -----------------------------------------------------
+
+            // On page load, if category exists, call fetch with preselected months
+            if (editCategoryId) {
+                // convert months to array of strings
+                const monthsOnLoad = initialSelectedMonths.slice();
+                fetchSubcategoriesForCategory([String(editCategoryId)], monthsOnLoad);
+            }
+
+            // When category select changes
+            $('#post_category').change(function() {
+                const categoryId = $(this).val();
+                if (!categoryId) {
+                    $('#subcategoryMenu').empty();
+                    $('#subcategoryContainer').addClass('d-none');
+                    $('#monthContainer').addClass('d-none');
+                    return;
+                }
+
+                // reset month selection when category changes
+                // but keep the month container visible only if backend says so
+                $('.month-checkbox').prop('checked', false);
+                $('#selectedMonths').text('Choose');
+                $('#selectedMonthValues').val('');
+
+                fetchSubcategoriesForCategory([String(categoryId)], []);
+            });
+
+            // when user toggles a month checkbox (dynamically loaded from blade markup)
+            $(document).on('change', '.month-checkbox', function() {
+                const selectedMonths = $('.month-checkbox:checked').map(function(){ return String($(this).val()); }).get();
+                $('#selectedMonthValues').val(selectedMonths.join(','));
+                $('#selectedMonths').text(selectedMonths.length ? selectedMonths.length + ' selected' : 'Choose');
+
+                // re-fetch subcategories with newly selected months (if category selected)
+                const cat = $('#post_category').val();
+                if (cat) {
+                    fetchSubcategoriesForCategory([String(cat)], selectedMonths);
+                }
+            });
+
+            // subcategory checkboxes handler
+            $(document).on('change', '.subcategory-checkbox', function() {
+                const selected = $('.subcategory-checkbox:checked').map(function() { return $(this).val(); }).get();
+                $('#selectedSubcategoryValues').val(selected.join(','));
+                $('#selectedSubcategories').text(selected.length ? selected.length + ' selected' : 'Choose');
+            });
+
         });
     </script>
+
+    <style>
+        /* Keep your styles consistent with Create blade */
+        #edit-post-content-form .dropdown-container {
+            position: relative;
+        }
+
+        #edit-post-content-form .dropdown-container button#categoryDropdown,
+        #edit-post-content-form .dropdown-container button#subcategoryDropdown,
+        #edit-post-content-form .dropdown-container button#monthDropdown {
+            padding: calc(.8555rem - 1px) calc(1rem - 1px);
+            height: 3.0000625rem;
+            min-height: 3.0000625rem;
+            line-height: 1.375;
+            background-color: #ffffff !important;
+            border-color: #c8ced1 !important;
+            justify-content: space-between;
+        }
+
+        #edit-post-content-form .dropdown-container button#categoryDropdown+label,
+        #edit-post-content-form .dropdown-container button#monthDropdown+label,
+        #edit-post-content-form .dropdown-container button#subcategoryDropdown+label {
+            color: #f4d106 !important;
+            top: 20px !important;
+            position: absolute;
+            left: 0;
+            font-size: 12px;
+            padding: 0 10px;
+            margin-left: 15px;
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+        }
+
+        #edit-post-content-form .dropdown-container button#categoryDropdown:focus+label,
+        #edit-post-content-form .dropdown-container button#monthDropdown:focus+label,
+        #edit-post-content-form .dropdown-container button#subcategoryDropdown:focus+label {
+            top: -10px !important;
+            background-color: #ffffff;
+            opacity: 1;
+            transition: all 0.5s ease-in-out;
+        }
+
+        #edit-post-content-form .dropdown-container button#categoryDropdown:focus,
+        #edit-post-content-form .dropdown-container button#monthDropdown:focus,
+        #edit-post-content-form .dropdown-container button#subcategoryDropdown:focus {
+            border-color: #f4d106 !important;
+        }
+    </style>
 @endsection

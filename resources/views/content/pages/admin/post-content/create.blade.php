@@ -4,29 +4,12 @@
 
 <!-- Vendor Styles -->
 @section('vendor-style')
-    @vite([
-        'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-select-bs5/select.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss',
-        'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss',
-        'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
-        'resources/assets/vendor/libs/quill/typography.scss',
-        'resources/assets/vendor/libs/quill/katex.scss',
-        'resources/assets/vendor/libs/quill/editor.scss'
-    ])
+    @vite(['resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-select-bs5/select.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-fixedcolumns-bs5/fixedcolumns.bootstrap5.scss', 'resources/assets/vendor/libs/datatables-fixedheader-bs5/fixedheader.bootstrap5.scss', 'resources/assets/vendor/libs/@form-validation/form-validation.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss', 'resources/assets/vendor/libs/quill/typography.scss', 'resources/assets/vendor/libs/quill/katex.scss', 'resources/assets/vendor/libs/quill/editor.scss'])
 @endsection
 
 <!-- Vendor Scripts -->
 @section('vendor-script')
-    @vite([
-        'resources/assets/vendor/libs/@form-validation/popular.js',
-        'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
-        'resources/assets/vendor/libs/@form-validation/auto-focus.js',
-        'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
-        'resources/assets/vendor/libs/quill/katex.js',
-        'resources/assets/vendor/libs/quill/quill.js'
-    ])
+    @vite(['resources/assets/vendor/libs/@form-validation/popular.js', 'resources/assets/vendor/libs/@form-validation/bootstrap5.js', 'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js', 'resources/assets/vendor/libs/quill/katex.js', 'resources/assets/vendor/libs/quill/quill.js'])
 @endsection
 
 @section('content')
@@ -52,51 +35,58 @@
 
                         {{-- Category multi-checkbox dropdown --}}
                         <div class="col-12 col-md-6 dropdown-container">
-                        
-                        <button id="categoryDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span id="selectedCategories">Choose</span>
-                        </button>
-                        <label for="categoryDropdown" class="dropdown-label">Select Categories</label>
-                        <ul class="dropdown-menu w-100" id="categoryMenu">
-                            @foreach($categories as $category)
-                            <li>
-                                <label class="dropdown-item">
-                                    <input type="checkbox" class="category-checkbox" value="{{ $category->id }}"> {{ $category->name }}
-                                </label>
-                            </li>
-                            @endforeach
-                        </ul>
-                        <input type="hidden" name="post_category[]" id="selectedCategoryValues">
+
+                            <button id="categoryDropdown" type="button"
+                                class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span id="selectedCategories">Choose</span>
+                            </button>
+                            <label for="categoryDropdown" class="dropdown-label">Select Categories</label>
+                            <ul class="dropdown-menu w-100" id="categoryMenu">
+                                @foreach ($categories as $category)
+                                    <li>
+                                        <label class="dropdown-item">
+                                            <input type="checkbox" class="category-checkbox" value="{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </label>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <input type="hidden" name="post_category[]" id="selectedCategoryValues">
                         </div>
-                        
+
                         <div class="col-12 col-md-6 dropdown-container d-none" id="monthContainer">
-                        <button id="monthDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <span id="selectedMonths">Choose</span>
-                        </button>
-                        <label for="monthDropdown" class="dropdown-label">Select Month</label>
-                        <ul class="dropdown-menu w-100" id="monthMenu">
-                            @foreach($months as $month)
-                            <li>
-                                <label class="dropdown-item"><input type="checkbox" class="month-checkbox" value="{{ $month->month_number }}"> {{ $month->month_name }}
-                                </label>
-                            </li>
-                            @endforeach
-                        </ul>
-                        <input type="hidden" name="months" id="selectedMonthValues">
-                    </div>
+                            <button id="monthDropdown" type="button"
+                                class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span id="selectedMonths">Choose</span>
+                            </button>
+                            <label for="monthDropdown" class="dropdown-label">Select Month</label>
+                            <ul class="dropdown-menu w-100" id="monthMenu">
+                                @foreach ($months as $month)
+                                    <li>
+                                        <label class="dropdown-item"><input type="checkbox" class="month-checkbox"
+                                                value="{{ $month->month_number }}"> {{ $month->month_name }}
+                                        </label>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <input type="hidden" name="months" id="selectedMonthValues">
+                        </div>
 
 
 
                         {{-- Subcategory multi-checkbox dropdown --}}
                         <div class="col-12 col-md-6 dropdown-container d-none" id="subcategoryContainer">
-                            <button id="subcategoryDropdown" type="button" class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span id="selectedSubcategories">Choose</span>
-                        </button>
-                        <label for="subcategoryDropdown" class="dropdown-label">Select Subcategories</label>
-                        
-                        <ul class="dropdown-menu w-100" id="subcategoryMenu"></ul>
-                        <input type="hidden" name="post_sub_category[]" id="selectedSubcategoryValues">
+                            <button id="subcategoryDropdown" type="button"
+                                class="btn btn-outline-secondary w-100 text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span id="selectedSubcategories">Choose</span>
+                            </button>
+                            <label for="subcategoryDropdown" class="dropdown-label">Select Subcategories</label>
+
+                            <ul class="dropdown-menu w-100" id="subcategoryMenu"></ul>
+                            <input type="hidden" name="post_sub_category[]" id="selectedSubcategoryValues">
                         </div>
 
 
@@ -194,11 +184,18 @@
                     direction: 'rtl'
                 }],
                 ['link', 'image', 'video', 'formula'],
-                [
-                    {'insert-name': 'Name'},
-                    {'insert-email': 'Email'},
-                    {'insert-phone': 'Phone'},
-                    {'insert-website': 'Website'},
+                [{
+                        'insert-name': 'Name'
+                    },
+                    {
+                        'insert-email': 'Email'
+                    },
+                    {
+                        'insert-phone': 'Phone'
+                    },
+                    {
+                        'insert-website': 'Website'
+                    },
                 ],
                 ['clean']
             ];
@@ -247,13 +244,13 @@
                     $('#hiddenPostDescription').val('') :
                     $('#hiddenPostDescription').val(createPostDescription.root.innerHTML);
                 if ($('.ql-editor').hasClass('ql-blank')) {
-                    $('.ql-toolbar').css("border","2px solid #ff4d49")
+                    $('.ql-toolbar').css("border", "2px solid #ff4d49")
                     // on container remove top border
-                    $('.ql-container').css("border","2px solid #ff4d49")
-                    $('.ql-container').css("border-top","none")
-                }else{
-                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
-                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                    $('.ql-container').css("border", "2px solid #ff4d49")
+                    $('.ql-container').css("border-top", "none")
+                } else {
+                    $('.ql-toolbar').css("border", ".0625rem solid #c8ced1")
+                    $('.ql-container').css("border", ".0625rem solid #c8ced1")
                 }
                 validator.revalidateField('post_description');
             });
@@ -307,93 +304,140 @@
             }).on('core.form.valid', function() {
                 $('#create-post-content-form').submit();
             });
-            
-            $(document).on('click','#createPostContentBtn', function () {
+
+            $(document).on('click', '#createPostContentBtn', function() {
                 if ($('.ql-editor').hasClass('ql-blank')) {
-                    $('.ql-toolbar').css("border","2px solid #ff4d49")
+                    $('.ql-toolbar').css("border", "2px solid #ff4d49")
                     // on container remove top border
-                    $('.ql-container').css("border","2px solid #ff4d49")
-                    $('.ql-container').css("border-top","none")
-                }else{
-                    $('.ql-toolbar').css("border",".0625rem solid #c8ced1")
-                    $('.ql-container').css("border",".0625rem solid #c8ced1")
+                    $('.ql-container').css("border", "2px solid #ff4d49")
+                    $('.ql-container').css("border-top", "none")
+                } else {
+                    $('.ql-toolbar').css("border", ".0625rem solid #c8ced1")
+                    $('.ql-container').css("border", ".0625rem solid #c8ced1")
                 }
             });
 
             $(document).on('change', '.category-checkbox, .month-checkbox', function() {
-                let selectedCategories = [];
-                $('.category-checkbox:checked').each(function() {
-                    selectedCategories.push($(this).val());
-                });
 
+                // collect selected categories and months as strings
+                const selectedCategories = $('.category-checkbox:checked').map(function() {
+                    return String($(this).val());
+                }).get();
+
+                const selectedMonths = $('.month-checkbox:checked').map(function() {
+                    return String($(this).val());
+                }).get();
+
+                // update hidden inputs / labels
                 $('#selectedCategoryValues').val(selectedCategories);
-                $('#selectedCategories').text(selectedCategories.length ? selectedCategories.length + ' selected' : 'Choose');
+                $('#selectedCategories').text(selectedCategories.length ? selectedCategories.length +
+                    ' selected' : 'Choose');
 
-                // Handle month dropdown visibility
-                if (selectedCategories.includes('131')) { // Category ID 7 = National Days
-                    $('#monthContainer').removeClass('d-none');
-                } else {
-                    $('#monthContainer').addClass('d-none');
-                    $('#monthMenu input[type="checkbox"]').prop('checked', false);
-                    $('#selectedMonths').text('Choose');
-                    $('#selectedMonthValues').val('');
-                }
-
-                // Collect selected months (if any)
-                let selectedMonths = [];
-                $('.month-checkbox:checked').each(function() {
-                    selectedMonths.push($(this).val());
-                });
                 $('#selectedMonthValues').val(selectedMonths.join(','));
-                $('#selectedMonths').text(selectedMonths.length ? selectedMonths.length + ' selected' : 'Choose');
+                $('#selectedMonths').text(selectedMonths.length ? selectedMonths.length + ' selected' :
+                    'Choose');
 
-                // If no categories, hide subcategory section
+                // nothing selected -> hide both month & subcategory
                 if (selectedCategories.length === 0) {
+                    $('#monthContainer').addClass('d-none');
                     $('#subcategoryContainer').addClass('d-none');
                     return;
                 }
 
-                // Fetch subcategories based on category + month
+                // AJAX fetch subcategories for the selected categories (and months if any)
                 $.ajax({
                     url: '{{ route('post-content.sub-category.get.data') }}',
                     type: 'GET',
                     data: {
                         category_ids: selectedCategories,
-                        month_ids: selectedMonths
+                        month_ids: selectedMonths.length ? selectedMonths : []
                     },
                     beforeSend: showBSPLoader,
                     complete: hideBSPLoader,
-                    success: function(data) {
-                        if (data.success && data.data.length) {
-                            let html = '';
-                            data.data.forEach(item => {
-                                html += `
-                                    <li>
-                                        <label class="dropdown-item">
-                                            <input type="checkbox" class="subcategory-checkbox" value="${item.id}"> ${item.name}
-                                        </label>
-                                    </li>`;
-                            });
+                    success: function(response) {
+                        console.log('API Response:', response);
+
+                        // 1) Try to get categoriesWithMonth from explicit backend key (preferred)
+                        let categoriesWithMonth = [];
+                        if (response.with_month) {
+                            categoriesWithMonth = response.with_month.map(String);
+                        } else if (response.debug && response.debug.with_month) {
+                            categoriesWithMonth = response.debug.with_month.map(String);
+                        }
+
+                        // 2) ALSO inspect returned subcategory data: if ANY returned item has month_id -> month should show
+                        // (this covers cases where backend did not send with_month array)
+                        let dataHasMonth = false;
+                        if (response.data && Array.isArray(response.data)) {
+                            for (let i = 0; i < response.data.length; i++) {
+                                const item = response.data[i];
+                                // handle both numeric 0/null and empty string cases
+                                if (item.hasOwnProperty('month_id') && item.month_id !== null &&
+                                    item.month_id !== '' && item.month_id !== 0) {
+                                    dataHasMonth = true;
+                                    break;
+                                }
+                                // fallback: if backend returns month_number or similar field
+                                if (item.hasOwnProperty('month_number') && item.month_number !==
+                                    null && item.month_number !== '') {
+                                    dataHasMonth = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Decide whether month dropdown should be visible:
+                        // show if any selected category is in categoriesWithMonth OR response data contains any subcategory with month_id
+                        const hasMonthCategoryFromDebug = selectedCategories.some(cat =>
+                            categoriesWithMonth.includes(cat));
+                        const shouldShowMonth = hasMonthCategoryFromDebug || dataHasMonth;
+
+                        if (shouldShowMonth || selectedMonths.length > 0) {
+                            $('#monthContainer').removeClass('d-none');
+                        } else {
+                            $('#monthContainer').addClass('d-none');
+                            $('.month-checkbox').prop('checked', false);
+                            $('#selectedMonths').text('Choose');
+                            $('#selectedMonthValues').val('');
+                        }
+
+                        // Render subcategories (if any)
+                        if (response.success && response.data && response.data.length > 0) {
+                            const html = response.data.map(item => {
+                                // Safely display name; ensure item.name exists
+                                const name = item.name || item.title || 'Unnamed';
+                                return `
+                        <li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="subcategory-checkbox" value="${item.id}">
+                                ${name}
+                            </label>
+                        </li>`;
+                            }).join('');
                             $('#subcategoryMenu').html(html);
                             $('#subcategoryContainer').removeClass('d-none');
                         } else {
-                            $('#subcategoryContainer').addClass('d-none');
                             $('#subcategoryMenu').empty();
+                            $('#subcategoryContainer').addClass('d-none');
+
+                            // if we need month selection but user hasn't selected a month -> show alert
+                            if (shouldShowMonth && selectedMonths.length === 0) {
+                                alert('Please select month to view related subcategories');
+                            }
                         }
                     },
-                    error: function(err) {
-                        console.log('AJAX Error:', err);
+                    error: function(xhr, status, error) {
+                        console.error('API Error:', status, error, xhr && xhr.responseText);
+                        // keep UI stable
+                        $('#subcategoryContainer').addClass('d-none');
                     }
-                },
-                error: function(err) {
-                    console.log('AJAX Error:', err);
-                }
                 });
             });
-            
-            $(document).on('change', '.month-checkbox', function () {
+
+
+            $(document).on('change', '.month-checkbox', function() {
                 let selected = [];
-                $('.month-checkbox:checked').each(function () {
+                $('.month-checkbox:checked').each(function() {
                     selected.push($(this).val());
                 });
 
@@ -410,7 +454,8 @@
                     selected.push($(this).val());
                 });
                 $('#selectedSubcategoryValues').val(selected);
-                $('#selectedSubcategories').text(selected.length ? selected.length + ' selected' : 'Choose');
+                $('#selectedSubcategories').text(selected.length ? selected.length + ' selected' :
+                    'Choose');
             });
 
         });
@@ -419,7 +464,9 @@
         #create-post-content-form .dropdown-container {
             position: relative;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown, #create-post-content-form .dropdown-container button#subcategoryDropdown {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown,
+        #create-post-content-form .dropdown-container button#subcategoryDropdown {
             padding: calc(.8555rem - 1px) calc(1rem - 1px);
             height: 3.0000625rem;
             min-height: 3.0000625rem;
@@ -428,9 +475,10 @@
             border-color: #c8ced1 !important;
             justify-content: space-between;
         }
-        
 
-        #create-post-content-form .dropdown-container button#categoryDropdown + label, #create-post-content-form .dropdown-container button#subcategoryDropdown + label {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown+label,
+        #create-post-content-form .dropdown-container button#subcategoryDropdown+label {
             color: #f4d106 !important;
             top: 20px !important;
             position: absolute;
@@ -441,35 +489,39 @@
             opacity: 0;
             transition: all 0.5s ease-in-out;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown:focus + label, #create-post-content-form .dropdown-container button#subcategoryDropdown:focus + label {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown:focus+label,
+        #create-post-content-form .dropdown-container button#subcategoryDropdown:focus+label {
             top: -10px !important;
             background-color: #ffffff;
             opacity: 1;
             transition: all 0.5s ease-in-out;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown:focus, #create-post-content-form .dropdown-container button#subcategoryDropdown:focus {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown:focus,
+        #create-post-content-form .dropdown-container button#subcategoryDropdown:focus {
             border-color: #f4d106 !important;
         }
+
         #create-post-content-form .dropdown-container {
-        
+
             position: relative;
-        
+
         }
-        
+
         #create-post-content-form .dropdown-container button#categoryDropdown,
-        #create-post-content-form .dropdown-container button#monthDropdown
-         {        
-            padding: calc(.8555rem - 1px) calc(1rem - 1px);        
-            height: 3.0000625rem;        
-            min-height: 3.0000625rem;        
-            line-height: 1.375;        
-            background-color: #ffffff !important;        
-            border-color: #c8ced1 !important;        
+        #create-post-content-form .dropdown-container button#monthDropdown {
+            padding: calc(.8555rem - 1px) calc(1rem - 1px);
+            height: 3.0000625rem;
+            min-height: 3.0000625rem;
+            line-height: 1.375;
+            background-color: #ffffff !important;
+            border-color: #c8ced1 !important;
             justify-content: space-between;
         }
-        
-        #create-post-content-form .dropdown-container button#categoryDropdown + label,
-        #create-post-content-form .dropdown-container button#monthDropdown + label {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown+label,
+        #create-post-content-form .dropdown-container button#monthDropdown+label {
             color: #f4d106 !important;
             top: 20px !important;
             position: absolute;
@@ -480,13 +532,15 @@
             opacity: 0;
             transition: all 0.5s ease-in-out;
         }
-        #create-post-content-form .dropdown-container button#categoryDropdown:focus + label,
-        #create-post-content-form .dropdown-container button#monthDropdown:focus + label {
+
+        #create-post-content-form .dropdown-container button#categoryDropdown:focus+label,
+        #create-post-content-form .dropdown-container button#monthDropdown:focus+label {
             top: -10px !important;
             background-color: #ffffff;
             opacity: 1;
             transition: all 0.5s ease-in-out;
         }
+
         #create-post-content-form .dropdown-container button#categoryDropdown:focus,
         #create-post-content-form .dropdown-container button#monthDropdown:focus {
             border-color: #f4d106 !important;
